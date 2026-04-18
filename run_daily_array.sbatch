@@ -16,9 +16,9 @@ module load py-pytorch/2.0.0_py39
 module unload py-scipy
 
 export PYTHONNOUSERSITE=1
-export PYTHONPATH=/home/users/nberrios/miniconda3/envs/das/lib/python3.9/site-packages:/share/software/user/open/py-pytorch/2.0.0_py39/lib/python3.9/site-packages:/home/groups/edunham/nberrios/safod_das/DAS-utilities/python
+export PYTHONPATH=/home/users/nberrios/miniconda3/envs/das/lib/python3.9/site-packages:/share/software/user/open/py-pytorch/2.0.0_py39/lib/python3.9/site-packages:/home/groups/ettore88/nberrios/safod_das_git/DAS-utilities/python
 
-cd /home/groups/edunham/nberrios/safod_das || exit 1
+cd /home/groups/ettore88/nberrios/safod_das_git || exit 1
 
 mkdir -p logs
 
