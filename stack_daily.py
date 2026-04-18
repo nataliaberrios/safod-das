@@ -10,8 +10,6 @@ from cc_tools import temporal_normalization, computeCC
 CSV     = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv"
 OUT_DIR = "/oak/stanford/groups/ettore88/nberrios"
 
-NFILES_PER_DAY = 1440   # 1 file per minute, 1440 min per day
-
 ch_start, ch_end         = 150, 800
 virtual_source_original  = 200
 
@@ -29,10 +27,9 @@ UTC_OFFSET     = -7
 
 # --- get day index from SLURM array task ID ---
 day_idx = int(os.environ.get("SLURM_ARRAY_TASK_ID", sys.argv[1] if len(sys.argv) > 1 else 0))
-FILE_START_INDEX = day_idx * NFILES_PER_DAY
 
 # --- load CSV ---
-print(f"Day index: {day_idx}  FILE_START_INDEX: {FILE_START_INDEX}")
+print(f"Day index: {day_idx}")
 db = pd.read_csv(CSV, delim_whitespace=True).drop_duplicates()
 db = db[db["nSamples"] > 0].reset_index(drop=True)
 db["startTime_dt"] = pd.to_datetime(db["startTime"], errors="coerce", utc=True)
@@ -40,20 +37,22 @@ db["endTime_dt"]   = pd.to_datetime(db["endTime"],   errors="coerce", utc=True)
 db = db.dropna(subset=["startTime_dt", "endTime_dt"]).reset_index(drop=True)
 dur_s = (db["endTime_dt"] - db["startTime_dt"]).dt.total_seconds()
 db = db[dur_s > 1.0].reset_index(drop=True)
+db["date"] = db["startTime_dt"].dt.strftime("%Y-%m-%d")
 
-if FILE_START_INDEX >= len(db):
-    print(f"Day {day_idx}: FILE_START_INDEX {FILE_START_INDEX} >= total rows {len(db)}, skipping.")
+unique_dates = db["date"].drop_duplicates().tolist()
+if day_idx >= len(unique_dates):
+    print(f"Day {day_idx}: only {len(unique_dates)} valid dates available, skipping.")
     sys.exit(0)
 
-nfiles = min(NFILES_PER_DAY, len(db) - FILE_START_INDEX)
-selectedFiles = db["file"].iloc[FILE_START_INDEX:FILE_START_INDEX + nfiles].to_list()
+date_str = unique_dates[day_idx]
+db_day = db[db["date"] == date_str].reset_index(drop=True)
+selectedFiles = db_day["file"].to_list()
 
 if len(selectedFiles) == 0:
     print(f"Day {day_idx}: no files, skipping.")
     sys.exit(0)
 
-# --- use the calendar date of the first file as output tag ---
-date_str = db["startTime_dt"].iloc[FILE_START_INDEX].strftime("%Y-%m-%d")
+# --- use the calendar date as output tag ---
 print(f"Date: {date_str}  ({len(selectedFiles)} files)")
 
 # --- skip if already done ---
