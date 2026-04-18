@@ -1,0 +1,12 @@
+__pycache__/
+.ipynb_checkpoints/
+logs/
+
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+weekly_stacks_seismicity_day/
+weekly_stacks_seismicity_night/
