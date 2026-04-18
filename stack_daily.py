@@ -10,6 +10,20 @@ from cc_tools import temporal_normalization, computeCC
 CSV     = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv"
 OUT_DIR = "/oak/stanford/groups/ettore88/nberrios"
 
+DATA_ROOT_OLD = "/oak/stanford/groups/ettore88/data/SAFODAS1-harddrive-transfer"
+DATA_ROOT_NEW = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer"
+
+
+def normalize_file_path(path):
+    path = str(path)
+    if os.path.exists(path):
+        return path
+    if path.startswith(DATA_ROOT_OLD):
+        alt = path.replace(DATA_ROOT_OLD, DATA_ROOT_NEW, 1)
+        if os.path.exists(alt):
+            return alt
+    return path
+
 ch_start, ch_end         = 150, 800
 virtual_source_original  = 200
 
@@ -38,6 +52,7 @@ db = db.dropna(subset=["startTime_dt", "endTime_dt"]).reset_index(drop=True)
 dur_s = (db["endTime_dt"] - db["startTime_dt"]).dt.total_seconds()
 db = db[dur_s > 1.0].reset_index(drop=True)
 db["date"] = db["startTime_dt"].dt.strftime("%Y-%m-%d")
+db["file_norm"] = db["file"].map(normalize_file_path)
 
 unique_dates = db["date"].drop_duplicates().tolist()
 if day_idx >= len(unique_dates):
@@ -46,7 +61,8 @@ if day_idx >= len(unique_dates):
 
 date_str = unique_dates[day_idx]
 db_day = db[db["date"] == date_str].reset_index(drop=True)
-selectedFiles = db_day["file"].to_list()
+selectedFiles = db_day["file_norm"].tolist()
+selectedFiles = [f for f in selectedFiles if os.path.exists(f)]
 
 if len(selectedFiles) == 0:
     print(f"Day {day_idx}: no files, skipping.")
@@ -63,7 +79,7 @@ if os.path.exists(outfile_day) and os.path.exists(outfile_night):
     print(f"Output already exists for {date_str}, skipping.")
     sys.exit(0)
 
-file_to_time = db.set_index("file")["startTime_dt"].to_dict()
+file_to_time = db.set_index("file_norm")["startTime_dt"].to_dict()
 
 # --- get fs/dt from first file ---
 DAS0, info0 = DASutils.readFile_HDF(
