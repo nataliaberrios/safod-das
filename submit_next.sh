@@ -4,15 +4,24 @@
 # indices as a SLURM array job. Defaults to N=10.
 
 N=${1:-10}
+OUTPUT_VERSION=${OUTPUT_VERSION:-base}
+USE_TEMPORAL_NORMALIZATION=${USE_TEMPORAL_NORMALIZATION:-false}
+USE_SECOND_BANDPASS=${USE_SECOND_BANDPASS:-false}
 
 NEXT_INDICES=$(/home/users/nberrios/miniconda3/envs/das/bin/python - $N <<'EOF'
 import os, sys, pandas as pd
 
 CSV     = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv"
-OUT_DIR = "/oak/stanford/groups/ettore88/nberrios"
+BASE_OUTPUT_DIR = "/oak/stanford/groups/ettore88/nberrios"
+OUTPUT_VERSION = os.environ.get("OUTPUT_VERSION", "base")
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 10
 
-db = pd.read_csv(CSV, delim_whitespace=True).drop_duplicates()
+if OUTPUT_VERSION == "base":
+    OUT_DIR = BASE_OUTPUT_DIR
+else:
+    OUT_DIR = os.path.join(BASE_OUTPUT_DIR, OUTPUT_VERSION)
+
+db = pd.read_csv(CSV, sep=r'\s+').drop_duplicates()
 db = db[db["nSamples"] > 0].reset_index(drop=True)
 db["startTime_dt"] = pd.to_datetime(db["startTime"], errors="coerce", utc=True)
 db["endTime_dt"]   = pd.to_datetime(db["endTime"],   errors="coerce", utc=True)
@@ -41,4 +50,5 @@ if [ -z "$NEXT_INDICES" ]; then
 fi
 
 echo "Submitting day indices: $NEXT_INDICES"
-sbatch --array="$NEXT_INDICES" run_daily_array.sbatch
+echo "OUTPUT_VERSION=$OUTPUT_VERSION USE_TEMPORAL_NORMALIZATION=$USE_TEMPORAL_NORMALIZATION USE_SECOND_BANDPASS=$USE_SECOND_BANDPASS"
+sbatch --export=ALL,OUTPUT_VERSION="$OUTPUT_VERSION",USE_TEMPORAL_NORMALIZATION="$USE_TEMPORAL_NORMALIZATION",USE_SECOND_BANDPASS="$USE_SECOND_BANDPASS" --array="$NEXT_INDICES" run_daily_array.sbatch

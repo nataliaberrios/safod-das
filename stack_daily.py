@@ -9,7 +9,7 @@ from cc_tools import temporal_normalization, computeCC
 # ================== USER PARAMETERS ==================
 CSV             = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv"
 BASE_OUTPUT_DIR = "/oak/stanford/groups/ettore88/nberrios"
-OUTPUT_VERSION  = "base"   # e.g. "base", "tn", "tn_bp2"
+OUTPUT_VERSION  = os.environ.get("OUTPUT_VERSION", "base")   # e.g. "base", "tn", "tn_bp2"
 
 DATA_ROOT_OLD = "/oak/stanford/groups/ettore88/data/SAFODAS1-harddrive-transfer"
 DATA_ROOT_NEW = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer"
@@ -33,8 +33,8 @@ max_lag     = 1.0
 TN_WINDOW   = 20.0
 WINDOW_SEC  = 30.0
 OVERLAP     = 0.5
-USE_TEMPORAL_NORMALIZATION = False
-USE_SECOND_BANDPASS = False
+USE_TEMPORAL_NORMALIZATION = os.environ.get("USE_TEMPORAL_NORMALIZATION", "false").lower() == "true"
+USE_SECOND_BANDPASS = os.environ.get("USE_SECOND_BANDPASS", "false").lower() == "true"
 
 DAY_START_HOUR = 8
 DAY_END_HOUR   = 20

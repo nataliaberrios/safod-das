@@ -70,6 +70,12 @@ Submit missing dates in chunks:
 bash submit_next.sh 20
 ```
 
+Submit a comparison run with temporal normalization and a second bandpass:
+
+```bash
+OUTPUT_VERSION=tn_bp2 USE_TEMPORAL_NORMALIZATION=true USE_SECOND_BANDPASS=true bash submit_next.sh 20
+```
+
 Test one day explicitly:
 
 ```bash
