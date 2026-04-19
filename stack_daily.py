@@ -7,8 +7,9 @@ import DASutils
 from cc_tools import temporal_normalization, computeCC
 
 # ================== USER PARAMETERS ==================
-CSV     = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv"
-OUT_DIR = "/oak/stanford/groups/ettore88/nberrios"
+CSV             = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv"
+BASE_OUTPUT_DIR = "/oak/stanford/groups/ettore88/nberrios"
+OUTPUT_VERSION  = "base"   # e.g. "base", "tn", "tn_bp2"
 
 DATA_ROOT_OLD = "/oak/stanford/groups/ettore88/data/SAFODAS1-harddrive-transfer"
 DATA_ROOT_NEW = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer"
@@ -32,19 +33,30 @@ max_lag     = 1.0
 TN_WINDOW   = 20.0
 WINDOW_SEC  = 30.0
 OVERLAP     = 0.5
-DO_TEMP_NORM = False
+USE_TEMPORAL_NORMALIZATION = False
+USE_SECOND_BANDPASS = False
 
 DAY_START_HOUR = 8
 DAY_END_HOUR   = 20
 UTC_OFFSET     = -7
 # =====================================================
 
+if OUTPUT_VERSION == "base":
+    OUT_DIR = BASE_OUTPUT_DIR
+else:
+    OUT_DIR = os.path.join(BASE_OUTPUT_DIR, OUTPUT_VERSION)
+
 # --- get day index from SLURM array task ID ---
 day_idx = int(os.environ.get("SLURM_ARRAY_TASK_ID", sys.argv[1] if len(sys.argv) > 1 else 0))
 
 # --- load CSV ---
 print(f"Day index: {day_idx}")
-db = pd.read_csv(CSV, delim_whitespace=True).drop_duplicates()
+print(
+    f"OUTPUT_VERSION={OUTPUT_VERSION}  "
+    f"USE_TEMPORAL_NORMALIZATION={USE_TEMPORAL_NORMALIZATION}  "
+    f"USE_SECOND_BANDPASS={USE_SECOND_BANDPASS}"
+)
+db = pd.read_csv(CSV, sep=r"\s+").drop_duplicates()
 db = db[db["nSamples"] > 0].reset_index(drop=True)
 db["startTime_dt"] = pd.to_datetime(db["startTime"], errors="coerce", utc=True)
 db["endTime_dt"]   = pd.to_datetime(db["endTime"],   errors="coerce", utc=True)
@@ -127,8 +139,10 @@ for f in tqdm.tqdm(selectedFiles):
             Xraw   = X[:, i0:i0 + win_npts].copy()
             Xcombo = Xraw - np.median(Xraw, axis=0, keepdims=True)
             Xcombo = DASutils.bandpass2D_c(Xcombo, fmin, fmax, dt, zerophase=True)
-            if DO_TEMP_NORM:
+            if USE_TEMPORAL_NORMALIZATION:
                 Xcombo = temporal_normalization(Xcombo.copy(), fs, window_time=TN_WINDOW)
+            if USE_SECOND_BANDPASS:
+                Xcombo = DASutils.bandpass2D_c(Xcombo, fmin, fmax, dt, zerophase=True)
 
             cc_i = computeCC(Xcombo, dt, max_lag,
                              isource=isource,
@@ -145,14 +159,15 @@ for f in tqdm.tqdm(selectedFiles):
 
 # --- save ---
 common = dict(
-    date=date_str, day_idx=day_idx,
+    date=date_str, day_idx=day_idx, output_version=OUTPUT_VERSION,
     fs=fs, dt=dt,
     ch_start=ch_start, ch_end=ch_end,
     src=virtual_source_original,
     fmin=fmin, fmax=fmax,
     max_lag=max_lag,
     window_sec=WINDOW_SEC, overlap=OVERLAP,
-    do_temp_norm=DO_TEMP_NORM,
+    use_temporal_normalization=USE_TEMPORAL_NORMALIZATION,
+    use_second_bandpass=USE_SECOND_BANDPASS,
     day_start_hour=DAY_START_HOUR,
     day_end_hour=DAY_END_HOUR,
     utc_offset=UTC_OFFSET,
