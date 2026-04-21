@@ -14,7 +14,6 @@ OUTPUT_VERSION  = os.environ.get("OUTPUT_VERSION", "base")   # e.g. "base", "tn"
 DATA_ROOT_OLD = "/oak/stanford/groups/ettore88/data/SAFODAS1-harddrive-transfer"
 DATA_ROOT_NEW = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer"
 
-
 def normalize_file_path(path):
     path = str(path)
     if os.path.exists(path):
@@ -30,7 +29,7 @@ virtual_source_original  = 200
 
 fmin, fmax  = 5.0, 20.0
 max_lag     = 1.0
-TN_WINDOW   = 20.0
+TN_WINDOW = float(os.environ.get("TN_WINDOW", "10.0"))
 WINDOW_SEC  = 30.0
 OVERLAP     = 0.5
 USE_TEMPORAL_NORMALIZATION = os.environ.get("USE_TEMPORAL_NORMALIZATION", "false").lower() == "true"
