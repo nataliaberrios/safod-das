@@ -1,5 +1,5 @@
 """
-Canonical Lellouch et al. 2019 Figure 7c reproduction — single-day cross-correlation.
+Canonical Lellouch et al. 2019 Figure 7c reproduction cross-correlation.
 
 Faithful to the paper as far as possible given the differences in the dataset:
   - Bandpass:                    5-20 Hz
@@ -9,9 +9,9 @@ Faithful to the paper as far as possible given the differences in the dataset:
   - Spectral whitening:          OFF by default — Lellouch does not describe a
                                  whitening step (only running-AM). Optional knob
                                  via SANITY_WHITEN=true if you want to test it.
-  - Geometry (a):                virtual source at top of usable channel range (CH_START)
+  - Geometry (a):                virtual source at top of usable channel range by default
                                  receivers along array
-  - Stack across windows:        per-channel sum across all 30s windows in the day
+  - Stack across windows:        per-channel sum across all 30s windows in selected day(s)
 
 Not done in this script (intentionally — handled in sanity_plot.py):
   - Adjacent-channel pre-shifted stacking (R±10 with 3200 m/s shift). That is a
@@ -21,18 +21,24 @@ Not done in this script (intentionally — handled in sanity_plot.py):
 Differences from the paper that we accept:
   - Sampling rate: 500 Hz (vs Lellouch's 2500 Hz). Nyquist 250 Hz, so the 5-20 Hz
     CC band is fully usable.
-  - Gauge length: 16.3 m (vs Lellouch's 10 m). Increases relative amplitude of
-    along-fiber guided modes (tube/casing) — visible in the F-K diagnostic.
+  - Gauge length: 16.3 m (vs Lellouch's 10 m). In the 5-20 Hz band, the
+    finite-gauge sinc response is close to flat for both 3200 m/s body waves
+    and 1500 m/s guided/tube waves, so this is not expected to be a first-order
+    obstacle to reproduction.
 
 Inputs:
   SAFOD_CSV       : CSV manifest path (default oak path)
   SANITY_DATE     : YYYY-MM-DD (default 2024-10-23)
+  SANITY_DATES    : optional comma-separated date list or inclusive range
+                    YYYY-MM-DD:YYYY-MM-DD. Overrides SANITY_DATE.
   SANITY_CH_START : top channel of usable in-well array (default 150)
   SANITY_CH_END   : bottom channel exclusive (default 800)
+  SANITY_SOURCE_CH: virtual source channel (default SANITY_CH_START)
   SANITY_OUT      : output directory for the daily npz
 
 Output:
-  <SANITY_OUT>/sanity_cc_<DATE>.npz with cc, lags, channels, and parameters.
+  <SANITY_OUT>/sanity_cc_<DATE_TAG>_ch<START>-<END>_src<SOURCE>.npz
+  with cc, lags, channels, and parameters.
 """
 import os
 import sys
@@ -52,8 +58,10 @@ DATA_ROOT_OLD = "/oak/stanford/groups/ettore88/data/SAFODAS1-harddrive-transfer"
 DATA_ROOT_NEW = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer"
 
 TARGET_DATE = os.environ.get("SANITY_DATE", "2024-10-23")
+TARGET_DATES_ENV = os.environ.get("SANITY_DATES", "").strip()
 CH_START    = int(os.environ.get("SANITY_CH_START", "150"))
 CH_END      = int(os.environ.get("SANITY_CH_END",   "800"))
+SOURCE_CH   = int(os.environ.get("SANITY_SOURCE_CH", str(CH_START)))
 
 # Lellouch-faithful CC parameters
 FMIN, FMAX  = 5.0, 20.0
@@ -98,8 +106,27 @@ def normalize_path(p):
     return p
 
 
-def select_files(csv_path, date_str):
-    """Continuous-only daytime files for the target date."""
+def parse_target_dates():
+    """Return selected UTC date strings."""
+    if not TARGET_DATES_ENV:
+        return [TARGET_DATE]
+
+    if ":" in TARGET_DATES_ENV:
+        start, end = [x.strip() for x in TARGET_DATES_ENV.split(":", 1)]
+        dates = pd.date_range(start=start, end=end, freq="D")
+        return [d.strftime("%Y-%m-%d") for d in dates]
+
+    return [x.strip() for x in TARGET_DATES_ENV.split(",") if x.strip()]
+
+
+def make_date_tag(date_list):
+    if len(date_list) == 1:
+        return date_list[0]
+    return f"{date_list[0]}_to_{date_list[-1]}_{len(date_list)}d"
+
+
+def select_files(csv_path, date_list):
+    """Continuous-only daytime files for the target date(s)."""
     db = pd.read_csv(csv_path, sep=r"\s+").drop_duplicates()
     db = db[db["nSamples"] == 30000].reset_index(drop=True)  # continuous-only — drop ~20s event triggers
     db["startTime_dt"] = pd.to_datetime(db["startTime"], errors="coerce", utc=True)
@@ -108,30 +135,41 @@ def select_files(csv_path, date_str):
     db["hour"]      = db["startTime_dt"].dt.hour
     db["file_norm"] = db["file"].map(normalize_path)
     sel = db[
-        (db["date"] == date_str)
+        (db["date"].isin(date_list))
         & (db["hour"].isin(DAY_UTC_HOURS))
     ].copy()
     sel = sel[sel["file_norm"].map(os.path.exists)].reset_index(drop=True)
+    sel = sel.sort_values("startTime_dt").reset_index(drop=True)
     return sel
 
 
 def main():
+    target_dates = parse_target_dates()
+    date_tag = make_date_tag(target_dates)
+    if not (CH_START <= SOURCE_CH < CH_END):
+        print(f"SANITY_SOURCE_CH={SOURCE_CH} must be in [{CH_START}, {CH_END}). Aborting.")
+        sys.exit(5)
+
     print("=== SAFOD DAS canonical Lellouch CC pipeline ===")
-    print(f"Date         : {TARGET_DATE}")
+    print(f"Dates        : {', '.join(target_dates)}")
+    print(f"Date tag     : {date_tag}")
     print(f"Channels     : [{CH_START}, {CH_END})")
-    print(f"Source ch    : {CH_START} (top of usable array)")
+    print(f"Source ch    : {SOURCE_CH}")
     print(f"Bandpass     : {FMIN}-{FMAX} Hz")
     print(f"Window       : {WINDOW_SEC}s, overlap {OVERLAP}")
     print(f"Running-AM   : {TN_WINDOW_S} s")
     print(f"Whitening    : {'phase-only' if USE_WHITEN else 'off'}")
     print(f"Output       : {OUT_DIR}")
 
-    files_df = select_files(CSV, TARGET_DATE)
+    files_df = select_files(CSV, target_dates)
     files = files_df["file_norm"].tolist()
     if len(files) == 0:
-        print(f"No daytime continuous files for {TARGET_DATE}. Aborting.")
+        print(f"No daytime continuous files for {target_dates}. Aborting.")
         sys.exit(1)
     print(f"Selected {len(files)} daytime continuous files for CC.")
+    print("Files by date:")
+    for d, n in files_df.groupby("date").size().items():
+        print(f"  {d}: {n}")
 
     # Read first file to lock down fs/dt
     DAS0, info0 = DASutils.readFile_HDF(
@@ -144,7 +182,7 @@ def main():
     print(f"fs={fs} Hz   dt={dt:.6f} s")
 
     nch          = CH_END - CH_START
-    isource      = 0  # virtual source = first channel of slice = CH_START (top of array)
+    isource      = SOURCE_CH - CH_START
     win_npts     = int(WINDOW_SEC / dt)
     step_npts    = int(win_npts * (1 - OVERLAP))
     max_lag_npts = int(MAX_LAG / dt)
@@ -187,9 +225,9 @@ def main():
           f"(threshold {RMS_OUTLIER_MAD_K} MAD above median).")
     if bad_mask.sum() > 0:
         print(f"  Bad channels (absolute idx): {bad_channels.tolist()}")
-    if bad_mask[0]:
-        print("  WARNING: source channel (ch_start) flagged as bad. "
-              "CC will be unusable — pick a different ch_start or lower SANITY_BADCH_K.")
+    if bad_mask[isource]:
+        print("  WARNING: source channel flagged as bad. "
+              "CC will be unusable — pick a different SANITY_SOURCE_CH or lower SANITY_BADCH_K.")
         sys.exit(4)
 
     for f in tqdm.tqdm(files):
@@ -253,15 +291,17 @@ def main():
     lags    = np.arange(-max_lag_npts, max_lag_npts + 1) * dt
     channels = np.arange(CH_START, CH_END)
 
-    out_path = os.path.join(OUT_DIR, f"sanity_cc_{TARGET_DATE}.npz")
+    out_name = f"sanity_cc_{date_tag}_ch{CH_START}-{CH_END}_src{SOURCE_CH}.npz"
+    out_path = os.path.join(OUT_DIR, out_name)
     np.savez(
         out_path,
         cc=cc_mean,
         lags=lags,
         channels=channels,
-        date=TARGET_DATE,
+        date=date_tag,
+        target_dates=np.array(target_dates),
         ch_start=CH_START, ch_end=CH_END,
-        isource_idx=isource, source_channel=CH_START,
+        isource_idx=isource, source_channel=SOURCE_CH,
         fs=fs, dt=dt,
         fmin=FMIN, fmax=FMAX,
         window_sec=WINDOW_SEC, overlap=OVERLAP,

@@ -20,15 +20,17 @@ plotting choices without re-running CC.
 """
 import os
 import sys
+import glob
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 # ---------------- USER PARAMETERS ----------------
-DEFAULT_NPZ = os.environ.get(
-    "SANITY_NPZ",
-    "/oak/stanford/groups/ettore88/nberrios/sanity_v1/sanity_cc_2024-10-23.npz",
+DEFAULT_NPZ = os.environ.get("SANITY_NPZ", "")
+DEFAULT_NPZ_DIR = os.environ.get(
+    "SANITY_OUT",
+    "/oak/stanford/groups/ettore88/nberrios/sanity_v1",
 )
 
 V_AVG       = float(os.environ.get("SANITY_VAVG", "3200.0"))   # Lellouch's pre-shift velocity
@@ -43,6 +45,24 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 XLIM = (-0.4, 0.4)   # Lellouch Fig 7c is roughly ±0.3 s
 # -------------------------------------------------
+
+
+def resolve_npz_path():
+    if len(sys.argv) > 1:
+        return sys.argv[1]
+    if DEFAULT_NPZ:
+        return DEFAULT_NPZ
+
+    candidates = sorted(
+        glob.glob(os.path.join(DEFAULT_NPZ_DIR, "sanity_cc_*.npz")),
+        key=os.path.getmtime,
+    )
+    if not candidates:
+        raise FileNotFoundError(
+            f"No sanity_cc_*.npz files found in {DEFAULT_NPZ_DIR}. "
+            "Set SANITY_NPZ or pass the npz path as an argument."
+        )
+    return candidates[-1]
 
 
 def adjacent_pair_preshift_stack(cc, channels, isource_idx, dz_m, v_avg, pair_half, dt):
@@ -162,7 +182,7 @@ def plot_fk(cc, channels, dt, dz_m, out_png, title):
 
 
 def main():
-    npz_path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_NPZ
+    npz_path = resolve_npz_path()
     print(f"Loading {npz_path}")
     d = np.load(npz_path, allow_pickle=True)
     cc       = d["cc"]
@@ -176,6 +196,11 @@ def main():
     fmax      = float(d["fmax"])
     n_stack   = int(d["n_stack"])
     date_str  = str(d["date"])
+    use_whiten = bool(d["use_whiten"]) if "use_whiten" in d.files else False
+    ch_start = int(d["ch_start"]) if "ch_start" in d.files else int(channels[0])
+    ch_end = int(d["ch_end"]) if "ch_end" in d.files else int(channels[-1]) + 1
+    run_tag = f"{date_str}_ch{ch_start}-{ch_end}_src{source_ch}"
+    whitening_label = "phase-only whitening" if use_whiten else "whitening off"
 
     print(f"Date={date_str}  cc shape={cc.shape}  fs={fs}  n_stack={n_stack}")
     print(f"Bandpass {fmin}-{fmax} Hz   source channel = {source_ch}")
@@ -184,11 +209,11 @@ def main():
     title_raw = (
         f"Sanity CC — {date_str}, raw (no pair-stack)\n"
         f"src ch {source_ch}, {fmin}-{fmax} Hz, n_stack={n_stack}, "
-        f"running-AM 0.1 s, phase-only whitening"
+        f"running-AM 0.1 s, {whitening_label}"
     )
     plot_cc_panel(cc, lags, channels, source_ch, DZ_M, title_raw,
-                  os.path.join(OUT_DIR, f"cc_raw_{date_str}.png"))
-    print(f"Wrote cc_raw_{date_str}.png")
+                  os.path.join(OUT_DIR, f"cc_raw_{run_tag}.png"))
+    print(f"Wrote cc_raw_{run_tag}.png")
 
     # 2. Adjacent-channel pre-shift stack (Lellouch's R±10 @ V_AVG)
     print(f"Applying R±{PAIR_HALF} pre-shift stack at V_AVG={V_AVG:.0f} m/s...")
@@ -200,14 +225,14 @@ def main():
         f"src ch {source_ch}, {fmin}-{fmax} Hz, n_stack={n_stack} — Lellouch Fig 7c equivalent"
     )
     plot_cc_panel(cc_stack, lags, channels, source_ch, DZ_M, title_stack,
-                  os.path.join(OUT_DIR, f"cc_stacked_{date_str}.png"))
-    print(f"Wrote cc_stacked_{date_str}.png")
+                  os.path.join(OUT_DIR, f"cc_stacked_{run_tag}.png"))
+    print(f"Wrote cc_stacked_{run_tag}.png")
 
     # 3. F-K of the stacked CC
     plot_fk(cc_stack, channels, dt, DZ_M,
-            os.path.join(OUT_DIR, f"cc_fk_{date_str}.png"),
+            os.path.join(OUT_DIR, f"cc_fk_{run_tag}.png"),
             title=f"F-K of stacked CC — {date_str}")
-    print(f"Wrote cc_fk_{date_str}.png")
+    print(f"Wrote cc_fk_{run_tag}.png")
     print("Done.")
 
 

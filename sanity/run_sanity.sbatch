@@ -17,10 +17,12 @@
 #   sbatch --export=ALL,STAGE=plot      run_sanity.sbatch
 #   sbatch --export=ALL,STAGE=all       run_sanity.sbatch     # default
 #
-# Override target date and channel range by exporting before sbatch:
+# Override target date, channel range, and virtual source by exporting before sbatch:
 #   export SANITY_DATE=2024-10-23
+#   export SANITY_DATES=2024-10-22:2024-10-28
 #   export SANITY_CH_START=150
 #   export SANITY_CH_END=800
+#   export SANITY_SOURCE_CH=150
 #   sbatch --export=ALL run_sanity.sbatch
 
 set -euo pipefail
@@ -36,7 +38,7 @@ module unload py-scipy || true
 
 export PYTHONNOUSERSITE=1
 
-REPO_DIR="${REPO_DIR:-/home/groups/ettore88/nberrios/safod_das_git}"
+REPO_DIR="${REPO_DIR:-/home/groups/ettore88/nberrios/safod-das}"
 SANITY_DIR="${REPO_DIR}/sanity"
 PYTHON="${PYTHON:-/home/users/nberrios/miniconda3/envs/das/bin/python}"
 

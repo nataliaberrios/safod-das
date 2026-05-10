@@ -1,6 +1,6 @@
 # SAFOD DAS sanity reproduction of Lellouch et al. 2019 Fig 7c
 
-This directory is a clean, minimal, single-day pipeline that asks one question:
+This directory is a clean, minimal pipeline that asks one question:
 
 > Can the SAFOD DAS 2024–2025 dataset recover a body-wave Green's function from
 > ambient noise cross-correlation when run with the Lellouch et al. 2019 recipe
@@ -8,10 +8,10 @@ This directory is a clean, minimal, single-day pipeline that asks one question:
 
 If the answer is yes, the existing pipeline can be repaired toward this canonical
 configuration and the rest of the project (day/night, temporal monitoring, etc.)
-can rest on a validated CC. If the answer is no, the result itself is informative
-— it tells us body-wave energy is not present in the wavefield, or this geometry
-cannot recover it with one day of data — and we move on to a different scientific
-target.
+can rest on a validated CC. If one day fails, the next controlled checks are:
+stack more days, move the virtual source/top channel, and compare against the
+2017 data used by Lellouch et al. before deciding that the 2024 data cannot
+support this body-wave ambient-noise workflow.
 
 ## Target day
 
@@ -20,7 +20,13 @@ target.
   Parkfield (lowest in your processed range).
 - Wednesday → cultural noise is active.
 
-Override with `SANITY_DATE=YYYY-MM-DD` if you want a different day.
+Override with `SANITY_DATE=YYYY-MM-DD` if you want a different day. Use
+`SANITY_DATES` for multi-day stacks:
+
+```bash
+export SANITY_DATES=2024-10-22:2024-10-28          # inclusive range
+export SANITY_DATES=2024-10-22,2024-10-23,2024-10-24
+```
 
 ## Faithful Lellouch parameters
 
@@ -30,10 +36,10 @@ Override with `SANITY_DATE=YYYY-MM-DD` if you want a different day.
 | Window               | 30 s, 50% overlap       | 30 s, 50% overlap       |
 | Time normalization   | running-AM (Bensen 2007) | running-AM, **0.1 s window** |
 | Spectral whitening   | not described in paper  | **OFF by default** (optional knob `SANITY_WHITEN=true` for phase-only) |
-| Geometry (a) source  | top channel             | `ch_start` (= 150 default) |
+| Geometry (a) source  | top channel             | `SANITY_SOURCE_CH` (= `ch_start` by default) |
 | Receivers            | along array             | all channels in `[ch_start, ch_end)` |
 | Per-pair stacking    | R ± 10, pre-shifted at 3200 m/s | post-processed in `sanity_plot.py` |
-| Data length          | 1 day                   | 1 day daytime continuous-only |
+| Data length          | 1 day                   | 1 day by default; multi-day via `SANITY_DATES` |
 
 The previous pipeline used `TN_WINDOW = 10.0` s (~100× too long for body-wave CC),
 included event-triggered ~20 s files in the "continuous" stack, and never applied
@@ -44,7 +50,7 @@ the adjacent-channel pre-shift stack. Those are all corrected here.
 | Item               | Paper           | Here              | Why it's OK |
 |--------------------|-----------------|-------------------|-------------|
 | Sample rate        | 2500 Hz         | 500 Hz (after `Desample=20`) | Nyquist 250 Hz → 5–20 Hz CC band fully usable |
-| Gauge length       | 10 m            | 16 m              | Increases tube/casing-mode amplitude — visible in F-K diagnostic |
+| Gauge length       | 10 m            | 16 m              | In 5–20 Hz, the gauge-length sinc term is close to flat for 3200 m/s body waves and 1500 m/s guided/tube waves; not expected to be a first-order obstacle |
 | Year               | 2017            | 2024–2025         | Same fiber and well, but cultural noise patterns may have shifted |
 
 ## Files
@@ -53,8 +59,9 @@ the adjacent-channel pre-shift stack. Those are all corrected here.
   spectrogram, time-distance plot, and **F-K spectrum**. The F-K plot is the existence
   check: if there is no body-wave-velocity ridge in the wavefield, no CC trick will
   recover one.
-- `sanity_cc.py` — Canonical Lellouch CC for one day. Saves daily npz to
-  `/oak/stanford/groups/ettore88/nberrios/sanity_v1/sanity_cc_<DATE>.npz`.
+- `sanity_cc.py` — Canonical Lellouch CC for one or more days. Saves npz files to
+  `/oak/stanford/groups/ettore88/nberrios/sanity_v1/` with date, channel, and
+  source-channel tags.
 - `sanity_plot.py` — Loads the daily npz, applies R±10 pre-shifted stacking at
   3200 m/s, plots the Fig 7c equivalent and the F-K of the stacked CC.
 - `run_sanity.sbatch` — SLURM submission. `STAGE` env var picks the script.
@@ -76,7 +83,7 @@ Then on Sherlock:
 
 ```bash
 ssh nberrios@login.sherlock.stanford.edu
-cd /home/groups/ettore88/nberrios/safod_das_git
+cd /home/groups/ettore88/nberrios/safod-das
 git pull
 ls sanity/                                    # confirm files arrived
 ```
@@ -95,7 +102,7 @@ the `DAS-utilities/python` directory on `PYTHONPATH`).
 ### Step 1 — Pre-flight diagnostic (fast, ~few minutes)
 
 ```bash
-cd /home/groups/ettore88/nberrios/safod_das_git/sanity
+cd /home/groups/ettore88/nberrios/safod-das/sanity
 sbatch --export=ALL,STAGE=preflight run_sanity.sbatch
 ```
 
@@ -110,7 +117,7 @@ tail -f logs/safod_sanity_<JOBID>.out
 When it finishes, the four PNGs land here on Sherlock:
 
 ```
-/home/groups/ettore88/nberrios/safod_das_git/sanity/preflight_out/
+/home/groups/ettore88/nberrios/safod-das/sanity/preflight_out/
   rms_per_channel.png
   spectrogram.png
   timedist_one_file.png
@@ -122,7 +129,7 @@ Copy them back to your laptop to look at:
 ```bash
 # from your laptop
 mkdir -p ~/Documents/Claude/Projects/DAS/sanity_results
-rsync -avz nberrios@login.sherlock.stanford.edu:/home/groups/ettore88/nberrios/safod_das_git/sanity/preflight_out/ \
+rsync -avz nberrios@login.sherlock.stanford.edu:/home/groups/ettore88/nberrios/safod-das/sanity/preflight_out/ \
   ~/Documents/Claude/Projects/DAS/sanity_results/preflight_out/
 ```
 
@@ -142,10 +149,10 @@ the f-axis; tube/surface modes show up as *shallow* ridges near the k-axis.
 sbatch --export=ALL,STAGE=cc run_sanity.sbatch
 ```
 
-The daily output lands at:
+The output lands at a tagged path such as:
 
 ```
-/oak/stanford/groups/ettore88/nberrios/sanity_v1/sanity_cc_2024-10-23.npz
+/oak/stanford/groups/ettore88/nberrios/sanity_v1/sanity_cc_2024-10-23_ch150-800_src150.npz
 ```
 
 This stays on `oak` (not in the repo) because `.npz` files are heavy and shouldn't
@@ -162,10 +169,10 @@ sbatch --export=ALL,STAGE=plot run_sanity.sbatch
 Plots land at:
 
 ```
-/home/groups/ettore88/nberrios/safod_das_git/sanity/plot_out/
-  cc_raw_2024-10-23.png        # before pair-stacking
-  cc_stacked_2024-10-23.png    # Lellouch Fig 7c equivalent
-  cc_fk_2024-10-23.png         # F-K of stacked CC
+/home/groups/ettore88/nberrios/safod-das/sanity/plot_out/
+  cc_raw_<TAG>.png        # before pair-stacking
+  cc_stacked_<TAG>.png    # Lellouch Fig 7c equivalent
+  cc_fk_<TAG>.png         # F-K of stacked CC
 ```
 
 Then rsync them back the same way as the preflight outputs.
@@ -178,7 +185,7 @@ rsync -avz nberrios@login.sherlock.stanford.edu:/oak/stanford/groups/ettore88/nb
   ~/Documents/Claude/Projects/DAS/sanity_results/sanity_v1/
 
 cd ~/Documents/Claude/Projects/DAS/safod-das/sanity
-SANITY_NPZ=~/Documents/Claude/Projects/DAS/sanity_results/sanity_v1/sanity_cc_2024-10-23.npz \
+SANITY_NPZ=~/Documents/Claude/Projects/DAS/sanity_results/sanity_v1/sanity_cc_2024-10-23_ch150-800_src150.npz \
 SANITY_PLOT_OUT=~/Documents/Claude/Projects/DAS/sanity_results/plot_out \
 python sanity_plot.py
 ```
@@ -208,9 +215,19 @@ the PYTHONPATH or env activation mismatching.
 export SANITY_DATE=2024-10-24
 sbatch --export=ALL,STAGE=cc run_sanity.sbatch
 
+# multi-day stack
+export SANITY_DATES=2024-10-22:2024-10-28
+sbatch --export=ALL,STAGE=cc run_sanity.sbatch
+
 # tighter channel range after looking at the RMS plot
 export SANITY_CH_START=180
 export SANITY_CH_END=750
+sbatch --export=ALL,STAGE=cc run_sanity.sbatch
+
+# source-channel sweep inside the same receiver aperture
+export SANITY_CH_START=150
+export SANITY_CH_END=800
+export SANITY_SOURCE_CH=180
 sbatch --export=ALL,STAGE=cc run_sanity.sbatch
 
 # test phase-only whitening on top of strict-Lellouch (paper does NOT specify this)
@@ -240,7 +257,40 @@ are dominant in the recovered correlations.
 export SANITY_DATE=2024-10-24
 export SANITY_CH_START=150       # uphole/in-well boundary (verify with rms_per_channel.png)
 export SANITY_CH_END=800
+export SANITY_SOURCE_CH=150
 export SANITY_VAVG=3200.0        # pre-shift velocity for adjacent-channel stack
 export SANITY_PAIR_HALF=10       # R±10 -> 21-channel stack
 sbatch --export=ALL,STAGE=all run_sanity.sbatch
 ```
+
+## Controlled follow-up tests before abandoning 2024 body-wave CC
+
+1. **Stack more days.** Keep preprocessing fixed and increase the number of
+   daytime continuous files:
+
+   ```bash
+   export SANITY_DATES=2024-10-22:2024-10-28
+   export SANITY_CH_START=150
+   export SANITY_CH_END=800
+   export SANITY_SOURCE_CH=150
+   sbatch --export=ALL,STAGE=cc run_sanity.sbatch
+   sbatch --export=ALL,STAGE=plot run_sanity.sbatch
+   ```
+
+2. **Move the virtual source/top channel.** Keep the same channel aperture, but
+   test whether the chosen source channel is suppressing the result:
+
+   ```bash
+   for src in 150 180 200 250; do
+     export SANITY_SOURCE_CH=$src
+     sbatch --export=ALL,STAGE=cc run_sanity.sbatch
+   done
+   ```
+
+   Plot each output by passing `SANITY_NPZ=/oak/.../<tag>.npz` or by letting
+   `sanity_plot.py` pick the most recent `.npz`.
+
+3. **Run the same code on 2017 data.** Use the Lellouch-era data/manifest path
+   through `SAFOD_CSV` and, if needed, a matching `SANITY_CH_START`,
+   `SANITY_CH_END`, and `SANITY_SOURCE_CH`. This separates implementation
+   reproducibility from 2017-vs-2024 wavefield differences.
