@@ -72,6 +72,13 @@ WHITEN_WIN_HZ = 0.0        # 0 -> phase-only whitening when USE_WHITEN is True
 # October 2024 is PDT (DST), so UTC offset is -7. Day window in UTC is 17:00 - 03:00 next day.
 DAY_UTC_HOURS = set(list(range(17, 24)) + list(range(0, 3)))
 
+# Bad-channel masking. Channels whose median-of-window RMS is more than this
+# many MAD-multiples above the per-day median are zeroed out before CC, so they
+# don't contaminate the per-window running-AM normalization. The 2024-10-23
+# preflight RMS plot showed a clear ~30x spike near channel 310; this catches
+# that and any similar ones automatically.
+RMS_OUTLIER_MAD_K = float(os.environ.get("SANITY_BADCH_K", "8.0"))
+
 OUT_DIR = os.environ.get(
     "SANITY_OUT",
     "/oak/stanford/groups/ettore88/nberrios/sanity_v1",
@@ -151,6 +158,40 @@ def main():
     n_files_used = 0
     n_files_skipped = 0
 
+    # Pass 1: estimate per-channel RMS over the first few files to identify
+    # bad channels. We only need a rough estimate, so a handful of files suffices.
+    n_rms_files = min(5, len(files))
+    rms_accum = np.zeros(nch, dtype=np.float64)
+    rms_count = 0
+    for f in files[:n_rms_files]:
+        try:
+            DAS, _ = DASutils.readFile_HDF(
+                [f], 0.05, 24.0, verbose=0,
+                preproc=True, diff=True, taper=False,
+                desampling=True, nChbuffer=900, system="OptaSense",
+            )
+            Xrms = DAS[CH_START:CH_END, :].astype(np.float64, copy=False)
+            rms_accum += np.sqrt(np.mean(Xrms ** 2, axis=1))
+            rms_count += 1
+        except Exception as e:
+            print(f"  RMS pass: skipping {f}: {e}")
+    if rms_count == 0:
+        print("Could not estimate RMS for bad-channel masking. Aborting.")
+        sys.exit(3)
+    rms_per_ch = rms_accum / rms_count
+    med  = np.median(rms_per_ch)
+    mad  = np.median(np.abs(rms_per_ch - med)) + 1e-30
+    bad_mask = rms_per_ch > med + RMS_OUTLIER_MAD_K * 1.4826 * mad
+    bad_channels = np.where(bad_mask)[0] + CH_START
+    print(f"Bad-channel mask: {bad_mask.sum()} channels flagged "
+          f"(threshold {RMS_OUTLIER_MAD_K} MAD above median).")
+    if bad_mask.sum() > 0:
+        print(f"  Bad channels (absolute idx): {bad_channels.tolist()}")
+    if bad_mask[0]:
+        print("  WARNING: source channel (ch_start) flagged as bad. "
+              "CC will be unusable — pick a different ch_start or lower SANITY_BADCH_K.")
+        sys.exit(4)
+
     for f in tqdm.tqdm(files):
         try:
             DAS, info = DASutils.readFile_HDF(
@@ -159,6 +200,11 @@ def main():
                 desampling=True, nChbuffer=900, system="OptaSense",
             )
             X = DAS[CH_START:CH_END, :].astype(np.float64, copy=False)
+            # Zero out bad channels — they will not contribute to CC since
+            # CC of zero with anything is zero. They remain in the array shape
+            # so the channel index alignment downstream stays simple.
+            if bad_mask.any():
+                X[bad_mask, :] = 0.0
             npts = X.shape[1]
             if npts < win_npts:
                 n_files_skipped += 1
@@ -225,6 +271,9 @@ def main():
         n_stack=n_stack,
         n_files_used=n_files_used,
         n_files_skipped=n_files_skipped,
+        bad_channels=bad_channels,                    # absolute channel indices
+        bad_channel_threshold_mad=RMS_OUTLIER_MAD_K,
+        rms_per_channel=rms_per_ch,
     )
     print(f"Saved {out_path}  (n_stack={n_stack}, files_used={n_files_used}, skipped={n_files_skipped})")
     print("Done. Next: run sanity_plot.py against this npz.")
