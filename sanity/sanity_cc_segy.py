@@ -216,15 +216,18 @@ def main():
     # Minimum samples needed for scipy_decimate (padlen=27 at raw fs)
     MIN_SAMPLES_RAW = 50  # well above padlen=27
 
-    nch          = CH_END - CH_START
+    # actual channel count may be less than CH_END - CH_START when the array
+    # has fewer traces than CH_END (e.g. 118-channel OptaSense file with CH_END=800)
+    actual_nch   = min(CH_END, int(sel.iloc[0]["nTraces"])) - CH_START
     isource      = SOURCE_CH - CH_START
     win_npts     = int(WINDOW_SEC / dt)
     step_npts    = int(win_npts * (1 - OVERLAP))
     max_lag_npts = int(MAX_LAG / dt)
     n_lag        = 2 * max_lag_npts + 1
+    print(f"  Actual channels: {actual_nch}  (requested {CH_END - CH_START})")
 
     # ── bad-channel estimation from first few files ───────────────────────────
-    rms_accum = np.zeros(nch)
+    rms_accum = np.zeros(actual_nch)
     rms_count = 0
     for _, row in sel.iloc[:min(5, len(sel))].iterrows():
         try:
@@ -257,7 +260,7 @@ def main():
         sys.exit(4)
 
     # ── main CC loop ──────────────────────────────────────────────────────────
-    cc_sum  = np.zeros((nch, n_lag), dtype=np.float64)
+    cc_sum  = np.zeros((actual_nch, n_lag), dtype=np.float64)
     n_stack = 0
     n_used  = 0
     n_skip  = 0
@@ -295,7 +298,7 @@ def main():
                 Xw = temporal_normalization(Xw, work_fs, window_time=TN_WINDOW_S)
 
                 cc_sum += computeCC(Xw, dt, MAX_LAG, isource=isource,
-                                    ch_buffer_in=nch, whitening_params=None)
+                                    ch_buffer_in=actual_nch, whitening_params=None)
                 n_stack += 1
 
             n_used += 1
@@ -310,7 +313,7 @@ def main():
 
     cc_mean  = cc_sum / n_stack
     lags     = np.arange(-max_lag_npts, max_lag_npts + 1) * dt
-    channels = np.arange(CH_START, CH_END)
+    channels = np.arange(CH_START, CH_START + actual_nch)
 
     out_name = (f"sanity_cc_segy_{date_tag}_hours{HOUR_MODE}"
                 f"_ch{CH_START}-{CH_END}_src{SOURCE_CH}.npz")
