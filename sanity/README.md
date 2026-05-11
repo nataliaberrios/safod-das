@@ -28,6 +28,11 @@ export SANITY_DATES=2024-10-22:2024-10-28          # inclusive range
 export SANITY_DATES=2024-10-22,2024-10-23,2024-10-24
 ```
 
+By default, the CC stage uses **all continuous files** for the selected UTC
+date(s), matching the paper's description more closely than the earlier
+daytime-only sanity run. Use `SANITY_HOURS=day` or `SANITY_HOURS=night` only
+when explicitly testing source timing.
+
 ## Faithful Lellouch parameters
 
 | Parameter            | Lellouch 2019           | This pipeline           |
@@ -39,7 +44,7 @@ export SANITY_DATES=2024-10-22,2024-10-23,2024-10-24
 | Geometry (a) source  | top channel             | `SANITY_SOURCE_CH` (= `ch_start` by default) |
 | Receivers            | along array             | all channels in `[ch_start, ch_end)` |
 | Per-pair stacking    | R ± 10, pre-shifted at 3200 m/s | post-processed in `sanity_plot.py` |
-| Data length          | 1 day                   | 1 day by default; multi-day via `SANITY_DATES` |
+| Data length          | 1 day                   | 1 day by default; multi-day via `SANITY_DATES`; all continuous files unless `SANITY_HOURS` is set |
 
 The previous pipeline used `TN_WINDOW = 10.0` s (~100× too long for body-wave CC),
 included event-triggered ~20 s files in the "continuous" stack, and never applied
@@ -152,7 +157,7 @@ sbatch --export=ALL,STAGE=cc run_sanity.sbatch
 The output lands at a tagged path such as:
 
 ```
-/oak/stanford/groups/ettore88/nberrios/sanity_v1/sanity_cc_2024-10-23_ch150-800_src150.npz
+/oak/stanford/groups/ettore88/nberrios/sanity_v1/sanity_cc_2024-10-23_hoursall_ch150-800_src150.npz
 ```
 
 This stays on `oak` (not in the repo) because `.npz` files are heavy and shouldn't
@@ -185,7 +190,7 @@ rsync -avz nberrios@login.sherlock.stanford.edu:/oak/stanford/groups/ettore88/nb
   ~/Documents/Claude/Projects/DAS/sanity_results/sanity_v1/
 
 cd ~/Documents/Claude/Projects/DAS/safod-das/sanity
-SANITY_NPZ=~/Documents/Claude/Projects/DAS/sanity_results/sanity_v1/sanity_cc_2024-10-23_ch150-800_src150.npz \
+SANITY_NPZ=~/Documents/Claude/Projects/DAS/sanity_results/sanity_v1/sanity_cc_2024-10-23_hoursall_ch150-800_src150.npz \
 SANITY_PLOT_OUT=~/Documents/Claude/Projects/DAS/sanity_results/plot_out \
 python sanity_plot.py
 ```
@@ -217,6 +222,13 @@ sbatch --export=ALL,STAGE=cc run_sanity.sbatch
 
 # multi-day stack
 export SANITY_DATES=2024-10-22:2024-10-28
+export SANITY_HOURS=all
+sbatch --export=ALL,STAGE=cc run_sanity.sbatch
+
+# source-timing tests, only after the all-hours run
+export SANITY_HOURS=day
+sbatch --export=ALL,STAGE=cc run_sanity.sbatch
+export SANITY_HOURS=night
 sbatch --export=ALL,STAGE=cc run_sanity.sbatch
 
 # tighter channel range after looking at the RMS plot
@@ -265,11 +277,12 @@ sbatch --export=ALL,STAGE=all run_sanity.sbatch
 
 ## Controlled follow-up tests before abandoning 2024 body-wave CC
 
-1. **Stack more days.** Keep preprocessing fixed and increase the number of
-   daytime continuous files:
+1. **Stack more days using all continuous files.** Keep preprocessing fixed and
+   increase the number of files without imposing a day/night source assumption:
 
    ```bash
    export SANITY_DATES=2024-10-22:2024-10-28
+   export SANITY_HOURS=all
    export SANITY_CH_START=150
    export SANITY_CH_END=800
    export SANITY_SOURCE_CH=150
@@ -277,12 +290,25 @@ sbatch --export=ALL,STAGE=all run_sanity.sbatch
    sbatch --export=ALL,STAGE=plot run_sanity.sbatch
    ```
 
-2. **Move the virtual source/top channel.** Keep the same channel aperture, but
+2. **Compare source timing.** After the all-hours result, explicitly test whether
+   daytime cultural noise helps or hurts the stack:
+
+   ```bash
+   for hours in day night; do
+     export SANITY_DATES=2024-10-22:2024-10-28
+     export SANITY_HOURS=$hours
+     export SANITY_SOURCE_CH=150
+     sbatch --export=ALL,STAGE=cc run_sanity.sbatch
+   done
+   ```
+
+3. **Move the virtual source/top channel.** Keep the same channel aperture, but
    test whether the chosen source channel is suppressing the result:
 
    ```bash
    for src in 150 180 200 250; do
      export SANITY_SOURCE_CH=$src
+     export SANITY_HOURS=all
      sbatch --export=ALL,STAGE=cc run_sanity.sbatch
    done
    ```
@@ -290,7 +316,7 @@ sbatch --export=ALL,STAGE=all run_sanity.sbatch
    Plot each output by passing `SANITY_NPZ=/oak/.../<tag>.npz` or by letting
    `sanity_plot.py` pick the most recent `.npz`.
 
-3. **Run the same code on 2017 data.** Use the Lellouch-era data/manifest path
+4. **Run the same code on 2017 data.** Use the Lellouch-era data/manifest path
    through `SAFOD_CSV` and, if needed, a matching `SANITY_CH_START`,
    `SANITY_CH_END`, and `SANITY_SOURCE_CH`. This separates implementation
    reproducibility from 2017-vs-2024 wavefield differences.

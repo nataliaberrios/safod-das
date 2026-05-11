@@ -20,6 +20,7 @@
 # Override target date, channel range, and virtual source by exporting before sbatch:
 #   export SANITY_DATE=2024-10-23
 #   export SANITY_DATES=2024-10-22:2024-10-28
+#   export SANITY_HOURS=all
 #   export SANITY_CH_START=150
 #   export SANITY_CH_END=800
 #   export SANITY_SOURCE_CH=150

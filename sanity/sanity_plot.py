@@ -199,7 +199,8 @@ def main():
     use_whiten = bool(d["use_whiten"]) if "use_whiten" in d.files else False
     ch_start = int(d["ch_start"]) if "ch_start" in d.files else int(channels[0])
     ch_end = int(d["ch_end"]) if "ch_end" in d.files else int(channels[-1]) + 1
-    run_tag = f"{date_str}_ch{ch_start}-{ch_end}_src{source_ch}"
+    hour_mode = str(d["hour_mode"]) if "hour_mode" in d.files else "unknown"
+    run_tag = f"{date_str}_hours{hour_mode}_ch{ch_start}-{ch_end}_src{source_ch}"
     whitening_label = "phase-only whitening" if use_whiten else "whitening off"
 
     print(f"Date={date_str}  cc shape={cc.shape}  fs={fs}  n_stack={n_stack}")
@@ -208,7 +209,7 @@ def main():
     # 1. Raw CC (no pair-stacking)
     title_raw = (
         f"Sanity CC — {date_str}, raw (no pair-stack)\n"
-        f"src ch {source_ch}, {fmin}-{fmax} Hz, n_stack={n_stack}, "
+        f"hours={hour_mode}, src ch {source_ch}, {fmin}-{fmax} Hz, n_stack={n_stack}, "
         f"running-AM 0.1 s, {whitening_label}"
     )
     plot_cc_panel(cc, lags, channels, source_ch, DZ_M, title_raw,
@@ -222,7 +223,7 @@ def main():
     )
     title_stack = (
         f"Sanity CC — {date_str}, R±{PAIR_HALF} pre-shifted stack at {V_AVG:.0f} m/s\n"
-        f"src ch {source_ch}, {fmin}-{fmax} Hz, n_stack={n_stack} — Lellouch Fig 7c equivalent"
+        f"hours={hour_mode}, src ch {source_ch}, {fmin}-{fmax} Hz, n_stack={n_stack}"
     )
     plot_cc_panel(cc_stack, lags, channels, source_ch, DZ_M, title_stack,
                   os.path.join(OUT_DIR, f"cc_stacked_{run_tag}.png"))

@@ -31,6 +31,8 @@ Inputs:
   SANITY_DATE     : YYYY-MM-DD (default 2024-10-23)
   SANITY_DATES    : optional comma-separated date list or inclusive range
                     YYYY-MM-DD:YYYY-MM-DD. Overrides SANITY_DATE.
+  SANITY_HOURS    : all, day, or night (default all). Lellouch-style reproduction
+                    should use all continuous files unless testing source timing.
   SANITY_CH_START : top channel of usable in-well array (default 150)
   SANITY_CH_END   : bottom channel exclusive (default 800)
   SANITY_SOURCE_CH: virtual source channel (default SANITY_CH_START)
@@ -59,6 +61,7 @@ DATA_ROOT_NEW = "/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-tra
 
 TARGET_DATE = os.environ.get("SANITY_DATE", "2024-10-23")
 TARGET_DATES_ENV = os.environ.get("SANITY_DATES", "").strip()
+HOUR_MODE   = os.environ.get("SANITY_HOURS", "all").strip().lower()
 CH_START    = int(os.environ.get("SANITY_CH_START", "150"))
 CH_END      = int(os.environ.get("SANITY_CH_END",   "800"))
 SOURCE_CH   = int(os.environ.get("SANITY_SOURCE_CH", str(CH_START)))
@@ -79,6 +82,8 @@ WHITEN_WIN_HZ = 0.0        # 0 -> phase-only whitening when USE_WHITEN is True
 # Daytime UTC band for filtering files (10 AM - 8 PM PDT = UTC-7 in October)
 # October 2024 is PDT (DST), so UTC offset is -7. Day window in UTC is 17:00 - 03:00 next day.
 DAY_UTC_HOURS = set(list(range(17, 24)) + list(range(0, 3)))
+ALL_UTC_HOURS = set(range(24))
+NIGHT_UTC_HOURS = ALL_UTC_HOURS - DAY_UTC_HOURS
 
 # Bad-channel masking. Channels whose median-of-window RMS is more than this
 # many MAD-multiples above the per-day median are zeroed out before CC, so they
@@ -125,8 +130,19 @@ def make_date_tag(date_list):
     return f"{date_list[0]}_to_{date_list[-1]}_{len(date_list)}d"
 
 
-def select_files(csv_path, date_list):
-    """Continuous-only daytime files for the target date(s)."""
+def selected_hour_set(hour_mode):
+    """Return selected UTC hours for all/day/night modes."""
+    if hour_mode == "all":
+        return ALL_UTC_HOURS
+    if hour_mode == "day":
+        return DAY_UTC_HOURS
+    if hour_mode == "night":
+        return NIGHT_UTC_HOURS
+    raise ValueError("SANITY_HOURS must be one of: all, day, night")
+
+
+def select_files(csv_path, date_list, hour_mode):
+    """Continuous-only files for the target date(s) and hour mode."""
     db = pd.read_csv(csv_path, sep=r"\s+").drop_duplicates()
     db = db[db["nSamples"] == 30000].reset_index(drop=True)  # continuous-only — drop ~20s event triggers
     db["startTime_dt"] = pd.to_datetime(db["startTime"], errors="coerce", utc=True)
@@ -134,9 +150,10 @@ def select_files(csv_path, date_list):
     db["date"]      = db["startTime_dt"].dt.strftime("%Y-%m-%d")
     db["hour"]      = db["startTime_dt"].dt.hour
     db["file_norm"] = db["file"].map(normalize_path)
+    hours = selected_hour_set(hour_mode)
     sel = db[
         (db["date"].isin(date_list))
-        & (db["hour"].isin(DAY_UTC_HOURS))
+        & (db["hour"].isin(hours))
     ].copy()
     sel = sel[sel["file_norm"].map(os.path.exists)].reset_index(drop=True)
     sel = sel.sort_values("startTime_dt").reset_index(drop=True)
@@ -146,6 +163,11 @@ def select_files(csv_path, date_list):
 def main():
     target_dates = parse_target_dates()
     date_tag = make_date_tag(target_dates)
+    try:
+        selected_hour_set(HOUR_MODE)
+    except ValueError as e:
+        print(str(e))
+        sys.exit(6)
     if not (CH_START <= SOURCE_CH < CH_END):
         print(f"SANITY_SOURCE_CH={SOURCE_CH} must be in [{CH_START}, {CH_END}). Aborting.")
         sys.exit(5)
@@ -153,6 +175,7 @@ def main():
     print("=== SAFOD DAS canonical Lellouch CC pipeline ===")
     print(f"Dates        : {', '.join(target_dates)}")
     print(f"Date tag     : {date_tag}")
+    print(f"Hour mode    : {HOUR_MODE}")
     print(f"Channels     : [{CH_START}, {CH_END})")
     print(f"Source ch    : {SOURCE_CH}")
     print(f"Bandpass     : {FMIN}-{FMAX} Hz")
@@ -161,12 +184,12 @@ def main():
     print(f"Whitening    : {'phase-only' if USE_WHITEN else 'off'}")
     print(f"Output       : {OUT_DIR}")
 
-    files_df = select_files(CSV, target_dates)
+    files_df = select_files(CSV, target_dates, HOUR_MODE)
     files = files_df["file_norm"].tolist()
     if len(files) == 0:
-        print(f"No daytime continuous files for {target_dates}. Aborting.")
+        print(f"No {HOUR_MODE}-hours continuous files for {target_dates}. Aborting.")
         sys.exit(1)
-    print(f"Selected {len(files)} daytime continuous files for CC.")
+    print(f"Selected {len(files)} {HOUR_MODE}-hours continuous files for CC.")
     print("Files by date:")
     for d, n in files_df.groupby("date").size().items():
         print(f"  {d}: {n}")
@@ -291,7 +314,7 @@ def main():
     lags    = np.arange(-max_lag_npts, max_lag_npts + 1) * dt
     channels = np.arange(CH_START, CH_END)
 
-    out_name = f"sanity_cc_{date_tag}_ch{CH_START}-{CH_END}_src{SOURCE_CH}.npz"
+    out_name = f"sanity_cc_{date_tag}_hours{HOUR_MODE}_ch{CH_START}-{CH_END}_src{SOURCE_CH}.npz"
     out_path = os.path.join(OUT_DIR, out_name)
     np.savez(
         out_path,
@@ -300,6 +323,8 @@ def main():
         channels=channels,
         date=date_tag,
         target_dates=np.array(target_dates),
+        hour_mode=HOUR_MODE,
+        selected_hours=np.array(sorted(selected_hour_set(HOUR_MODE))),
         ch_start=CH_START, ch_end=CH_END,
         isource_idx=isource, source_channel=SOURCE_CH,
         fs=fs, dt=dt,
