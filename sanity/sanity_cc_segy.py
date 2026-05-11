@@ -35,13 +35,31 @@ from cc_tools import temporal_normalization, computeCC
 
 def _segy_nt_from_trace_header(infile):
     """Read nSamples from first trace header bytes 115-116 (SEG-Y standard location)."""
-    import struct
     try:
         with open(infile, 'rb') as f:
-            f.seek(3600 + 114)  # text(3200) + binary(400) + 114 bytes into first trace header
+            f.seek(3600 + 114)
             return int.from_bytes(f.read(2), byteorder='big', signed=False)
     except Exception:
         return 0
+
+
+def _segy_ns_ntr_from_filesize(infile, fs, max_seconds=300):
+    """Recover (nSamples, nTraces) when header nSamples=0 (OptaSense: >65535 samples).
+
+    Tries multiples of fs (round-second durations) since OptaSense files are
+    always an integer number of seconds.  Returns (0, 0) on failure.
+    """
+    filesize = os.path.getsize(infile)
+    data_bytes = filesize - 3600  # subtract text + binary file headers
+    fs_int = int(round(fs))
+    for n_sec in range(1, max_seconds + 1):
+        ns = fs_int * n_sec
+        record_size = 240 + ns * 4
+        if data_bytes % record_size == 0:
+            ntr = data_bytes // record_size
+            if 1 <= ntr <= 5000:
+                return ns, ntr
+    return 0, 0
 
 # ── parameters ────────────────────────────────────────────────────────────────
 SEGY_DIR    = os.environ.get("SEGY_DIR", "")
@@ -110,10 +128,8 @@ def build_manifest(segy_dir):
         try:
             nt, fs, t0, t1, ntr = DASutils.read_PASSCAL_SEGY_headers(f)
             if nt == 0:
-                # Binary header nSamples field is 0 (OptaSense quirk) — read from trace header
-                nt = _segy_nt_from_trace_header(f)
-                if nt > 0:
-                    ntr = int((os.path.getsize(f) - 3600) / (240 + nt * 4))
+                # nSamples exceeds uint16 max (OptaSense >65535 samples) — recover from file size
+                nt, ntr = _segy_ns_ntr_from_filesize(f, fs if fs > 0 else 2500.0)
             rows.append(dict(file=f, startTime=t0, endTime=t1,
                              fs=fs, nTraces=ntr, nSamples=nt))
         except Exception as e:
