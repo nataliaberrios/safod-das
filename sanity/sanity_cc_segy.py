@@ -170,11 +170,19 @@ def main():
         sys.exit(1)
     print(f"Selected {len(sel)} file(s) for processing.")
 
+    # Diagnostic: show first file dimensions
+    row0 = sel.iloc[0]
+    print(f"  First file: nSamples={int(row0['nSamples'])}, nTraces={int(row0['nTraces'])}, "
+          f"start={row0['startTime']}, end={row0['endTime']}")
+
     # Determine working fs from first file
     raw_fs  = float(sel.iloc[0]["fs"])
     work_fs = raw_fs / DECIMATE_Q if DECIMATE_Q > 1 else raw_fs
     dt      = 1.0 / work_fs
     print(f"  Raw fs={raw_fs} Hz  →  working fs={work_fs:.2f} Hz  dt={dt:.6f} s")
+
+    # Minimum samples needed for scipy_decimate (padlen=27 at raw fs)
+    MIN_SAMPLES_RAW = 50  # well above padlen=27
 
     nch          = CH_END - CH_START
     isource      = SOURCE_CH - CH_START
@@ -189,6 +197,10 @@ def main():
     for _, row in sel.iloc[:min(5, len(sel))].iterrows():
         try:
             X = load_segy(row, CH_START, CH_END)
+            print(f"  RMS scan file shape: {X.shape}  ({row['file'].split('/')[-1]})")
+            if X.shape[1] < MIN_SAMPLES_RAW:
+                print(f"  RMS scan skip: only {X.shape[1]} samples (need >{MIN_SAMPLES_RAW})")
+                continue
             if DO_DIFF:
                 X = DASutils.preprocess_diff(X, 1.0 / raw_fs)
             if DECIMATE_Q > 1:
