@@ -25,6 +25,17 @@
 #   export SANITY_CH_END=800
 #   export SANITY_SOURCE_CH=150
 #   sbatch --export=ALL run_sanity.sbatch
+#
+# For 2017 SEG-Y data (STAGE=cc_segy):
+#   export SEGY_DIR=/scratch/groups/ettore88/dataTMP/SAFOD_DAS_Experimental-1/DT13_GL7
+#   export SANITY_DATE=2017-06-14          # or SANITY_DATES=2017-06-14:2017-06-21
+#   export SANITY_CH_START=0
+#   export SANITY_CH_END=800
+#   export SANITY_SOURCE_CH=0
+#   export SANITY_DIFF=true
+#   export SANITY_DECIMATE=40
+#   export SANITY_OUT=/oak/stanford/groups/ettore88/nberrios/sanity_segy
+#   sbatch --export=ALL,STAGE=cc_segy run_sanity.sbatch
 
 set -euo pipefail
 
@@ -59,6 +70,11 @@ run_cc() {
     "${PYTHON}" sanity_cc.py
 }
 
+run_cc_segy() {
+    echo "=== Running sanity_cc_segy.py ==="
+    "${PYTHON}" sanity_cc_segy.py
+}
+
 run_plot() {
     echo "=== Running sanity_plot.py ==="
     "${PYTHON}" sanity_plot.py
@@ -67,6 +83,7 @@ run_plot() {
 case "${STAGE}" in
     preflight) run_preflight ;;
     cc)        run_cc ;;
+    cc_segy)   run_cc_segy ;;
     plot)      run_plot ;;
     all)
         run_preflight
@@ -74,7 +91,7 @@ case "${STAGE}" in
         run_plot
         ;;
     *)
-        echo "Unknown STAGE='${STAGE}'. Use one of: preflight | cc | plot | all"
+        echo "Unknown STAGE='${STAGE}'. Use one of: preflight | cc | cc_segy | plot | all"
         exit 1
         ;;
 esac
