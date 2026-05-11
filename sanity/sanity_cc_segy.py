@@ -71,6 +71,7 @@ CH_END      = int(os.environ.get("SANITY_CH_END",    "800"))
 SOURCE_CH   = int(os.environ.get("SANITY_SOURCE_CH", str(CH_START)))
 DO_DIFF     = os.environ.get("SANITY_DIFF",     "true").lower() == "true"
 DECIMATE_Q  = int(os.environ.get("SANITY_DECIMATE", "40"))   # 2500 → 62.5 Hz
+SEGY_SUFFIX = os.environ.get("SANITY_FILE_SUFFIX", "").strip()  # e.g. ".814+0000.sgy"
 OUT_DIR     = os.environ.get("SANITY_OUT",
               "/oak/stanford/groups/ettore88/nberrios/sanity_segy")
 
@@ -117,6 +118,8 @@ def build_manifest(segy_dir):
         files.extend(glob.glob(os.path.join(segy_dir, "**", pat), recursive=True))
         files.extend(glob.glob(os.path.join(segy_dir, pat)))
     files = sorted(set(files))
+    if SEGY_SUFFIX:
+        files = [f for f in files if os.path.basename(f).endswith(SEGY_SUFFIX)]
 
     if not files:
         print(f"No SEG-Y files found in {segy_dir}")
