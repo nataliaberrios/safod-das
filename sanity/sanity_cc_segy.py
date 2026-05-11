@@ -32,6 +32,17 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import DASutils
 from cc_tools import temporal_normalization, computeCC
 
+
+def _segy_nt_from_trace_header(infile):
+    """Read nSamples from first trace header bytes 115-116 (SEG-Y standard location)."""
+    import struct
+    try:
+        with open(infile, 'rb') as f:
+            f.seek(3600 + 114)  # text(3200) + binary(400) + 114 bytes into first trace header
+            return int.from_bytes(f.read(2), byteorder='big', signed=False)
+    except Exception:
+        return 0
+
 # ── parameters ────────────────────────────────────────────────────────────────
 SEGY_DIR    = os.environ.get("SEGY_DIR", "")
 TARGET_DATE = os.environ.get("SANITY_DATE",  "2017-09-20")
@@ -98,6 +109,11 @@ def build_manifest(segy_dir):
     for f in tqdm.tqdm(files):
         try:
             nt, fs, t0, t1, ntr = DASutils.read_PASSCAL_SEGY_headers(f)
+            if nt == 0:
+                # Binary header nSamples field is 0 (OptaSense quirk) — read from trace header
+                nt = _segy_nt_from_trace_header(f)
+                if nt > 0:
+                    ntr = int((os.path.getsize(f) - 3600) / (240 + nt * 4))
             rows.append(dict(file=f, startTime=t0, endTime=t1,
                              fs=fs, nTraces=ntr, nSamples=nt))
         except Exception as e:
