@@ -75,6 +75,11 @@ run_cc_segy() {
     "${PYTHON}" sanity_cc_segy.py
 }
 
+run_cc_segy_cmn() {
+    echo "=== Running sanity_cc_segy_cmn.py ==="
+    "${PYTHON}" sanity_cc_segy_cmn.py
+}
+
 run_plot() {
     echo "=== Running sanity_plot.py ==="
     "${PYTHON}" sanity_plot.py
@@ -83,7 +88,8 @@ run_plot() {
 case "${STAGE}" in
     preflight) run_preflight ;;
     cc)        run_cc ;;
-    cc_segy)   run_cc_segy ;;
+    cc_segy)     run_cc_segy ;;
+    cc_segy_cmn) run_cc_segy_cmn ;;
     plot)      run_plot ;;
     all)
         run_preflight
@@ -91,7 +97,7 @@ case "${STAGE}" in
         run_plot
         ;;
     *)
-        echo "Unknown STAGE='${STAGE}'. Use one of: preflight | cc | cc_segy | plot | all"
+        echo "Unknown STAGE='${STAGE}'. Use one of: preflight | cc | cc_segy | cc_segy_cmn | plot | all"
         exit 1
         ;;
 esac
