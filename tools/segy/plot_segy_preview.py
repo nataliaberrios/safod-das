@@ -277,6 +277,14 @@ def apply_bandpass(data: np.ndarray, fs: float, bandpass: list[float] | None) ->
     return sosfiltfilt(sos, data, axis=1).astype(np.float32)
 
 
+def decimate_for_display(data: np.ndarray, fs: float, factor: int) -> tuple[np.ndarray, float]:
+    if factor <= 1:
+        return data, fs
+    if data.shape[1] < factor:
+        return data, fs
+    return data[:, ::factor], fs / factor if fs > 0 else fs
+
+
 def plot_time_distance(
     data: np.ndarray,
     fs: float,
@@ -359,6 +367,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--time-start", type=float, default=0.0, help="Seconds from file start to begin plot")
     parser.add_argument("--time-max", type=float, default=10.0, help="Seconds to plot from file start")
     parser.add_argument("--bandpass", nargs=2, type=float, default=None, metavar=("FMIN", "FMAX"))
+    parser.add_argument(
+        "--display-decimate",
+        type=int,
+        default=1,
+        help="Keep every Nth time sample for plotting after filtering",
+    )
     parser.add_argument("--clip-percentile", type=float, default=99.0, help="Symmetric plot clip percentile")
     parser.add_argument("--median-subtract", action="store_true", help="Subtract median trace at each time sample")
     parser.add_argument(
@@ -402,12 +416,15 @@ def main() -> None:
     data = read_preview_data(segy_file, header, dasutils, args.trace_start, trace_count)
     data = select_time_window(data, fs, args.time_start, args.time_max)
     data = apply_bandpass(data, fs, args.bandpass)
+    data, fs_plot = decimate_for_display(data, fs, args.display_decimate)
     data_plot = preprocess_for_plot(data, args.median_subtract, args.trace_normalize)
 
     stem = segy_file.name.replace(".gz", "").replace(".segy", "").replace(".sgy", "")
     suffix = f"tr{args.trace_start}-{args.trace_start + trace_count}"
     if args.bandpass is not None:
         suffix += f"_bp{args.bandpass[0]:g}-{args.bandpass[1]:g}Hz"
+    if args.display_decimate > 1:
+        suffix += f"_dispdec{args.display_decimate}"
     header_txt = out_dir / f"{stem}_{suffix}_header.txt"
     td_png = out_dir / f"{stem}_{suffix}_timedist.png"
     rms_png = out_dir / f"{stem}_{suffix}_rms.png"
@@ -415,7 +432,7 @@ def main() -> None:
     write_header(header, header_txt, segy_file)
     plot_time_distance(
         data_plot,
-        fs,
+        fs_plot,
         args.trace_start,
         f"{segy_file.name} traces {args.trace_start}-{args.trace_start + trace_count}",
         td_png,
