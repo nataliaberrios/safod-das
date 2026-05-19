@@ -61,6 +61,12 @@ def _segy_ns_ntr_from_filesize(infile, fs, max_seconds=300):
                 return ns, ntr
     return 0, 0
 
+
+def _segy_end_time_from_samples(start_time, n_samples, fs):
+    if fs <= 0 or n_samples <= 0:
+        return start_time
+    return start_time + pd.to_timedelta(float(n_samples) / float(fs), unit="s")
+
 # ── parameters ────────────────────────────────────────────────────────────────
 SEGY_DIR    = os.environ.get("SEGY_DIR", "")
 TARGET_DATE = os.environ.get("SANITY_DATE",  "2017-09-20")
@@ -133,6 +139,7 @@ def build_manifest(segy_dir):
             if nt == 0:
                 # nSamples exceeds uint16 max (OptaSense >65535 samples) — recover from file size
                 nt, ntr = _segy_ns_ntr_from_filesize(f, fs if fs > 0 else 2500.0)
+                t1 = _segy_end_time_from_samples(t0, nt, fs if fs > 0 else 2500.0)
             rows.append(dict(file=f, startTime=t0, endTime=t1,
                              fs=fs, nTraces=ntr, nSamples=nt))
         except Exception as e:
