@@ -228,11 +228,15 @@ def fill_missing_sample_count(
         header["file_size_leftover_bytes"] = int(leftover)
 
 
-def preprocess_for_plot(data: np.ndarray, median_subtract: bool) -> np.ndarray:
+def preprocess_for_plot(data: np.ndarray, median_subtract: bool, trace_normalize: bool) -> np.ndarray:
     data = np.asarray(data, dtype=np.float32)
     data = data - np.nanmean(data, axis=1, keepdims=True)
     if median_subtract:
         data = data - np.nanmedian(data, axis=0, keepdims=True)
+    if trace_normalize:
+        scale = np.nanpercentile(np.abs(data), 99.0, axis=1, keepdims=True)
+        scale[~np.isfinite(scale) | (scale == 0)] = 1.0
+        data = data / scale
     return np.nan_to_num(data)
 
 
@@ -317,6 +321,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--time-max", type=float, default=10.0, help="Seconds to plot from file start")
     parser.add_argument("--clip-percentile", type=float, default=99.0, help="Symmetric plot clip percentile")
     parser.add_argument("--median-subtract", action="store_true", help="Subtract median trace at each time sample")
+    parser.add_argument(
+        "--trace-normalize",
+        action="store_true",
+        help="Scale each trace by its own 99th percentile absolute amplitude for visual QC",
+    )
     parser.add_argument("--out-dir", default="segy_preview_out", help="Output directory for PNGs/header")
     return parser.parse_args()
 
@@ -350,7 +359,7 @@ def main() -> None:
     print(f"Reading traces {args.trace_start}:{args.trace_start + trace_count}")
 
     data = read_preview_data(segy_file, header, dasutils, args.trace_start, trace_count)
-    data_plot = preprocess_for_plot(data, args.median_subtract)
+    data_plot = preprocess_for_plot(data, args.median_subtract, args.trace_normalize)
 
     stem = segy_file.name.replace(".gz", "").replace(".segy", "").replace(".sgy", "")
     suffix = f"tr{args.trace_start}-{args.trace_start + trace_count}"
