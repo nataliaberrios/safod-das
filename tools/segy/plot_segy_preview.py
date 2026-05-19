@@ -240,6 +240,43 @@ def preprocess_for_plot(data: np.ndarray, median_subtract: bool, trace_normalize
     return np.nan_to_num(data)
 
 
+def select_time_window(
+    data: np.ndarray,
+    fs: float,
+    time_start: float,
+    time_max: float | None,
+) -> np.ndarray:
+    if fs <= 0:
+        return data
+    i0 = max(0, int(round(time_start * fs)))
+    if time_max is None:
+        i1 = data.shape[1]
+    else:
+        i1 = min(data.shape[1], i0 + max(1, int(round(time_max * fs))))
+    if i0 >= data.shape[1] or i0 >= i1:
+        raise ValueError("Requested time window is outside the file.")
+    return data[:, i0:i1]
+
+
+def apply_bandpass(data: np.ndarray, fs: float, bandpass: list[float] | None) -> np.ndarray:
+    if bandpass is None:
+        return data
+    if fs <= 0:
+        raise ValueError("Cannot bandpass because sampling rate is unknown.")
+
+    fmin, fmax = bandpass
+    if not (0 < fmin < fmax < fs / 2):
+        raise ValueError(f"Invalid bandpass {fmin:g}-{fmax:g} Hz for fs={fs:g} Hz.")
+
+    try:
+        from scipy.signal import butter, sosfiltfilt
+    except Exception as exc:  # pragma: no cover - reported at runtime
+        raise RuntimeError("Bandpass preview requires scipy.") from exc
+
+    sos = butter(4, [fmin, fmax], btype="bandpass", fs=fs, output="sos")
+    return sosfiltfilt(sos, data, axis=1).astype(np.float32)
+
+
 def plot_time_distance(
     data: np.ndarray,
     fs: float,
@@ -247,20 +284,21 @@ def plot_time_distance(
     title: str,
     out_png: Path,
     clip_percentile: float,
-    time_max: float | None,
+    time_start: float,
 ) -> None:
     n_traces, n_samples = data.shape
-    if time_max is not None and fs > 0:
-        keep = max(1, min(n_samples, int(time_max * fs)))
-        data = data[:, :keep]
-        n_samples = keep
 
     clip = np.nanpercentile(np.abs(data), clip_percentile)
     if not np.isfinite(clip) or clip == 0:
         clip = np.nanmax(np.abs(data)) or 1.0
 
-    t1 = n_samples / fs if fs > 0 else n_samples
-    extent = [0, t1, trace_start + n_traces - 1, trace_start]
+    if fs > 0:
+        t0 = time_start
+        t1 = time_start + n_samples / fs
+    else:
+        t0 = 0.0
+        t1 = float(n_samples)
+    extent = [t0, t1, trace_start + n_traces - 1, trace_start]
 
     fig, ax = plt.subplots(figsize=(12, 8), constrained_layout=True)
     im = ax.imshow(
@@ -318,7 +356,9 @@ def parse_args() -> argparse.Namespace:
         default=60.0,
         help="Record length used when SEGY sample-count headers are zero",
     )
+    parser.add_argument("--time-start", type=float, default=0.0, help="Seconds from file start to begin plot")
     parser.add_argument("--time-max", type=float, default=10.0, help="Seconds to plot from file start")
+    parser.add_argument("--bandpass", nargs=2, type=float, default=None, metavar=("FMIN", "FMAX"))
     parser.add_argument("--clip-percentile", type=float, default=99.0, help="Symmetric plot clip percentile")
     parser.add_argument("--median-subtract", action="store_true", help="Subtract median trace at each time sample")
     parser.add_argument(
@@ -358,11 +398,16 @@ def main() -> None:
     print(f"Header: {header}")
     print(f"Reading traces {args.trace_start}:{args.trace_start + trace_count}")
 
+    fs = float(header.get("fs_hz", 0.0) or 0.0)
     data = read_preview_data(segy_file, header, dasutils, args.trace_start, trace_count)
+    data = select_time_window(data, fs, args.time_start, args.time_max)
+    data = apply_bandpass(data, fs, args.bandpass)
     data_plot = preprocess_for_plot(data, args.median_subtract, args.trace_normalize)
 
     stem = segy_file.name.replace(".gz", "").replace(".segy", "").replace(".sgy", "")
     suffix = f"tr{args.trace_start}-{args.trace_start + trace_count}"
+    if args.bandpass is not None:
+        suffix += f"_bp{args.bandpass[0]:g}-{args.bandpass[1]:g}Hz"
     header_txt = out_dir / f"{stem}_{suffix}_header.txt"
     td_png = out_dir / f"{stem}_{suffix}_timedist.png"
     rms_png = out_dir / f"{stem}_{suffix}_rms.png"
@@ -370,12 +415,12 @@ def main() -> None:
     write_header(header, header_txt, segy_file)
     plot_time_distance(
         data_plot,
-        float(header.get("fs_hz", 0.0) or 0.0),
+        fs,
         args.trace_start,
         f"{segy_file.name} traces {args.trace_start}-{args.trace_start + trace_count}",
         td_png,
         args.clip_percentile,
-        args.time_max,
+        args.time_start,
     )
     plot_rms(data_plot, args.trace_start, f"{segy_file.name} trace RMS", rms_png)
 
