@@ -92,20 +92,34 @@ def read_basic_header(path: Path) -> dict[str, object]:
 
         sample_interval_us = int.from_bytes(binary_header[16:18], byteorder="big", signed=False)
         n_samples = int.from_bytes(binary_header[20:22], byteorder="big", signed=False)
+        n_samples_extended = int.from_bytes(binary_header[84:88], byteorder="big", signed=False)
         sample_format = int.from_bytes(binary_header[24:26], byteorder="big", signed=False)
+        n_extended_headers = int.from_bytes(binary_header[304:306], byteorder="big", signed=True)
+
+    # OptaSense SEGY v1.5 sets the standard 2-byte nsamples field to zero
+    # when nsamples > 32767, then stores the true value in binary bytes 85-88.
+    if n_samples == 0 and n_samples_extended > 0:
+        n_samples = n_samples_extended
 
     fs = 1.0 / (sample_interval_us * 1e-6) if sample_interval_us else 0.0
     bytes_per_sample = 4
+    data_start = 3600
+    if n_extended_headers > 0:
+        data_start += n_extended_headers * 3200
     size = file_size_uncompressed(path)
     n_traces = None
     if size is not None and n_samples:
-        n_traces = (size - 3600) // (240 + bytes_per_sample * n_samples)
+        n_traces = (size - data_start) // (240 + bytes_per_sample * n_samples)
 
     return {
         "n_samples": n_samples,
+        "n_samples_standard": int.from_bytes(binary_header[20:22], byteorder="big", signed=False),
+        "n_samples_extended": n_samples_extended,
         "sample_interval_us": sample_interval_us,
         "fs_hz": fs,
         "sample_format_code": sample_format,
+        "n_extended_headers": n_extended_headers,
+        "data_start_byte": data_start,
         "n_traces": n_traces,
     }
 
@@ -121,9 +135,20 @@ def header_with_dasutils(path: Path, dasutils) -> dict[str, object]:
         print(f"Warning: DASutils header read failed ({exc}); using basic SEGY header.")
         return header
 
+    nt = int(nt)
+    if nt == 0 and int(header["n_samples"]) > 0:
+        print(
+            "Note: DASutils PASSCAL header reports n_samples=0; "
+            "using OptaSense extended sample count from binary bytes 85-88."
+        )
+        nt = int(header["n_samples"])
+        dt = 1.0 / float(fs) if fs else 0.0
+        n_traces = header.get("n_traces", n_traces)
+        end_time = start_time + __import__("datetime").timedelta(seconds=nt * dt)
+
     header.update(
         {
-            "n_samples": int(nt),
+            "n_samples": nt,
             "fs_hz": float(fs),
             "start_time": str(start_time),
             "end_time": str(end_time),
@@ -162,8 +187,9 @@ def read_preview_data(
 
     data = np.empty((trace_count, n_samples), dtype=np.float32)
     bytes_per_trace = 240 + n_samples * 4
+    data_start = int(header.get("data_start_byte", 3600) or 3600)
     with open_binary(path) as fid:
-        fid.seek(3600 + trace_start * bytes_per_trace)
+        fid.seek(data_start + trace_start * bytes_per_trace)
         for itrace in range(trace_count):
             trace_header = fid.read(240)
             if len(trace_header) < 240:
@@ -173,6 +199,33 @@ def read_preview_data(
                 raise EOFError(f"Trace data ended early at trace {trace_start + itrace}.")
             data[itrace, :] = np.frombuffer(buf, dtype=">f4", count=n_samples)
     return data
+
+
+def fill_missing_sample_count(
+    header: dict[str, object],
+    n_samples_override: int | None,
+    record_seconds: float | None,
+) -> None:
+    n_samples = int(header.get("n_samples", 0) or 0)
+    fs = float(header.get("fs_hz", 0.0) or 0.0)
+
+    if n_samples_override is not None:
+        header["n_samples"] = int(n_samples_override)
+        header["n_samples_source"] = "command-line --n-samples"
+    elif n_samples == 0 and record_seconds is not None and fs > 0:
+        header["n_samples"] = int(round(record_seconds * fs))
+        header["n_samples_source"] = f"command-line/default --record-seconds={record_seconds:g}"
+
+    n_samples = int(header.get("n_samples", 0) or 0)
+    size = file_size_uncompressed(Path(str(header["source_file"])))
+    data_start = int(header.get("data_start_byte", 3600) or 3600)
+    if size is not None and n_samples > 0:
+        bytes_per_trace = 240 + 4 * n_samples
+        n_traces = (size - data_start) // bytes_per_trace
+        leftover = (size - data_start) % bytes_per_trace
+        header["n_traces"] = int(n_traces)
+        header["trace_size_bytes"] = int(bytes_per_trace)
+        header["file_size_leftover_bytes"] = int(leftover)
 
 
 def preprocess_for_plot(data: np.ndarray, median_subtract: bool) -> np.ndarray:
@@ -254,6 +307,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dasutils-path", default=None, help="Directory containing DASutils.py")
     parser.add_argument("--trace-start", type=int, default=0, help="First trace/channel to read")
     parser.add_argument("--trace-count", type=int, default=400, help="Number of traces to read")
+    parser.add_argument("--n-samples", type=int, default=None, help="Override samples per trace")
+    parser.add_argument(
+        "--record-seconds",
+        type=float,
+        default=60.0,
+        help="Record length used when SEGY sample-count headers are zero",
+    )
     parser.add_argument("--time-max", type=float, default=10.0, help="Seconds to plot from file start")
     parser.add_argument("--clip-percentile", type=float, default=99.0, help="Symmetric plot clip percentile")
     parser.add_argument("--median-subtract", action="store_true", help="Subtract median trace at each time sample")
@@ -270,6 +330,13 @@ def main() -> None:
 
     dasutils = import_dasutils(args.dasutils_path)
     header = header_with_dasutils(segy_file, dasutils)
+    header["source_file"] = str(segy_file)
+    fill_missing_sample_count(header, args.n_samples, args.record_seconds)
+
+    if int(header.get("n_samples", 0) or 0) <= 0:
+        raise ValueError(
+            "Could not determine samples per trace. Rerun with --n-samples or --record-seconds."
+        )
 
     n_traces_total = header.get("n_traces")
     trace_count = args.trace_count
