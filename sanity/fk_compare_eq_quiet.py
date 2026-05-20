@@ -35,8 +35,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 import DASutils
-from obspy.clients.fdsn import Client
-from obspy.geodetics import gps2dist_azimuth
+# NCEDC query is optional — disabled by setting SANITY_EQ_TIME explicitly.
+try:
+    from obspy.clients.fdsn import Client
+    from obspy.geodetics import gps2dist_azimuth
+    HAS_OBSPY = True
+except Exception:
+    HAS_OBSPY = False
 
 # ---------------- USER PARAMETERS ----------------
 CSV = os.environ.get(
@@ -105,11 +110,46 @@ def load_manifest(csv_path):
 
 
 def find_eq_with_file(db):
-    """Query NCEDC for M>=MIN_MAG events near Parkfield in 2024.
-       Return (event_dict, csv_row) for the first event whose origin time
-       lies inside a continuous 60-s file window."""
+    """Either use the user-supplied SANITY_EQ_TIME (UTC ISO format), or
+    query NCEDC. Returns (event_dict, csv_row) for the first event whose
+    origin time lies inside a continuous 60-s file window."""
+
+    user_time_str = os.environ.get("SANITY_EQ_TIME", "").strip()
+    if user_time_str:
+        try:
+            t = pd.Timestamp(user_time_str)
+            if t.tzinfo is None:
+                t = t.tz_localize("UTC")
+            else:
+                t = t.tz_convert("UTC")
+        except Exception as e:
+            raise SystemExit(f"SANITY_EQ_TIME='{user_time_str}' could not be parsed: {e}")
+        ev = {
+            "time_utc":  t,
+            "lat":       float(os.environ.get("SANITY_EQ_LAT", "0.0")),
+            "lon":       float(os.environ.get("SANITY_EQ_LON", "0.0")),
+            "depth_km":  float(os.environ.get("SANITY_EQ_DEPTH_KM", "0.0")),
+            "mag":       float(os.environ.get("SANITY_EQ_MAG", "0.0")),
+            "mag_type":  os.environ.get("SANITY_EQ_MAG_TYPE", "user"),
+            "dist_km":   float(os.environ.get("SANITY_EQ_DIST_KM", "0.0")),
+        }
+        match = db[(db["startTime_dt"] <= t) & (db["endTime_dt"] >= t)]
+        if len(match) == 0:
+            raise SystemExit(
+                f"No continuous file in manifest contains SANITY_EQ_TIME={t.isoformat()}. "
+                "Check the timestamp or pick a different event."
+            )
+        print(f"Using user-supplied event time {t.isoformat()} "
+              f"(M={ev['mag']} {ev['mag_type']}); matched file {match.iloc[0]['file_norm']}")
+        return ev, match.iloc[0]
+
+    # No user time — fall back to NCEDC.
+    if not HAS_OBSPY:
+        raise SystemExit("obspy not importable, and SANITY_EQ_TIME not set. "
+                         "Set SANITY_EQ_TIME on the command line.")
     print(f"Querying {CATALOG} for events near Parkfield {EQ_YEAR_START}..{EQ_YEAR_END}, "
-          f"M>={MIN_MAG}, within {RADIUS_KM} km...")
+          f"M>={MIN_MAG}, within {RADIUS_KM} km... (this needs internet; if it hangs, "
+          "interrupt and set SANITY_EQ_TIME explicitly instead.)")
     client = Client(CATALOG)
     catalog = client.get_events(
         starttime=pd.Timestamp(EQ_YEAR_START).to_pydatetime(),
