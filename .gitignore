@@ -10,3 +10,24 @@ logs/
 
 weekly_stacks_seismicity_day/
 weekly_stacks_seismicity_night/
+
+# Processing output and raw data. These belong on $OAK, not in git — the
+# untracked working tree currently holds tens of GB of them, and individual
+# .npz stacks reach multiple GB.
+*.npz
+*.npy
+*.mseed
+*.h5
+*.sgy
+data/
+out/
+notebooks/figures/
+notebooks/waveforms_sds/
+
+# Regenerable figures from the plotting scripts. Use `git add -f` for the
+# occasional figure that genuinely belongs in the repo.
+*.png
+
+# Vendored DAS-utilities checkout, including its compiled build/ artifacts.
+# Not a submodule; obtained separately per the environment setup in CLAUDE.md.
+DAS-utilities/
