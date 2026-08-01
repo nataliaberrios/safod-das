@@ -24,9 +24,10 @@ out/
 notebooks/figures/
 notebooks/waveforms_sds/
 
-# Regenerable figures from the plotting scripts. Use `git add -f` for the
-# occasional figure that genuinely belongs in the repo.
+# Regenerable figures from the plotting scripts. The curated paper figure set
+# under docs/ is exempt — that one is version-controlled on purpose.
 *.png
+!docs/**/figures/*.png
 
 # Vendored DAS-utilities checkout, including its compiled build/ artifacts.
 # Not a submodule; obtained separately per the environment setup in CLAUDE.md.
