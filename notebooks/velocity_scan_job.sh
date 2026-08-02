@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J nano_vscan
-#SBATCH -p normal
+#SBATCH -p serc
 #SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=24GB
