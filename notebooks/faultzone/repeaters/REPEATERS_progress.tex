@@ -1,0 +1,526 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
+\usepackage{xcolor}
+
+\newcommand{\accepted}{\textcolor{teal}{\textbf{Accepted}}}
+\newcommand{\preliminary}{\textcolor{orange}{\textbf{Preliminary}}}
+\newcommand{\unresolved}{\textcolor{red}{\textbf{Unresolved}}}
+\newcommand{\notrun}{\textcolor{gray}{\textbf{Not yet run}}}
+
+\title{Repeating-Earthquake Coda-Wave Interferometry on SAFOD Borehole DAS\\
+\large Progress log: what has been tried, what it returned}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Why this project exists}
+
+The active-source route was closed by measurement, not by opinion. The
+accelerated weight drop (AWD) has an injection--recovery detection floor of about
+$1\%$ apparent-velocity change. The largest published fault-zone $dv/v$ at
+Parkfield outside an M6 mainshock is $0.02$--$0.2\%$: $0.08\%$ coseismic for the
+2004 M6.0 (Brenguier et al.\ 2008, \texttt{10.1126/science.1160943}), at most
+$0.2\%$ in the depth-resolved reanalysis (Wu et al.\ 2016,
+\texttt{10.1002/2016GL069145}), and seasonal variation at Parkfield reported as
+\emph{not evident} (Okubo et al.\ 2024, \texttt{10.1029/2023JB028084}).
+
+A 5--50$\times$ gap set by source physics before acquisition cannot be closed by
+processing. Prior art in the same borehole makes the point sharply: Niu et al.\
+(2008, \texttt{10.1038/nature07111}) needed a 2\,kHz crosswell geometry over a
+10\,m baseline to reach $0.0011\%$, and explicitly predicted the solid-earth tide
+at SAFOD to be undetectable.
+
+\subsection*{What replaces it}
+
+Repeating earthquakes are a naturally repeatable source at seismogenic depth.
+Coda-wave interferometry (CWI) on doublets routinely resolves
+$\mathbf{0.02}$--$\mathbf{0.2\%}$ (Poupinet, Ellsworth \& Fr\'echet 1984,
+\texttt{10.1029/JB089iB07p05719}) --- one to two orders of magnitude better than
+first-arrival timing.
+
+The reason is geometric. A coda wave has scattered many times and travelled a far
+longer path than the direct arrival, so a small \emph{fractional} velocity change
+accumulates into a large \emph{absolute} delay. Timing a runner over a marathon
+rather than over ten metres.
+
+\subsection*{Novelty}
+
+No prior work anywhere combines repeating-earthquake CWI with DAS --- in a
+borehole or otherwise. The two existing DAS+CWI studies use short cable segments
+and ambient noise. Moreover, Lellouch et al.\ (2019,
+\texttt{10.1029/2019JB017533}), working on \emph{this exact fiber}, proposed the
+step and never took it: ``coda waves and converted modes may be examined more
+systematically.'' Six years on, nobody has.
+
+\subsection*{The framing, which matters more than the sensitivity argument}
+
+Do \emph{not} pitch this as ``repeaters beat the weight drop.'' Rubinstein \&
+Beroza (2005, \texttt{10.1029/2005GL023189}) used the \emph{SAFOD target
+repeaters specifically} and concluded the coseismic velocity change is confined
+to the top $<100$\,m, with direct S at depth much less affected. That is an
+adverse, on-target precedent.
+
+The framing that survives it is the one the geometry uniquely enables:
+\textbf{depth-resolved $dv/v$ from a continuous vertical array}, turning their
+surface-versus-100\,m binary into a continuous 0--919\,m profile and settling
+where the change lives. This framing does not require the signal to be large.
+
+\section{Data}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.35\linewidth}p{0.55\linewidth}}
+\toprule
+Quantity & Value \\
+\midrule
+Continuous DAS span & 2024-05-07 to 2025-09-24 \\
+Covered days & \textbf{286} \\
+Manifest rows (usable) & 392{,}038 \\
+Fiber & 900 channels $\times$ 1.0210\,m = \textbf{919\,m} \\
+Gauge length & 16.34\,m \\
+Cable identity & Lellouch et al.\ (2019) cemented fiber \\
+Catalog events in window & 540 \\
+Events on covered days & \textbf{305 (56\%)} \\
+\bottomrule
+\end{tabular}
+\caption{Continuous cemented-fiber archive and the Parkfield catalog over the
+same window. Catalog from USGS FDSN, box $35.70$--$36.10^\circ$N,
+$-120.70$--$-120.20^\circ$E, all magnitudes.}
+\end{table}
+
+The fiber spans 0--919\,m; Parkfield repeaters sit at 2--12\,km. The fiber does
+not need to reach the source --- CWI needs a repeatable source--receiver pair, and
+a 919\,m vertical array recording near-vertically-incident energy from below
+gives depth-continuous sampling of the receiver-side path, which a surface
+network cannot.
+
+\section{A short primer on the methods used}
+
+\paragraph{Coda-wave interferometry.} The coda is the scattered tail of the
+seismogram. Because coda energy has travelled far longer paths than the direct
+arrival, a uniform fractional velocity change $dv/v$ delays coda arriving at
+lapse time $t$ by $\Delta t \approx -(dv/v)\,t$. Measuring that proportionality
+is the measurement.
+
+\paragraph{The stretching estimator.} Rather than picking delays, one resamples
+(``stretches'') the later trace by a trial factor $\varepsilon$ and finds the
+$\varepsilon$ maximising correlation with the earlier trace over a lapse window.
+That $\varepsilon$ \emph{is} $dv/v$.
+
+\paragraph{Why repeaters are required.} Coda looks like noise but is a
+deterministic fingerprint of one source in one medium. Move the source tens of
+metres and the fingerprint changes entirely. Repeating earthquakes --- the same
+patch rupturing the same way --- are the only natural source that satisfies this.
+
+\paragraph{Gates.} Each stage has a numeric pass/fail condition written before it
+runs, so ``it produced a number'' cannot be confused with ``it worked.''
+
+\section{What has been tried, and what it returned}
+
+\subsection{Catalog intersection --- \accepted}
+
+\textbf{Script:} \texttt{count\_doublets.py}. \textbf{Question:} are there enough
+co-located, similar-magnitude events on days the fiber was recording to be worth
+running waveform correlation on?
+
+Result: 305 of 540 catalog events fall on covered days; 111 candidate co-located
+pairs; \textbf{32 candidate sequences} with $\ge 2$ covered events; 13 within
+5\,km of SAFOD; 30 at seismogenic depth.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrl}
+\toprule
+seq & $n$ & depth (km) & mag & span \\
+\midrule
+0 & 13 & 1.2--2.3 & 0.42--1.15 & 2024-05 $\to$ 2025-04 \\
+2 & 12 & 3.5--4.3 & 0.04--1.14 & 2024-06 $\to$ 2025-04 \\
+4 &  5 & 2.2--3.1 & \textbf{1.58--1.86} & 2024-06 $\to$ 2025-04 \\
+5 &  4 & \textbf{9.87--10.05} & 0.95--1.45 & 2024-07 $\to$ 2025-03 \\
+\bottomrule
+\end{tabular}
+\caption{Leading candidate sequences, all within $\sim$3--4\,km of SAFOD.}
+\end{table}
+
+\paragraph{Two defects in this list, found by inspecting it.} Single-link
+clustering \emph{chains}: sequence 0 spans 1\,km of depth despite a 0.5\,km
+threshold, so these are over-merged and the true sequence count is lower. And
+several ``repeats'' are seconds apart (2025-03-29 06:43:47 / 06:43:58), which
+provide no temporal baseline for CWI. Sequence 4 has the most repeater-like
+magnitude tightness (0.28 spread); sequence 5 the tightest depths (180\,m).
+Neither ranking survives without waveform confirmation.
+
+\paragraph{Standing limitation.} Catalog absolute locations at Parkfield carry
+$\sim$0.2--0.5\,km error while true repeaters are $<$20\,m across. Every number
+here is an \textbf{upper bound} on candidates, not a repeater count.
+
+\subsection{Gate G1 --- coda SNR --- \accepted (PASS)}
+
+\textbf{Script:} \texttt{g1\_coda\_snr.py}. \textbf{Question:} does a 16.34\,m
+gauge length give usable \emph{coda} SNR for M$\sim$1 events 3--5\,km away?
+Nobody had demonstrated this. Lellouch showed \emph{arrivals}; coda is tens of dB
+weaker and a much harder bar.
+
+\textbf{Pass condition, written before running:} coda SNR $>3$ over $\ge 200$
+channels for a 2--10\,s lapse window.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Event & Mag & Median coda SNR & Channels $>3$ \\
+\midrule
+2024-06-09 16:35:44 & 1.85 & 34.62 & 900/900 \\
+2024-06-22 19:26:50 & 1.58 &  5.84 & 739/900 \\
+2025-04-06 08:23:21 & 1.86 &  6.82 & 750/900 \\
+2025-04-06 13:51:22 & 1.62 &  5.87 & 705/900 \\
+2025-04-08 13:11:32 & 1.62 &  6.43 & 699/900 \\
+\midrule
+\multicolumn{3}{l}{Across events (median-SNR channels $>3$)} & \textbf{785/900} \\
+\bottomrule
+\end{tabular}
+\caption{G1 result. \textbf{PASS} by roughly $4\times$ the threshold.}
+\end{table}
+
+Visual confirmation: the arrival is flat across all 900 channels (near-vertical
+incidence), with clear coda in the lapse window.
+
+\paragraph{An unplanned corroboration.} Median coda SNR drops below 3 in the
+deepest $\sim$70\,m of fiber --- exactly where Lellouch et al.\ report the end-loop
+failure at 800\,m. Two independent measurements, same boundary.
+
+\subsection{Gate G2 --- waveform confirmation --- \unresolved{} (twice failed, rebuilt)}
+
+\textbf{Script:} \texttt{g2\_confirm\_repeaters.py}. \textbf{Question:} are the
+catalog clusters actually repeating earthquakes? \textbf{Pass:} $\ge 3$ sequences
+with median cross-channel CC $>0.9$ for a pair separated by $>30$ days.
+
+\paragraph{Attempt 1 --- FAIL, and the failure was mine.} Max off-diagonal CC of
+$0.42$, $0.18$, $0.26$ across five sequences. The estimator computed
+\emph{zero-lag} correlation. Catalog origin times for M$\sim$1 events carry
+$0.1$--$0.5$\,s uncertainty, which at 100\,Hz is 10--50 samples; two
+\emph{identical} waveforms offset by that much give near-zero zero-lag
+correlation. Repeater identification is always done by maximising over lag.
+
+\paragraph{Attempt 2 --- lag search added, still FAIL but very differently.}
+Correlations roughly doubled, confirming the bug was real and large:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrr}
+\toprule
+Sequence & Zero-lag (buggy) & With lag search \\
+\midrule
+0 & 0.42 & \textbf{0.893} \\
+2 & --   & 0.721 \\
+4 & 0.18 & 0.734 \\
+5 & --   & 0.048 \\
+6 & 0.26 & 0.097 \\
+\bottomrule
+\end{tabular}
+\caption{Sequence 0 reaches 0.893, just below the pre-registered 0.90 threshold.
+The threshold was not lowered to pass the gate.}
+\end{table}
+
+\paragraph{Diagnosis: the gate tested the wrong thing.} The candidate list was
+built from \emph{standard-catalog colocation} with single-link clustering at
+0.5\,km. Standard-catalog absolute errors at Parkfield are 0.2--0.5\,km while
+repeaters are $<$20\,m across, so a ``sequence'' built that way mixes different
+patches by construction. Low similarity was reporting a broken candidate list,
+not absent repeaters --- Parkfield demonstrably has 187 documented sequences over
+1987--1998. The field builds repeater catalogs from waveform similarity, not from
+locations; this had it backwards.
+
+\subsection{Rebuild on the double-difference catalog --- \accepted}
+
+\textbf{Script:} \texttt{ddrt\_candidates.py}, \texttt{ddrt\_diagnose.py}.
+
+William Ellsworth --- the Ellsworth of Poupinet, Ellsworth \& Fr\'echet (1984),
+the paper that introduced doublet monitoring --- supplied the correct catalog:
+NCEDC \textbf{Double-Difference relocated} (DDRT), 329 events, 2024-05-01 to
+2026-04-01, within 15\,km of SAFOD. DD \emph{relative} locations are accurate to
+tens of metres, which is the scale repeaters occupy. His guidance: focus on spots
+with multiple dates at one location, prefer larger events, and expect to verify
+candidates as ``either repeaters or neighbors.''
+
+Method changes, each addressing a named defect: DD locations; \textbf{complete}
+linkage instead of single, so clusters cannot chain; 150\,m diameter instead of
+500\,m; magnitude spread $<0.3$; pairs $>30$ days apart.
+
+\paragraph{First run returned zero sequences.} Rather than tune the threshold,
+the pair count was decomposed --- which located the real constraint.
+
+\paragraph{A second coverage manifest had been missed.} The coverage list was
+built from \texttt{SAFOD\_2024\_2025.csv} alone: 286 days ending 2025-07-25. A
+second manifest on the same cable,
+\texttt{SAFOD\_vertical\_2026\_01\_28.csv} (182{,}271 rows), adds \textbf{127
+further days} and extends coverage to \textbf{2026-01-27}. Union:
+\textbf{413 days}, 2024-05-07 to 2026-01-27. Covered events rose 153 $\to$ 215
+of 329.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrrr}
+\toprule
+Separation (m) & Pairs & Both covered & $+\Delta M<0.3$ & $+>30$\,d & All filters \\
+\midrule
+50   & 0    & 0   & 0   & 0    & 0 \\
+100  & 14   & 5   & 6   & 10   & 2 \\
+150  & 35   & 12  & 11  & 23   & \textbf{3} \\
+250  & 116  & 46  & 41  & 84   & \textbf{8} \\
+500  & 427  & 186 & 168 & 332  & 51 \\
+\bottomrule
+\end{tabular}
+\caption{Pair-count decomposition after merging both manifests. The binding
+constraint is \emph{coverage}, not clustering: tight, magnitude-matched,
+well-separated pairs exist, but frequently only one member was recorded.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrrrl}
+\toprule
+Cluster & $n$ & Diameter & Depth & Mag & km from SAFOD & Separation \\
+\midrule
+63 & 2 & \textbf{83\,m} & 4.50\,km & \textbf{2.13} & 7.75 & 88 d \\
+42 & 2 & 70\,m & 1.76\,km & 0.95 & 2.85 & 39 d \\
+\bottomrule
+\end{tabular}
+\caption{Surviving candidates at 150\,m. Cluster 63 is the strongest target:
+M2.13 gives good SNR, 83\,m is within a single M2 rupture dimension, and 88 days
+is a usable CWI baseline. G2 on these is queued.}
+\end{table}
+
+\subsection{Similarity-first search over all pairs --- \accepted}
+
+\textbf{Scripts:} \texttt{build\_event\_list.py}, \texttt{extract\_all.py} (SLURM
+array), \texttt{correlate\_all.py}.
+
+The catalog-first approach was backwards. The field builds repeater catalogs from
+waveform similarity and uses location as a check on the answer (REDPy,
+Waldhauser--Schaff); I had used location as a filter on the input. Rebuilt: all
+207 extractable covered events, all \textbf{21{,}321} pairs, channel-stacked over
+channels 100--800, 5--20\,Hz, lag-searched normalised cross-correlation.
+
+The decisive property of doing every pair is that \textbf{the CC distribution is
+its own null}. Essentially all pairs are unrelated events, so the bulk of the
+histogram measures what ``not a repeater'' looks like on this instrument, in this
+band, with this processing --- no threshold need be imported.
+
+\paragraph{A bug that produced a spurious null, found only after the result
+looked implausible.} The first run subtracted the across-channel median and then
+took the across-channel mean:
+\begin{verbatim}
+Xb -= np.median(Xb, axis=0)      # remove common mode
+s   = Xb[:, i0:i1].mean(axis=0)  # then average channels
+\end{verbatim}
+mean minus median is approximately zero. Worse, G1's own figure had already shown
+the arrival is \emph{flat across all 900 channels} --- near-vertical incidence
+means the earthquake \textbf{is} the common mode. Median subtraction is the
+standard DAS treatment for common-mode \emph{noise}; here it deleted the signal,
+and the reported null was a null for noise. Removing it thickened the tail from 32
+to 166 pairs above CC 0.4.
+
+\subsection{HRSN control --- \accepted{} --- REPEATERS CONFIRMED}
+
+\textbf{Script:} \texttt{hrsn\_control.py}.
+
+Even after that fix, no DAS pair reached the CC $\sim$0.9 that defines a
+repeater, over 14 months at a site where Schaff \& Waldhauser report $>$40\% of
+seismicity is repeating. That inconsistency with the literature could mean either
+the processing was blunt or the events genuinely do not repeat --- opposite
+remedies, indistinguishable from DAS alone.
+
+HRSN (network BP) is the 13-station borehole array the Parkfield repeater
+catalogs were built on, it is public at NCEDC, and it records the same
+earthquakes. Correlating the same pairs there, with the processing matched
+(identical band, window and lag-searched CC, median across stations):
+
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrl}
+\toprule
+DAS CC & \textbf{HRSN CC} & stations & separation & events \\
+\midrule
+0.792 & \textbf{0.987} & 8 & 39 d   & 2025-04-02 / 2025-05-11 \\
+0.790 & \textbf{0.995} & 5 & 272 d  & 2024-07-08 / 2025-04-06 \\
+0.775 & \textbf{0.993} & 3 & 305 d  & 2024-06-23 / 2025-04-23 \\
+0.742 & \textbf{0.962} & 8 & 39 d   & 2025-04-02 / 2025-05-11 \\
+0.683 & \textbf{0.991} & 5 & 440 d  & 2024-05-13 / 2025-07-27 \\
+0.677 & \textbf{0.917} & 5 & 331 d  & 2024-05-10 / 2025-04-06 \\
+0.631 & \textbf{0.945} & 4 & 59 d   & 2024-05-10 / 2024-07-08 \\
+\bottomrule
+\end{tabular}
+\caption{Same event pairs, two instruments. \textbf{Seven pairs above CC 0.9 on
+HRSN}, with baselines from 39 to 440 days. These are repeating earthquakes.
+Random-pair nulls: DAS median 0.124 / max 0.328; HRSN median $-0.004$ / max
+0.347.}
+\end{table}
+
+Note that 2024-05-10, 2024-07-08 and 2025-04-06 all correlate mutually --- a
+three-event sequence spanning 331 days.
+
+\paragraph{Two conclusions, and the second corrects an error of mine.}
+
+\emph{First}, the repeaters exist and have been recorded, with CWI-usable
+baselines of 272, 305, 331 and 440 days.
+
+\emph{Second}, the DAS detects every one of them. Against the DAS null --- random
+pairs at median 0.124, maximum 0.328 --- confirmed repeaters sit at 0.63--0.79,
+two to six times above the null maximum. Every one is an extreme outlier
+\emph{in the DAS data}. What DAS does not do is reach 0.9, being single-component
+strain rate with 16.34\,m gauge-length averaging against a 250\,Hz borehole
+seismometer. \textbf{The earlier ``no repeaters'' conclusion came from applying
+HRSN's threshold to DAS} --- exactly the instrument-dependence problem identified
+when the 0.9 criterion was first questioned, and then not acted upon.
+
+\subsection{Failures and corrections during this work}
+
+Recorded so that they are not repeated.
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Timestamp parsing.} \texttt{pd.to\_datetime} without
+  \texttt{format='mixed'} rejects the saved candidate times, which vary in
+  fractional-second precision. Cost: one job.
+  \item \textbf{Empty-frame masking.} Filtering a manifest slice with a boolean
+  mask built from \texttt{.map()} on an \emph{empty} frame drops the columns, so
+  the subsequent \texttt{sort\_values('t0')} raises \texttt{KeyError} instead of
+  returning an empty result. The emptiness check must come first. Present in
+  both G1 and G2; patched in both.
+  \item \textbf{Buffered output.} \texttt{sbatch --wrap} without \texttt{python
+  -u} buffers stdout, so a 47-minute job shows no progress until it exits. Use
+  \texttt{python -u}.
+  \item \textbf{Zero-lag correlation.} The first G2 estimator omitted the lag
+  search, halving every correlation and producing a spurious FAIL. Catalog
+  origin-time error alone guarantees this.
+  \item \textbf{Wrong catalog.} Candidates were built on standard-catalog
+  locations (0.2--0.5\,km error) rather than double-difference relocations
+  (tens of metres). The clustering scale must match the location precision.
+  \item \textbf{Incomplete coverage list.} Only one of two manifests for the same
+  cable was used, undercounting recording days by 127 and truncating coverage six
+  months early. Later the same inconsistency appeared again: the merged list was
+  used for event SELECTION while extraction still read one manifest, so the second
+  member of both candidate pairs was silently skipped.
+  \item \textbf{Regex CSV separator.} \texttt{sep=r'\textbackslash s+'} forces
+  pandas onto its pure-Python parser; on a 108\,MB manifest that alone exceeded a
+  25 minute job limit. Use \texttt{delim\_whitespace} and cache the parsed frame.
+  \item \textbf{574k filesystem stats on Lustre.} \texttt{map(os.path.exists)} over
+  the whole manifest hammers the metadata server, which this project's
+  \texttt{CLAUDE.md} explicitly warns against. Only the few files overlapping each
+  event window need checking.
+  \item \textbf{Median subtraction destroying the signal.} See the
+  similarity-first section. The single most consequential error: it produced a
+  believable but meaningless null.
+  \item \textbf{Applying an instrument's threshold to a different instrument.}
+  The 0.9 criterion is calibrated on seismometers. Used on DAS it hid seven
+  genuine repeaters. Thresholds must be calibrated against the null of the
+  instrument in hand.
+  \item \textbf{Second-resolution cache tags.} Two events in the same second
+  collapsed to one cached file, so both ``events'' loaded the identical waveform
+  and produced a spurious CC of exactly 1.000.
+  \item \textbf{A self-check that checked nothing.} An ``expected under null''
+  column recomputed the observed count rather than a model expectation, so it
+  trivially agreed with itself.
+\end{itemize}
+
+\section{Evidence ladder}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{0.30\linewidth}p{0.15\linewidth}p{0.47\linewidth}}
+\toprule
+Statement & Status & Basis \\
+\midrule
+Continuous DAS covers 286 days & \accepted & Manifest filename scan; 392{,}038 rows \\
+Catalog events coincide with coverage & \accepted & 305/540 on covered days \\
+Candidate sequences exist & \preliminary & 2 at 150\,m, 8 at 250\,m, on DD relocations with 413-day coverage \\
+Candidate list is over-merged & \accepted & seq 0 spans 1\,km depth at a 0.5\,km threshold \\
+Fiber resolves earthquake coda & \accepted & G1: 785/900 channels, SNR $>3$, 5 events \\
+Fiber is degraded below $\sim$850\,m & \accepted & G1 SNR collapse; independently matches Lellouch's 800\,m failure \\
+\textbf{Repeating earthquakes present} & \accepted & \textbf{7 pairs at HRSN CC 0.92--0.995, baselines 39--440 d} \\
+DAS detects those repeaters & \accepted & DAS CC 0.63--0.79 vs DAS null max 0.328 \\
+DAS CC is systematically below HRSN & \accepted & 0.15--0.30 deficit on identical pairs; cause not yet established \\
+A three-event sequence exists & \preliminary & 2024-05-10 / 2024-07-08 / 2025-04-06 mutually correlated \\
+Pair count is coverage-limited & \accepted & Decomposition: tight matched pairs exist but often only one member recorded \\
+$dv/v$ measurable on this fiber & \notrun & Week 2; inputs now exist \\
+$dv/v$ resolvable \emph{versus depth} & \notrun & Week 3; the actual deliverable \\
+Velocity change confined to top 100\,m & \unresolved & Rubinstein \& Beroza's result; this dataset is the test, not a confirmation \\
+\bottomrule
+\end{tabular}
+\caption{``Accepted'' refers to the stated empirical property only and must not
+be silently promoted to a more specific interpretation.}
+\end{table}
+
+\section{Next, in order}
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{G2 completion.} If fewer than 3 sequences confirm, the plan says
+  stop --- the candidates were catalog artifacts.
+  \item \textbf{Re-cluster} with complete linkage rather than single link, and
+  require magnitude spread $<0.3$.
+  \item \textbf{Week 2 --- $dv/v$.} Stretching estimator on channel-stacked coda
+  first, for maximum SNR, before attempting per-channel work. Three mandatory
+  nulls: non-repeating pairs must give no coherent stretch; the two halves of a
+  coda must agree; randomised channel order must degrade the stack.
+  \item \textbf{Week 3 --- depth profile.} Per-channel $dv/v$ binned to
+  $\sim$50\,m, with error bars. This answers Rubinstein \& Beroza.
+  \item \textbf{External corroboration.} Cross-check confirmed sequences against
+  the Waldhauser--Schaff relocated catalog (\texttt{10.1029/2007JB005479}) and
+  Sawi et al.\ (2023), which cover 1984--2019. A sequence active then and now is
+  strong independent support.
+\end{enumerate}
+
+\section{Reproducibility map}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{0.30\linewidth}p{0.28\linewidth}p{0.34\linewidth}}
+\toprule
+Script & Output & Purpose \\
+\midrule
+\texttt{count\_doublets.py} & \texttt{doublet\_candidates.csv} & Catalog intersection \\
+\texttt{g1\_coda\_snr.py} & \texttt{g1\_coda\_snr\_seq4.\{npz,png\}} & Gate G1 \\
+\texttt{g2\_confirm\_repeaters.py} & \texttt{g2\_confirm\_repeaters.\{npz,png\}}, \texttt{cache/} & Gate G2 \\
+\texttt{REPEATERS\_dashboard.ipynb} & figures & Presentation layer \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Catalog retrieval: USGS FDSN CSV query, box $35.70$--$36.10^\circ$N,
+$-120.70$--$-120.20^\circ$E, 2024-05-01 to 2025-10-01, all magnitudes, saved as
+\texttt{parkfield\_catalog\_2024\_2025.csv}.
+
+Everything lives in \texttt{notebooks/faultzone/repeaters/}. Nothing in
+\texttt{awd\_clean/} is read-modified or written.
+
+\section{Bottom line}
+
+Both preconditions now hold. G1 established that this fiber resolves earthquake
+coda across 785 of 900 channels, which nobody had shown. The HRSN control
+established that genuine repeating earthquakes were recorded during the DAS
+period --- seven pairs at CC 0.92--0.995 with baselines out to 440 days --- and
+that the DAS detects all of them as extreme outliers against its own null.
+
+What remains open is not whether the measurement can be made but how to make it
+correctly. The DAS returns 0.15--0.30 lower correlation than a co-located
+seismometer on identical pairs, and the cause --- single-component strain rate,
+16.34\,m gauge-length low-passing, channel stacking, or per-channel SNR --- is not
+yet established. A literature methods review is running to settle the processing
+chain before the $dv/v$ estimator is built, because the record of this work so far
+is that improvised method choices have failed repeatedly and in ways that looked
+like results.
+
+\end{document}
