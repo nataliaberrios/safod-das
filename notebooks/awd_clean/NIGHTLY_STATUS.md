@@ -194,3 +194,17 @@ intersections remain provisional fiber coordinates. The Deep coordinate audit an
 - Seven chunk scores at 3.2 km/s are all positive: 0.285, 0.316, 0.285, 0.283, 0.262, 0.306, 0.327.
 - Status: stable 70-minute F-K-selected observable; complete-day and held-out-day validation remain.
 - Figure: ambient_transfer/fk_negative_v25.png.
+## Conditional 500–520 m anomaly test (v37)
+
+- Assumption: the current records use the same cemented main-hole fiber as Lellouch et al.; current channel 0 and 1.020952 m spacing inherit the Lellouch approximate position-as-depth convention.
+- Completed diagnostic: 369 ten-minute negative signed F–K products from four dates. Early 50–350 m apparent velocities are 3.13–3.19 km/s; late 450–650 m velocities are 2.49–2.61 km/s.
+- Descriptive breakpoint medians are 350–425 m, so the curvature is repeatable but is not uniquely localized at 500–520 m. This is not a lithology or Vp inversion.
+- Products: `fk_geology_anomaly_test.py`, `fk_geology_anomaly_test.json`, and `fk_geology_anomaly_test.png`.
+
+## Follow-up validation (running)
+
+- Seasonal F–K: job `37478467`; exact-resolution unfiltered control: `37478473`; aggregate: `37478474`.
+- Multi-band test: job `37492825` (dependency on seasonal F–K), using 3–8, 5–12, 8–20, and 15–30 Hz negative signed F–K bands on deterministic blocks from each selected day.
+- Full anomaly rerun after seasonal aggregation: job `37493070` (dependency on `37478474`).
+- No seasonal or frequency-band conclusion is assigned until these jobs complete and their day-level products are inspected.
+
