@@ -212,4 +212,9 @@ intersections remain provisional fiber coordinates. The Deep coordinate audit an
 - Synthetic `cos(2πf(t−z/v))` at 10 Hz and 3.2 km/s, passed through the exact production decimation and masks, is retained by `F*K < 0` when propagation is toward increasing fiber coordinate. The opposite synthetic is retained by `F*K > 0`.
 - This validates coordinate-direction selection only; no physical upgoing/downgoing label is assigned without fiber orientation and time/depth convention.
 - Lellouch et al. used F–K filtering in earthquake S-wave processing after P-moveout correction (Figure 5), not as a described step in their ambient interferometry cross-correlation workflow.
+## Nano F–K physical branch labels (v40)
+
+- Under the documented Nano geometry, channel 0 is the shallow/top end and increasing coordinate is downhole. Active-source arrival ordering supports this orientation.
+- Combined with the synthetic sign check, `F*K < 0` is the Nano downgoing surface-to-depth branch and `F*K > 0` is the upgoing depth-to-surface branch.
+- This label is not transferred to the Deep hairpin, which retains conditional outbound/return coordinate labels.
 
