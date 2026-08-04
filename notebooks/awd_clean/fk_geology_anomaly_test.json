@@ -1,0 +1,67 @@
+{
+  "assumption": "Current channel 0 and 1.020952-m spacing inherit the Lellouch same-cemented-fiber position/depth convention.",
+  "hypothesis_interval_m": [
+    500.0,
+    520.0
+  ],
+  "products": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/ambient_transfer",
+  "n_products": 369,
+  "dates": [
+    "2024-05-11",
+    "2024-12-20",
+    "2025-02-20",
+    "2025-02-24"
+  ],
+  "by_date": {
+    "2024-05-11": {
+      "n_blocks": 66,
+      "early_median_m_s": 3190.4760748147964,
+      "late_median_m_s": 2605.927311457121,
+      "late_minus_early_median_m_s": -615.8656184446672,
+      "breakpoint_median_m": 350.0,
+      "breakpoint_q16_q84_m": [
+        350.0,
+        350.0
+      ]
+    },
+    "2024-12-20": {
+      "n_blocks": 144,
+      "early_median_m_s": 3126.6665533185005,
+      "late_median_m_s": 2605.9273114571197,
+      "late_minus_early_median_m_s": -633.8702841881195,
+      "breakpoint_median_m": 425.0,
+      "breakpoint_q16_q84_m": [
+        350.0,
+        450.0
+      ]
+    },
+    "2025-02-20": {
+      "n_blocks": 15,
+      "early_median_m_s": 3126.6665533185005,
+      "late_median_m_s": 2605.927311457121,
+      "late_minus_early_median_m_s": -520.7392418613795,
+      "breakpoint_median_m": 425.0,
+      "breakpoint_q16_q84_m": [
+        350.0,
+        425.0
+      ]
+    },
+    "2025-02-24": {
+      "n_blocks": 144,
+      "early_median_m_s": 3126.6665533185005,
+      "late_median_m_s": 2492.796269130381,
+      "late_minus_early_median_m_s": -633.8702841881195,
+      "breakpoint_median_m": 425.0,
+      "breakpoint_q16_q84_m": [
+        350.0,
+        425.0
+      ]
+    }
+  },
+  "interpretation": "Repeatable early/late curvature supports a common transition-like feature, but breakpoint estimates are broader and shallower than 500--520 m; this does not identify the Lellouch anomaly uniquely.",
+  "limitations": [
+    "Negative F-K branch and row maxima are conditional on the processing selection.",
+    "Ten-minute products are not independent samples; date-level summaries are descriptive.",
+    "The breakpoint scan is not a lithology or Vp inversion."
+  ]
+}
