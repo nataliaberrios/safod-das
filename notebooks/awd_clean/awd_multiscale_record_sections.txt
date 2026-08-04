@@ -1,0 +1,15 @@
+SAFOD AWD multiscale record sections
+====================================
+Selection rule: temporal center of burst with most paired drops
+Selected burst/drop: 34/10
+Selected p26.cc9.txt UTC_Date: 2026-06-17T16:48:42.922500+00:00
+Selected Nano file: timeseriesScaler_2026-06-17_16.48.28_UTC_000504.pb
+Selected Deep file: SAFOD-Deep-10mGL-1000HzFs-2mChDualPulse_2026-06-17T164748Z.h5
+Paired drops in selected burst: 21
+Paired drops in full weighted stack: 859
+Nonempty paired bursts: 46
+Nano display: 30-60 Hz, 80-500 m, -0.08-0.3 s
+Deep display: outbound leg only, 3-15 Hz, 0-3473.3 m fiber coordinate, -0.08-2.85 s
+Amplitude scaling: each trace divided by RMS in -0.45 to -0.15 s; fixed display limits +/-12 noise RMS for every panel
+Timing definition: all times are relative to the UTC_Date value in p26.cc9.txt; its physical relation to the AWD impact is not assumed.
+Deep coordinate definition: distance along the outbound fiber leg from Deep channel 0, not independently registered physical borehole depth.

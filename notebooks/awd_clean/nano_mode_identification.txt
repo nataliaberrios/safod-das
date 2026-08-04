@@ -1,0 +1,17 @@
+SAFOD AWD Nano mode-identification summary
+Times are relative to p26.cc9.txt UTC_Date, used only as an alignment timestamp.
+t0 is the coherence-window start at the first aperture channel, not an onset or phase pick.
+Bursts=46; represented common drops=859; bootstrap resamples=999; seed=20260802.
+Slowness-trend 2.5/50/97.5 percentiles: 0.413761, 0.482544, 0.549275 microseconds m^-1 Hz^-1.
+
+15-25 Hz: speed 3300 [3250,3350] m/s; P(+ preferred)=1.000.
+25-35 Hz: speed 2900 [2900,2900] m/s; P(+ preferred)=1.000.
+35-45 Hz: speed 2950 [2950,2950] m/s; P(+ preferred)=1.000.
+45-60 Hz: speed 2950 [2950,2950] m/s; P(+ preferred)=1.000.
+60-80 Hz: speed 2950 [2950,2950] m/s; P(+ preferred)=1.000.
+
+Positive ordering supported in every band: True.
+Monotonic frequency-dependent slowness resolved: True.
+Resolved dispersion would be compatible with, but not unique to, guided propagation.
+Unresolved dispersion would be necessary but insufficient evidence for direct body-wave propagation.
+This test alone cannot distinguish direct P energy from a weakly dispersive guided/coupled mode.

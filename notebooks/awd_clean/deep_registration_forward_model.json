@@ -1,0 +1,53 @@
+{
+  "status": "conditional_consistency_test",
+  "physical_depth_registration": "unresolved",
+  "borehole_logs_available": false,
+  "dx_m": 2.0419,
+  "n_channels": 3200,
+  "start_locus_index": 1800,
+  "start_locus_coordinate_m": 3675.42,
+  "turnaround_channel": 1702,
+  "turnaround_coordinate_m": 3475.3138,
+  "array_end_coordinate_m": 6532.0381,
+  "candidate_count": 24,
+  "candidate_velocity_median_mps": 1538.461538461538,
+  "candidate_velocity_p05_mps": 1388.8888888888887,
+  "candidate_velocity_p95_mps": 1562.4999999999995,
+  "direct_fluid_prior_mps": [
+    1300.0,
+    1800.0
+  ],
+  "compliance_factor_envelope": [
+    0.75,
+    1.0
+  ],
+  "direct_fluid_compatibility_fraction": 1.0,
+  "bounded_envelope_compatibility_fraction": 1.0,
+  "velocity_model_stats": {
+    "Vp_model.dat": {
+      "n": 1690,
+      "min": 1.0,
+      "median": 4.531,
+      "max": 9.5,
+      "p05": 1.0,
+      "p95": 9.5
+    },
+    "Vs_model.dat": {
+      "n": 1690,
+      "min": 0.571,
+      "median": 2.516,
+      "max": 5.429,
+      "p05": 0.571,
+      "p95": 5.429
+    },
+    "Vpvs_model.dat": {
+      "n": 1690,
+      "min": 1.6,
+      "median": 1.75,
+      "max": 2.1,
+      "p05": 1.683,
+      "p95": 2.0835500000000002
+    }
+  },
+  "model_limit": "No surveyed Deep fiber-to-depth transform or borehole logs found in workspace."
+}

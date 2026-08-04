@@ -1,0 +1,9 @@
+SAFOD AWD phase-neutral null tests
+band: 30-60 Hz
+Nano fiber-coordinate aperture: 80-440 m
+observed coarse local-max semblance: 0.643689
+observed speed/intercept: 2975.0 m/s, -22.0 ms
+depth permutations: 499; seed: 20260801
+permutation p-value (local look-elsewhere corrected): 0.002000
+largest pre-source control: 0.042945
+pre-source speed/intercept: 3175.0 m/s, -358.0 ms

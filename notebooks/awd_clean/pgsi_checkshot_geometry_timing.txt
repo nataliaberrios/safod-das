@@ -1,0 +1,33 @@
+SAFOD PGSI check-shot geometry/timing audit
+===========================================
+Decision: use the controlled PGSI explosions as the next highest-leverage
+test because surveyed receiver geometry and explicit SEG2 timing make a
+direct-P moveout/depth-registration hypothesis testable.
+
+Geometry: position-1 receiver depths 46.677--1249.777 m; max |WELL_DEP-REC_DEP| 0.864 m.
+Source offsets are from shot_locs.doc (UTM NAD27 relative to the wellhead).
+The 1040 source depth follows the supplied R code (31 ft below KB); other
+hole depths are documented as 10 ft (shot 6: 15 ft) and are not inverted here.
+
+SEG2 timing inventory (do not silently harmonize):
+  shot 1 file 1027.dat: DELAY=-0.200 s; ACQUISITION_TIME=20:09:24
+  shot 2 file 1040.dat: DELAY=-0.200 s; ACQUISITION_TIME=21:24:24
+  shot 3 file 1060.dat: DELAY=-0.200 s; ACQUISITION_TIME=15:04:24
+  shot 4 file 1071.dat: DELAY=+0.200 s; ACQUISITION_TIME=19:59:59
+  shot 5 file 1078.dat: DELAY=-0.200 s; ACQUISITION_TIME=20:27:59
+  shot 6 file 1082.dat: DELAY=+0.000 s; ACQUISITION_TIME=21:39:25
+The legacy R note explicitly states that file zero is 200 ms before
+the shot origin (DELAY=-0.200 s). Two supplied files instead carry
++0.200 s and 0.000 s, so a multi-shot timing correction remains required.
+
+Shot 1040 corrected axial channel test:
+  axial mapping: channels 3,6,...,240, reversed to shallow-to-deep
+  retained AIC picks: 38/80
+  robust slope velocity: 2981.8 m/s
+  fitted origin offset: 26.1 ms
+  residual RMS: 3.1 ms
+Interpretation: the corrected gather has a coherent, approximately 2.98 km/s moveout slope after geometry correction,
+but the fitted origin offset (26.1 ms), 38/80 retained picks, and inconsistent delays mean this remains a
+validation result, not a standalone Vp inversion or proof that the 2026 Nano mode is direct P.
+The next step is to reconcile SEG2 header/shot-origin conventions across
+all six files, then compare the registered PGSI moveout with the Nano depth axis.

@@ -1,0 +1,12 @@
+SAFOD AWD Nano burst-delay regression
+Status: source-history nuisance regression plus phase-free tidal-timescale stress test.
+
+Data: 49 burst-level leave-one-burst-out delays.
+Compaction proxy: cumulative AWD drops; coupling proxy: burst signal RMS. Neither is an independent ground-level displacement measurement.
+Delay median and p05-p95: -0.048 ms; -0.413 to 0.497 ms.
+Baseline RMSE=0.239 ms; +24-h harmonic RMSE=0.199 ms.
+Blocked 5-fold CV RMSE: baseline=0.297 ms; +24-h harmonic=0.223 ms.
+Observed ΔRSS=0.8629 ms^2; naive F p=0.000299; circular block-bootstrap p=0.002 (block=3, N=5000).
+Fitted 24-h component amplitude=0.283 ms; maximum at 4.98 h (+0.283 ms), minimum at 16.98 h (-0.283 ms).
+Interpretation: source-history/coupling removal leaves a reproducible nonmonotone 24-hour-timescale delay component. This is a candidate tidal-timescale pattern, not a tidal-force detection: phase is fitted from the data and is not mapped to opening or closing without an astronomical tide/traction predictor.
+Next check: add a physically phased Earth-tide/strain predictor and repeat with held-out bursts and environmental controls.

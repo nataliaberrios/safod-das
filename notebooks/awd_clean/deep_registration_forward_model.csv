@@ -1,0 +1,16 @@
+quantity,value,units,interpretation
+dx,2.0419,m/channel,instrument spatial sampling interval
+n_channels,3200,channels,raw Deep array used by stack builder
+start_locus_index,1800,index,interrogator absolute locus metadata
+start_locus_coordinate,3675.42,m,absolute interrogator coordinate; not borehole depth
+turnaround_channel,1702,index,data-derived hairpin split used by Deep analyses
+turnaround_coordinate,3475.3138,m,coordinate from channel 0; not surveyed depth
+array_end_coordinate,6532.0381,m,(N-1)*dx
+candidate_count,24,candidates,six ranked candidates per leg and band
+candidate_velocity_median,1538.461538461538,m/s,validated slow-mode candidate median
+candidate_velocity_p05,1388.8888888888887,m/s,candidate distribution
+candidate_velocity_p95,1562.4999999999995,m/s,candidate distribution
+direct_fluid_compatibility_fraction,1.0,fraction,within 1.3–1.8 km/s prior
+bounded_envelope_compatibility_fraction,1.0,fraction,within 0.75–1.0 times 1.3–1.8 km/s envelope
+physical_depth_registration,unresolved,status,raw metadata contain no surveyed fiber-to-depth transform
+borehole_log_comparison,not available,status,no borehole logs found in workspace

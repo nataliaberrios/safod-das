@@ -1,0 +1,3 @@
+Corrected geometry: source offset 15 m; vertical Nano fiber; depths 80-500 m.
+Median direct-P speed: 3940.6 m/s; range 3723.3-4097.6 m/s.
+Model values are km/s on the Zhang-Thurber-Bedrosian grid. This is a forward sensitivity test, not an inversion.

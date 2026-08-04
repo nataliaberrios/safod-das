@@ -1,0 +1,9 @@
+2005 PGSI axial check-shot signed frequency-slowness summary
+Each record uses its own SEG2 DELAY header; axial channels are reversed into shallow-to-deep order.
+
+shot 1027: delay=-0.200 s, median p=+0.07000 ms/m, signed v=+nan m/s, median ridge power=0.0687
+shot 1040: delay=-0.200 s, median p=-0.44500 ms/m, signed v=-2247.2 m/s, median ridge power=0.0709
+shot 1060: delay=-0.200 s, median p=+0.22500 ms/m, signed v=+4444.4 m/s, median ridge power=0.0653
+shot 1071: delay=+0.200 s, median p=+0.28500 ms/m, signed v=+3508.8 m/s, median ridge power=0.0751
+shot 1078: delay=-0.200 s, median p=+0.00000 ms/m, signed v=+nan m/s, median ridge power=0.0714
+shot 1082: delay=+0.000 s, median p=-0.01000 ms/m, signed v=+nan m/s, median ridge power=0.0680

@@ -1,0 +1,9 @@
+SAFOD AWD signed frequency-slowness summary
+Positive/negative signs refer to increasing/decreasing coordinate in each plotted orientation.
+Deep return was reversed into a provisional surface-to-turnaround orientation.
+20-60 Hz ridge summaries use the stronger 40% of frequency bins and are descriptive, not phase labels.
+
+Nano 80-440 m: QC channels=285/285, median signed p=0.33500 ms/m, median signed v=2985.1 m/s, median ridge power=0.5298
+Deep 80-440 m: QC channels=177/177, median signed p=-0.01000 ms/m, median signed v=-116.7 m/s, median ridge power=0.0744
+Deep outbound leg: QC channels=1702/1702, median signed p=nan ms/m, median signed v=nan m/s, median ridge power=nan
+Deep return leg (reversed): QC channels=1498/1498, median signed p=nan ms/m, median signed v=nan m/s, median ridge power=nan

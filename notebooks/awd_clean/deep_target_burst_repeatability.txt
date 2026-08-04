@@ -1,0 +1,24 @@
+SAFOD AWD Deep target-window burst repeatability
+Fixed trajectories selected from even-numbered discovery epochs; all 46 non-empty burst stacks evaluated independently.
+Positive-minus-negative semblance is a directional repeatability statistic, not a calibrated amplitude or creep measurement.
+Primary band: 15–30 Hz; 3–15 Hz is the control. Assumed depths remain conditional on the provisional fiber mapping.
+
+Summary (validation split):
+3192 m outbound 3–15 Hz: n=23, positive fraction=0.261, sign p=0.9947, median difference=-0.0088 [-0.0396,-0.0096]
+3192 m outbound 15–30 Hz: n=23, positive fraction=0.913, sign p=3.302e-05, median difference=0.2892 [0.1589,0.2929]
+3192 m return 3–15 Hz: n=23, positive fraction=0.565, sign p=0.3388, median difference=0.0006 [-0.0063,0.0084]
+3192 m return 15–30 Hz: n=23, positive fraction=0.870, sign p=0.0002441, median difference=0.0804 [0.0729,0.1772]
+3302 m outbound 3–15 Hz: n=23, positive fraction=0.217, sign p=0.9987, median difference=-0.0210 [-0.0376,-0.0139]
+3302 m outbound 15–30 Hz: n=23, positive fraction=0.913, sign p=3.302e-05, median difference=0.2917 [0.1686,0.3162]
+3302 m return 3–15 Hz: n=23, positive fraction=0.609, sign p=0.2024, median difference=0.0080 [-0.0007,0.0252]
+3302 m return 15–30 Hz: n=23, positive fraction=0.696, sign p=0.04657, median difference=0.0172 [0.0189,0.0749]
+2800 m outbound 3–15 Hz: n=23, positive fraction=0.826, sign p=0.0013, median difference=0.0305 [0.0236,0.0698]
+2800 m outbound 15–30 Hz: n=23, positive fraction=0.826, sign p=0.0013, median difference=0.3072 [0.1919,0.3209]
+2800 m return 3–15 Hz: n=23, positive fraction=0.696, sign p=0.04657, median difference=0.0142 [0.0047,0.0237]
+2800 m return 15–30 Hz: n=23, positive fraction=0.522, sign p=0.5, median difference=0.0003 [-0.0232,0.0008]
+3000 m outbound 3–15 Hz: n=23, positive fraction=0.348, sign p=0.9534, median difference=-0.0153 [-0.0349,0.0079]
+3000 m outbound 15–30 Hz: n=23, positive fraction=0.957, sign p=2.861e-06, median difference=0.1343 [0.1018,0.1634]
+3000 m return 3–15 Hz: n=23, positive fraction=0.783, sign p=0.005311, median difference=0.0275 [0.0469,0.1924]
+3000 m return 15–30 Hz: n=23, positive fraction=0.783, sign p=0.005311, median difference=0.1043 [0.0863,0.2067]
+
+Interpretation: burst-level support strengthens the active-source baseline; absence of burst-level support would limit the creep-monitoring framing. Neither outcome measures a creep rate from this 24-hour experiment.

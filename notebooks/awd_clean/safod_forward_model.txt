@@ -1,0 +1,8 @@
+SAFOD AWD Nano forward sensitivity test
+========================================
+Model: Vp_model.dat, Vs_model.dat, Vpvs_model.dat; coordinates parsed from MOD.head.
+Grid: 13 x 13 x 10 padded nodes; units km and km/s.
+Representative straight path: source [-0.2, 0.0, 0.5] km, offsets 0.08-0.50 km.
+Median integrated direct-P speed: 4138.9 m/s; range 3750.1-4211.5 m/s.
+Guided alternative: c(f)=2.72+0.004(f-20) km/s, a sensitivity hypothesis anchored near the observed ridge.
+Interpretation: this calculation tests identifiability and geometry sensitivity; it does not invert Vp or prove a phase.

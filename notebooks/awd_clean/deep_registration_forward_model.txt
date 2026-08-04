@@ -1,0 +1,9 @@
+SAFOD AWD Deep registration and bounded tube-wave forward test
+Status: conditional consistency test; no physical depth registration or inversion.
+
+Deep metadata: dx=2.0419 m/channel, N=3200, StartLocusIndex=1800 (3675.42 m interrogator coordinate), hairpin channel=1702 (3475.31 m from channel 0), end=6532.04 m.
+The StartLocusIndex and hairpin coordinate are not measured depth. The HDF5 metadata provide no surveyed fiber path, orientation, or depth origin.
+Validated candidate velocity median=1538.5 m/s; 5th–95th percentile=1388.9–1562.5 m/s.
+Direct 1.3–1.8 km/s fluid-prior compatibility=1.000; bounded 0.75–1.0 compliance envelope compatibility=1.000.
+Interpretation: the slow mode is numerically compatible with a tube-wave-like speed range, but this result cannot distinguish fluid, casing, formation compliance, or another guided mode.
+The supplied Vp/Vs arrays are plotted only as formation-background context; no candidate can be assigned to a depth or fracture.

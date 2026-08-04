@@ -1,0 +1,26 @@
+SAFOD AWD Deep targeted tube-wave observability scan
+Status: target-specific validation; provisional coordinate-to-depth mapping only.
+Assumed mapping: outbound s=depth; reversed return s=3475.31-depth (m).
+Target range: 3000–3450 m; SDZ=3192 m; CDZ=3302 m; damage interval=3150–3414 m.
+Aperture=200 m; target center step=50 m; bands=((3.0, 15.0), (15.0, 30.0)); channel-order permutations=499.
+Rows=96; non-empty epochs=46; discovery/validation split by epoch parity.
+A non-significant target test means the target window was tested and did not validate; it is not evidence that the array lacks a tube wave elsewhere.
+The current 24-hour experiment cannot measure the rate of aseismic creep; it establishes a candidate baseline and a repeat-survey sensitivity test.
+
+Target null summaries:
+3192 m outbound negative 3–15 Hz: observed=0.0504, null median=0.0222, null p95=0.0564, p=0.0780
+3192 m outbound negative 15–30 Hz: observed=0.0786, null median=0.0259, null p95=0.0564, p=0.0200
+3192 m outbound positive 3–15 Hz: observed=0.0169, null median=0.0285, null p95=0.0709, p=0.7940
+3192 m outbound positive 15–30 Hz: observed=0.3318, null median=0.0244, null p95=0.0575, p=0.0020
+3192 m return negative 3–15 Hz: observed=0.0244, null median=0.0260, null p95=0.0778, p=0.5240
+3192 m return negative 15–30 Hz: observed=0.0295, null median=0.0243, null p95=0.0573, p=0.3700
+3192 m return positive 3–15 Hz: observed=0.0207, null median=0.0208, null p95=0.0594, p=0.5040
+3192 m return positive 15–30 Hz: observed=0.2606, null median=0.0252, null p95=0.0584, p=0.0020
+3302 m outbound negative 3–15 Hz: observed=0.0556, null median=0.0239, null p95=0.0461, p=0.0140
+3302 m outbound negative 15–30 Hz: observed=0.0294, null median=0.0238, null p95=0.0371, p=0.2400
+3302 m outbound positive 3–15 Hz: observed=0.0382, null median=0.0304, null p95=0.0608, p=0.3180
+3302 m outbound positive 15–30 Hz: observed=0.2122, null median=0.0244, null p95=0.0505, p=0.0020
+3302 m return negative 3–15 Hz: observed=0.0330, null median=0.0198, null p95=0.0508, p=0.2180
+3302 m return negative 15–30 Hz: observed=0.0780, null median=0.0228, null p95=0.0678, p=0.0300
+3302 m return positive 3–15 Hz: observed=0.0346, null median=0.0236, null p95=0.0505, p=0.2360
+3302 m return positive 15–30 Hz: observed=0.1491, null median=0.0254, null p95=0.0578, p=0.0020

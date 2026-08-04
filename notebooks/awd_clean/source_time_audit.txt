@@ -1,0 +1,9 @@
+SAFOD AWD source-time audit
+Timing definition: p26.cc9 UTC_Date is a cross-correlation pick on nearby PEG500 node 453009664, not a physical impact trigger.
+catalog rows: 989
+reference-node windows extracted: 989
+reference-node sampling rate: 2000.0 Hz
+reference-node analysis band: 15.0-80.0 Hz
+stack envelope onset relative to UTC_Date: 8.000 ms
+stack absolute-amplitude peak relative to UTC_Date: 86.500 ms
+Consequence: absolute DAS travel times require the reference node's source distance/coordinates and a physical impact-time calibration. Relative moveout and interval slowness do not require that constant correction.

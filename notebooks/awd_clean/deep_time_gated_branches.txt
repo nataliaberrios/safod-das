@@ -1,0 +1,3 @@
+Time reference: p26.cc9.txt UTC_Date; physical meaning not independently documented.
+Branch rows: 120; geometric intersections: 5; permutation p<=0.05: 0.
+Intersection positions are provisional fiber coordinates, not true depth or accepted fracture locations.

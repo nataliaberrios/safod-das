@@ -1,0 +1,29 @@
+# Large/raw data and generated checkpoint trees
+ambient_transfer/
+Check shots/
+pgsi_reference/
+elasticwavemodeling/
+repeating/
+*.npz
+*.npy
+*.dat
+*.sgy
+*.segy
+
+# Batch logs and LaTeX build products
+*.log
+*.out
+*.err
+*.aux
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+
+# Generated PDFs are kept out of the source snapshot; selected figures can be force-added.
+*.pdf
+
+# Notebook/editor caches and superseded dashboard copies
+.ipynb_checkpoints/
+AWD_results_dashboard_v*.ipynb

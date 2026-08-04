@@ -1,0 +1,7 @@
+SAFOD AWD Deep tube-wave candidate: split-sample validation
+discovery epochs: 23; validation epochs: 23
+spatial permutations: 499; seed: 20260802
+outbound 3-15 Hz: validation fixed-p power=0.23474, permutation p=0.0020, bursts +p>-p=1.000
+outbound 15-30 Hz: validation fixed-p power=0.21768, permutation p=0.0020, bursts +p>-p=1.000
+return 3-15 Hz: validation fixed-p power=0.03151, permutation p=0.0020, bursts +p>-p=1.000
+return 15-30 Hz: validation fixed-p power=0.06140, permutation p=0.0020, bursts +p>-p=1.000

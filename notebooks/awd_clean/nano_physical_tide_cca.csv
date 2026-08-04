@@ -1,0 +1,13 @@
+quantity,value,units,interpretation
+n_bursts,49,bursts,burst-level observations
+canonical_correlation_1,0.3658580017120496,r,full-sample CCA
+row_permutation_p,0.11597680463907219,probability,rows independently permuted
+block_permutation_p,0.2625474905018996,probability,three-burst blocks permuted
+blocked_cv_corr_mean,0.3594353501489437,r,five contiguous test folds
+blocked_cv_corr_median,0.24733505971958192,r,five contiguous test folds
+blocked_cv_corr_values,0.780;0.247;0.230;0.501;0.039,r,fold-by-fold values
+x_set,Moon and Sun degree-2 tidal potential,predictor,physically phased from UTC ephemeris
+y_set,source-corrected delay and burst signal RMS,response,delay corrected with history/coupling baseline
+safod_latitude,35.98,deg,approximate phase geometry
+safod_longitude,-120.55,deg,approximate phase geometry
+status,exploratory physical-phase CCA; not traction detection,status,fault orientation and compaction measurement unavailable

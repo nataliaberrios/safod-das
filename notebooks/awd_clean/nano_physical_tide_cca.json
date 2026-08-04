@@ -1,0 +1,35 @@
+{
+  "status": "exploratory_physical_phase_cca_not_tidal_traction_detection",
+  "n_bursts": 49,
+  "canonical_correlation": 0.3658580017120496,
+  "row_permutation_p": 0.11597680463907219,
+  "block_permutation_p": 0.2625474905018996,
+  "blocked_cv_correlations": [
+    0.7797986660530294,
+    0.24733505971958192,
+    0.23017930410838647,
+    0.500831448049059,
+    0.03903227281466142
+  ],
+  "x_weights": [
+    -0.5378618330421804,
+    1.7310173590440412
+  ],
+  "y_weights": [
+    -0.4520443337834529,
+    0.891995471005472
+  ],
+  "x_set": "Moon and Sun degree-2 tide-generating potential from UTC ephemeris",
+  "y_set": "source-corrected delay and burst signal RMS",
+  "geometry": {
+    "latitude_deg": 35.98,
+    "longitude_deg": -120.55
+  },
+  "limitations": [
+    "No independent ground-level compaction measurement was found.",
+    "Low-precision ephemeris is suitable for phase screening, not precision gravimetry.",
+    "Scalar potential is not fault-normal traction.",
+    "Fault strike/dip and stress convention are unavailable.",
+    "Serial block null and blocked CV control the interpretation."
+  ]
+}

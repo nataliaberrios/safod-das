@@ -1,0 +1,28 @@
+{
+  "status": "candidate_nonmonotone_delay_component",
+  "n_bursts": 49,
+  "delay_median_ms": -0.04754213773544856,
+  "delay_p05_ms": -0.4128927265751,
+  "delay_p95_ms": 0.4966120587223798,
+  "source_compaction_proxy": "cumulative AWD drops",
+  "source_coupling_proxy": "burst signal RMS",
+  "tidal_predictor": "phase-free 24-hour sine/cosine pair",
+  "baseline_rss_ms2": 2.7972263797894636,
+  "harmonic_rss_ms2": 1.9343398981979918,
+  "blocked_cv_rmse_ms": {
+    "baseline": 0.296560267207491,
+    "harmonic": 0.22273557491233692
+  },
+  "delta_rss_ms2": 0.8628864815914719,
+  "naive_f_p": 0.0002990293651636941,
+  "block_bootstrap_p": 0.001999600079984003,
+  "harmonic_amplitude_ms": 0.28263654663684096,
+  "harmonic_max_hour": 4.9799999999999995,
+  "harmonic_min_hour": 16.979999999999997,
+  "limitations": [
+    "No independent ground-level compaction sensor was found.",
+    "The 24-hour harmonic is phase-free, not an astronomical traction calculation.",
+    "The 49 delays are time ordered, not independent daily experiments.",
+    "Opening/closing sign requires an externally phased predictor."
+  ]
+}

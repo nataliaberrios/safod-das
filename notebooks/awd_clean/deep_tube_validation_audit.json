@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-08-02T01:32:29-07:00",
+  "parent_job": "37217153",
+  "parent_job_state": "COMPLETED 0:0",
+  "computational_status": "PASS",
+  "problems": [],
+  "files": {
+    "record_sections": {
+      "path": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/deep_tube_record_sections.png",
+      "exists": true,
+      "bytes": 1080648
+    },
+    "repeatability_figure": {
+      "path": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/deep_tube_repeatability.png",
+      "exists": true,
+      "bytes": 362476
+    },
+    "null_figure": {
+      "path": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/deep_tube_null_tests.png",
+      "exists": true,
+      "bytes": 169856
+    },
+    "candidate_table": {
+      "path": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/deep_tube_candidates.csv",
+      "exists": true,
+      "bytes": 5241
+    },
+    "burst_table": {
+      "path": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/deep_tube_burst_repeatability.csv",
+      "exists": true,
+      "bytes": 15820
+    },
+    "numerical_product": {
+      "path": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/deep_tube_validation.npz",
+      "exists": true,
+      "bytes": 119622
+    },
+    "text_report": {
+      "path": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/deep_tube_validation.txt",
+      "exists": true,
+      "bytes": 516
+    }
+  },
+  "candidate_rows": 24,
+  "burst_rows": 184,
+  "metrics": [
+    {
+      "leg": "outbound",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "validation_power": 0.23474,
+      "permutation_p": 0.002,
+      "direction_fraction": 1.0,
+      "screen": "PASS"
+    },
+    {
+      "leg": "outbound",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "validation_power": 0.21768,
+      "permutation_p": 0.002,
+      "direction_fraction": 1.0,
+      "screen": "PASS"
+    },
+    {
+      "leg": "return",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "validation_power": 0.03151,
+      "permutation_p": 0.002,
+      "direction_fraction": 1.0,
+      "screen": "PASS"
+    },
+    {
+      "leg": "return",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "validation_power": 0.0614,
+      "permutation_p": 0.002,
+      "direction_fraction": 1.0,
+      "screen": "PASS"
+    }
+  ],
+  "interpretation_policy": "Automated screens are not scientific phase labels."
+}

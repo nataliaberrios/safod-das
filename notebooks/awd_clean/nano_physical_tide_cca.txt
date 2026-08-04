@@ -1,0 +1,12 @@
+SAFOD AWD Nano physically phased astronomical tide CCA
+Status: exploratory timing/association test; not a fault-traction, opening/closing, or permeability detection.
+
+Predictors: degree-2 Moon and Sun tide-generating potentials evaluated at the actual UTC burst times using a low-precision ephemeris.
+Approximate geometry: latitude=35.98 deg, longitude=-120.55 deg.
+Response: Nano burst delay after cumulative-drop and burst-RMS source-history correction, plus burst signal RMS.
+No independent source-ground compaction/settlement time series was found locally; cumulative drops remain a mechanical-history proxy.
+
+Full-sample first canonical correlation: 0.366.
+Independent row-permutation p=0.1160; three-burst block-permutation p=0.2625.
+Five contiguous-fold test correlations: 0.780, 0.247, 0.230, 0.501, 0.039; mean=0.359, median=0.247.
+Interpretation: a physically phased association is screened, but significance must be judged by the serial block null and held-out stability. The scalar potential does not provide a fault-normal sign; an opening/closing interpretation requires surveyed fault orientation, stress convention, and ideally an independent compaction measurement.

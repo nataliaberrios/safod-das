@@ -1,0 +1,29 @@
+SAFOD Nano AWD hierarchical repeatability
+=========================================
+Input observations: 988 Nano-available rows from awd_manifest.csv
+Extracted individual drops: 988 in 49 bursts
+Alignment timestamp: literal p26.cc9.txt UTC_Date; physical source-time meaning is not assumed
+Fixed mode test: 30-60 Hz, 80-440 m, 2975 m/s, intercept -0.022 s at the first aperture channel
+Reduced observable: unnormalized equal-channel mean after trajectory alignment; no individual DAS waveform cube is saved
+Signal tau window: -0.040 to +0.160 s
+Equal-duration noise tau window: -0.360 to -0.160 s
+Cross-correlation lag search: +/-12.0 ms; positive delay means the observation is later than its LOO reference
+
+Within-burst drop signal NCC (16/50/84%): (0.5514927723531526, 0.8891710426894152, 0.9891352663937016)
+Within-burst drop noise NCC (16/50/84%): (0.17200958964729332, 0.2878730958028909, 0.43532276676675297)
+Bursts whose median signal NCC exceeds median noise NCC: 49/49
+Exact one-sided burst-level sign-test probability: 1.77636e-15
+Within-burst drop delay, ms (16/50/84%): (-0.5718869163944986, 0.009194045429670335, 0.5882834117364205)
+Within-burst relative amplitude (16/50/84%): (0.8819490661195624, 1.0, 1.3346146186463104)
+Individual-drop moveout-beam SNR, dB (16/50/84%): (1.2640055505992727, 7.720136744979516, 24.90185429933983)
+Across-burst template NCC (16/50/84%): (0.9515434764846262, 0.9757433296927794, 0.992727898356908)
+Across-burst template delay, ms (16/50/84%): (-0.2541886640631191, -0.047542137735448554, 0.31117469643256307)
+
+Independent within-burst substack convergence:
+  n=1 drops per substack, NCC 16/50/84%: (0.372805189513159, 0.7403405785159677, 0.9855107845044667)
+  n=2 drops per substack, NCC 16/50/84%: (0.5122784858361559, 0.7821244661116189, 0.9799136725731242)
+  n=4 drops per substack, NCC 16/50/84%: (0.6630866468225821, 0.8499328900518435, 0.973692989178119)
+  n=8 drops per substack, NCC 16/50/84%: (0.7975900058862211, 0.9094058359043404, 0.9813006275944581)
+
+Interpretive boundary: these metrics quantify repeatability of a fixed phase-neutral moveout beam. They do not by themselves identify the mode as direct P, infer formation V_P, or establish absolute source amplitude.
+Saved: nano_drop_repeatability.csv, nano_burst_repeatability_hierarchical.csv, nano_stack_convergence.csv, nano_hierarchical_repeatability.npz, nano_hierarchical_repeatability.png

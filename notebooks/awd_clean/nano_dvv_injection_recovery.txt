@@ -1,0 +1,10 @@
+SAFOD AWD Nano phase-neutral apparent-moveout injection--recovery
+Input: canonical_epoch_stacks_paired_deep_all.npz
+Band: 30-60 Hz; aperture: 80-440 m along-fiber coordinate
+Fixed reference trajectory: 2975.0 m/s; intercept -0.022 s relative to p26.cc9.txt UTC_Date
+Trials: 690; zero-injection trials: 46
+Null median removed as calibration: 0.000335039
+Empirical two-sided 95% null threshold: 0.00324613
+Empirical false-positive rate: 0.065217
+Smallest tested magnitude with >=95% correct-sign detection in both directions: 0.01
+Interpretation: detection applies only to fractional change in the accepted Nano apparent-moveout observable. It is not yet a formation Vp or direct-P dv/v limit.

@@ -1,0 +1,21 @@
+quantity,value,units,interpretation
+n_bursts,49,bursts,independent burst-level delays
+delay_median,-0.04754213773544856,ms,LOO-template delay
+delay_p05,-0.4128927265751,ms,LOO-template delay
+delay_p95,0.4966120587223798,ms,LOO-template delay
+baseline_rss,2.7972263797894636,ms^2,intercept + cumulative-drop + coupling
+harmonic_rss,1.9343398981979918,ms^2,baseline + phase-free 24-h sine/cosine
+baseline_blocked_cv_rmse,0.296560267207491,ms,five contiguous time blocks
+harmonic_blocked_cv_rmse,0.22273557491233692,ms,five contiguous time blocks
+delta_rss,0.8628864815914719,ms^2,24-h improvement
+naive_f_p,0.0002990293651636941,probability,reference only; not autocorrelation corrected
+block_bootstrap_p,0.001999600079984003,probability,circular residual blocks of 3 bursts
+harmonic_amplitude,0.28263654663684096,ms,phase-free 24-h component
+harmonic_max_hour,4.9799999999999995,hours,maximum of fitted component
+harmonic_max_ms,0.28263654663435794,ms,maximum of fitted component
+harmonic_min_hour,16.979999999999997,hours,minimum of fitted component
+harmonic_min_ms,-0.28263654663435794,ms,minimum of fitted component
+source_compaction_proxy,cumulative AWD drops,proxy,no independent ground-level compaction sensor
+source_coupling_proxy,burst signal RMS,proxy,observed coupling nuisance
+tidal_predictor,phase-free 24-hour harmonic,proxy,not an astronomical traction calculation
+interpretation_status,candidate nonmonotone delay component,status,not a tidal detection

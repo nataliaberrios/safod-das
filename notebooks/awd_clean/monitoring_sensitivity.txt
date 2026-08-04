@@ -1,0 +1,6 @@
+Nano AWD monitoring sensitivity
+===============================
+Null trials: 46; null standard deviation: 0.00174744.
+Threshold curves use sigma/sqrt(N) independence scaling and are not a replacement for new synthetic injections.
+Illustrative Earth-tide benchmark: 5.0e-04; this is a comparison target, not a detected signal.
+The threshold applies to the accepted Nano apparent-moveout observable, not directly to formation dV_P/V_P.

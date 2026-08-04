@@ -1,0 +1,208 @@
+{
+  "status": "target_specific_validation_provisional_depth",
+  "mapping": "outbound s=depth; return s=turnaround-depth after reversal",
+  "turnaround_m": 3475.3138,
+  "target_range_m": [
+    3000.0,
+    3450.0
+  ],
+  "sdz_m": 3192.0,
+  "cdz_m": 3302.0,
+  "damage_interval_m": [
+    3150.0,
+    3414.0
+  ],
+  "aperture_m": 200.0,
+  "center_step_m": 50.0,
+  "bands_hz": [
+    [
+      3.0,
+      15.0
+    ],
+    [
+      15.0,
+      30.0
+    ]
+  ],
+  "n_permutation": 499,
+  "seed": 20260802,
+  "row_count": 96,
+  "null_summaries": [
+    {
+      "depth_m": 3192.0,
+      "leg": "outbound",
+      "direction": "negative",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "observed": 0.05041282405556767,
+      "null_median": 0.022170522410849998,
+      "null_p95": 0.056379244470068327,
+      "p_value": 0.078
+    },
+    {
+      "depth_m": 3192.0,
+      "leg": "outbound",
+      "direction": "negative",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "observed": 0.07859771947772583,
+      "null_median": 0.025905256760563617,
+      "null_p95": 0.056404064667514506,
+      "p_value": 0.02
+    },
+    {
+      "depth_m": 3192.0,
+      "leg": "outbound",
+      "direction": "positive",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "observed": 0.01687206510613498,
+      "null_median": 0.028450192898355556,
+      "null_p95": 0.07089809404592724,
+      "p_value": 0.794
+    },
+    {
+      "depth_m": 3192.0,
+      "leg": "outbound",
+      "direction": "positive",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "observed": 0.3318390933902173,
+      "null_median": 0.024435166423337304,
+      "null_p95": 0.05752379569303873,
+      "p_value": 0.002
+    },
+    {
+      "depth_m": 3192.0,
+      "leg": "return",
+      "direction": "negative",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "observed": 0.02437555814424183,
+      "null_median": 0.02595604370220108,
+      "null_p95": 0.07778576209508994,
+      "p_value": 0.524
+    },
+    {
+      "depth_m": 3192.0,
+      "leg": "return",
+      "direction": "negative",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "observed": 0.02952190709669532,
+      "null_median": 0.024290882673064146,
+      "null_p95": 0.05731704629162087,
+      "p_value": 0.37
+    },
+    {
+      "depth_m": 3192.0,
+      "leg": "return",
+      "direction": "positive",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "observed": 0.020732307045965598,
+      "null_median": 0.020802577980451688,
+      "null_p95": 0.05941763911028708,
+      "p_value": 0.504
+    },
+    {
+      "depth_m": 3192.0,
+      "leg": "return",
+      "direction": "positive",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "observed": 0.2606369107422287,
+      "null_median": 0.025155434005966072,
+      "null_p95": 0.058407541789697384,
+      "p_value": 0.002
+    },
+    {
+      "depth_m": 3302.0,
+      "leg": "outbound",
+      "direction": "negative",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "observed": 0.05557467372887386,
+      "null_median": 0.02393877023255403,
+      "null_p95": 0.04613109217428305,
+      "p_value": 0.014
+    },
+    {
+      "depth_m": 3302.0,
+      "leg": "outbound",
+      "direction": "negative",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "observed": 0.02942207010940328,
+      "null_median": 0.02379299315795684,
+      "null_p95": 0.03713746862484487,
+      "p_value": 0.24
+    },
+    {
+      "depth_m": 3302.0,
+      "leg": "outbound",
+      "direction": "positive",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "observed": 0.038153837813746,
+      "null_median": 0.030418476656721514,
+      "null_p95": 0.06083727302019408,
+      "p_value": 0.318
+    },
+    {
+      "depth_m": 3302.0,
+      "leg": "outbound",
+      "direction": "positive",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "observed": 0.2122162647150247,
+      "null_median": 0.0243658508399944,
+      "null_p95": 0.05047056653275635,
+      "p_value": 0.002
+    },
+    {
+      "depth_m": 3302.0,
+      "leg": "return",
+      "direction": "negative",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "observed": 0.033027299294547355,
+      "null_median": 0.01983745289133378,
+      "null_p95": 0.05081756323116947,
+      "p_value": 0.218
+    },
+    {
+      "depth_m": 3302.0,
+      "leg": "return",
+      "direction": "negative",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "observed": 0.0779832011852061,
+      "null_median": 0.02280411315738446,
+      "null_p95": 0.06783323018114923,
+      "p_value": 0.03
+    },
+    {
+      "depth_m": 3302.0,
+      "leg": "return",
+      "direction": "positive",
+      "band_low_hz": 3.0,
+      "band_high_hz": 15.0,
+      "observed": 0.03459144820260386,
+      "null_median": 0.023630269671659543,
+      "null_p95": 0.050488399221547894,
+      "p_value": 0.236
+    },
+    {
+      "depth_m": 3302.0,
+      "leg": "return",
+      "direction": "positive",
+      "band_low_hz": 15.0,
+      "band_high_hz": 30.0,
+      "observed": 0.14910323614972812,
+      "null_median": 0.02541121042916188,
+      "null_p95": 0.05776545745262433,
+      "p_value": 0.002
+    }
+  ]
+}

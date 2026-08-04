@@ -1,0 +1,32 @@
+{
+  "status": "exploratory_cca_not_tidal_detection",
+  "n_bursts": 49,
+  "canonical_correlation": 0.5333849318750805,
+  "row_permutation_p": 0.019396120775844832,
+  "block_permutation_p": 0.11757648470305938,
+  "blocked_cv_correlations": [
+    0.6974050692446251,
+    0.015903020449455095,
+    0.3780738622791256,
+    0.05732642395193021,
+    0.07545350589945533
+  ],
+  "x_weights": [
+    -1.0146048232504103,
+    -0.8336276381915199,
+    -0.45147393693959204,
+    -0.3285558142396687
+  ],
+  "y_weights": [
+    -0.6080682092981072,
+    0.79388478562131
+  ],
+  "x_set": "phase-free 24-hour and 12.4206-hour sine/cosine bases",
+  "y_set": "source-corrected delay and burst signal RMS",
+  "limitations": [
+    "CCA phase is free, not an astronomical tide phase.",
+    "No independent ground-compaction measurement is available.",
+    "Block null and blocked CV are not robustly significant.",
+    "Opening/closing sign requires an external fault-traction convention."
+  ]
+}

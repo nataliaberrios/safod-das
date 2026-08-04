@@ -1,0 +1,11 @@
+quantity,value,units,interpretation
+n_bursts,49,bursts,burst-level observations
+canonical_correlation_1,0.5333849318750805,r,full-sample CCA
+row_permutation_p,0.019396120775844832,probability,rows independently permuted
+block_permutation_p,0.11757648470305938,probability,3-burst blocks permuted
+blocked_cv_corr_mean,0.24483237636491828,r,five contiguous test folds
+blocked_cv_corr_median,0.07545350589945533,r,five contiguous test folds
+blocked_cv_corr_values,0.697;0.016;0.378;0.057;0.075,r,fold-by-fold values
+x_set,24 h and 12.4206 h sine/cosine bases,predictor,phase-free tidal-timescale basis
+y_set,source-corrected delay and burst signal RMS,response,delay corrected using history/coupling baseline
+status,exploratory CCA; not tidal detection,status,block null and CV are controlling checks

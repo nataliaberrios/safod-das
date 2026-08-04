@@ -1,0 +1,9 @@
+SAFOD AWD Nano canonical-correlation test
+Status: exploratory pattern-discovery test; not a causal or tidal-force detection.
+
+X set: phase-free 24-hour and 12.4206-hour sine/cosine bases.
+Y set: source-corrected burst delay and burst signal RMS.
+Full-sample first canonical correlation: 0.533.
+Independent row-permutation p=0.0194; 3-burst block-permutation p=0.1176.
+Five contiguous-fold test correlations: 0.697, 0.016, 0.378, 0.057, 0.075; mean=0.245, median=0.075.
+Interpretation: CCA finds a full-sample association with the phase-free tidal-timescale basis, but the serial-dependence-aware block null and unstable blocked-CV correlations do not establish a robust tidal signal. Use CCA to prioritize a physically phased tide/traction predictor, not to assign opening or closing.

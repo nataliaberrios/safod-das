@@ -1,0 +1,367 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{microtype}
+
+\definecolor{caution}{RGB}{150,55,35}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\caution}[1]{\textcolor{caution}{#1}}
+
+\title{Clean Analysis of the June 2026 SAFOD\\
+Accelerated Weight-Drop DAS Experiment}
+\author{Analysis workflow documentation}
+\date{1 August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This document describes a clean reanalysis of the June 2026 accelerated
+weight-drop (AWD) experiment recorded by two distributed acoustic sensing
+(DAS) installations at SAFOD.  The purpose of the workflow is to reconstruct
+the experiment from authoritative timing information, preserve all valid AWD
+bursts, identify coherent wave modes without assigning phase labels in
+advance, and quantify the repeatability of each data-supported mode.  The
+workflow is intentionally separate from previous exploratory notebooks.  In
+particular, it does not use the locations of four conventional shots acquired
+at other times, does not assume that fiber coordinate is calibrated vertical
+depth, and does not call a coherent ridge a direct P wave or tube wave until
+independent evidence supports that interpretation.
+\end{abstract}
+
+\section{Scientific motivation}
+
+The experiment provides repeated, nominally identical controlled-source
+observations on two different borehole DAS installations.  The AWD remained at
+one surface location for the approximately 24-hour experiment, about 15~m
+horizontally from the Nano wellhead.  Approximately 20 drops were performed in
+each burst.  This design is well suited to three questions:
+
+\begin{enumerate}[label=\arabic*.]
+    \item Which coherent propagating modes are excited by the AWD source?
+    \item How do those modes differ between the cemented Nano fiber and the
+          wireline Deep fiber over a matched fiber-coordinate aperture?
+    \item How stable are their moveout, waveform coherence, and amplitude from
+          burst to burst?
+\end{enumerate}
+
+Velocity structure, attenuation, coupling, and time-lapse velocity change are
+potential later products.  They are not treated as established results until
+the observed modes and geometry have been validated.
+
+\section{Data and working geometry}
+
+\subsection{Nano fiber}
+
+The Nano data are Sintela protobuf files in
+\begin{quote}
+\code{/oak/stanford/groups/ettore88/data/SAFOD/ActiveJune2026/Nano/}.
+\end{quote}
+The inventory contains 589 files.  Each file holds approximately 300~s of data
+from 732 channels sampled at 1000~Hz.  Acquisition metadata and the existing
+reader report a channel spacing of
+\[
+\Delta x_{\rm Nano}=1.26606202~\mathrm{m}
+\]
+and a gauge length of approximately 16.46~m.  The data returned by the current
+reader are treated as strain-rate observations.
+
+\subsection{Deep fiber}
+
+The Deep data are HDF5 files from the simultaneously operating wireline DAS
+array.  The existing paired product contains 3200 channels with a nominal
+channel spacing of
+\[
+\Delta x_{\rm Deep}=2.0419~\mathrm{m}.
+\]
+The Deep fiber has a down-going and returning geometry.  Its fiber-coordinate
+turnaround and true depth registration require separate validation.  The clean
+mode comparison therefore uses only a matched 80--440~m interval in fiber
+coordinate and does not claim that equal fiber coordinates correspond exactly
+to equal physical depths.
+
+\subsection{Source geometry}
+
+The AWD source was fixed approximately 15~m horizontally from the Nano
+wellhead.  If the fiber segment is vertical and its depth origin is known, the
+source--receiver distance would be
+\begin{equation}
+r(z)=\sqrt{z^2+h^2}, \qquad h\simeq 15~\mathrm{m}.
+\end{equation}
+The correction relative to a zero-offset assumption is most important near
+the surface.  The current workflow nevertheless plots distance along fiber,
+not calibrated depth, because an absolute channel-to-depth registration has
+not yet been established.
+
+\subsection{Excluded conventional shots}
+
+The file \code{SAFOD\_ActiveSrc\_ShotLocs\&Times\_20260617.csv} describes four
+shots performed in the same general area at other times.  Those events are
+not the repeating AWD experiment.  Their locations and times are excluded
+from every step documented here.
+
+\section{Why the analysis was restarted}
+
+The recent exploratory notebook contains useful code and diagnostic products,
+but it accumulated multiple evolving hypotheses and inconsistent epoch
+conventions.  In particular, one branch inferred 48 epochs from the number of
+five-minute files and truncated the GPS-defined burst list.  Other cells
+handled a 49-row stack by discarding the first row.  Consequently, downstream
+results could depend on which notebook cell had most recently defined the
+working array.
+
+The clean workflow adopts the following rules:
+
+\begin{itemize}
+    \item GPS times define drops and bursts; file count does not define epochs.
+    \item Every excluded drop must have an explicit, machine-readable reason.
+    \item Old arrays and figures are retained for reproducibility but are not
+          silently reused as authoritative inputs.
+    \item Moveout is detected before a geological or borehole-mode name is
+          assigned.
+    \item Fiber coordinate is not labeled as depth without calibration.
+\end{itemize}
+
+\section{Stage 1: authoritative AWD manifest}
+
+The script \code{build\_manifest.py} reads the GPS timing catalog
+\code{p26.cc9.txt}, indexes all Nano and Deep files by their acquisition start
+times, and associates each drop with its containing file.  Adjacent GPS picks
+are assigned to the same burst when their separation is no greater than 60~s.
+Groups with fewer than five drops are treated as non-burst anomalies.
+
+For every accepted drop, the manifest records
+\begin{itemize}
+    \item burst and within-burst identifiers;
+    \item absolute UTC time and time since burst start;
+    \item the timing catalog's maximum correlation and previous-pick interval;
+    \item Nano and Deep file names and offsets within those files;
+    \item nominal Nano, Deep, and paired availability.
+\end{itemize}
+
+This reconstruction finds
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Quantity & Count\\
+\midrule
+GPS entries within Nano acquisition coverage & 989\\
+Qualifying AWD bursts & 49\\
+Drops in qualifying bursts & 988\\
+Drops with nominal Nano coverage & 988\\
+Drops with nominal Deep coverage & 926\\
+\bottomrule
+\end{tabular}
+\end{center}
+The single GPS entry not included among the 988 drops belongs to a group that
+does not meet the minimum burst-size definition.  Nominal Deep coverage is
+absent for the final three bursts.  ``Nominal coverage'' only means that a file
+spans the GPS time; the stack reconstruction additionally tests whether the
+entire requested waveform window lies inside the decoded array.
+
+The output is \code{awd\_manifest.csv}.  It is the authoritative bookkeeping
+table for all later stages.
+
+\section{Stage 2: canonical paired stack reconstruction}
+
+The rebuild uses all Nano files rather than imposing the earlier artificial
+24-hour filename boundary.  Drops are windowed using
+\[
+t\in[-0.5,3.0]~\mathrm{s}
+\]
+relative to their GPS times.  Both arrays are read at 1000~Hz and initially
+filtered from 1 to 100~Hz.  A paired drop is retained for comparative analysis
+only when a complete window can be extracted from both fibers.
+
+For burst $b$ with $N_b$ retained drops, the stored epoch stack is
+\begin{equation}
+\bar{u}_b(x,t)=\frac{1}{N_b}\sum_{k=1}^{N_b}u_{bk}(x,t).
+\end{equation}
+The canonical product stores the Nano and full Deep stacks, $N_b$, burst start
+times, channel spacings, sampling rate, and Deep channel bounds.  It is written
+to
+\begin{quote}
+\code{canonical\_epoch\_stacks\_paired\_deep\_all.npz}.
+\end{quote}
+This new filename prevents accidental overwriting of the older stack product.
+
+Stacking improves visibility of repeatable phases, but it suppresses
+within-burst variability.  Therefore, stack-based mode identification is a
+first robust visualization, not a substitute for later individual-drop QC.
+
+\section{Stage 3: phase-neutral coherent-moveout scan}
+
+\subsection{Matched apertures and frequency bands}
+
+Nano and Deep are initially compared over the same 80--440~m fiber-coordinate
+interval.  Three non-overlapping or minimally overlapping bands are analyzed:
+\[
+5\text{--}15~\mathrm{Hz},\qquad
+15\text{--}30~\mathrm{Hz},\qquad
+30\text{--}60~\mathrm{Hz}.
+\]
+The multiband design tests whether a ridge has stable kinematics or disperses
+with frequency.  Such behavior is important for distinguishing body-wave and
+guided-wave interpretations.
+
+\subsection{Semblance definition}
+
+For a trial unsigned apparent speed $v$ and intercept $t_0$, samples are
+extracted along
+\begin{equation}
+t(x)=t_0+\frac{x-x_{\min}}{v}.
+\end{equation}
+The search covers 500--6000~m/s in 25~m/s increments and intercepts from
+$-50$ to 300~ms in 2~ms increments.  A 40~ms waveform window is extracted at
+each channel.  For channel samples $u_i(\tau)$, semblance is
+\begin{equation}
+S(v,t_0)=
+\frac{\displaystyle\sum_{\tau}
+      \left[\sum_{i=1}^{N}u_i(\tau)\right]^2}
+     {\displaystyle N\sum_{\tau}\sum_{i=1}^{N}u_i^2(\tau)}.
+\end{equation}
+Perfectly aligned identical waveforms approach $S=1$, whereas incoherent
+energy produces a much smaller value.  The analysis reports several distinct
+speed peaks rather than only the global maximum, because multiple wave modes
+may coexist.
+
+The primary visualization, \code{mode\_scan.png}, contains six panels: three
+bands for Nano and three bands for Deep.  Its numerical counterpart is
+\code{mode\_scan.npz}.
+
+\subsection{Interpretation discipline}
+
+A semblance maximum is initially described only by its apparent speed,
+intercept, bandwidth, and fiber.  A phase label requires additional evidence:
+\begin{itemize}
+    \item onset and polarity in an unnormalized record section;
+    \item persistence across neighboring frequency bands;
+    \item frequency-dependent speed or waveform dispersion;
+    \item expected geometry after applying the 15~m source offset;
+    \item consistency or contrast between the cemented and wireline fibers;
+    \item stability across bursts and, ideally, individual drops;
+    \item comparison with physically plausible formation and borehole-mode
+          speeds.
+\end{itemize}
+
+\section{Stage 4: burst-to-burst repeatability}
+
+The repeatability stage takes the strongest data-selected mode in each
+fiber--band combination and performs a local search for every burst.  The local
+speed search spans $\pm300$~m/s around the all-burst optimum, and the intercept
+search spans $\pm20$~ms.  Each burst yields
+\begin{itemize}
+    \item best local apparent speed;
+    \item best intercept;
+    \item peak semblance;
+    \item RMS amplitude along the aligned moveout;
+    \item number of common drops contributing to that burst.
+\end{itemize}
+
+The output table \code{mode\_repeatability.csv} preserves every measurement.
+The figure \code{mode\_repeatability.png} plots apparent speed by burst, colored
+by semblance.  The median and median absolute deviation are reported because
+they are less sensitive than a mean and standard deviation to anomalous bursts.
+
+This test distinguishes a stable propagating ridge from a peak that appears
+only after averaging the full day.  However, grid spacing and bandwidth limit
+the precision.  Scatter smaller than one speed-grid increment must not be
+interpreted as physical velocity precision.
+
+\section{Products and visualization}
+
+All clean products are located in
+\begin{quote}
+\code{/home/groups/ettore88/nberrios/safod\_das\_git/notebooks/awd\_clean/}.
+\end{quote}
+
+\begin{center}
+\begin{tabular}{p{0.41\textwidth}p{0.48\textwidth}}
+\toprule
+File & Purpose\\
+\midrule
+\code{awd\_manifest.csv} & Authoritative drop, burst, timing, and file coverage table.\\
+\code{canonical\_epoch\_stacks\_paired\_deep\_all.npz} & Corrected 49-burst paired stack product.\\
+\code{mode\_scan.png} & Phase-neutral multiband Nano/Deep semblance visualization.\\
+\code{mode\_scan.npz} & Numerical semblance surfaces and scan axes.\\
+\code{mode\_repeatability.png} & Burst-to-burst apparent-speed and coherence stability.\\
+\code{mode\_repeatability.csv} & Machine-readable per-burst mode measurements.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The PNG files can be opened directly in JupyterLab.  The NPZ and CSV products
+are intended for reproducible downstream analysis rather than visual inspection.
+
+\section{Current limitations}
+
+\begin{enumerate}
+    \item \textbf{Fiber coordinate is not yet calibrated depth.} Geological
+          depths must not be attached to anomalies until the channel origin,
+          cable path, and Deep turnaround are verified.
+    \item \textbf{The source offset is approximate.} The reported 15~m value is
+          adequate for preliminary moveout work but should be replaced by a
+          surveyed source--wellhead distance if available.
+    \item \textbf{Cross-fiber amplitudes are not absolutely calibrated.}
+          Interrogator response, gauge length, optical configuration, and
+          strain versus strain-rate conventions must be reconciled before an
+          absolute cemented/wireline amplitude ratio is interpreted.
+    \item \textbf{Semblance can favor strong guided energy.} A high-coherence
+          ridge is not automatically a direct body wave.
+    \item \textbf{Burst stacks hide individual-source variability.} Final
+          uncertainty analysis should return to single-drop windows.
+    \item \textbf{The current speed scan is unsigned.} Reverse-propagating or
+          returning-leg energy on the Deep fiber requires signed-slowness and
+          hairpin-aware analysis.
+    \item \textbf{A detection threshold has not yet been established by a
+          null test.} Depth permutation, time scrambling, or pre-source scans
+          should be used to determine which semblance peaks exceed chance
+          coherence.
+\end{enumerate}
+
+\section{Criteria for the next scientific decision}
+
+After the mode-scan and repeatability products are complete, the next analysis
+will be chosen from the evidence:
+
+\begin{itemize}
+    \item A fast, weakly dispersive, early and repeatable ridge consistent on
+          both arrays would motivate a direct-P travel-time and velocity study.
+    \item A slower, dispersive, high-amplitude ridge that differs strongly
+          between installations would motivate a borehole-guided-mode and
+          coupling study.
+    \item Stable kinematics but variable amplitude would motivate a source and
+          coupling repeatability study.
+    \item Poor per-burst stability despite an all-day semblance peak would
+          indicate that the apparent mode is stack-dependent and unsuitable
+          for time-lapse inference.
+\end{itemize}
+
+\section{What is deliberately not claimed}
+
+At this stage, the analysis does not claim a calibrated interval-$V_P$ profile,
+a detected Earth-tide velocity perturbation, a confirmed tube wave, a precise
+maximum monitoring depth, or an absolute cemented-versus-wireline sensitivity
+ratio.  Each could become a valid result, but only after phase, geometry,
+calibration, and null-hypothesis tests support it.
+
+\section{Reproducibility}
+
+The clean workflow consists of the following scripts:
+\begin{enumerate}
+    \item \code{build\_manifest.py};
+    \item \code{run\_canonical\_rebuild.py};
+    \item \code{analyze\_modes.py};
+    \item \code{measure\_repeatability.py}.
+\end{enumerate}
+The raw source directories are read only.  All new tables, arrays, logs, and
+figures are written beneath \code{awd\_clean}.  Previous notebooks and figures
+are preserved and are not overwritten.
+
+\end{document}

@@ -1,0 +1,1 @@
+30-60 Hz farthest 40 m bin center with median SNR > 0 dB: 460.0 m
