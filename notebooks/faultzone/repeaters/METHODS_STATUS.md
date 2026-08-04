@@ -351,3 +351,92 @@ Note: Scite is exhausted, and both top-priority DAS papers returned
 10. **574k `os.path.exists` on Lustre** — violates this repo's CLAUDE.md guidance.
 11. **Window far too long** — 11 s from catalog origin, vs the 1–2 s phase windows on
     picks that the literature uses.
+
+---
+
+## 11. G0 — channel-to-depth registration (2026-08-04)
+
+**Scripts:** `channel_depth_registration.py` (206-event scan, ~22 min),
+`g0_refine.py` (post-processing). Outputs `channel_depth_registration.png`,
+`g0_refine.png`.
+
+**Result: PARTIAL PASS. Wellhead ≈ channel 15–25; absolute depth uncertain ±25 m.
+The shallow channels ARE usable, which is the answer the project needed.**
+
+### Three determinations
+
+| method | wellhead channel | quality |
+|---|---|---|
+| pre-event noise transition | **23** | clean — lead-in is **35× noisier** |
+| velocity-structure match to 2005 VSP | **8–23** | clean — two features matched |
+| fibre-length arithmetic | 50 | **outlier, unexplained** |
+| travel-time match | 155 | uninformative (minimum spans ch 11–199) |
+
+### The cross-validation that matters
+
+| | DAS local slant stack | 2005 check shot |
+|---|---|---|
+| slow layer | **1493 m/s** at ch 62 | **1496 m/s** over 20–75 m |
+| fast peak | 3731 m/s at ch 118 | 3439 m/s over 75–150 m |
+
+Independent instruments 20 years apart, agreeing to **0.2%** on shallow-layer
+velocity. This also shows the DAS resolves structure shallower than Lellouch et al.
+attempted (they stop at 50–75 m and flag the shallow section unreliable for V_P/V_S).
+
+### Shallow channel verdict — the gating question
+
+Channels 0–23: 35× baseline noise → uncemented lead-in, unusable.
+Channels 23–896: noise flat within ±10% → uniformly well coupled.
+Semblance 0.37 at ch 30 rising to 0.80 by ch 86; the lower shallow values are
+expected (slow layer ⇒ shorter wavelength ⇒ more moveout across a 61-ch window),
+not a defect.
+
+**`CH_LO = 100`, used in every script in this directory, is depth 79 m — it was
+discarding the entire depth range where the seasonal signal is largest.**
+Li & Ben-Zion's ~17 m peak sensitivity is **channel ≈40**, which is coherent and at
+baseline noise. The fibre samples the peak of the target signal.
+
+### Two errors in the first run, corrected in `g0_refine.py`
+
+1. **Semblance is not a discriminator here.** Median semblance is 0.3–0.85 across
+   *all* 900 channels and never approaches the incoherent floor of 1/61 = 0.016.
+   The arrival is coherent along the whole array, so "where coherent moveout
+   begins" has no answer; the threshold crossing at ch 30 was an arbitrary cut.
+   Pre-event noise is the real discriminator.
+2. **Matching velocities instead of travel times.** The reference was built by
+   smoothing t(z) and differentiating, which amplified digitisation noise (the
+   reference swung to 8574 m/s) and produced a broad monotonic plateau with no true
+   minimum. Travel time is the integral and is smooth — but it turned out to be
+   *too* smooth to constrain the offset at all. **Localised velocity features are
+   what carry the information**; the fix was to match the slow layer and the fast
+   peak individually, not the whole curve.
+3. **Incomplete arithmetic.** The 54-channel prediction ignored channels past the
+   fibre terminus. With a dead tail of D, lead-in = 900 − 846 − D.
+
+### Unresolved
+
+The ~27 m gap between the noise/velocity determination (~20) and the length
+arithmetic (50). Not explained by well deviation (PGSI `WELL_DEP` vs `REC_DEP`
+differ by only 0.9 m at 1250 m) nor by cable overstuff (0.1–0.3% ≈ 2 m over 864 m).
+Per Madsen et al. 2016 this residual is the signature of a **fibre accumulation in
+the wellhead area**, which breaks linearity worst in the shallow section. **The
+acquisition-metadata ask stands** (`StartLocusIndex`, lead-in length, OTDR/tap test).
+
+### Also corrected here
+
+The near-surface velocity is **not ~300 m/s**. That figure came from dividing depth
+by traveltime when the check-shot source sits **45.72 m** from the wellhead: 66.4 ms
+at 20.3 m depth is along a **50.0 m slant path** → 754 m/s apparent. Vertical-
+corrected interval velocities: **1496** (20–75 m), 3439 (75–150), 3361 (150–300),
+3091 (300–500, a low-velocity zone), 3495 (500–800), 5111 m/s (800–1250). This
+removes the "factor of 8" tension with Lellouch's regional model — there was none.
+Consequence for sensitivity: 4% over the top 75 m gives **2.7 ms** (≈5σ against
+0.52 ms repeatability); 1% gives 0.68 ms, marginal.
+
+### Reference data located (was not being used)
+
+`awd_clean/pgsi_reference/PGSIarray_rec_coords_pos1.txt` — the 2005 PGSI 80-level
+array with **known** `WELL_DEP` and `REC_DEP`, 46.68 → 1250.64 m at 15.24 m (50 ft)
+spacing, UTM NAD27. Two further deployments (pos2 930–2134 m, pos3 1539–2743 m).
+Raw check-shot SEG2 files are in `pgsi_reference/Check shots/`. This is the depth
+ground truth and is far better than the digitised PNG.
