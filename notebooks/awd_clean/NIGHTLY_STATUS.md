@@ -207,4 +207,9 @@ intersections remain provisional fiber coordinates. The Deep coordinate audit an
 - Multi-band test: job `37492825` (dependency on seasonal F–K), using 3–8, 5–12, 8–20, and 15–30 Hz negative signed F–K bands on deterministic blocks from each selected day.
 - Full anomaly rerun after seasonal aggregation: job `37493070` (dependency on `37478474`).
 - No seasonal or frequency-band conclusion is assigned until these jobs complete and their day-level products are inspected.
+## Signed F–K convention check (v39)
+
+- Synthetic `cos(2πf(t−z/v))` at 10 Hz and 3.2 km/s, passed through the exact production decimation and masks, is retained by `F*K < 0` when propagation is toward increasing fiber coordinate. The opposite synthetic is retained by `F*K > 0`.
+- This validates coordinate-direction selection only; no physical upgoing/downgoing label is assigned without fiber orientation and time/depth convention.
+- Lellouch et al. used F–K filtering in earthquake S-wave processing after P-moveout correction (Figure 5), not as a described step in their ambient interferometry cross-correlation workflow.
 

@@ -1648,4 +1648,18 @@ The result supports a repeatable transition-like feature in the current wavefiel
 
 \takeaway{The advisor-facing short version is: channel 0 is the fixed virtual source; the current corrected branch matches Lellouch's geometry and normalization much more closely, while F--K isolation is our added extension. The earlier failure was not a controlled reproduction because its geometry, stacking, acquisition, and correlation scaling differed.}
 
+
+\subsection{Synthetic signed F--K convention check and relation to Lellouch filtering}
+\figquestion{Does the sign of $F K$ in the current implementation select the expected coordinate-propagation direction, and where did Lellouch et al. use F--K filtering?}
+
+A synthetic wave $u(z,t)=\cos[2\pi f(t-z/v)]$ was passed through the same decimation and signed F--K masks as the ambient branch, using $f=10$~Hz and $v=3.2$~km~s$^{-1}$. This wave propagates toward increasing fiber coordinate $z$ and was retained by the $F K<0$ branch (output RMS 0.560 versus 0.057 for $F K>0$). The opposite wave $\cos[2\pi f(t+z/v)]$ propagates toward decreasing $z$ and was retained by $F K>0$ (output RMS 0.560 versus 0.056 for $F K<0$). The synthetic confirms the code's coordinate-direction sign. It does not by itself label either branch physically as upgoing or downgoing; that requires the fiber orientation, depth direction, and correlation time convention.
+
+Lellouch et al. do explicitly use F--K filtering, but in their earthquake S-wave processing (their Figure 5), after P-moveout correction. Their filter retains upgoing events below 11~km~s$^{-1}$ and 10--80~Hz energy to suppress P events and downgoing free-surface reflections before S-wave picking. Their ambient-field interferometry section instead describes 5--20~Hz bandpass-filtered cross-correlations, causal/anti-causal comparison, and 1-day stacks; it does not describe the signed 2.5--4.5~km~s$^{-1}$ F--K wedge used in this project. The current ambient F--K operation is therefore an added transfer-test extension, not a hidden step copied from their ambient method.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\linewidth]{fk_sign_synthetic_test.png}
+\caption{\textbf{Synthetic sign convention check for the ambient signed F--K masks.} A 10-Hz, 3.2-km-s$^{-1}$ wave traveling toward increasing fiber coordinate is retained by $F K<0$, whereas the opposite coordinate-propagating wave is retained by $F K>0$. The test uses the production code's 2-fold spatial/temporal decimation and 5--20~Hz, 2.5--4.5~km~s$^{-1}$ wedge. The result validates coordinate-direction selection only; physical upgoing/downgoing labels require independent fiber orientation and time/depth registration.}
+\end{figure}
+
 \end{document}

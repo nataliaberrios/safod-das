@@ -1,0 +1,28 @@
+{
+  "synthetic_wave_plus": "cos(2*pi*f*(t-z/v)): propagation toward increasing fiber coordinate z",
+  "synthetic_wave_minus": "cos(2*pi*f*(t+z/v)): propagation toward decreasing fiber coordinate z",
+  "f_hz": 10.0,
+  "velocity_m_s": 3200.0,
+  "original_fs_hz": 500.0,
+  "original_spacing_m": 1.020952,
+  "post_decimation_fs_hz": 250.0,
+  "post_decimation_spacing_m": 2.041904,
+  "mask": "5-20 Hz, 2.5-4.5 km/s, F*K sign, same decimation as production code",
+  "results": {
+    "increasing_z": {
+      "negative_F_times_K_power_fraction": 0.6273304098288282,
+      "positive_F_times_K_power_fraction": 0.006452647371534537,
+      "negative_output_rms": 0.5600660567251015,
+      "positive_output_rms": 0.05680153190263989,
+      "retained_branch": "negative (F*K<0)"
+    },
+    "decreasing_z": {
+      "negative_F_times_K_power_fraction": 0.006333638719781968,
+      "positive_F_times_K_power_fraction": 0.6272622595173073,
+      "negative_output_rms": 0.05627298324056589,
+      "positive_output_rms": 0.5600126985273737,
+      "retained_branch": "positive (F*K>0)"
+    }
+  },
+  "physical_label_boundary": "F*K branch labels are coordinate-direction labels only; upgoing/downgoing requires fiber orientation and time/depth convention."
+}
