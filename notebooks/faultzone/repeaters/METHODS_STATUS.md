@@ -14,7 +14,9 @@ project stands, so none of it lives only in terminal scrollback.
 | DAS detects those repeaters | **Established** | DAS CC 0.63–0.79 vs DAS null max 0.328 |
 | DAS CC systematically below HRSN | **Established** | 0.15–0.30 deficit, identical pairs |
 | Cause of the deficit | **Diagnosed, under test** | job 37524673, `moveout_test.py` |
-| dv/v measurable | Not started | Week 2; inputs now exist |
+| dv/v at HRSN depth (251–284 m) | **NULL, quantified** | G3: 0/10 pairs above a 1.94% control floor (§12) |
+| dv/v in the shallow DAS interval | **Estimator not yet trustworthy** | G5 first run: common-mode systematic (§13) |
+| Depth of any velocity change | Open — the remaining question | bounded above 75 m only once §13 is fixed |
 
 ### The seven confirmed repeater pairs
 
@@ -440,3 +442,157 @@ array with **known** `WELL_DEP` and `REC_DEP`, 46.68 → 1250.64 m at 15.24 m (5
 spacing, UTM NAD27. Two further deployments (pos2 930–2134 m, pos3 1539–2743 m).
 Raw check-shot SEG2 files are in `pgsi_reference/Check shots/`. This is the depth
 ground truth and is far better than the digitised PNG.
+
+---
+
+## 12. G3 — dv/v on HRSN: NULL at 251–284 m (2026-08-04, job 37585615)
+
+`dvv_hrsn.py`, coda stretching on the seven confirmed pairs, three overlapping
+lapse windows (1–6, 2–12, 4–14 s), bootstrapped over stations.
+
+**0/10 pairs exceed max(2·err, control floor). Control floor 1.944%** (90th
+percentile of |dv/v| on 40 random non-repeating pairs). Repeater |dv/v| medians
+are 0.024–0.035% against a control median of 0.78–1.02% — the repeaters are an
+order of magnitude *quieter* than the null, which is what a real null looks like
+when the estimator is working.
+
+Supporting controls:
+
+- coda halves: median |half1 − half2| 0.062% vs median |dv/v| 0.029%;
+  r(half1, half2) = −0.14. No coherent change in either half.
+- r(|dv/v|, seasonal phase) = +0.16, r(|dv/v|, elapsed) = +0.18. Neither.
+- selection bias: r(selection CC, |dv/v|) = −0.46. Mildly negative, so the pair
+  set is if anything censored *against* signal — the null is conservative.
+
+**Why this is a result and not a failure.** Li & Ben-Zion 2023 put the seasonal
+signal in the top few tens of metres, peak sensitivity ~17 m. HRSN sits *below*
+that. A null at 251–284 m localises any change to shallower depth and makes the
+shallow DAS channels — which G0 showed are usable from channel 23 — the whole
+point rather than a bonus.
+
+Note the asymmetry this creates: HRSN is the better instrument everywhere except
+at the one depth that matters, where it has no sensors at all.
+
+---
+
+## 13. G5 — shallow differential timing: first run, and why its numbers are not
+usable yet (job 37588342)
+
+`g5_shallow_dvv.py`. Per-channel differential delay of the direct arrival between
+the two occurrences of a pair, then dv/v as the slope of delay against one-way
+travel time (`dvv_core.slope_dvv`), interval by interval down the fibre. The
+intercept absorbs the origin-time difference, so no absolute timing is needed.
+
+**The deep half of the measurement works.** 250–550 m gives −0.29 ± 0.34% and
+550–850 m gives +0.28 ± 0.52%, both consistent with zero and consistent with G3.
+That is the machinery validating itself on the depth range where an independent
+instrument already says the answer is zero.
+
+**The shallow half is a common-mode systematic, not a signal.** The fine profile
+returned −26% (2–25 m), −21% (25–50 m), −3.7% (50–100 m), −2.4% (100–200 m),
+turning positive below 200 m. Three things say this is processing, not medium:
+
+1. **Pair-to-pair scatter far below the mean.** 25–50 m gave −21.4% with ±6.3%
+   across ten pairs whose baselines run 39 to 440 days at different seasonal
+   phases. A seasonal change *must* vary between those pairs. One that is
+   identical for all of them is something being done to every pair alike.
+2. **The two bands disagree.** 5–30 Hz gave −1.36 ± 2.37% over 2–75 m, 5–20 Hz
+   gave −6.11 ± 1.97% on the same data. A medium change shifts the arrival by the
+   same *time* in every passband. A cycle skip does not.
+3. **The magnitude is not physical.** −21% over 25–50 m is not a seasonal
+   velocity change in any published record.
+
+Diagnosed cause: **residual cycle skipping**. The per-channel delay residual is
+~2–3 ms (printed as `sigma ms` in the new output), while the rejection guard was a
+fixed |dt| < 20 ms — a 7σ outlier that a least-squares slope over a 65 ms interval
+cannot absorb. The shallow intervals are hit hardest because they have both the
+fewest channels (~72) and the least travel-time leverage.
+
+Two controls were also undersampled to the point of being misleading: the acausal
+test returned "CONTAMINATED" off **two** surviving pairs, and the random-pair
+floor came back NaN because dissimilar waveforms fail the coherence gate and yield
+no measurement at all. The gate refusing to time incoherent pairs is the control
+working, but it leaves the floor unsampled, and that needs saying rather than
+reporting a NaN.
+
+### Fixes in the rerun (job 37589998)
+
+- `slope_dvv` now rejects iteratively on the **residual about the fitted line** at
+  3.5 robust sigma, not on |dt|. Delays legitimately trend with depth, so a fixed
+  |dt| cut either keeps the skips or discards real signal at the interval ends.
+- Per-channel MAD gate at 4σ after the coarse 20 ms guard.
+- Reported error is now **max(inverse-variance, pair scatter)**, so a claim never
+  rests on the more flattering of two defensible numbers.
+- **Common-mode test** printed per interval: flags any interval whose pair-to-pair
+  spread is below 35% of its mean as systematic rather than seasonal.
+- **Band-agreement check** promoted to a verdict-level veto.
+- Controls require n ≥ 5 pairs before they are allowed to clear *or* condemn.
+- `sigma ms` printed per interval — the per-channel timing precision is what
+  limits every number in the table and it belongs in the output.
+
+### The sensitivity arithmetic, for reference
+
+err(dv/v) ≈ σ / (√N · spread of tau across the interval). With σ ≈ 2 ms:
+
+| interval | tau | N ch | floor per pair | over 10 pairs |
+|---|---|---|---|---|
+| 2–75 m | 65.4 ms | ~72 | ~1.2% | ~0.4% |
+| 250–550 m | 97.9 ms | ~300 | ~0.4% | ~0.13% |
+
+So the shallow interval is intrinsically the *least* sensitive part of the fibre,
+which is unwelcome but not fatal: even a clean 0.4% upper bound above 75 m,
+combined with G3's 1.94% at HRSN depth, is a two-depth bound worth reporting.
+
+### Still unaddressed, and probably real
+
+The shallowest bins sit where two effects are strongest and neither is in the
+current model: **free-surface interference** (above the reflection point the
+fibre records upgoing and downgoing waves together, so "delay" is not a travel
+time) and **gauge-length averaging** — 16.34 m in a 754 m/s layer at 17 Hz is
+0.37 wavelength, far more aggressive than the 1.9% figure in §2.8, which assumed
+V ≥ 3000 m/s. Both are depth-dependent and both could survive the fixes above.
+Treat any residual shallow trend as suspect until they are modelled.
+
+---
+
+## 14. Deliverable B — catalog closeout (queued 2026-08-04)
+
+**Duplicate tags: resolved, and it was not what §10 item 7 assumed.** There is
+exactly one collision, 2024-12-30 04:39:33. The catalog shows nc75109596 (M0.98,
+18 stations, gap 60, rms 0.07) and nc75109601 (M1.02, 16 stations, gap 84, rms
+0.09) at the **same origin time to the millisecond**, 0.3 km apart. That is the
+NCSN double-listing one earthquake with two solutions, not two earthquakes in one
+second. The cache collapse was therefore physically correct and no re-extraction
+is needed; the second listing just has to be dropped so it cannot pair with
+itself at CC = 1.000. Handled in `correlate_perchannel.py`, with the reasoning in
+the code so it is not re-litigated.
+
+**Per-channel correlation (job 37588824).** `correlate_perchannel.py` had been
+written but never run — the explicit loop is 206 events × 21,115 pairs × 700
+channels × 3 bands, which does 206 transforms' worth of work 21,115 times. Now
+precomputes one rFFT per event per band and forms each pair's stacked correlogram
+as a single frequency-domain sum, since correlogram stacking is linear. About an
+hour per band becomes about two minutes. The explicit loop is retained and the
+fast path is **asserted against it on four pairs at startup**, so a transcription
+error cannot quietly produce a plausible wrong threshold.
+
+Emits `perchannel_candidates.csv`: the top 40 pairs ranked by their **weakest**
+band, so a pair that survives 2–8, 4–16 and 10–40 Hz outranks one that is
+spectacular at low frequency and gone by 10–40.
+
+**HRSN extension (job 37589048, chained afterok).** `hrsn_extend.py` takes those
+40 to HRSN. The existing confirmation covers only the top 10 from the *trace-
+stacked* search, and that ranking is compromised by the moveout bug of §2.4 — the
+comb filter that depresses every DAS CC by 0.15–0.30. Pairs it ranked 11th–40th
+are not reliably worse; they are samples from a blurred ordering. Fetches are
+cache-first and fail per event, so a node without an outbound route degrades to a
+cache-only run instead of dying.
+
+The interesting outcome is not only "more pairs". If the per-channel ranking
+recovers the same seven and adds nothing, that is itself informative: the moveout
+bug depressed the CC **values** but did not scramble the **ordering**.
+
+Every additional confirmed pair adds a CWI baseline, and baselines are the binding
+constraint on separating the seasonal term from secular drift — that separation
+works only because elapsed time and seasonal phase are nearly uncorrelated across
+the pair set, which improves with more pairs.

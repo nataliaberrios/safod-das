@@ -1,0 +1,8 @@
+# Waveform caches and derived binaries. Results belong on $OAK, not in git
+# (CLAUDE.md). Everything here is regenerable from the tracked scripts.
+cache/
+cache_all/
+hrsn_cache/
+*.npz
+*.png
+manifest_cache.pkl

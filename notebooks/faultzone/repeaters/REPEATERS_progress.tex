@@ -434,6 +434,278 @@ Recorded so that they are not repeated.
   trivially agreed with itself.
 \end{itemize}
 
+\section{Registration, dv/v, and the limits found in doing it}
+
+\subsection{G0 --- channel-to-depth registration --- \preliminary}
+
+\textbf{Scripts:} \texttt{channel\_depth\_registration.py} (206-event scan),
+\texttt{g0\_refine.py}.
+
+Absolute depth registration of this fibre had never been established.
+\texttt{step2\_timing\_check.py:5} recorded the discrepancy and listed ``the channel
+at 130\,m of fibre is nowhere near 130\,m depth'' as a live hypothesis; the
+\texttt{awd\_clean} dashboard states that ``every depth label is explicitly
+provisional.'' Neither was resolved. Since Li \& Ben-Zion 2023
+(doi:10.1029/2022JB025682) place the seasonal signal at \textasciitilde17\,m peak
+sensitivity, and every script here began at \texttt{CH\_LO = 100}, the question of
+what channel 100 actually \emph{is} became the gate on the whole project.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrl}
+\toprule
+determination & wellhead channel & quality \\
+\midrule
+pre-event noise transition & \textbf{23} & clean; lead-in is \textbf{35$\times$} noisier \\
+velocity-structure match to 2005 VSP & \textbf{8--23} & clean; two features matched \\
+fibre-length arithmetic & 50 & outlier, unexplained \\
+travel-time match & 155 & uninformative (minimum spans ch 11--199) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The cross-validation: the DAS local slant stack finds a \textbf{1493\,m/s} slow
+layer where the 2005 check shot independently gives \textbf{1496\,m/s} over
+20--75\,m --- two instruments twenty years apart agreeing to \textbf{0.2\%}. This
+also shows the fibre resolves structure shallower than Lellouch et al. attempted;
+they stop at 50--75\,m and flag the shallow section unreliable for $V_P/V_S$.
+
+\textbf{Verdict: the shallow channels are usable.} Channels 0--23 sit at 35$\times$
+baseline noise (uncemented lead-in); 23--896 are flat within $\pm$10\%.
+\textbf{\texttt{CH\_LO = 100} is depth 79\,m} --- it was discarding the entire
+interval where the target signal is largest. Li \& Ben-Zion's 17\,m is channel
+\textasciitilde40, which is coherent and at baseline noise.
+
+Absolute depths remain provisional at $\pm$25\,m. A \textasciitilde27\,m gap between
+the noise determination and the length arithmetic is unexplained by well deviation
+(PGSI \texttt{WELL\_DEP} vs \texttt{REC\_DEP} differ by 0.9\,m at 1250\,m) or
+overstuff (0.1--0.3\% $\approx$ 2\,m). Per Madsen et al. 2016
+(doi:10.1190/tle35070610.1) that residual is the signature of a fibre accumulation
+in the wellhead area. The acquisition-metadata request stands.
+
+\paragraph{Reference data that was on disk and unused.}
+\texttt{awd\_clean/pgsi\_reference/PGSIarray\_rec\_coords\_pos1.txt} --- the 2005
+PGSI 80-level array with \emph{known} well depth and true depth per level,
+46.68\,$\rightarrow$\,1250.64\,m at 15.24\,m spacing. Better ground truth than the
+digitised PNG.
+
+\paragraph{A correction this forced.} The near-surface is \emph{not}
+\textasciitilde300\,m/s. That came from dividing depth by traveltime when the
+check-shot source sits \textbf{45.72\,m} from the wellhead, so 66.4\,ms at 20.3\,m
+depth is a \textbf{50.0\,m slant path}. Vertical-corrected interval $V_P$:
+\textbf{1496} (20--75\,m), 3439 (75--150), 3361 (150--300), 3091 (300--500, a
+low-velocity zone), 3495 (500--800), 5111\,m/s (800--1250). No conflict with the
+regional model ever existed.
+
+\subsection{G3 --- dv/v at HRSN depth --- \accepted{} --- NULL, and a useful one}
+
+\textbf{Script:} \texttt{dvv\_hrsn.py}. Coda stretching (Sens-Sch\"onfelder \&
+Wegler 2006) on the confirmed pairs, three overlapping lapse windows, bootstrapped
+over stations.
+
+Representative measurements, 2--12\,s lapse:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+pair & dv/v & error & coda CC \\
+\midrule
+2024-05-10 / 2025-04-06 & $-0.004\%$ & $\pm0.080\%$ & 0.957 \\
+2024-05-10 / 2024-07-08 & $-0.026\%$ & $\pm0.039\%$ & 0.963 \\
+2024-05-10 / 2025-04-06 (1--6\,s) & $-0.005\%$ & $\pm0.052\%$ & 0.964 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{$|dv/v| < 0.1\%$ at 251--284\,m depth}, over baselines of 39--440 days.
+
+\paragraph{A correction to how this was first reported.} The initial write-up gave
+the bound as 1.944\%, using \texttt{max(2$\cdot$err, control\_floor)}. That
+conflates two statistics. The control floor is a \emph{detection} threshold derived
+from random pairs producing ill-conditioned fits --- appropriate for ``is this a
+repeater,'' not for ``how large is dv/v for a pair already confirmed at HRSN CC
+0.99 with coda CC 0.96.'' The bootstrap error is the right number, and it is
+20$\times$ smaller. The stronger bound is the correct one.
+
+\textbf{Why a null is a result.} Li \& Ben-Zion put 4\% at \textasciitilde17\,m.
+HRSN sits below that layer. A $<0.1\%$ bound at 250\,m implies a \textbf{40$\times$
+drop between 17\,m and 250\,m}, measured rather than assumed, and localises any
+change to depths only this fibre instruments.
+
+Supporting controls: coda halves show no coherent change in either half;
+$r(|dv/v|,\ \text{seasonal phase}) = +0.16$ and $r(|dv/v|,\ \text{elapsed}) = +0.18$,
+neither significant; $r(\text{selection CC},\ |dv/v|) = -0.46$, so the pair set is
+if anything censored \emph{against} signal, making the null conservative.
+
+\subsection{The alignment bug --- documented because it recurred}
+
+Two runs (G3 first pass, and the first coda-window survey) returned coda CC of
+0.01--0.63 and $\sim$1\% dv/v on pairs that correlate at 0.99. Both measured
+windowed correlation at \textbf{zero lag}. Catalog origin times carry 0.1--0.5\,s of
+error, which at 5--20\,Hz drives the correlation of two \emph{identical} waveforms
+to zero.
+
+This is item 4 of the failures list in this document, reintroduced after being
+recorded. \texttt{dvv\_core.bulk\_align()} now exists with the reasoning in its
+docstring, and \texttt{stretch\_dvv} carries a residual lag search, so it cannot
+recur silently.
+
+After the fix, the same survey gives \textbf{coda CC 0.845--0.964 across all 24
+lapse windows} (0.5--14\,s), with controls scattered about zero and per-pair peaks
+of 0.850--0.998. Repeater $|dv/v|$ of 0.03--0.17\% against a random-pair floor of
+0.6--1.6\% --- the repeaters land an order of magnitude \emph{below} the null, which
+is what a well-conditioned measurement of approximately zero looks like.
+
+\subsection{G5 --- shallow differential timing --- \unresolved}
+
+\textbf{Script:} \texttt{g5\_shallow\_dvv.py}. Per-channel differential delay of the
+direct arrival, then dv/v as the slope of delay against one-way travel time.
+
+The first run returned $-26\%$ (2--25\,m), $-21\%$ (25--50\,m), $-3.7\%$
+(50--100\,m). Three things identified it as systematic rather than medium:
+pair-to-pair scatter far below the mean (a seasonal change \emph{must} vary across
+baselines of 39--440 days at different phases); the two passbands disagreed (a
+medium change shifts arrivals by the same \emph{time} in every band, a cycle skip
+does not); and $-21\%$ over 25--50\,m is not physical. Cause: residual cycle
+skipping against a fixed $|dt| < 20$\,ms guard when the per-channel residual is
+2--3\,ms.
+
+After rejecting on residuals about the fitted line at 3.5 robust sigma:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lr}
+\toprule
+interval & dv/v \\
+\midrule
+shallow 2--75\,m & $-1.97 \pm 3.57\%$ (not resolved) \\
+250--550\,m (artifact control) & $+0.60 \pm 0.99\%$ \\
+550--850\,m (artifact control) & $+0.57 \pm 1.05\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The deep intervals are consistent with zero and with G3 --- the machinery
+validating itself where an independent instrument already knows the answer.
+
+\textbf{The shallow bound is too weak to be useful, and should not be presented
+otherwise.} The script's own verdict text calls a 7.15\% upper bound
+``publishable.'' It is not: the predicted signal is 4\% and typical seasonal values
+are 0.1--0.5\%.
+
+\paragraph{The number that redirects the project.}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lr}
+\toprule
+method & precision achieved \\
+\midrule
+HRSN coda stretching & $\pm0.05\%$ \\
+DAS direct-arrival differential timing & $\pm3.6\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A factor of \textbf{70}. Direct-arrival timing was chosen because it is
+depth-\emph{local} while coda is path-integrated. Correct physics, wrong
+engineering: locality bought at 70$\times$ sensitivity yields a bound that tests
+nothing.
+
+\subsection{Catalog closeout --- per-channel correlation --- \accepted}
+
+\textbf{Script:} \texttt{correlate\_perchannel.py}. Per-channel CC with
+SNR-weighted correlogram stacking --- Lellouch et al. 2021's actual method, written
+earlier and never run. Precomputing one rFFT per event per band and forming each
+pair's stacked correlogram as a single frequency-domain sum turns about an hour per
+band into about two minutes; the explicit loop is retained and \textbf{asserted
+against the fast path on four pairs at startup} (max $|\Delta CC| = 1.3\times
+10^{-10}$).
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrrrrr}
+\toprule
+band & median & MAD & 6$\times$MAD & acausal floor & pairs above \\
+\midrule
+2--8\,Hz & 0.016 & 0.096 & 0.577 & 0.160 & 83 \\
+4--16\,Hz & 0.014 & 0.075 & 0.451 & 0.140 & 93 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A proper null, a threshold calibrated on it, and a time-reversed acausal
+false-positive floor 3--4$\times$ below that threshold.
+
+\subsection{How many confirmed repeaters there actually are --- \accepted}
+
+\textbf{Script:} \texttt{hrsn\_extend.py}. 100 pairs taken to HRSN.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lr}
+\toprule
+HRSN CC threshold & pairs \\
+\midrule
+$>0.95$ & 6 \\
+$\mathbf{>0.90}$ \textbf{(Waldhauser \& Schaff convention)} & \textbf{8 rows} \\
+$>0.85$ & 12 \\
+$>0.78$ & 17 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{The correct count is 7 distinct pairs over 11 events, not 17.} Two things
+had to be fixed to say that:
+
+\begin{enumerate}
+  \item \textbf{Threshold shopping.} 17 is the count above 0.78, a cut chosen to
+  obtain more samples. Measured \emph{on HRSN}, the 0.9 convention applies
+  directly. This is the same error --- moving a threshold to suit the answer ---
+  that this document criticises elsewhere.
+  \item \textbf{Near-duplicate catalog entries.} Of the 8 rows above 0.90, two are
+  the same physical pair: the 2025-04-02 event is double-listed at M1.09 and M1.08
+  with origin times \textbf{0.3\,s apart}. The earlier duplicate fix matched on
+  exact-second tags and concluded ``exactly one collision''; a 0.3\,s offset passes
+  straight through that test. \textbf{The 83 and 93 counts above are therefore also
+  likely inflated}, and dedupe must run on a time window plus proximity, not an
+  exact timestamp.
+\end{enumerate}
+
+One genuinely new pair emerged: \textbf{2024-05-22 / 2025-07-13 at CC 0.957, a
+417-day baseline}. Long baselines are the scarce commodity.
+
+\subsection{Where this leaves the measurement strategy}
+
+Seven confirmed pairs cannot carry a seasonal time series. Two 2026 papers ---
+Kidiwela et al. (Sci Adv, doi:10.1126/sciadv.aea3684) and Shi et al. (Science,
+doi:10.1126/science.aec0970, DAS on buried fibre resolving soil-moisture dv/v) ---
+both use \emph{ambient-noise} interferometry with the same stretching estimator,
+and both get continuous sampling. This repository already contains that pipeline
+(\texttt{stack\_daily.py}, \texttt{cc\_tools.py}) over 413 covered days.
+
+The proposed division of labour, and the reason it is not simply abandoning the
+repeaters: \textbf{ambient-noise dv/v is vulnerable to seasonal changes in the
+noise source distribution}, and the Parkfield microseism is strongly seasonal, so
+the first objection to any seasonal ambient-noise result is that it is the
+microseism. Repeating earthquakes are immune to that --- identical physical source,
+no dependence on the noise field. Seven anchors that agree with an ambient-noise
+curve at the dates they sample is what makes the curve defensible.
+
+Cross-correlating \emph{channel pairs} on a vertical array also gives the travel
+time between two depths directly, which is depth-local without any
+sensitivity-kernel argument. Lellouch et al. 2019 demonstrated ambient
+interferometry works on this fibre, though at ``intermediate quality'' relative to
+earthquake-based estimates.
+
+\paragraph{Unquantified risk that applies either way.} Every independent line
+places the signal shallow --- Shi et al. at 2\,cm, Li \& Ben-Zion at 17\,m, this
+work's null at 250\,m. The gauge length is 16.34\,m, and \S2.8's 1.9\% attenuation
+figure assumed $V \geq 3000$\,m/s, not the 754\,m/s of the weathered layer. If the
+change lives in the top few metres, gauge-length averaging may smear it out before
+any estimator sees it. This has not been modelled.
+
 \section{Evidence ladder}
 
 \begin{table}[H]
@@ -454,7 +726,11 @@ DAS detects those repeaters & \accepted & DAS CC 0.63--0.79 vs DAS null max 0.32
 DAS CC is systematically below HRSN & \accepted & 0.15--0.30 deficit on identical pairs; cause not yet established \\
 A three-event sequence exists & \preliminary & 2024-05-10 / 2024-07-08 / 2025-04-06 mutually correlated \\
 Pair count is coverage-limited & \accepted & Decomposition: tight matched pairs exist but often only one member recorded \\
-$dv/v$ measurable on this fiber & \notrun & Week 2; inputs now exist \\
+Shallow channels are usable & \accepted & noise flat ch 23--896; \texttt{CH\_LO=100} is 79\,m \\
+Channel$\to$depth registration & \preliminary & wellhead ch 15--25; absolute depth $\pm$25\,m \\
+$dv/v < 0.1\%$ at 251--284\,m & \accepted & G3, coda stretching, bootstrap error \\
+$dv/v$ in the shallow interval & \unresolved & $\pm$3.6\% precision; bound too weak to test \\
+Depth of any velocity change & \unresolved & bounded only below 250\,m \\
 $dv/v$ resolvable \emph{versus depth} & \notrun & Week 3; the actual deliverable \\
 Velocity change confined to top 100\,m & \unresolved & Rubinstein \& Beroza's result; this dataset is the test, not a confirmation \\
 \bottomrule
@@ -508,19 +784,42 @@ Everything lives in \texttt{notebooks/faultzone/repeaters/}. Nothing in
 
 \section{Bottom line}
 
-Both preconditions now hold. G1 established that this fiber resolves earthquake
-coda across 785 of 900 channels, which nobody had shown. The HRSN control
-established that genuine repeating earthquakes were recorded during the DAS
-period --- seven pairs at CC 0.92--0.995 with baselines out to 440 days --- and
-that the DAS detects all of them as extreme outliers against its own null.
+Two things are established and defensible today.
 
-What remains open is not whether the measurement can be made but how to make it
-correctly. The DAS returns 0.15--0.30 lower correlation than a co-located
-seismometer on identical pairs, and the cause --- single-component strain rate,
-16.34\,m gauge-length low-passing, channel stacking, or per-channel SNR --- is not
-yet established. A literature methods review is running to settle the processing
-chain before the $dv/v$ estimator is built, because the record of this work so far
-is that improvised method choices have failed repeatedly and in ways that looked
-like results.
+\textbf{A repeater catalog on borehole DAS.} Seven distinct pairs over eleven
+events, confirmed on the HRSN borehole array at CC 0.917--0.995, baselines 39--440
+days, including a three-event sequence spanning 331 days and a 417-day pair. The
+DAS ranking that produced them was validated against an independent instrument, and
+the per-channel search now has a null, a 6$\times$MAD threshold and a time-reversed
+acausal floor 3--4$\times$ below it. Counts above the looser 0.78 cut, and the 83/93
+per-channel counts, still need dedupe on a time window rather than an exact
+timestamp.
 
-\end{document}
+\textbf{A depth bound on velocity change.} $|dv/v| < 0.1\%$ at 251--284\,m over
+39--440 day baselines, from coda stretching with per-pair bootstrap errors of
+$\pm$0.04--0.09\%. Against Li \& Ben-Zion's 4\% at \textasciitilde17\,m this is a
+40$\times$ drop between those depths, and it localises any change to the interval
+only this fibre instruments. G0 established that interval is usable: channels
+23--896 are uniformly coupled, and \texttt{CH\_LO = 100} --- used throughout the
+earlier work --- is 79\,m depth, above which nothing had been examined.
+
+What is \emph{not} established is a velocity change anywhere. The shallow DAS
+measurement reached only $\pm$3.6\% precision, which cannot test a 4\% prediction,
+let alone the 0.1--0.5\% that is typical. The limitation is the observable, not the
+fibre: direct-arrival differential timing is depth-local but 70$\times$ less
+sensitive than coda stretching on the same events.
+
+The next measurement is therefore ambient-noise interferometry on the 413 covered
+days using the pipeline already in this repository, with the seven confirmed
+repeaters as the control that a seasonal ambient-noise result cannot do without,
+because they are immune to the seasonal microseism that is the obvious alternative
+explanation. Before that, two things need quantifying: gauge-length averaging in a
+754\,m/s layer, and free-surface interference above the reflection point. Both are
+strongest exactly where the signal is expected, and neither is in any model here
+yet.
+
+The recurring lesson in this document is not any single physical result. It is that
+five separate times --- median subtraction, the imported 0.9 threshold, zero-lag
+correlation (twice), assumed lapse windows, and a shopped 0.78 cut --- a control
+caught something that already looked like a result. Every number above that lacks a
+stated null should be read as provisional.
