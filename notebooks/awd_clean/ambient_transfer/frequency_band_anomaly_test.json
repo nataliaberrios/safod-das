@@ -1,0 +1,1689 @@
+{
+  "assumption": "Same cemented main-hole fiber; current channel 0 and 1.020952-m spacing inherit Lellouch position/depth convention.",
+  "bands_hz": [
+    [
+      3.0,
+      8.0
+    ],
+    [
+      5.0,
+      12.0
+    ],
+    [
+      8.0,
+      20.0
+    ],
+    [
+      15.0,
+      30.0
+    ]
+  ],
+  "blocks_per_day": 4,
+  "nfiles_per_block": 10,
+  "results": [
+    {
+      "date": "2024-12-20",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.06253689231515613
+    },
+    {
+      "date": "2024-12-20",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -2555.882068164391,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7587835757102463
+    },
+    {
+      "date": "2024-12-20",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3387.7055048942566,
+      "late_velocity_m_s": -19442.483767219215,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.13025955552681967
+    },
+    {
+      "date": "2024-12-20",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 4547.878623008728,
+      "late_velocity_m_s": -6630.7403120706085,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.5453457643678992
+    },
+    {
+      "date": "2024-12-20",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 3286.1340876399295,
+      "best_breakpoint_m": 425.0,
+      "breakpoint_sse_reduction": 0.2741105604531744
+    },
+    {
+      "date": "2024-12-20",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -1053.3448324995697,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.9090718508985656
+    },
+    {
+      "date": "2024-12-20",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -2268.2897728422413,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.42864871012936223
+    },
+    {
+      "date": "2024-12-20",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 2594.9205408493676,
+      "late_velocity_m_s": 3450.440792021926,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.23934867131104853
+    },
+    {
+      "date": "2024-12-20",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.636657208612105
+    },
+    {
+      "date": "2024-12-20",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -2962.222619541878,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7551238603699942
+    },
+    {
+      "date": "2024-12-20",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3277.7943673886753,
+      "late_velocity_m_s": -1919.0470490152434,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.40216846234794157
+    },
+    {
+      "date": "2024-12-20",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 5002.666485309602,
+      "late_velocity_m_s": -1373.4285574561898,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.5688871271218986
+    },
+    {
+      "date": "2024-12-20",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.06253689231515613
+    },
+    {
+      "date": "2024-12-20",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -2577.3897789397224,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7437686875399265
+    },
+    {
+      "date": "2024-12-20",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3190.4760748147964,
+      "late_velocity_m_s": 712.5749335172701,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.7324346733562948
+    },
+    {
+      "date": "2024-12-20",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 4083.809375762941,
+      "late_velocity_m_s": -1484.6518148938972,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.7502286156985749
+    },
+    {
+      "date": "2025-02-24",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 425.0,
+      "breakpoint_sse_reduction": 0.9757067583726504
+    },
+    {
+      "date": "2025-02-24",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -885.7498264069874,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8086328834020422
+    },
+    {
+      "date": "2025-02-24",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3147.9363938172655,
+      "late_velocity_m_s": -10840.657615661616,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.1459093313811881
+    },
+    {
+      "date": "2025-02-24",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 4448.435212884631,
+      "late_velocity_m_s": -6089.013162391632,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.4565319023971047
+    },
+    {
+      "date": "2025-02-24",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.06253689231515613
+    },
+    {
+      "date": "2025-02-24",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -800.5143652512074,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8080861363216745
+    },
+    {
+      "date": "2025-02-24",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -1969.7661997173725,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.721199661512525
+    },
+    {
+      "date": "2025-02-24",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 2491.123719215393,
+      "late_velocity_m_s": -4405.243105278659,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.6912760608709967
+    },
+    {
+      "date": "2025-02-24",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3286.13408763993,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.5696444241873463
+    },
+    {
+      "date": "2025-02-24",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -1650.1000983248778,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7992595948217802
+    },
+    {
+      "date": "2025-02-24",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -1919.0470490152434,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.2531600901447626
+    },
+    {
+      "date": "2025-02-24",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 3190.4760748147964,
+      "late_velocity_m_s": -1514.8276647901146,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.6820849537778966
+    },
+    {
+      "date": "2025-02-24",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3286.13408763993,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7194997299241028
+    },
+    {
+      "date": "2025-02-24",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -836.2597971779273,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.80651601521851
+    },
+    {
+      "date": "2025-02-24",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3190.4760748147964,
+      "late_velocity_m_s": -2023.2390771612236,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.6986595094118586
+    },
+    {
+      "date": "2025-02-24",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 2594.9205408493676,
+      "late_velocity_m_s": 12939.15297008221,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.8901459714589841
+    },
+    {
+      "date": "2024-05-11",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3286.13408763993,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7194997299241028
+    },
+    {
+      "date": "2024-05-11",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 1094.0113190117233,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7121838190818199
+    },
+    {
+      "date": "2024-05-11",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3190.4760748147964,
+      "late_velocity_m_s": 2492.796269130381,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.7406848206369432
+    },
+    {
+      "date": "2024-05-11",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 5002.666485309602,
+      "late_velocity_m_s": -13801.763168087746,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.4363044290389835
+    },
+    {
+      "date": "2024-05-11",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.9739878124742604
+    },
+    {
+      "date": "2024-05-11",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 544.173228174044,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8426780240760604
+    },
+    {
+      "date": "2024-05-11",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 1084.3071657589098,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.9096187468386989
+    },
+    {
+      "date": "2024-05-11",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 5002.666485309602,
+      "late_velocity_m_s": -16938.52752447134,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.4418022191579397
+    },
+    {
+      "date": "2024-05-11",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.06253689231515613
+    },
+    {
+      "date": "2024-05-11",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.782655003079,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.14859336039301652
+    },
+    {
+      "date": "2024-05-11",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3190.4760748147964,
+      "late_velocity_m_s": 2492.796269130381,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.7406848206369432
+    },
+    {
+      "date": "2024-05-11",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 2594.9205408493676,
+      "late_velocity_m_s": 1068.758131189935,
+      "best_breakpoint_m": 425.0,
+      "breakpoint_sse_reduction": 0.4096298492091298
+    },
+    {
+      "date": "2024-05-11",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.636657208612105
+    },
+    {
+      "date": "2024-05-11",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3896.9684239306494,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.9997507146932464
+    },
+    {
+      "date": "2024-05-11",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 1108.3297524358145,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.9250786318029144
+    },
+    {
+      "date": "2024-05-11",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 6210.793425639473,
+      "late_velocity_m_s": 7031.086896950334,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.3281872082345568
+    },
+    {
+      "date": "2025-03-04",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3277.7943673886753,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.9781577337317714
+    },
+    {
+      "date": "2025-03-04",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -813.5323088162193,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8084849843710242
+    },
+    {
+      "date": "2025-03-04",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -2108.5141652863795,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.22566655189823792
+    },
+    {
+      "date": "2025-03-04",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 1779.3740851538523,
+      "late_velocity_m_s": 68796.48102246839,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.905125070446524
+    },
+    {
+      "date": "2025-03-04",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.636657208612105
+    },
+    {
+      "date": "2025-03-04",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -885.7498264069874,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8186928652333283
+    },
+    {
+      "date": "2025-03-04",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -2023.2390771612236,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.7224372322635879
+    },
+    {
+      "date": "2025-03-04",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 2594.9205408493676,
+      "late_velocity_m_s": 2492.796269130381,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.5991694022664282
+    },
+    {
+      "date": "2025-03-04",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3147.9363938172655,
+      "late_velocity_m_s": 3115.995336412976,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.3287540849137319
+    },
+    {
+      "date": "2025-03-04",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -1439.474392698466,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8144635516569696
+    },
+    {
+      "date": "2025-03-04",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": -3407.063822065082,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.381007516684831
+    },
+    {
+      "date": "2025-03-04",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 2594.9205408493676,
+      "late_velocity_m_s": 1068.758131189935,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.41859771780889676
+    },
+    {
+      "date": "2025-03-04",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 425.0,
+      "breakpoint_sse_reduction": 0.9757067583726504
+    },
+    {
+      "date": "2025-03-04",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -813.5323088162193,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8084849843710242
+    },
+    {
+      "date": "2025-03-04",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": -2050.5033881392524,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.7298900076955025
+    },
+    {
+      "date": "2025-03-04",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 3387.7055048942566,
+      "late_velocity_m_s": -6276.170198540944,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.1801658264504622
+    },
+    {
+      "date": "2024-06-17",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 3286.1340876399327,
+      "best_breakpoint_m": 425.0,
+      "breakpoint_sse_reduction": 0.19435927105910533
+    },
+    {
+      "date": "2024-06-17",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 2822.215250599698,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.9993831290397929
+    },
+    {
+      "date": "2024-06-17",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3459.894054465824,
+      "late_velocity_m_s": 1168.9969699987223,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.8544491150084996
+    },
+    {
+      "date": "2024-06-17",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 5002.666485309602,
+      "late_velocity_m_s": -1373.4285574561898,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.6393187607680556
+    },
+    {
+      "date": "2024-06-17",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 3286.1340876399327,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.1604536460290219
+    },
+    {
+      "date": "2024-06-17",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -1024.9639445063174,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8653510303947725
+    },
+    {
+      "date": "2024-06-17",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": -7335.58278618834,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.19912340525276195
+    },
+    {
+      "date": "2024-06-17",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 4253.968099753063,
+      "late_velocity_m_s": -6242.64364833506,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.6583714916839748
+    },
+    {
+      "date": "2024-06-17",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3277.7943673886753,
+      "late_velocity_m_s": 3286.1340876399327,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.29013839711296796
+    },
+    {
+      "date": "2024-06-17",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -3116.216910425379,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7561887786034598
+    },
+    {
+      "date": "2024-06-17",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3277.7943673886753,
+      "late_velocity_m_s": 1685.8704114836642,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.8531480425679605
+    },
+    {
+      "date": "2024-06-17",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 5002.666485309602,
+      "late_velocity_m_s": 906.4151239205781,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.6188590007462991
+    },
+    {
+      "date": "2024-06-17",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3277.7943673886753,
+      "late_velocity_m_s": 3286.1340876399327,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.16332039584234226
+    },
+    {
+      "date": "2024-06-17",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 2848.261953159502,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.9986417562314505
+    },
+    {
+      "date": "2024-06-17",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3387.7055048942566,
+      "late_velocity_m_s": 1810.433711117578,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.8243223186680808
+    },
+    {
+      "date": "2024-06-17",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 3062.857031822204,
+      "late_velocity_m_s": 15657.462417578503,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.8083729442532964
+    },
+    {
+      "date": "2024-06-26",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3277.7943673886753,
+      "late_velocity_m_s": 3478.0443183581015,
+      "best_breakpoint_m": 250.0,
+      "breakpoint_sse_reduction": 0.36089142307241473
+    },
+    {
+      "date": "2024-06-26",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3105.396712819735,
+      "late_velocity_m_s": 1026.577425725532,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7528641088340461
+    },
+    {
+      "date": "2024-06-26",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 1749.5192748280192,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.8609205241256891
+    },
+    {
+      "date": "2024-06-26",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 3573.3332037925725,
+      "late_velocity_m_s": 1350.9882980242958,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.5688917540715863
+    },
+    {
+      "date": "2024-06-26",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 3286.1340876399327,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.1604536460290219
+    },
+    {
+      "date": "2024-06-26",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -1068.758131189935,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8776100045491777
+    },
+    {
+      "date": "2024-06-26",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": -652.9494965628479,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7732359435727263
+    },
+    {
+      "date": "2024-06-26",
+      "start": 476,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 3387.7055048942566,
+      "late_velocity_m_s": -6242.64364833506,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.2765653301974861
+    },
+    {
+      "date": "2024-06-26",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3277.7943673886753,
+      "late_velocity_m_s": 3286.1340876399327,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.29013839711296796
+    },
+    {
+      "date": "2024-06-26",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -6298.269389380872,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.703993900618638
+    },
+    {
+      "date": "2024-06-26",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3277.7943673886753,
+      "late_velocity_m_s": -17252.2039601096,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.19658702085723512
+    },
+    {
+      "date": "2024-06-26",
+      "start": 953,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": Infinity,
+      "late_velocity_m_s": 4446.868801173843,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.4705606211358151
+    },
+    {
+      "date": "2024-06-26",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3277.7943673886753,
+      "late_velocity_m_s": 3286.1340876399327,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.34702313583240696
+    },
+    {
+      "date": "2024-06-26",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 2605.927311457121,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.9992399146458282
+    },
+    {
+      "date": "2024-06-26",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -857.0552105298257,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.8806552252397496
+    },
+    {
+      "date": "2024-06-26",
+      "start": 1430,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 3190.4760748147964,
+      "late_velocity_m_s": -10181.628566622094,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.6451778932708374
+    },
+    {
+      "date": "2024-10-28",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3147.9363938172655,
+      "late_velocity_m_s": 3115.995336412976,
+      "best_breakpoint_m": 425.0,
+      "breakpoint_sse_reduction": 0.374223987028805
+    },
+    {
+      "date": "2024-10-28",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -912.7584439580125,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8188545287135871
+    },
+    {
+      "date": "2024-10-28",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 1244.2747987311784,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.22154925332087627
+    },
+    {
+      "date": "2024-10-28",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 2594.9205408493676,
+      "late_velocity_m_s": 1922.846261807885,
+      "best_breakpoint_m": 425.0,
+      "breakpoint_sse_reduction": 0.2506412017432146
+    },
+    {
+      "date": "2024-10-28",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3286.13408763993,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.5696444241873463
+    },
+    {
+      "date": "2024-10-28",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -2744.0913515343755,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7595823494487866
+    },
+    {
+      "date": "2024-10-28",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3105.396712819735,
+      "late_velocity_m_s": 2467.1841470126456,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.7403143790961182
+    },
+    {
+      "date": "2024-10-28",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 3190.4760748147964,
+      "late_velocity_m_s": 2719.2453717617336,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.8272756680294019
+    },
+    {
+      "date": "2024-10-28",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 3286.1340876399295,
+      "best_breakpoint_m": 425.0,
+      "breakpoint_sse_reduction": 0.2741105604531744
+    },
+    {
+      "date": "2024-10-28",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -2871.1211983694498,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7703674677969256
+    },
+    {
+      "date": "2024-10-28",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 1648.5792687411686,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.48961317040657615
+    },
+    {
+      "date": "2024-10-28",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 50026.664853096045,
+      "late_velocity_m_s": -1607.1055764457933,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.7004588460026916
+    },
+    {
+      "date": "2024-10-28",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": 3478.0443183581015,
+      "best_breakpoint_m": 425.0,
+      "breakpoint_sse_reduction": 0.29064743398035753
+    },
+    {
+      "date": "2024-10-28",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -3116.216910425379,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7537210565595956
+    },
+    {
+      "date": "2024-10-28",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 2492.796269130381,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.7367448903980252
+    },
+    {
+      "date": "2024-10-28",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 2594.9205408493676,
+      "late_velocity_m_s": 1068.758131189935,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.3249381451555665
+    },
+    {
+      "date": "2024-11-30",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 2822.215250599698,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8561379126571177
+    },
+    {
+      "date": "2024-11-30",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -800.5143652512074,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.8024743346551909
+    },
+    {
+      "date": "2024-11-30",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3573.3332037925725,
+      "late_velocity_m_s": -2339.4916939628497,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.5344494528854336
+    },
+    {
+      "date": "2024-11-30",
+      "start": 0,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 2491.123719215393,
+      "late_velocity_m_s": -2934.233114475342,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.5174535802334287
+    },
+    {
+      "date": "2024-11-30",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.06253689231515613
+    },
+    {
+      "date": "2024-11-30",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -1336.7300637906328,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7944641919466445
+    },
+    {
+      "date": "2024-11-30",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3573.3332037925725,
+      "late_velocity_m_s": 29575.206788759195,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.12778569439146237
+    },
+    {
+      "date": "2024-11-30",
+      "start": 477,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 3062.857031822204,
+      "late_velocity_m_s": -3327.2107637354334,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.4170583094147168
+    },
+    {
+      "date": "2024-11-30",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3147.9363938172655,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.9740584026684324
+    },
+    {
+      "date": "2024-11-30",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 1190.5674298350425,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.2096955691453284
+    },
+    {
+      "date": "2024-11-30",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3335.110990206401,
+      "late_velocity_m_s": -14223.191051082724,
+      "best_breakpoint_m": 350.0,
+      "breakpoint_sse_reduction": 0.22983379322936892
+    },
+    {
+      "date": "2024-11-30",
+      "start": 954,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 5002.666485309602,
+      "late_velocity_m_s": 3286.1340876399313,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.5948134790461987
+    },
+    {
+      "date": "2024-11-30",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        3.0,
+        8.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3115.9953364129774,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.06253689231515613
+    },
+    {
+      "date": "2024-11-30",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        5.0,
+        12.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -2764.6190209956217,
+      "best_breakpoint_m": 450.0,
+      "breakpoint_sse_reduction": 0.7626303428844943
+    },
+    {
+      "date": "2024-11-30",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        8.0,
+        20.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": -8821.126894386485,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.8420974510860226
+    },
+    {
+      "date": "2024-11-30",
+      "start": 1431,
+      "nfiles": 10,
+      "band_hz": [
+        15.0,
+        30.0
+      ],
+      "early_velocity_m_s": 3126.6665533185005,
+      "late_velocity_m_s": 3297.766420693522,
+      "best_breakpoint_m": 325.0,
+      "breakpoint_sse_reduction": 0.1763149443552695
+    }
+  ]
+}
