@@ -37,7 +37,7 @@
 
 \title{SAFOD June 2026 AWD--DAS: Analysis Summary and Figure Notes}
 \author{SAFOD AWD--DAS working analysis}
-\date{2 August 2026}
+\date{5 August 2026}
 
 \begin{document}
 \maketitle
@@ -55,7 +55,7 @@ $1.4$--$1.56~\mathrm{km\,s^{-1}}$ low-frequency mode is validated on the
 wireline Deep array.  The former is not yet securely identified as direct P;
 the latter is consistent with, but not yet proven to be, a borehole tube wave.
 The document follows the current results notebook,
-\path{AWD_results_dashboard.ipynb}, version v30.  The hierarchical
+\path{AWD_results_dashboard.ipynb}, version v41.  The hierarchical
 individual-drop/burst repeatability analysis and the split-sample Deep
 time-gated branch search are now promoted into the authoritative results
 record.  A six-figure core presentation set plus an advisor-facing figure
@@ -1519,7 +1519,7 @@ For this archive, one HDF5 segment contains 30,000 samples at the 500-Hz output 
 
 
 \subsection{Longer signed F--K stack}
-The frozen negative signed-wavenumber wedge was extended to seven independent 10-file chunks (70 segments, approximately 70~min). The aggregate peak is 3.075~km~s$^{-1}$, the score at 3.2~km~s$^{-1}$ is 0.2947, and a 5,000-permutation receiver null gives $p=0.0002$. All seven chunk scores are positive. This is a stable 70-minute F--K-selected observable, but not yet a complete-day reproduction or an independent velocity estimate because the wedge contains the target interval. The next tests are a complete-day stack and held-out-day/wedge-sensitivity validation.
+The frozen negative signed-wavenumber wedge was extended to seven independent 10-file chunks (70 segments, approximately 70~min). The aggregate peak is 3.075~km~s$^{-1}$, the score at 3.2~km~s$^{-1}$ is 0.2947, and a 5,000-permutation receiver null gives $p=0.0002$. All seven chunk scores are positive. This is a stable 70-minute F--K-selected observable, but not yet a complete-day reproduction or an independent velocity estimate because the wedge contains the target interval. The complete-day and seasonal products are now available below; held-out-day and nearby-wedge tests remain the appropriate robustness checks.
 
 
 \subsection{Seasonal robustness of the ambient F--K result (running)}
@@ -1568,7 +1568,7 @@ Lellouch et al. organize the top-source geometry by receiver position along the 
 
 The first selected winter day (2024-12-20) has enough completed checkpoint products for a five-hour interim stack using 300 one-minute files. The exact-resolution unfiltered path gives a normalized-correlation score of 0.0003 at 3.2~km~s$^{-1}$, below its receiver-permutation 95th-percentile maximum (p = 0.265). The negative signed F--K branch peaks at 3.075~km~s$^{-1}$, has score 0.266 at 3.2~km~s$^{-1}$, and gives p = 0.0005; the positive branch is not significant, while the two-sided branch remains enhanced.
 
-All traces were detrended, filtered from 5--20~Hz, and normalized by a 5-s running absolute mean. Earthquake-containing intervals were retained. Because the F--K wedge was selected to include 2.5--4.5~km~s$^{-1}$, its null result is conditional on that selection and is not an independent velocity estimate. This is an interim one-day diagnostic; the complete seasonal jobs remain running.
+All traces were detrended, filtered from 5--20~Hz, and normalized by a 5-s running absolute mean. Earthquake-containing intervals were retained. Because the F--K wedge was selected to include 2.5--4.5~km~s$^{-1}$, its null result is conditional on that selection and is not an independent velocity estimate. This is an interim one-day diagnostic; the completed seasonal aggregate is reported below.
 
 \takeaway{The early checkpoint evidence supports the working hypothesis that signed F--K isolation materially improves observability, while the exact-resolution unfiltered control remains weak.}
 
@@ -1579,7 +1579,7 @@ All traces were detrended, filtered from 5--20~Hz, and normalized by a 5-s runni
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.98\linewidth]{ambient_transfer/interim_2024-12-20_n300.png}
-\caption{\textbf{Five-hour interim ambient transfer test from 2024-12-20.} (a) Exact-resolution unfiltered Lellouch-style top-source correlations with 2.5, 3.2, and 4.0~km~s$^{-1}$ reference moveout lines; (b) the same geometry after the negative signed F--K wedge with the same reference lines; (c) trial-velocity scores for unfiltered, negative, positive, and two-sided branches; and (d) scores at 3.2~km~s$^{-1}$ with receiver-permutation 95th-percentile thresholds. The unfiltered score at 3.2~km~s$^{-1}$ is 0.0003 (p = 0.265), whereas the negative branch reaches 0.266 (p = 0.0005). All records were detrended, filtered from 5--20~Hz, and temporally normalized by a 5-s running absolute mean; earthquake-containing intervals were retained. The F--K wedge includes the target velocity range by construction, so its significance is conditional and does not constitute an independent velocity estimate. This is a preliminary one-day partial stack; the complete seasonal jobs remain in progress.}
+\caption{\textbf{Five-hour interim ambient transfer test from 2024-12-20.} (a) Exact-resolution unfiltered Lellouch-style top-source correlations with 2.5, 3.2, and 4.0~km~s$^{-1}$ reference moveout lines; (b) the same geometry after the negative signed F--K wedge with the same reference lines; (c) trial-velocity scores for unfiltered, negative, positive, and two-sided branches; and (d) scores at 3.2~km~s$^{-1}$ with receiver-permutation 95th-percentile thresholds. The unfiltered score at 3.2~km~s$^{-1}$ is 0.0003 (p = 0.265), whereas the negative branch reaches 0.266 (p = 0.0005). All records were detrended, filtered from 5--20~Hz, and temporally normalized by a 5-s running absolute mean; earthquake-containing intervals were retained. The F--K wedge includes the target velocity range by construction, so its significance is conditional and does not constitute an independent velocity estimate. This is a preliminary one-day partial stack; the completed seasonal aggregate is reported in the v41 section below.}
 \end{figure}
 
 
@@ -1626,7 +1626,7 @@ The immediate comparison is between the current negative F--K ridge curvature an
 
 We treated current channel 0 and the measured 1.020952-m channel spacing as inherited from the same cemented main-hole fiber used by Lellouch et al. and analyzed 369 available ten-minute negative-branch F--K products from four dates. For each product, the maximum-correlation lag in each receiver-position row was picked. The early 50--350~m segment has date-level median apparent velocities of 3.13--3.19~km~s$^{-1}$, while the late 450--650~m segment has medians of 2.49--2.61~km~s$^{-1}$. Thus the curvature is repeatable across dates under the assumed registration. A descriptive two-segment breakpoint scan gives date-level medians of 350--425~m, with broad intervals extending to approximately 450~m; it does not uniquely localize the change at 500--520~m.
 
-The result supports a repeatable transition-like feature in the current wavefield and makes the Lellouch anomaly a legitimate comparison target, but it does not establish that the two features are identical. The mismatch may reflect the broadness of the transition, fiber-coordinate uncertainty, dispersive or mixed-mode moveout, or the fact that row maxima are quantized at the lag sample interval. The next validation is to repeat the scan in independent frequency bands and in the completed seasonal day-level aggregates, then compare the registered coordinate with the Lellouch $V_P/V_S$ and mode-conversion evidence.
+The result supports a repeatable transition-like feature in the current wavefield and makes the Lellouch anomaly a legitimate comparison target, but it does not establish that the two features are identical. The mismatch may reflect the broadness of the transition, fiber-coordinate uncertainty, dispersive or mixed-mode moveout, or the fact that row maxima are quantized at the lag sample interval. The completed frequency-band and seasonal products now provide that comparison. They support a broad transition-like feature, but the registered coordinate remains conditional and does not uniquely identify the Lellouch anomaly or a lithologic boundary.
 
 \begin{figure}[H]
 \centering
@@ -1644,7 +1644,7 @@ The result supports a repeatable transition-like feature in the current wavefiel
 
 \paragraph{What differs from Lellouch et al. (2019).} The current archive is a later acquisition and is not the original 2017 continuous record. The earlier unsuccessful branch used channel 200 as the reference, hard-coded 1-m spacing, selected short files rather than a complete UTC day, and used unnormalized FFT correlations. The corrected transfer branch uses the published top-channel and fixed-50-m geometries, measured spacing, 5-s temporal normalization, pairwise RMS normalization, and complete-day/chunked stacking. F--K isolation is an additional processing experiment, not a step in the published Lellouch ambient-interferometry method.
 
-\paragraph{Why the signal appears now.} The present recovery cannot yet be attributed to one change alone. The strongest methodological changes are removal of the channel-200 geometry error, correct spatial calibration, bounded correlation normalization, more coherent stacking, and signed F--K isolation of a directional branch. The current result should therefore be described as a successful \emph{transfer test on a different acquisition}, not an exact reproduction of the 2017 paper. The ongoing seasonal and frequency-band controls test whether the F--K enhancement is persistent and whether it survives changes in passband.
+\paragraph{Why the signal appears now.} The present recovery cannot yet be attributed to one change alone. The strongest methodological changes are removal of the channel-200 geometry error, correct spatial calibration, bounded correlation normalization, more coherent stacking, and signed F--K isolation of a directional branch. The current result should therefore be described as a successful \emph{transfer test on a different acquisition}, not an exact reproduction of the 2017 paper. The completed seasonal and frequency-band controls show that the F--K enhancement persists across dates, while the apparent transition is sensitive to passband and row-maximum stability.
 
 \takeaway{The advisor-facing short version is: channel 0 is the fixed virtual source; the current corrected branch matches Lellouch's geometry and normalization much more closely, while F--K isolation is our added extension. The earlier failure was not a controlled reproduction because its geometry, stacking, acquisition, and correlation scaling differed.}
 
@@ -1669,5 +1669,37 @@ For the Nano ambient branch, the coordinate-direction labels can be converted to
 This physical label is specific to the Nano top-source geometry and its stated coordinate convention. It should not be transferred automatically to the Deep hairpin, whose outbound/return orientation is still represented with explicit coordinate reversals and whose physical depth direction remains conditional.
 
 \takeaway{For Nano, the negative signed F--K branch is physically interpretable as downgoing under the documented same-fiber orientation; for Deep, retain coordinate-direction labels until the hairpin orientation is independently surveyed.}
+
+
+\subsection{Completed eight-day seasonal F--K validation and unfiltered control}
+\figquestion{Does the signed F--K observable persist across independent dates, and does it remain absent from the exact-resolution unfiltered control?}
+
+The seasonal jobs processed eight selected dates independently and then formed an aggregate from 11,523 weighted one-minute files. All records were detrended, filtered from 5--20~Hz, divided by a 5-s running mean of absolute amplitude, and correlated with the channel-0 top-source geometry using the measured 1.020952-m spacing. The fixed negative signed wedge has a peak at 3.075~km~s$^{-1}$, score 0.279, and a 500-permutation receiver null probability $p=0.0002$. The positive branch peaks at 3.825~km~s$^{-1}$ but is not significant ($p=0.978$). The two-sided branch is enhanced ($p=0.0026$), while the exact-resolution unfiltered aggregate is weak ($p=0.343$).
+
+This establishes a repeatable directionally selected transfer observable across seasons, not an independent velocity estimate: the negative wedge was defined to include 2.5--4.5~km~s$^{-1}$. Earthquake-containing intervals were retained; temporal normalization suppresses their amplitude leverage but does not remove their waveforms.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\linewidth]{ambient_transfer/fk_seasonal_day_comparison.png}
+\caption{\textbf{Eight-day seasonal validation of the ambient signed F--K observable.} Each selected date was processed independently with the channel-0 top-source geometry, measured 1.020952-m spacing, 5--20-Hz preprocessing, and fixed signed velocity masks before aggregation. The negative branch reaches 3.075~km~s$^{-1}$ with score 0.279 and receiver-permutation $p=0.0002$ across 11,523 weighted files. The positive branch is not significant ($p=0.978$), the two-sided branch remains enhanced ($p=0.0026$), and the exact-resolution unfiltered control is weak ($p=0.343$). The figure demonstrates seasonal repeatability of a directionally selected transfer observable; because the negative wedge contains the target velocity interval by construction, it is not an independent formation-velocity estimate or an exact reproduction of the 2017 acquisition.}\end{figure}
+
+\subsection{Completed frequency-band and anomaly diagnostics}
+The frequency-band scan processed four ten-file blocks per selected day in 3--8, 5--12, 8--20, and 15--30~Hz bands. The 3--8-Hz control is the most stable, with median early and late apparent velocities of approximately 3.15 and 3.12~km~s$^{-1}$ and a median descriptive breakpoint near 425~m. Higher-frequency row-maximum fits are less stable and sometimes yield nonphysical late-branch values, so they are retained as sensitivity diagnostics rather than independent geological constraints. The full anomaly postprocess contains 1,167 products across nine dates and places the descriptive transition broadly near 350--425~m, not uniquely at 500--520~m.
+
+\takeaway{The seasonal result is robust as a selected directional observable. The apparent spatial transition is repeatable but broad, frequency-dependent, and conditional on fiber-coordinate registration; it is not yet a lithologic boundary or $V_P$ inversion.}
+
+\subsection{Anti-alias preprocessing sensitivity pilot}
+\figquestion{Does the short-stack F--K result depend materially on direct factor-of-two decimation?}
+
+The pilot compares the current direct slicing path, explicit anti-aliased polyphase resampling along both time and channel axes, and full-resolution processing. The same normalized correlations, 5--20-Hz bandpass, 2.5--4.5~km~s$^{-1}$ signed wedge, and receiver-permutation nulls are used in all paths. For the first 30 one-minute records on 2024-12-20, the direct path peaks at 1.875~km~s$^{-1}$ ($p=1.00$), the anti-aliased path at 1.850~km~s$^{-1}$ ($p=0.990$), and the full-resolution path at 1.925~km~s$^{-1}$ ($p=0.910$). These are all weak short-stack controls and differ by only 75~m~s$^{-1}$.
+
+The pilot is reassuring about gross preprocessing sensitivity but does not validate the long-stack seasonal signal: 30 minutes is much shorter than the five-hour and complete-day products. A longer anti-aliased-versus-direct comparison remains the next robustness run.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\linewidth]{ambient_transfer/alias_sensitivity_2024-12-20_start0_n30.png}
+\caption{\textbf{Anti-alias preprocessing sensitivity for a 30-minute ambient pilot.} Columns compare direct factor-of-two slicing, explicit anti-aliased polyphase resampling along the time and channel axes, and full-resolution processing. The upper row shows top-source correlation sections; the lower row shows trial-velocity scores with receiver-permutation 95th-percentile thresholds. All three paths are weak and nonsignificant over this short interval, with peak velocities from 1.850 to 1.925~km~s$^{-1}$. The result is a preprocessing control rather than a test of the full seasonal F--K signal; the longer-stack comparison is required before declaring the seasonal result insensitive to decimation.}\end{figure}
+
+\takeaway{v41 promotes the completed seasonal, unfiltered, frequency-band, and anti-alias products. The defensible claim is a repeatable, conditional negative signed F--K observable near 3.075~km~s$^{-1}$, with a broad processing-sensitive spatial transition and an anti-alias pilot that is reassuring but not yet long-stack validation.}
 
 \end{document}
