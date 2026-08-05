@@ -596,3 +596,73 @@ Every additional confirmed pair adds a CWI baseline, and baselines are the bindi
 constraint on separating the seasonal term from secular drift — that separation
 works only because elapsed time and seasonal phase are nearly uncorrelated across
 the pair set, which improves with more pairs.
+
+
+---
+
+## 15. Correction — there IS a seismometer in the SAFOD hole (2026-08-05)
+
+**§11 and the plan both state that no seismometer occupies the SAFOD borehole
+during the DAS period. That is wrong.** The query behind it
+(`station_geometry.py`) restricted to networks `BP`, `NC`, `PB`; the SAFOD
+instruments are on network **`SF`**, which was never requested. A plain search
+error, found only when the claim was challenged.
+
+`safod_hole_check.py` repeats it with no network restriction against NCEDC and
+IRIS.
+
+### What is actually there
+
+**`SF.MH029` — SAFOD Main Hole, 2555.1 m depth, active 2022-05-21 to present.**
+Three components (GP1/GP2/GP3) at **1000 Hz**, orientations az 35.5/dip 41.7,
+az 81.33/dip 31.95, az 338.14/dip 20.1 — a triaxial package in a deviated hole, so
+it must be rotated into a geographic frame before use.
+
+The history is long: `SF.MH001`–`MH029` since 2004 at 1844–2765 m, plus the
+`SF.PH*` Pilot Hole series including a 32-level array from 856 to 2096 m.
+
+**Near miss:** `SF.MHVSM` had a sensor at **782 m** — inside the fibre's range —
+but ran only to 2023-12-31, five months before DAS recording began.
+
+### What survives, and what does not
+
+**Survives:** the fibre spans 0–864 m and MH029 sits at 2555 m, about 1.7 km below
+the deepest channel. *Nothing else instruments 0–864 m.* The depth-range claim was
+right; the blanket "no seismometer in the hole" was not.
+
+**Does not survive:** the assertion that no same-hole reference exists for
+amplitude calibration. One does, which makes Atterholt's suggestion about
+collocated sensors far more sensible than the HRSN-based reading given earlier.
+
+### Coverage — the number that decides its usefulness
+
+`mh029_coverage.py`, over the 12 events in pairs above HRSN CC 0.90:
+
+| | |
+|---|---|
+| events with MH029 data | **5 / 12** |
+| **pairs with BOTH events** | **1 / 8** |
+
+Every 2024 event has data (2024-05-10, 05-13, 05-22, 06-23, 07-08); no 2025 event
+does (04-02, 04-06, 04-23, 05-11, 07-13, 07-27). Archiving stops between 2024-07
+and 2025-04. Since every confirmed pair straddles that gap, only
+2024-05-10 / 2024-07-08 is usable.
+
+**Conclusion: MH029 cannot serve as a general confirmation channel for the
+repeaters.** It is usable for amplitude calibration on the 5 events it recorded
+(calibration needs single events, not pairs) and as one independent check on that
+one pair. It is also **not continuously archived** — 1 of 6 random quiet windows
+returned data — so it cannot support ambient-noise interferometry.
+
+Worth asking NCEDC or the SAFOD data managers whether the 2025 gap is an archiving
+lapse or an instrument failure; if the former, the data may be recoverable and the
+coverage would change substantially.
+
+### Attribution correction
+
+An earlier message credited "collocated three-component sensors allow amplitude
+calibration and provide local particle motion observations" to Atterholt's Garlock
+paper. That came from a search summary, not from reading the paper, and the summary
+did not distinguish between Atterholt, Zhan & Yang 2022
+(doi:10.1029/2022JB025052) and Atterholt, Zhan, Yang & Zhu 2024. The attribution is
+unverified.
