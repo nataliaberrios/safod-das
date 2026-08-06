@@ -1,6 +1,21 @@
 # SAFOD DAS — literature organised by project direction
 
-46 PDFs in `/home/groups/ettore88/nberrios/planpapers/`. Organised 2026-08-05.
+The collection lives in `/home/groups/ettore88/nberrios/planpapers/`, sorted into
+folders that mirror the sections below and renamed to `author_year_journal_topic.pdf`.
+`MANIFEST.csv` there records every rename, so the whole reorganisation reverses
+with one command (see `notebooks/organise_papers.py`).
+
+| folder | papers |
+|---|---|
+| `01_repeaters` | 12 |
+| `02_tides` | 7 |
+| `03_ambient_noise` | 4 |
+| `04_methods_das` | 7 |
+| `05_site_safod_parkfield` | 14 |
+| `06_methods_borehole` | 1 |
+| `_duplicates` | 1 |
+
+Organised 2026-08-05.
 
 **On the organisation.** Three of the four directions you named — tides, repeating
 earthquakes, ambient-noise correlation — are *scientific targets*: each could carry
@@ -20,24 +35,24 @@ one direction; those are cross-referenced rather than duplicated.
 
 | paper | file | why |
 |---|---|---|
-| **Poupinet, Ellsworth & Fréchet 1984**, JGR 89:5719 | `...1984 - Poupinet...` | Founding paper. Earthquake doublets to monitor velocity, Calaveras Fault. Cross-spectral phase for sub-sample delay — still the best delay estimator. |
-| **Nadeau, Foxall & McEvilly 1995**, Science 267:503 | `science.267.5197.503` | Clustering and *periodic* recurrence at Parkfield. Establishes that these things repeat on a clock. |
-| **Nadeau & Johnson 1998**, BSSA 88(3):790 | `bssa0880030790` | "Parkfield VI: Moment Release Rates and Source Parameters." **The slip–moment scaling relation.** Note: calibrated *against* geodetic creep, so using it to measure creep at Parkfield is partly circular. |
-| **Nadeau & McEvilly 1999**, Science 285:718 | `science.285.5428.718` | **"Fault Slip Rates at Depth from Recurrence Intervals of Repeating Microearthquakes."** The paper this project's current direction reproduces. Four pages. Start here. |
+| **Poupinet, Ellsworth & Fréchet 1984**, JGR 89:5719 | `01_repeaters/`<br>`poupinet_ellsworth_frechet_1984_jgr_earthquake-doublets-calaveras.pdf` | Founding paper. Earthquake doublets to monitor velocity, Calaveras Fault. Cross-spectral phase for sub-sample delay — still the best delay estimator. |
+| **Nadeau, Foxall & McEvilly 1995**, Science 267:503 | `01_repeaters/`<br>`nadeau_1995_science_clustering-periodic-recurrence-parkfield.pdf` | Clustering and *periodic* recurrence at Parkfield. Establishes that these things repeat on a clock. |
+| **Nadeau & Johnson 1998**, BSSA 88(3):790 | `01_repeaters/`<br>`nadeau_johnson_1998_bssa_parkfield-VI-moment-release-scaling.pdf` | "Parkfield VI: Moment Release Rates and Source Parameters." **The slip–moment scaling relation.** Note: calibrated *against* geodetic creep, so using it to measure creep at Parkfield is partly circular. |
+| **Nadeau & McEvilly 1999**, Science 285:718 | `01_repeaters/`<br>`nadeau_mcevilly_1999_science_fault-slip-rates-at-depth.pdf` | **"Fault Slip Rates at Depth from Recurrence Intervals of Repeating Microearthquakes."** The paper this project's current direction reproduces. Four pages. Start here. |
 
 ### Why the scaling is contested — read after the above
 
 | paper | file | why |
 |---|---|---|
-| **Beeler & Hickman 2001**, JGR 106:30701 | `...2001 - Beeler...` | Stress drop vs lab-inferred interseismic strength recovery. Magnitude-dependent aseismic slip as the explanation for N&J's scaling. |
-| **Chen & Lapusta 2009**, JGR 114:B01311 | `...2009 - Chen...` | Rate-and-state simulation reproducing the scaling: a velocity-weakening patch inside a velocity-strengthening region. |
-| **Abercrombie 2014**, GRL | `...2014 - Abercrombie...` | Measured stress drops of Parkfield repeaters. **Contradicts** N&J's implied stress-drop-rises-as-moment-falls trend. |
-| **Gao, Kao & Wang 2021**, GRL | `...2021 - Gao...` | "Misconception of Waveform Similarity in the Identification of Repeating Earthquakes." Cautionary — high CC does not imply co-located rupture. |
+| **Beeler & Hickman 2001**, JGR 106:30701 | `01_repeaters/`<br>`beeler_hickman_2001_jgr_stress-drop-strength-recovery.pdf` | Stress drop vs lab-inferred interseismic strength recovery. Magnitude-dependent aseismic slip as the explanation for N&J's scaling. |
+| **Chen & Lapusta 2009**, JGR 114:B01311 | `01_repeaters/`<br>`chen_lapusta_2009_jgr_scaling-repeaters-rate-and-state.pdf` | Rate-and-state simulation reproducing the scaling: a velocity-weakening patch inside a velocity-strengthening region. |
+| **Abercrombie 2014**, GRL | `01_repeaters/`<br>`abercrombie_2014_grl_stress-drops-repeating-earthquakes.pdf` | Measured stress drops of Parkfield repeaters. **Contradicts** N&J's implied stress-drop-rises-as-moment-falls trend. |
+| **Gao, Kao & Wang 2021**, GRL | `01_repeaters/`<br>`gao_2021_grl_misconception-waveform-similarity.pdf` | "Misconception of Waveform Similarity in the Identification of Repeating Earthquakes." Cautionary — high CC does not imply co-located rupture. |
 
 ### Reviews and applications
 
-- **Uchida & Bürgmann 2019**, Annu. Rev. 47:305 — `annurev-earth-053018-060119`. The synthesis. §"Source characteristics and recurrence" contains every caveat above in one place.
-- **Uchida 2019**, PEPS 6:40 — `s40645-019-0284-z`. Detection methods; Table 1 compiles windows and bands per study.
+- **Uchida & Bürgmann 2019**, Annu. Rev. 47:305 — `01_repeaters/`<br>`uchida_burgmann_2019_annurev_repeating-earthquakes-review.pdf`. The synthesis. §"Source characteristics and recurrence" contains every caveat above in one place.
+- **Uchida 2019**, PEPS 6:40 — `01_repeaters/`<br>`uchida_2019_peps_detection-of-repeating-earthquakes.pdf`. Detection methods; Table 1 compiles windows and bands per study.
 - **Lengliné & Marsan 2009**, JGR 114:B10303 — coseismic/postseismic stress change at Parkfield from repeaters.
 - **Ide, Beroza, Shelly & Uchide 2007**, Nature 447 — "A scaling law for slow earthquakes." Adjacent: the aseismic end of the spectrum.
 
@@ -52,13 +67,13 @@ predictable to high precision, so the null is exactly computable.*
 
 | paper | file | why |
 |---|---|---|
-| **De Fazio, Aki & Alba 1973**, JGR 78:1319 | `...1973 - De Fazio...` | **The founding observation** — solid Earth tide changing in-situ seismic velocity. Aki is a co-author. |
-| **Takano et al. 2014**, GRL | `...2014 - Takano...` | **The modern template.** Velocity change from the Earth tide, detected by ambient-noise correlation. This is the paper your tides direction would follow. |
-| **Berger 1975**, JGR 80:274 | `...1975 - Berger...` | Thermoelastic strains and tilts. Short. The other periodic forcing that must be separated from tides. |
-| **Ben-Zion & Leary 1986**, BSSA 76:1447 | `bssa0760051447` | Thermoelastic strain in a half-space under unconsolidated cover. Gives the *depth dependence* — essential for telling a tidal signal from a thermal one. |
-| **Métivier & Conrad 2008**, JGR 113:B11405 | `...2008 - Métivier...` | Body tides of a heterogeneous, aspherical Earth. The forward model for what strain to expect. |
-| **Rojstaczer 1989**, JGR 94:12403 | `...1989 - Rojstaczer...` | Water levels in wells responding to Earth tides. The poroelastic transfer function. |
-| **HESS 2022**, 26:4301 | `hess-26-4301-2022` | In-situ hydro-geomechanical properties from groundwater response to Earth *and atmospheric* tides. Atmospheric loading is the confound. |
+| **De Fazio, Aki & Alba 1973**, JGR 78:1319 | `02_tides/`<br>`defazio_aki_alba_1973_jgr_solid-earth-tide-velocity-change.pdf` | **The founding observation** — solid Earth tide changing in-situ seismic velocity. Aki is a co-author. |
+| **Takano et al. 2014**, GRL | `02_tides/`<br>`takano_2014_grl_velocity-changes-earth-tide-ambient-noise.pdf` | **The modern template.** Velocity change from the Earth tide, detected by ambient-noise correlation. This is the paper your tides direction would follow. |
+| **Berger 1975**, JGR 80:274 | `02_tides/`<br>`berger_1975_jgr_thermoelastic-strains-and-tilts.pdf` | Thermoelastic strains and tilts. Short. The other periodic forcing that must be separated from tides. |
+| **Ben-Zion & Leary 1986**, BSSA 76:1447 | `02_tides/`<br>`benzion_leary_1986_bssa_thermoelastic-strain-halfspace.pdf` | Thermoelastic strain in a half-space under unconsolidated cover. Gives the *depth dependence* — essential for telling a tidal signal from a thermal one. |
+| **Métivier & Conrad 2008**, JGR 113:B11405 | `02_tides/`<br>`metivier_conrad_2008_jgr_body-tides-heterogeneous-earth.pdf` | Body tides of a heterogeneous, aspherical Earth. The forward model for what strain to expect. |
+| **Rojstaczer 1989**, JGR 94:12403 | `02_tides/`<br>`rojstaczer_1989_jgr_well-water-levels-response-earth-tides.pdf` | Water levels in wells responding to Earth tides. The poroelastic transfer function. |
+| **HESS 2022**, 26:4301 | `02_tides/`<br>`hess_2022_groundwater-response-earth-atmospheric-tides.pdf` | In-situ hydro-geomechanical properties from groundwater response to Earth *and atmospheric* tides. Atmospheric loading is the confound. |
 
 **Why this direction is attractive:** the forcing is known exactly, so unlike a
 seasonal signal you can predict the phase and amplitude in advance and test against
@@ -76,10 +91,10 @@ tiny. Takano et al. is the place to check what amplitude is actually detectable.
 
 | paper | file | why |
 |---|---|---|
-| **Wapenaar et al. 2010**, Geophysics 75:75A195 | `AmbientNoiseTutorial` | Tutorial on seismic interferometry, Part 1. Read first if the Green's-function-from-noise idea isn't yet intuitive. |
-| **Shapiro & Campillo 2004**, GRL 31:L07614 | `...2004 - Shapiro...` | Foundational: broadband Rayleigh waves emerging from noise correlation. |
-| **Brenguier et al. 2008**, Science 321:1478 | `science.1160943` | **Postseismic relaxation at Parkfield from continuous seismological observations.** dv/v monitoring *at your site*, on the 2004 M6. The direct precedent. |
-| **Li & Ben-Zion 2023**, JGR 128 | `...2023 - Li...` | Daily and seasonal shallow velocity variations, southern California. 4% seasonal, 10% daily, peak sensitivity ~17 m, driven by thermoelastic strain and soil moisture. |
+| **Wapenaar et al. 2010**, Geophysics 75:75A195 | `03_ambient_noise/`<br>`wapenaar_2010_geophysics_interferometry-tutorial-part1.pdf` | Tutorial on seismic interferometry, Part 1. Read first if the Green's-function-from-noise idea isn't yet intuitive. |
+| **Shapiro & Campillo 2004**, GRL 31:L07614 | `03_ambient_noise/`<br>`shapiro_campillo_2004_grl_broadband-rayleigh-from-noise.pdf` | Foundational: broadband Rayleigh waves emerging from noise correlation. |
+| **Brenguier et al. 2008**, Science 321:1478 | `03_ambient_noise/`<br>`brenguier_2008_science_postseismic-relaxation-parkfield.pdf` | **Postseismic relaxation at Parkfield from continuous seismological observations.** dv/v monitoring *at your site*, on the 2004 M6. The direct precedent. |
+| **Li & Ben-Zion 2023**, JGR 128 | `03_ambient_noise/`<br>`li_benzion_2023_jgr_daily-seasonal-shallow-velocity.pdf` | Daily and seasonal shallow velocity variations, southern California. 4% seasonal, 10% daily, peak sensitivity ~17 m, driven by thermoelastic strain and soil moisture. |
 
 *Also here:* Takano et al. 2014 (§2) uses ambient noise as its tool.
 
@@ -96,13 +111,13 @@ this," not "what does it mean."*
 
 | paper | file | why |
 |---|---|---|
-| **Zhan 2020**, SRL | `srl-2019112.1` | "DAS Turns Fiber-Optic Cables into Sensitive Seismic Antennas." The accessible overview — good to hand to anyone unfamiliar. |
-| **Lindsey, Rademacher & Ajo-Franklin 2020**, JGR 125 | `...2020 - Lindsey...` | Broadband instrument response, calibrated against a broadband seismometer. Amplitude and **phase** response — phase flatness is what lets you trust delay measurements. |
-| **Ichinose et al. 2022**, JGR 127 | `...2022 - Ichinose...` | DAS strain rate vs array-derived strain rate. Where DAS agrees with conventional sensors and where it stops (~2–5 Hz). |
-| **Lellouch, Lindsey, Ellsworth & Biondi 2020**, SRL 91:3256 | `srl-2020149.1` | DAS vs **collocated** geophones at FORGE. Magnitude of completeness −1.4 (DAS) vs −1.7 (geophones): DAS loses by 0.3 units *after* array processing. The honest benchmark. |
-| **Madsen, Tøndel & Kvam 2016**, TLE 35:610 | `tle35070610.1` | Data-driven depth calibration for DAS. Directly relevant to the ±25 m registration uncertainty in this project. |
-| **Martin 2018**, Stanford dissertation | `dissertation` | Passive imaging and characterisation with DAS. Dissertations carry the acquisition detail that papers cut. |
-| **Atterholt et al. 2024**, JGR 129 | `...2024 - Atterholt...` | Garlock fault zone imaged with fibre. Fault-zone structure from a DAS array. |
+| **Zhan 2020**, SRL | `04_methods_das/`<br>`zhan_2020_srl_das-fiber-optic-seismic-antennas.pdf` | "DAS Turns Fiber-Optic Cables into Sensitive Seismic Antennas." The accessible overview — good to hand to anyone unfamiliar. |
+| **Lindsey, Rademacher & Ajo-Franklin 2020**, JGR 125 | `04_methods_das/`<br>`lindsey_2020_jgr_broadband-instrument-response-das.pdf` | Broadband instrument response, calibrated against a broadband seismometer. Amplitude and **phase** response — phase flatness is what lets you trust delay measurements. |
+| **Ichinose et al. 2022**, JGR 127 | `04_methods_das/`<br>`ichinose_2022_jgr_das-vs-array-derived-strain-rate.pdf` | DAS strain rate vs array-derived strain rate. Where DAS agrees with conventional sensors and where it stops (~2–5 Hz). |
+| **Lellouch, Lindsey, Ellsworth & Biondi 2020**, SRL 91:3256 | `04_methods_das/`<br>`lellouch_2020_srl_das-vs-geophones-forge.pdf` | DAS vs **collocated** geophones at FORGE. Magnitude of completeness −1.4 (DAS) vs −1.7 (geophones): DAS loses by 0.3 units *after* array processing. The honest benchmark. |
+| **Madsen, Tøndel & Kvam 2016**, TLE 35:610 | `04_methods_das/`<br>`madsen_2016_tle_data-driven-depth-calibration-das.pdf` | Data-driven depth calibration for DAS. Directly relevant to the ±25 m registration uncertainty in this project. |
+| **Martin 2018**, Stanford dissertation | `04_methods_das/`<br>`martin_2018_thesis_passive-imaging-das.pdf` | Passive imaging and characterisation with DAS. Dissertations carry the acquisition detail that papers cut. |
+| **Atterholt et al. 2024**, JGR 129 | `04_methods_das/`<br>`atterholt_2024_jgr_garlock-fault-zone-with-fiber.pdf` | Garlock fault zone imaged with fibre. Fault-zone structure from a DAS array. |
 
 ---
 
@@ -112,9 +127,9 @@ this," not "what does it mean."*
 
 ### Your fibre specifically
 
-- **Lellouch, Yuan, Spica, Biondi & Ellsworth 2019**, JGR 124:6931 — `...2019 - Lellouch...`. Velocity estimation from downhole DAS at SAFOD. **Same cable.** Source of the 864 m length, the 800 m analysis limit, the loop failure, and the 50–750 m velocity model.
-- **Lellouch, Yuan, Ellsworth & Biondi 2019**, BSSA 109:2491 — `bssa-2019176.1`. Velocity-based earthquake detection on the same fibre.
-- **Chavarria, Malin, Catchings & Shalev 2003**, Science — `science.1090711` (two copies). VSP inside the San Andreas at Parkfield. Relevant to the check-shot registration work.
+- **Lellouch, Yuan, Spica, Biondi & Ellsworth 2019**, JGR 124:6931 — `05_site_safod_parkfield/`<br>`lellouch_2019_jgr_velocity-estimation-downhole-das-SAFOD.pdf`. Velocity estimation from downhole DAS at SAFOD. **Same cable.** Source of the 864 m length, the 800 m analysis limit, the loop failure, and the 50–750 m velocity model.
+- **Lellouch, Yuan, Ellsworth & Biondi 2019**, BSSA 109:2491 — `05_site_safod_parkfield/`<br>`lellouch_2019_bssa_velocity-based-detection-SAFOD.pdf`. Velocity-based earthquake detection on the same fibre.
+- **Chavarria, Malin, Catchings & Shalev 2003**, Science — `05_site_safod_parkfield/`<br>`chavarria_2003_science_vsp-inside-san-andreas-parkfield.pdf` (two copies). VSP inside the San Andreas at Parkfield. Relevant to the check-shot registration work.
 
 ### Structure, stress and damage
 
