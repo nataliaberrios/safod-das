@@ -38,7 +38,7 @@ def preprocess(x, fs, fmin=5.0, fmax=20.0, norm_seconds=5.0):
 
 def normalized_corr_pairs(x, pairs, fs, max_lag=0.35, batch=64):
     n=x.shape[1]; nfft=1<<int(np.ceil(np.log2(2*n-1)))
-    out_len=2*n-1; center=n-1; ml=int(round(max_lag*fs))
+    ml=int(round(max_lag*fs))
     lags=np.arange(-ml,ml+1)/fs; out=np.zeros((len(pairs),len(lags)),float)
     # Keep FFT work bounded: the previous all-channel FFT was memory intensive.
     for first in range(0,len(pairs),batch):
@@ -46,10 +46,12 @@ def normalized_corr_pairs(x, pairs, fs, max_lag=0.35, batch=64):
         si=np.asarray([i for i,j in pp],dtype=int); sj=np.asarray([j for i,j in pp],dtype=int)
         fi=np.fft.rfft(x[si],n=nfft,axis=1); fj=np.fft.rfft(x[sj],n=nfft,axis=1)
         for k,((i,j),a,b) in enumerate(zip(pp,fi,fj)):
-            c=np.fft.irfft(np.conj(a)*b,n=nfft)[:out_len]
-            c=np.concatenate((c[-(n-1):],c[:n]))
+            # Non-negative lags begin at index zero; negative lags wrap to
+            # the end of the padded circular-correlation array.
+            c=np.fft.irfft(np.conj(a)*b,n=nfft)
+            c=np.concatenate((c[-ml:],c[:ml+1]))
             den=np.sqrt(np.sum(x[i]**2)*np.sum(x[j]**2))
-            if den>0: out[first+k]=c[center-ml:center+ml+1]/den
+            if den>0: out[first+k]=c/den
         del fi,fj
     return lags,out
 
