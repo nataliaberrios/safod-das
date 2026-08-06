@@ -153,9 +153,20 @@ time-independent and cannot manufacture a tidal signal.
 | Deep paired, inverse-variance | +4.37×10⁻⁴ | 3.13×10⁻⁴ | 0.709 | 1.05×10⁻³ | 2.10 |
 
 **A √N scaling of the 23-burst result was also too optimistic.** It predicted
-8.8×10⁻⁴; the measured value is 1.03×10⁻³. Doubling the burst count bought only
-1.21×, not √2 = 1.41×, because σ fell from 4.02 to 3.13×10⁻⁴ while the fitted
-amplitude did not move.
+8.8×10⁻⁴; the measured value is 1.03×10⁻³. Decomposing σ_A = σ_res / L, where L
+is the tidal predictor after projecting out the constant and trend:
+
+| | 23 bursts | 46 bursts | ratio |
+|---|---|---|---|
+| residual scatter σ_res | 8.11×10⁻⁴ | 8.72×10⁻⁴ | 1.076× **worse** |
+| effective lever L | 2.016 | 2.788 | 1.383× (√2 = 1.414) |
+| σ_A | 4.02×10⁻⁴ | 3.13×10⁻⁴ | 1.286× |
+
+1.383 / 1.076 = 1.286, the observed ratio exactly. So 1/√N failed for two
+independent reasons, both small: the added discovery-half bursts are marginally
+noisier (robust per-burst scatter 7.76 → 8.03×10⁻⁴), and the effective lever grew
+slightly less than √N because the record is truncated at one end (§9). 1/√N was
+the wrong model because it assumes both terms are fixed.
 
 **At matched burst count the Deep tidal limit is still ~1.3× worse than Paper 1's
 Nano limit of 7.98×10⁻⁴.** Better per-burst precision does not translate into a
@@ -252,7 +263,45 @@ This experiment measures the sensitivity of the observable *as constructed*.
 Attribution of that sensitivity to the guided mode specifically rests on the
 prior permutation nulls in `deep_tube_validation` (p = 0.002), not on this test.
 
-## 9. Known caveats
+## 9. Acquisition inventory, and why 46 and not 48
+
+The burst count is easy to get wrong by a fencepost, and the drop count has four
+different legitimate values. Full chain, verified against `awd_manifest.csv`,
+`canonical_epoch_stacks_paired_deep_all.npz`, and `paired_stack_job_deep_all.py`:
+
+| Stage | Nano | Deep | Both |
+|---|---|---|---|
+| GPS drops in `p26.cc9.txt` | — | — | 989 |
+| Rows in `awd_manifest.csv` | 988 | 926 | 988 bursts×drops |
+| Full PRE/POST window fits inside the data file | 970 | 875 | — |
+| **Used by the canonical stacks** | 970 | 875 | **859 common** |
+
+**49 bursts**, median cadence 30.0 min (range 27.6–31.2), spanning 23.96 h.
+24 h at half-hour cadence gives 48 *intervals* and therefore 49 *bursts*.
+
+**The Deep fibre stopped recording after burst 45 (22:16:23 UTC).** Bursts 46, 47
+and 48 — 22:46, 23:16 and 23:44 UTC on 2026-06-17 — have full Nano coverage and
+zero Deep coverage. That is the entire reason the analysis has 46 bursts and not
+49. Nothing was discarded for quality.
+
+**Requiring drops on both fibres therefore costs the Deep analysis nothing.** A
+Deep-only analysis could not have used those three bursts either; the 46-burst
+count is set by Deep's own coverage, not by the pairing requirement.
+
+The 988→970 and 926→875 losses are **window truncation at file boundaries**
+(`paired_stack_job_deep_all.py:239` keeps a drop only if its full PRE_S/POST_S
+window fits inside the file), not quality rejection. Deep loses more because its
+3.0 s post-window is long relative to the `.h5` segmentation. Checks:
+859 + 111 Nano-only = 970, and 859 + 16 Deep-only = 875.
+
+This is **not** the same count as Paper 1's "47 of 49 clean", which counts
+contamination rather than coverage. Do not use them interchangeably.
+
+Consequence for the tidal fit: because the missing bursts are all at the end, the
+series is one-sidedly truncated to 21.98 h (held out) and 22.49 h (all bursts),
+not the nominal 24 h. That slightly worsens the diurnal-versus-drift degeneracy.
+
+## 10. Known caveats
 
 - The return 3–15 Hz trajectory intercept selected at +0.396 s against a search
   ceiling of +0.400 s — a grid-edge hit. Secondary band only; the primary 15–30 Hz
@@ -266,7 +315,7 @@ prior permutation nulls in `deep_tube_validation` (p = 0.002), not on this test.
   a check that the held-out threshold is not a small-N artefact. With 46 bursts
   the return leg also reaches 5×10⁻³.
 
-## 10. Files
+## 11. Files
 
 | File | Role |
 |---|---|
