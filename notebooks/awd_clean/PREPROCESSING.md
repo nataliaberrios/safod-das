@@ -144,17 +144,24 @@ channels:
 - `nano_hierarchical_repeatability.py` entirely — it sets `tapering=False`;
 - the whole ambient F-K chain — different code path, never calls DASutils.
 
+**Also not at risk: the burst-delay tidal-timescale regression.**
+`nano_tidal_compaction_regression.py:30-31` builds both its response
+(`loo_burst_delay_s`) and its coupling proxy (`burst_signal_rms`) from
+`nano_burst_repeatability_hierarchical.csv`, which is written by the one script
+that already sets `tapering=False`. That branch never touches the canonical
+stacks, so the taper cannot have manufactured its pattern.
+
 **At risk, needs checking.**
 
-1. **Any burst-level amplitude or RMS observable** built from the canonical
-   stacks. The 1.56× taper excursion is smooth and multi-hour.
-2. **The burst-delay tidal-timescale regression**, which uses signal RMS as a
-   source-history/coupling proxy. A smooth non-monotone amplitude excursion of
-   unrelated origin is exactly the pattern that branch is fitting. This is the
-   single most important item to re-check.
-3. **Late-arrival amplitude in Deep**, including the slow-mode candidates and the
+1. **Any burst-level amplitude or RMS observable built from the canonical
+   stacks** — `measure_repeatability.py`, `null_tests_and_inspection.py`,
+   `deep_target_*.py`, `mode_scan`, `multiscale_record_sections.py`. The 1.56×
+   taper excursion is smooth and multi-hour.
+2. **Late-arrival amplitude in Deep**, including the slow-mode candidates and the
    time-gated branch search, wherever the drop sat inside a 62 s file's ramp.
-4. **Cross-fiber amplitude and waveform-shape comparison**, from the strain vs
+   This is the most consequential remaining item, because the ramp is a
+   time-varying gain and the Deep slow modes live at late times.
+3. **Cross-fiber amplitude and waveform-shape comparison**, from the strain vs
    strain-rate mismatch in §2.
 
 **The cheap fix**, if any of the above needs redoing: pass `tapering=False` to
