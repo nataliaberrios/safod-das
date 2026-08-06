@@ -37,15 +37,33 @@ from dvv_core import bulk_align
 
 CACHE = os.path.join(HERE, 'cache_hf')
 BAND = (5.0, 40.0)
+FS_COMMON = 500.0
 WIN = (-0.5, 6.0)          # P through early coda, about the picked P
 
 
 def beam(tag):
+    """Moveout-corrected beam, resampled to a COMMON rate.
+
+    Three cached events (ev_20240510T122958, ev_20240512T042912,
+    ev_20240513T093029) are 5000 Hz, not 500 -- almost certainly event-triggered
+    recordings. Correlating a 5000 Hz trace against a 500 Hz one using a single fs
+    silently returns nonsense: pair 20240510/20250406 came back at CC 0.059 despite
+    an HRSN CC of 0.917. Everything is brought to FS_COMMON first.
+    """
+    from scipy.signal import decimate as _dec
     MT.BAND = BAND; MT.CACHE = CACHE
     got, _ = MT.prep(tag)
     if got is None:
         return None
     A, z, fs = got
+    if fs > FS_COMMON * 1.5:
+        q = int(round(fs / FS_COMMON))
+        if abs(fs / q - FS_COMMON) > 1:
+            return None
+        A = _dec(A, q, axis=-1, ftype='fir', zero_phase=True)
+        fs = fs / q
+    if abs(fs - FS_COMMON) > 1:
+        return None
     p, tp, sem, _, _ = MT.slant_scan(A, z, fs)
     B = MT.align(A, z, fs, p)
     i0, i1 = int((tp + WIN[0]) * fs), int((tp + WIN[1]) * fs)
