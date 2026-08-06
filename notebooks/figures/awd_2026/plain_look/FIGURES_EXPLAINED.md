@@ -300,3 +300,86 @@ than correlation.
 **Why it matters.** It removes the weight drop's own variability, which
 `docs/paper1/STATUS.md` already identifies as the thing limiting your
 sensitivity.
+
+---
+
+## Glossary: acquisition words, translated
+
+Written for someone comfortable with the maths but not with seismic-acquisition
+vocabulary. Nothing here is deep; the words are just borrowed from a field with
+its own dialect.
+
+**Channel.** One measurement point along the fiber. The DAS interrogator reports
+strain over a short segment every ~1.27 m (Nano) or ~2.04 m (Deep). Think of it
+as a spatial sampling grid: the fiber is a 1-D array of ~732 sensors.
+
+**Trace.** The time series recorded by one channel. A row of the data matrix.
+
+**Gather.** A set of traces plotted together, usually as an image with time on
+one axis and position on the other. "Record section" and "shot gather" are the
+same thing for our purposes. It is just the 2-D field $u(z,t)$ rendered as a
+picture.
+
+**Moveout.** How arrival time varies with distance, $t(z)$. For a wave of speed
+$v$ travelling along the array, $t(z) = t_0 + z/v$ — a straight line in the
+$(t,z)$ plane, which is why arrivals look like diagonal streaks. "Apparent"
+speed because you only measure the component along the fiber; a wave crossing
+the fiber obliquely looks faster than it is.
+
+**Slant stack.** Integrate the wavefield along lines $t = t_0 + z/v$ for a range
+of $v$. A Radon transform. The output tells you which speeds carry coherent
+energy without picking any arrival by hand.
+
+**Semblance.** Normalised coherence along a trial path. For $N$ trace amplitudes
+$a_i$ sampled along the path,
+$$S = \frac{(\sum_i a_i)^2}{N \sum_i a_i^2} \in [0,1]$$
+by Cauchy--Schwarz. $S=1$ means all traces identical; independent noise gives
+$S \approx 1/N$. So with 300 traces, $S = 0.45$ is enormous and $S = 0.05$ is
+marginal.
+
+**F--K.** The 2-D Fourier transform of the gather, frequency $f$ against
+wavenumber $k$. A plane wave of apparent speed $v$ maps to the line $f = vk$, so
+selecting a wedge in $(f,k)$ selects a range of speeds. Sign of $k$ = direction
+of travel. "Signed F--K" just means keeping the two directions separate.
+
+**Strain vs strain rate.** DAS measures how much a fiber segment stretches.
+Some interrogators report strain $\varepsilon$, others its time derivative
+$\dot\varepsilon$. Nano reports rate, Deep reports strain. They differ by a
+factor of $i\omega$ in the frequency domain — an amplitude slope across the band
+and a 90-degree phase rotation. Harmless within one fiber, wrong if you compare
+the two without converting.
+
+**Taper.** A smooth window multiplying the record, fading in at the start and out
+at the end, so the FFT does not see a step discontinuity at the edges. A Tukey
+window with $\alpha = 0.4$ is flat over the middle 60% and cosine-tapered over
+the outer 20% at each end. Standard and harmless — unless, as here, it is applied
+over a different span than you assumed.
+
+**Common mode.** The part of the signal identical on every channel at a given
+instant, estimated as the across-channel median. Usually laser and interrogator
+noise. Subtracting it is standard, but note it also removes any real arrival with
+no moveout.
+
+**Detrend.** Subtract a least-squares straight line from each trace. Removes DC
+offset and slow drift, which on the Deep fiber are large enough to swamp
+everything else.
+
+**Virtual source / redatuming.** Cross-correlate the trace at A with the trace at
+B. The source term is common to both and cancels; what survives behaves as if a
+source sat at A and was recorded at B. You have moved the source from the surface
+to a point inside the borehole without moving any equipment.
+
+**Deconvolution interferometry.** Same idea, but divide $B(\omega)$ by
+$A(\omega)$ instead of multiplying by its conjugate. Cancels the source spectrum
+as well as the source timing, at the cost of noise amplification where $|A|$ is
+small — hence the "water level", a small constant added to the denominator.
+
+**SNR in dB.** $10\log_{10}$ of a power ratio. 0 dB means signal equals noise,
+10 dB means ten times the power, 20 dB a hundred times.
+
+**Burst.** A group of weight drops fired close together in time. 989 drops in
+this survey, grouped into 49 bursts of roughly 20.
+
+**Stack.** Average repeated records. Coherent signal adds as $N$, incoherent
+noise as $\sqrt N$, so SNR improves as $\sqrt N$. This is why 859 stacked drops
+show structure a single drop does not.
