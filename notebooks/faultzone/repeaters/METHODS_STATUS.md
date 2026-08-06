@@ -833,3 +833,77 @@ negative result.
 - Everything here is at **100 Hz** (`extract_all.py:57`, `desampling=True`), one
   fifth of the 500 Hz the files actually carry. Orthogonal to the moveout question
   and still untested.
+
+---
+
+## 18. Re-measurement at 500 Hz with aligned stacks: two reversals and one clean death
+
+Everything in sections 12-13 and the stress-drop closure was measured at 100 Hz with
+FLAT channel stacking, i.e. through a ~27 dB array-gain loss and a 5x bandwidth loss.
+Three verdicts were re-run at the corrected configuration. Predictions were written
+into each script's docstring before submission.
+
+### 18.1 Stress drop — DEAD, and now for the correct reason
+
+`stress_drop_500.py`, job 37781283. Registered gate S1 was: fc must fall with
+magnitude, or the fit is reading the instrument rather than the source.
+
+    r(M, log fc) = +0.246        WRONG SIGN -> VOID
+    two M1.86 events give 0.47 and 0.01 MPa   (factor 47 at identical magnitude)
+    only 3 of 8 events land in 0.1-100 MPa
+    S2 passed: fc is depth-stable, median MAD/fc = 0.37
+
+The earlier closure blamed magnitude ("M0.65's corner is above the band"). That was
+the wrong reason: the spectral fit does not recover a source corner even for M3.17,
+whose corner sits an order of magnitude below the band edge with SNR > 3 on 845
+channels. **Do not reopen this on "use larger events" grounds again.**
+
+### 18.2 dv/v — REOPENS. The +/-3.6 % negative result was an artefact.
+
+`recheck_dvv_500.py`. Same estimator (`stretch_dvv_bootstrap`), same lapse windows
+as G3; the only changes are moveout-aligned subarray stacks and the wider band.
+
+| | G3, 100 Hz flat | 500 Hz, aligned |
+|---|---|---|
+| coda CC | 0.22 median (0.01-0.63) | **0.958** |
+| precision | +/-3.6 % | **+/-0.033 %** |
+
+Best configuration 5-20 Hz, lapse 2-12 s: repeater median |dv/v| 0.017 % with
+bootstrap error 0.033 %, random-pair floor 0.99 %. Values are consistent with zero
+at the 0.03 % level, i.e. a tight null rather than a detection.
+
+The registered prediction was "improved but still insufficient, ~+/-0.6 %". The
+measurement beat that by 20x, so the prediction was wrong in the conservative
+direction. Section 12's "0/10 pairs above a 1.94 % control floor" is superseded.
+
+**PROVISIONAL.** The bootstrap resamples only 4 subarrays. An error bar from 4
+samples is not trustworthy, so +/-0.033 % is not yet a quotable number. The 110x
+improvement in coda CC is solid; the precision figure needs many-subarray or
+channel-level resampling before use.
+
+### 18.3 Same-patch discriminant — significant, one control still missing
+
+`interval_dvv_gate.py`, job 37772600. G2 synthetic recovery now PASSES at all three
+injected levels (0.1/0.3/1.0 % recovered as 0.112/0.339/1.296 %), so the estimator
+is unbiased. G3 acausal passes. G1 fails: null sigma 54 %, per-pair error ~2.6 %.
+
+That per-pair error is **100x worse than the Cramer-Rao estimate** of 0.027 % quoted
+in the plan, so the "1.9 m resolvable offset" figure is wrong; real per-pair
+resolution is hundreds of metres. The measurement fails as a ruler.
+
+It works as a discriminant:
+
+| group | n | median inferred offset | IQR |
+|---|---|---|---|
+| family | 7 | 50.2 m | 547.7 m |
+| control | 33 | 1551.1 m | 3164.5 m |
+
+ratio 0.03, Mann-Whitney **p = 0.0008**.
+
+**NOT YET A RESULT.** The controls were random, not matched. Family pairs were
+selected for high HRSN correlation, and better-correlated pairs give
+better-determined delays, hence less slope scatter and a smaller inferred offset —
+with no geometry involved. Until controls are matched on distance, magnitude and
+SNR, and until inferred offset is regressed against CC *within* the family group,
+this separation may be entirely a similarity artefact. Do not cite p = 0.0008
+without that control.
