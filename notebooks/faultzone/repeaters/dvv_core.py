@@ -217,7 +217,7 @@ def interval_dvv(delays, depths, tau_of_z, z_lo, z_hi, half=15.0):
 
 
 def slope_dvv(delays, taus, weights=None, n_boot=400, seed=0,
-              robust_iters=2, clip=3.5):
+              robust_iters=2, clip=3.5, block=1):
     """Interval dv/v as the slope of delay against travel time. Preferred estimator.
 
     interval_dvv uses only two edge bands and throws away everything between them.
@@ -238,6 +238,19 @@ def slope_dvv(delays, taus, weights=None, n_boot=400, seed=0,
     covariance, which would assume the per-channel delays are independent and
     identically distributed. They are neither -- neighbouring channels share
     wavefield.
+
+    `block` -- BOOTSTRAP BLOCK LENGTH IN CHANNELS. Read this before trusting an
+    error bar. A plain bootstrap that resamples channels one at a time makes the
+    very independence assumption the paragraph above rejects, so it understates the
+    error by roughly sqrt(block). On this fiber the 16.335 m gauge length spans
+    16.335 / 1.021 = 16 channels, which all average the same strain, so the correct
+    call for DAS delays is `block=16`.
+
+    The default stays 1 only so that results already published from this function
+    (g5_shallow_dvv) remain reproducible. It is NOT the right value for DAS. An
+    earlier measurement, ray_parameter_test.py, divided by sqrt(N) with N ~ 700 and
+    produced error bars about 4x too small; the corroborating symptom was a median
+    |z| of 1.75 where 0.674 was expected. Pass block=16 for any new work.
 
     Returns (dvv, err, n_used, rms_residual_seconds).
     """
@@ -296,8 +309,21 @@ def slope_dvv(delays, taus, weights=None, n_boot=400, seed=0,
 
     rng = np.random.default_rng(seed)
     boot = []
+    blk = max(int(block), 1)
+    if blk > 1:
+        # Moving-block bootstrap. Delays are ordered along the fiber (taus increase
+        # monotonically with channel), so contiguous index blocks are contiguous in
+        # depth and one block spans one gauge length of shared strain.
+        nblk = max(int(np.ceil(n / blk)), 1)
+        starts_max = max(n - blk, 0)
     for _ in range(n_boot):
-        k = rng.integers(0, n, n)
+        if blk > 1:
+            st = rng.integers(0, starts_max + 1, nblk)
+            k = np.concatenate([np.arange(x, min(x + blk, n)) for x in st])[:n]
+        else:
+            k = rng.integers(0, n, n)
+        if k.size < 6:
+            continue
         b = fit(d[k], t[k], w[k])
         if np.isfinite(b):
             boot.append(b)

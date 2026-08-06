@@ -78,12 +78,50 @@ def extract(db, origin, tag):
             acc[:, d0:d0 + n] += D[:, s0:s0 + n]
             hits[d0:d0 + n] += 1
         del D
-    if hits is None or np.any(hits == 0):
-        miss = int(np.sum(hits == 0)) if hits is not None else -1
-        return f'gap ({miss} samples)'
+    if hits is None:
+        return 'no data'
+    # TRIM THE TAIL, NEVER THE HEAD. Rounding at a file junction loses ~1 sample;
+    # at 100 Hz the arithmetic happened to land safely, at 500 Hz it cost 32 of 73
+    # events. Requiring a perfectly gap-free window threw them away for one missing
+    # sample out of 12,500.
+    #
+    # Only the tail may be trimmed: sample 0 is t = origin - PRE_S, and every
+    # downstream script indexes the origin as int(PRE_S * fs). Trimming the head
+    # would shift every arrival time by the trim length with no error raised --
+    # exactly the class of silent bug that produced the 0/329 coverage result.
+    missing = np.flatnonzero(hits == 0)
+    filled = 0
+    if missing.size:
+        # Most gaps are a SINGLE sample at a file junction: the window spans two
+        # 60 s files and rounding the boundary count loses one sample. At 100 Hz the
+        # arithmetic happened to land safely; at 500 Hz it cost 32 of 73 events.
+        # Discarding a whole event for 1 absent sample in 12,500 is the wrong
+        # trade, so isolated gaps are interpolated from their neighbours. Runs
+        # longer than MAX_RUN are real data loss and still reject.
+        MAX_RUN, MAX_FRAC = 2, 0.005
+        runs, start = [], missing[0]
+        for a_, b_ in zip(missing[:-1], missing[1:]):
+            if b_ != a_ + 1:
+                runs.append((start, a_)); start = b_
+        runs.append((start, missing[-1]))
+        worst = max(hi - lo + 1 for lo, hi in runs)
+        if worst > MAX_RUN or missing.size > MAX_FRAC * npts:
+            return (f'gap ({missing.size} samples, longest run {worst}, '
+                    f'first at {int(missing[0])})')
+        # never extrapolate past the ends: sample 0 anchors t = origin - PRE_S and
+        # every downstream script indexes the origin as int(PRE_S * fs)
+        if missing[0] == 0 or missing[-1] == npts - 1:
+            return f'gap at window edge ({missing.size} samples)'
+        good = np.flatnonzero(hits > 0)
+        acc[:, missing] = 0.0
+        vals = acc[:, good] / hits[None, good]
+        for c in range(acc.shape[0]):
+            acc[c, missing] = np.interp(missing, good, vals[c])
+        hits[missing] = 1
+        filled = int(missing.size)
     np.savez_compressed(f, X=(acc / hits[None, :]).astype(np.float32), fs=fs,
-                        pre_s=PRE_S, post_s=POST_S)
-    return f'ok fs={fs:g}'
+                        pre_s=PRE_S, post_s=POST_S, npts=npts, filled=filled)
+    return f'ok fs={fs:g}' + (f' (interp {filled})' if filled else '')
 
 
 def main():
