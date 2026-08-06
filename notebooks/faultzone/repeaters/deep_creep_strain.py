@@ -75,9 +75,31 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-LF = '/oak/stanford/groups/ettore88/data/SAFOD/SAFOD-deep/LF_DAS_1Hz_serial'
-DX_DEEP = 2.0419047
-GAUGE_CH = 5                      # 10.21 m gauge / 2.04 m spacing
+# Two already-processed 1 Hz LF archives exist. Both were found late; the raw
+# 500 Hz route (156 GB/day) is unnecessary.
+#
+#   deep    SAFOD-deep/LF_DAS_1Hz_serial      1249 files, 2026-03-28 -> 2026-05-01
+#           2050 ch, HAIRPIN, crosses the fault at ~3.2 km. 26 days.
+#   shallow SAFOD-Harvest-2026-01-28/LF_DAS   6083 files, 2025-05-06 -> 2026-01-27
+#           900 ch, cemented 0-864 m, single-ended, 1.8 km from the fault. 129 days.
+#
+# The deep fibre is better placed (it crosses the fault) and has the hairpin
+# control; the shallow one is 5x longer and so far more likely to contain a creep
+# event. Run both.
+FIBRE = os.environ.get('FIBRE', 'deep')
+_CFG = {
+    'deep': dict(
+        lf='/oak/stanford/groups/ettore88/data/SAFOD/SAFOD-deep/LF_DAS_1Hz_serial',
+        dx=2.0419047, gauge_ch=5, hairpin=True),
+    'shallow': dict(
+        lf='/oak/stanford/groups/ettore88/data/SAFOD/SAFOD-Harvest-2026-01-28/LF_DAS',
+        dx=1.0209523, gauge_ch=16, hairpin=False),
+}[FIBRE]
+LF = _CFG['lf']
+DX_DEEP = _CFG['dx']
+GAUGE_CH = _CFG['gauge_ch']
+HAIRPIN = _CFG['hairpin']         # the cemented fibre is single-ended: no fold,
+                                  # so D1/D4 do not apply to it
 DECIM = int(os.environ.get('DEEP_DECIM', 60))     # 1 Hz -> 1/min
 NFILE = int(os.environ.get('DEEP_NFILE', 0))      # 0 = all
 
@@ -130,6 +152,7 @@ def find_fold(profile):
 
 
 def main():
+    print(f'FIBRE = {FIBRE}  ({LF})', flush=True)
     S, stamps = load_all()
     if S is None:
         print('no data'); return
@@ -149,12 +172,19 @@ def main():
 
     # D1 fold, from the time-averaged residual profile
     prof = np.nanstd(R, axis=1)
-    fold, foldc, curve, off = find_fold(prof)
-    print(f'\nD1 hairpin fold: channel {fold} (correlation {foldc:+.3f})')
-    print(f'   implies {fold*DX_DEEP:.0f} m of fibre to the turnaround, '
-          f'{nch*DX_DEEP:.0f} m total')
-    print(f'   {"PASS" if foldc > 0.3 else "FAIL"} -- '
-          f'{"fold located" if foldc > 0.3 else "no clear fold; hairpin control unavailable"}')
+    if HAIRPIN:
+        fold, foldc, curve, off = find_fold(prof)
+    else:
+        fold, foldc, curve, off = None, np.nan, np.array([np.nan]), 0
+        print('\nD1/D4 SKIPPED: the cemented fibre is single-ended, so there is no')
+        print('   fold and no leg-agreement control. Depth coherence (D3) and the')
+        print('   creepmeter comparison (D5) are the only checks available here.')
+    if HAIRPIN:
+        print(f'\nD1 hairpin fold: channel {fold} (correlation {foldc:+.3f})')
+        print(f'   implies {fold*DX_DEEP:.0f} m of fibre to the turnaround, '
+              f'{nch*DX_DEEP:.0f} m total')
+        print(f'   {"PASS" if foldc > 0.3 else "FAIL"} -- '
+              f'{"fold located" if foldc > 0.3 else "no clear fold; hairpin control unavailable"}')
 
     # D3 depth coherence
     Rz = R - R.mean(axis=1, keepdims=True)
@@ -185,7 +215,7 @@ def main():
         print(f'   {"PASS" if legc > 0.3 else "FAIL"} -- '
               f'{"both legs see the same thing: consistent with ground strain" if legc > 0.3 else "legs disagree: signal is a function of fibre distance, i.e. instrumental"}')
 
-    np.savez_compressed(os.path.join(HERE, 'deep_creep_strain.npz'),
+    np.savez_compressed(os.path.join(HERE, f'creep_strain_{FIBRE}.npz'),
                         R=R.astype(np.float32), cm=cm.astype(np.float32),
                         prof=prof, fold=fold if fold else -1, foldc=foldc,
                         Lc=Lc, legc=legc, removed=removed, decim=DECIM,
@@ -238,7 +268,7 @@ def main():
                  title='D  strain amplitude along fibre')
     ax[1, 1].grid(alpha=.3)
     fig.tight_layout()
-    p = os.path.join(HERE, 'deep_creep_strain.png')
+    p = os.path.join(HERE, f'creep_strain_{FIBRE}.png')
     fig.savefig(p, dpi=140)
     print(f'\nwrote {p}')
 
