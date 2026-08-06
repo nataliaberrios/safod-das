@@ -136,12 +136,27 @@ def main():
         hi = int(os.environ.get('SLURM_ARRAY_TASK_MAX', 0))
         ntask = hi - lo + 1
 
-    mt = pd.read_csv(os.path.join(HERE, 'moveout_test.csv'))
-    ev = pd.read_csv(os.path.join(HERE, 'correlate_all_events.csv'))
-    ev['time'] = pd.to_datetime(ev['time'], utc=True, format='mixed')
-    need = sorted(set(mt.i) | set(mt.j))
-    print(f'{len(mt)} pairs -> {len(need)} unique events; '
-          f'task {task}/{ntask}', flush=True)
+    # EVENT SOURCE. Default is the moveout_test pair set. EVENT_LIST points at a
+    # csv with columns (tag, t) instead -- used for ddrt_corrected_events.csv, the
+    # rebuilt screen. The original screen gated on a horizontal_separation_km
+    # column that reads 57x too small (file median 72 m against a true median of
+    # 4137 m), so its "candidate pairs" were not spatially screened at all.
+    src = os.environ.get('EVENT_LIST')
+    if src:
+        e2 = pd.read_csv(os.path.join(HERE, src))
+        e2 = e2[e2.get('has_das', True).astype(bool)] if 'has_das' in e2 else e2
+        ev = pd.DataFrame(dict(tag=e2.tag,
+                               time=pd.to_datetime(e2.t, utc=True, format='mixed'),
+                               mag=e2.get('mmax', pd.Series([np.nan]*len(e2)))))
+        ev = ev.drop_duplicates('tag').reset_index(drop=True)
+        need = list(range(len(ev)))
+        print(f'event list {src}: {len(ev)} events', flush=True)
+    else:
+        mt = pd.read_csv(os.path.join(HERE, 'moveout_test.csv'))
+        ev = pd.read_csv(os.path.join(HERE, 'correlate_all_events.csv'))
+        ev['time'] = pd.to_datetime(ev['time'], utc=True, format='mixed')
+        need = sorted(set(mt.i) | set(mt.j))
+    print(f'{len(need)} unique events; task {task}/{ntask}', flush=True)
 
     db = load_manifest()
     mine = [k for n, k in enumerate(need) if n % ntask == task]
@@ -150,7 +165,8 @@ def main():
     for k in mine:
         e = ev.loc[k]
         st = extract(db, e['time'], e['tag'])
-        print(f'  [{k:3d}] {e["tag"]}  M{e["mag"]:.2f}  {st}', flush=True)
+        m = e['mag'] if pd.notna(e.get('mag', np.nan)) else float('nan')
+        print(f'  [{k:3d}] {e["tag"]}  M{m:.2f}  {st}', flush=True)
 
 
 if __name__ == '__main__':
