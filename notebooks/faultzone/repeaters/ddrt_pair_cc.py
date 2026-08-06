@@ -84,8 +84,10 @@ def cc(a, b, fs, reverse=False):
 
 
 def main():
-    P = pd.read_csv(os.path.join(HERE, 'ddrt_pairs_corrected.csv'))
-    E = pd.read_csv(os.path.join(HERE, 'ddrt_corrected_events.csv'))
+    P = pd.read_csv(os.path.join(HERE, os.environ.get(
+        'PAIR_SET', 'ddrt_pairs_corrected.csv')))
+    E = pd.read_csv(os.path.join(HERE, os.environ.get(
+        'EVENT_SET', 'ddrt_corrected_events.csv')))
     tag = dict(zip(E.k, E.tag))
     have = {f[:-4] for f in os.listdir(CACHE)}
     B = {}
@@ -114,9 +116,31 @@ def main():
     ac = D.acausal.max()
     print(f'\nacausal false-positive floor: {ac:.3f}')
     print(f'pairs above it: {int((D.cc > ac).sum())} of {len(D)}')
-    if len(D) > 3:
-        print(f'r(separation, CC) = {np.corrcoef(D.sep_m, D.cc)[0,1]:+.3f}'
-              '   (negative = closer pairs correlate better, as they should)')
+    if len(D) > 5:
+        from scipy.stats import pearsonr
+        r_, p_ = pearsonr(D.sep_m, D.cc)
+        print(f'r(separation, CC) = {r_:+.3f}, p = {p_:.3f}   '
+              '(negative = closer pairs correlate better)')
+        # dM MUST be controlled for. Different magnitudes mean different corner
+        # frequencies and so genuinely different waveforms, which lowers CC with
+        # no help from geometry. Without this the separation term is confounded
+        # by exactly the kind of nuisance that invalidated the same-patch test.
+        X1 = np.column_stack([np.ones(len(D)), D.dM])
+        X2 = np.column_stack([np.ones(len(D)), D.dM, D.sep_m])
+        b1, *_ = np.linalg.lstsq(X1, D.cc, rcond=None)
+        b2, *_ = np.linalg.lstsq(X2, D.cc, rcond=None)
+        ss1 = float(((D.cc - X1 @ b1) ** 2).sum())
+        ss2 = float(((D.cc - X2 @ b2) ** 2).sum())
+        F = ((ss1 - ss2) / 1) / (ss2 / (len(D) - 3))
+        try:
+            from scipy.stats import f as fdist
+            pf = 1 - fdist.cdf(F, 1, len(D) - 3)
+        except Exception:
+            pf = np.nan
+        print(f'  controlling for dM: separation coefficient {b2[2]:+.2e} /m, '
+              f'F = {F:.2f}, p = {pf:.3f}')
+        print(f'  r(dM, CC) = {pearsonr(D.dM, D.cc)[0]:+.3f}  '
+              '(the nuisance being controlled)')
 
 
 if __name__ == '__main__':
