@@ -50,6 +50,7 @@ assume Gaussian independent errors.
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 from datetime import datetime, timedelta, timezone
@@ -93,9 +94,18 @@ LABELS = {
     "joint": "Deep paired, covariance-aware",
 }
 
-OUT_CSV = D.HERE / "deep_dvv_tidal_fit.csv"
-OUT_TXT = D.HERE / "deep_dvv_tidal_fit.txt"
-OUT_PNG = D.HERE / "deep_dvv_tidal_fit.png"
+OUT_CSV = OUT_TXT = OUT_PNG = IN_CSV = None
+POPULATION = "heldout"
+
+
+def _set_population(population: str) -> None:
+    global POPULATION, OUT_CSV, OUT_TXT, OUT_PNG, IN_CSV
+    POPULATION = population
+    suffix = "" if population == "heldout" else f"_{population}"
+    IN_CSV = D.HERE / f"deep_dvv_paired_legs{suffix}.csv"
+    OUT_CSV = D.HERE / f"deep_dvv_tidal_fit{suffix}.csv"
+    OUT_TXT = D.HERE / f"deep_dvv_tidal_fit{suffix}.txt"
+    OUT_PNG = D.HERE / f"deep_dvv_tidal_fit{suffix}.png"
 
 
 # --------------------------------------------------------------------------
@@ -203,6 +213,11 @@ def _design(shape: np.ndarray, hours: np.ndarray, with_trend: bool) -> np.ndarra
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--population", choices=("heldout", "allbursts"),
+                        default="heldout")
+    _set_population(parser.parse_args().population)
+    print(f"population: {POPULATION}")
     rng = np.random.default_rng(SEED)
 
     # Burst times for the held-out epochs.
@@ -214,7 +229,7 @@ def main() -> None:
             continue
         epoch_time[index] = datetime.fromisoformat(text).astimezone(timezone.utc)
 
-    rows = list(csv.DictReader(open(D.HERE / "deep_dvv_paired_legs.csv")))
+    rows = list(csv.DictReader(open(IN_CSV)))
     null_rows = [r for r in rows if float(r["injected_dvv"]) == 0.0]
     epochs = [int(r["epoch"]) for r in null_rows]
     missing = [e for e in epochs if e not in epoch_time]

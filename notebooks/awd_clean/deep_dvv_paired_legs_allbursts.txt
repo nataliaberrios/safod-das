@@ -1,0 +1,30 @@
+Deep guided mode: paired outbound/return combination
+======================================================================
+Population allbursts; band 15-30 Hz; pass primary.
+46 paired bursts x 15 levels; weights leave-one-burst-out from zero-injection pairs.
+
+Between-leg null error correlation: rho = +0.187
+Mean covariance-aware weight on outbound: 0.614 (0.5 would be equal weight)
+
+observable                         threshold   reliable    scatter        bias  vs out
+----------------------------------------------------------------------------------------
+Deep outbound (benchmark)         2.1934e-03    5.0e-03 1.1915e-03  -1.833e-05   1.000
+Deep return                       2.3869e-03    5.0e-03 1.3483e-03  +1.249e-04   0.919
+Deep paired, equal weight         2.1288e-03    5.0e-03 9.4361e-04  +4.235e-05   1.030
+Deep paired, inverse-variance     2.0676e-03    5.0e-03 8.2046e-04  +3.138e-05   1.061
+Deep paired, covariance-aware     2.0846e-03    5.0e-03 8.3329e-04  +3.535e-05   1.052
+
+Nano reference threshold 3.2461e-03, reliable detection 1.0e-02
+
+Verdict
+----------------------------------------------------------------------
+  The Deep paired, inverse-variance estimator improves on outbound by 1.06x in null threshold.
+
+Reading rho: the two legs record the same source impacts, so their
+errors are correlated and the second leg carries less independent
+information than its own scatter alone would suggest. That correlation
+bounds how much any combination can gain, whatever the weighting.
+
+Outbound was the pre-registered benchmark. A paired estimator that does
+not beat it does not replace it.
+

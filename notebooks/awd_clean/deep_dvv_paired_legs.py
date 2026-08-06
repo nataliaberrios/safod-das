@@ -26,6 +26,7 @@ the output table are computed identically.
 
 from __future__ import annotations
 
+import argparse
 import csv
 
 import numpy as np
@@ -33,13 +34,24 @@ import numpy as np
 import deep_dvv_injection_recovery as D
 
 
-POPULATION = "heldout"
 BAND = D.PRIMARY_BAND
 PASS = "primary"
 
-OUT_CSV = D.HERE / "deep_dvv_paired_legs.csv"
-OUT_TABLE = D.HERE / "deep_dvv_paired_comparison.csv"
-OUT_TXT = D.HERE / "deep_dvv_paired_legs.txt"
+# Set by main().  "heldout" is the primary, strictly held-out population; the
+# "allbursts" population is trajectory-contaminated for a sensitivity claim but
+# is legitimate for a tidal amplitude fit, where the extra bursts buy precision
+# and trajectory selection is time-independent.
+POPULATION = "heldout"
+OUT_CSV = OUT_TABLE = OUT_TXT = None
+
+
+def _set_population(population: str) -> None:
+    global POPULATION, OUT_CSV, OUT_TABLE, OUT_TXT
+    POPULATION = population
+    suffix = "" if population == "heldout" else f"_{population}"
+    OUT_CSV = D.HERE / f"deep_dvv_paired_legs{suffix}.csv"
+    OUT_TABLE = D.HERE / f"deep_dvv_paired_comparison{suffix}.csv"
+    OUT_TXT = D.HERE / f"deep_dvv_paired_legs{suffix}.txt"
 
 
 def _load_pairs() -> tuple[dict, dict]:
@@ -70,6 +82,11 @@ def _covariance(pairs: np.ndarray) -> np.ndarray:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--population", choices=("heldout", "allbursts"),
+                        default="heldout")
+    _set_population(parser.parse_args().population)
+    print(f"population: {POPULATION}")
     dvv, controls = _load_pairs()
 
     epochs = sorted({epoch for epoch, _ in dvv})

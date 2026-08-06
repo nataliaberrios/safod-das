@@ -21,7 +21,7 @@ apparent-moveout observable?
 | Recovery is unbiased on the primary branch | **Established** | bias ≤6×10⁻⁵ at every level, outbound |
 | Result carried by one aperture or one burst | **Refuted** | no single aperture moves it >0.55× threshold, no burst >0.27× |
 | Combining the two legs improves sensitivity | **Partial — improves the noise floor, not the detection level** | scatter 1.36–1.48× better; reliable detection unchanged at 5×10⁻³ |
-| A more sensitive observable lowers the tidal upper limit | **Refuted** | UL 1.25×10⁻³ = 2.5× De Fazio; comparable to Nano at matched burst count |
+| A more sensitive observable lowers the tidal upper limit | **Refuted** | UL 1.03×10⁻³ at 46 bursts = 2.05× De Fazio, still ~1.3× worse than Paper 1's Nano 7.98×10⁻⁴ |
 | Return-leg weakness is SNR-limited | **Unresolved** | 5 of 6 pre-registered criteria met; the 6th rests on a control that turned out non-diagnostic |
 | Sensitivity is attributable to the guided mode specifically | **Inherited, not shown here** | rests on the earlier permutation nulls (p = 0.002), not on this experiment |
 
@@ -138,10 +138,35 @@ because over a 22-hour record the diurnal tidal shape is not orthogonal to
 instrumental drift. Removing the trend term changes the limits by only 1.01–1.13×,
 so the degeneracy inflates the *uncertainty* rather than biasing the amplitude.
 
-Correcting for burst count alone, 1.25×10⁻³ × √(23/46) = 8.8×10⁻⁴, essentially
-Paper 1's 7.98×10⁻⁴. **At matched burst count the Deep tidal limit is comparable to
-Nano's, not better.** The binding constraint on a tidal search here is the 24-hour
-survey duration, not the choice of observable.
+### Matched burst count, measured rather than scaled
+
+Because burst count is the obvious confound, the fit was repeated on all 46
+bursts (`--population allbursts`). That population is trajectory-contaminated for
+a *sensitivity* claim, but legitimate here: trajectory selection is
+time-independent and cannot manufacture a tidal signal.
+
+| Observable | amplitude | σ | p | 95% UL | ×De Fazio |
+|---|---|---|---|---|---|
+| Deep outbound | +5.79×10⁻⁴ | 3.59×10⁻⁴ | 0.701 | 1.28×10⁻³ | 2.57 |
+| Deep return | +2.24×10⁻⁴ | 4.82×10⁻⁴ | 0.755 | 1.17×10⁻³ | 2.34 |
+| Deep paired, equal weight | +4.01×10⁻⁴ | 3.19×10⁻⁴ | 0.682 | **1.03×10⁻³** | **2.05** |
+| Deep paired, inverse-variance | +4.37×10⁻⁴ | 3.13×10⁻⁴ | 0.709 | 1.05×10⁻³ | 2.10 |
+
+**A √N scaling of the 23-burst result was also too optimistic.** It predicted
+8.8×10⁻⁴; the measured value is 1.03×10⁻³. Doubling the burst count bought only
+1.21×, not √2 = 1.41×, because σ fell from 4.02 to 3.13×10⁻⁴ while the fitted
+amplitude did not move.
+
+**At matched burst count the Deep tidal limit is still ~1.3× worse than Paper 1's
+Nano limit of 7.98×10⁻⁴.** Better per-burst precision does not translate into a
+better tidal limit. The binding constraint on a tidal search here is the 24-hour
+survey duration and its drift degeneracy, not the choice of observable.
+
+One asymmetry worth reporting: at 46 bursts the paired estimators *do* beat
+outbound for the tidal limit (1.03 against 1.28×10⁻³, 1.25× better), which they
+did not do for the reliable-detection level. Pairing pays off when the metric is
+a continuous amplitude and is swallowed when it is discretised onto an injection
+grid.
 
 This is the same *style* of regression as Paper 1's registered null, not a re-run:
 that fit used the depth-median dv/v chain with common-mode removal over 46 epochs.
