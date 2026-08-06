@@ -13,9 +13,8 @@ Deep needs its own script rather than a loop over both, for three reasons.
   `plain_look.py` figures 1 and 3 do, mislabels everything past the turnaround.
   Here the two legs are drawn separately and then folded onto a common
   coordinate.
-* **Files are 62 s, not 300 s.** The read-time Tukey taper therefore bites much
-  harder: 3.5 s of cut window is 5.6% of the file, so a drop inside the ramp
-  gets a strongly time-varying gain rather than a scale factor.
+* **Files are 60 s, not 300 s.** The read-time Tukey taper therefore bites much
+  harder: 3.5 s of cut window is 5.6% of the file, so a drop inside the ramp gets a strongly time-varying gain rather than a scale factor.
 * **Deep is the fiber with the open claims on it** -- the slow modes, the
   time-gated branch search, the conditional registration -- and they live at
   late times, which is exactly what a decaying ramp suppresses.
@@ -66,7 +65,7 @@ OUT_DIR = Path(
 DX = 2.0419                 # Deep channel spacing
 TURNAROUND_CH = 1702        # deep_target_scan.py:38
 PRE_S, POST_S = 0.5, 3.0
-DEEP_DURATION_S = 62.0
+DEEP_DURATION_S = 60.0   # (3200, 60000) at 1000 Hz; build_manifest 62.0 is a containment slack
 ALPHA = 0.4
 FS_NOMINAL = 1000.0
 RAW_KW = dict(filter=False, median=False, detrend=False, tapering=False)
@@ -156,7 +155,10 @@ def main():
     rows = load_manifest()
 
     # a clean reference drop: flat window, from the fullest burst available
-    clean = [r for r in rows if abs(r["ramp"] - 1.0) < 0.02 and r["w"] > 0.99]
+    clean = [r for r in rows if abs(r["ramp"] - 1.0) < 0.02 and r["w"] > 0.99
+             and r["off"] - PRE_S >= 0 and r["off"] + POST_S <= DEEP_DURATION_S]
+    if not clean:
+        raise SystemExit("no flat-window Deep drop found; nothing to use as reference")
     ref = sorted(clean, key=lambda r: r["t"])[len(clean) // 2]
     print(f"reference drop: burst {ref['burst']} at {ref['t']}, "
           f"offset {ref['off']:.1f} s, weight {ref['w']:.3f}, ramp {ref['ramp']:.3f}")
@@ -338,7 +340,9 @@ def main():
 
     # ---------------------------------------------------------------- fig 6
     # the flagged risk, tested directly: flat window vs steep ramp
-    ramped = [r for r in rows if np.isfinite(r["ramp"]) and r["ramp"] < 0.5]
+    ramped = [r for r in rows
+              if np.isfinite(r["ramp"]) and r["ramp"] < 0.5
+              and r["off"] - PRE_S >= 0 and r["off"] + POST_S <= DEEP_DURATION_S]
     if not ramped:
         print("no strongly ramped Deep drop found; skipping figure 6")
         return
@@ -346,13 +350,22 @@ def main():
     print(f"ramped drop: burst {bad['burst']} at {bad['t']}, offset {bad['off']:.1f} s, "
           f"weight {bad['w']:.3f}, ramp {bad['ramp']:.3f}")
 
-    d_bad, fs2 = read_deep(bad["file"])
-    sec_bad = cut(d_bad, fs2, deep_time(bad["file"]), bad["t"])
-    out_bad, _ = legs(sec_bad)
+    # Comparing two different drops would confound source variability with the
+    # taper. Instead apply the ramped drop's own reader gain to the SAME clean
+    # record, so the only difference between the two panels is the taper.
+    from scipy.signal.windows import tukey
+    n_file = int(round(DEEP_DURATION_S * FS_NOMINAL))
+    w_file = tukey(n_file, alpha=ALPHA)
+    j = int(bad["off"] * FS_NOMINAL) - int(PRE_S * FS_NOMINAL)
+    w_win = w_file[max(j, 0):max(j, 0) + out.shape[1]]
+    if w_win.size < out.shape[1]:
+        w_win = np.pad(w_win, (0, out.shape[1] - w_win.size), constant_values=0.0)
+    out_bad = out * w_win[None, :]
 
     fig, ax = plt.subplots(2, 2, figsize=(15, 9))
     for col, (s, r, name) in enumerate([
-        (out, ref, "flat window"), (out_bad, bad, "ramped window")
+        (out, ref, "as read (flat window)"),
+        (out_bad, bad, "same record, ramped drop's reader gain applied")
     ]):
         im = image(ax[0, col], norm_rows(bandpass(s, fs, (5.0, 20.0))), fs, z_out)
         ax[0, col].set_title(f"{name}: burst {r['burst']}, weight {r['w']:.2f}, "
@@ -380,7 +393,9 @@ def main():
         i = int(r["off"] * FS_NOMINAL)
         lo, hi = i - int(PRE_S * FS_NOMINAL), i + int(POST_S * FS_NOMINAL)
         seg = w[max(lo, 0):min(hi, n)]
-        ax[1, 1].plot(np.linspace(-PRE_S, POST_S, seg.size), seg / seg[0], lw=1.4,
+        # time axis must track the real sample positions, not just seg length
+        tt = (np.arange(max(lo, 0), max(lo, 0) + seg.size) - i) / FS_NOMINAL
+        ax[1, 1].plot(tt, seg / max(seg[0], 1e-9), lw=1.4,
                       label=f"{lab} (x{r['ramp']:.2f} across window)")
     ax[1, 1].axhline(1.0, color="k", lw=0.8, ls="--")
     ax[1, 1].set_xlabel("time after drop (s)")

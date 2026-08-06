@@ -31,7 +31,7 @@ still passed, but with ``filter=False`` they are inert.
 
 Outputs
 -------
-figures/awd_2026/plain_look/fig01..fig08*.png and plain_look.npz
+figures/awd_2026/plain_look/fig01..fig09*.png and plain_look.npz
 """
 from __future__ import annotations
 
@@ -332,7 +332,11 @@ def fig06_repeatability(nano_file_raw, fs_n, t_file, drops, tag):
     """Every drop in the burst, overlaid. No stacking, no metric."""
     depths = [150.0, 350.0, 550.0]
     fig, ax = plt.subplots(len(depths), 2, figsize=(14, 10))
-    peaks, times = [], []
+    # Peaks must stay separated by depth. Pooling them mixes the amplitude decay
+    # with depth into the drop-to-drop scatter, and the resulting CV is not a
+    # repeatability number.
+    peaks = {d: [] for d in depths}
+    times = []
     for row, depth in enumerate(depths):
         c = ch_at(depth, DX_NANO, nano_file_raw.shape[0])
         for band, col in [(None, 0), ((20.0, 50.0), 1)]:
@@ -348,12 +352,17 @@ def fig06_repeatability(nano_file_raw, fs_n, t_file, drops, tag):
                 a.plot(t, tr, lw=0.6, alpha=0.55)
                 n_used += 1
                 if col == 1:
-                    peaks.append(np.max(np.abs(tr)))
-                    times.append(d["utc_time"])
+                    peaks[depth].append(np.max(np.abs(tr)))
+                    if row == 0:
+                        times.append(d["utc_time"])
             a.set_xlabel("time after drop (s)")
             a.set_ylabel("raw units")
             label = "unfiltered" if band is None else "20-50 Hz"
-            a.set_title(f"{depth:.0f} m, {label} -- {n_used} drops overlaid")
+            cv = ""
+            if col == 1 and peaks[depth]:
+                v = np.asarray(peaks[depth])
+                cv = f", CV {v.std() / v.mean():.0%}"
+            a.set_title(f"{depth:.0f} m, {label} -- {n_used} drops overlaid{cv}")
             a.grid(alpha=0.3)
     fig.suptitle(
         f"6  Drop-to-drop repeatability, every trace drawn -- {tag}", fontsize=13
@@ -361,34 +370,47 @@ def fig06_repeatability(nano_file_raw, fs_n, t_file, drops, tag):
     fig.tight_layout()
     fig.savefig(OUT_DIR / "fig06_drop_repeatability.png", dpi=140)
     plt.close(fig)
-    return np.asarray(peaks), times
+    return {d: np.asarray(v) for d, v in peaks.items()}, times
 
 
-def fig07_processing_ladder(nano_raw, nano_default, fs_n, tag, band=(20.0, 50.0)):
+def fig07_processing_ladder(nano_file_raw, i_start, nano_default, fs_n, tag,
+                            band=(20.0, 50.0)):
     """The reader's default chain, one step at a time, in the order it happens.
 
     Reproduces detrend -> taper -> bandpass -> median removal by hand so each
-    step can be seen on its own. The last panel is the reader's own default
-    output, as a check that the hand-built ladder lands in the same place."""
+    step can be seen on its own, running each on the whole file exactly as
+    readFile_protobuf does (DASutils.py:1897-1919) and cutting to the display
+    window afterwards. The separate 7b panel is the reader's own default output,
+    as a check that the hand-built ladder lands in the same place."""
     from scipy.signal import detrend as sp_detrend
     from scipy.signal.windows import tukey
 
-    t = np.arange(nano_raw.shape[1]) / fs_n - PRE_S
+    # Every step must run on the DOMAIN THE READER USES -- the whole file -- and
+    # only then be cut to the display window. Detrending and tapering the 3.5 s
+    # section instead fabricates an edge fade the reader never applies: this
+    # section sits mid-file, where tukey(n_file, 0.4) is exactly 1.0.
+    n_sec = int((PRE_S + POST_S) * fs_n)
+    sl = slice(i_start, i_start + n_sec)
+    t = np.arange(n_sec) / fs_n - PRE_S
     steps, rms = [], []
 
-    x = nano_raw.astype(np.float64)
-    steps.append(("1. as stored on disk", x.copy()))
+    x = nano_file_raw.astype(np.float64)
+    steps.append(("1. as stored on disk", x[:, sl].copy()))
     x = sp_detrend(x, axis=-1, type="linear")
-    steps.append(("2. + detrend (linear)", x.copy()))
-    x = x * tukey(x.shape[1], alpha=0.4)[None, :]
-    steps.append((r"3. + Tukey taper ($\alpha$=0.4)", x.copy()))
+    steps.append(("2. + detrend, fitted over the whole file", x[:, sl].copy()))
+    w = tukey(x.shape[1], alpha=0.4)
+    x *= w[None, :]
+    w_here = float(w[sl].mean())
+    steps.append((rf"3. + Tukey taper over the whole file"
+                  "\n" rf"(weight here {w_here:.3f})", x[:, sl].copy()))
     x = bandpass(x, fs_n, band)
-    steps.append((f"4. + bandpass {band[0]:g}-{band[1]:g} Hz", x.copy()))
-    med = np.median(x, axis=0)
-    x = x - med[None, :]
-    steps.append(("5. + median removal (common mode)", x.copy()))
+    steps.append((f"4. + bandpass {band[0]:g}-{band[1]:g} Hz", x[:, sl].copy()))
+    med = np.median(x[:, sl], axis=0)
+    steps.append(("5. + median removal (common mode)", x[:, sl] - med[None, :]))
+    del x
     for _, s in steps:
         rms.append(float(np.sqrt(np.mean(s ** 2))))
+    nano_raw = steps[0][1]
 
     fig, axes = plt.subplots(2, 3, figsize=(16, 9))
     for a, (title, s) in zip(axes.ravel(), steps):
@@ -518,9 +540,10 @@ def fig09_common_mode(nano_raw, fs_n, tag, band=(20.0, 50.0)):
 def fig08_units(deep_raw, fs_d, tag):
     """Deep is stored as strain, Nano as strain rate. What that looks like.
 
-    OptaSense stores strain; Sintela stores strain rate. readFile_HDF only
-    differentiates when it is passed diff=True *and* an explicit
-    system='OptaSense'. awd_spectra.py, wireline_tube_look.py and
+    OptaSense stores strain; Sintela stores strain rate. readFile_HDF
+    differentiates only when passed diff=True; the system it gates on is the one
+    auto-detected from the file at DASutils.py:1680, which overwrites whatever
+    the caller passed as system=, so that kwarg is inert either way. awd_spectra.py, wireline_tube_look.py and
     tube_wave_gate.py reconcile this with np.gradient; the paired-stack and
     record-section paths do not. A factor of omega is a 90 degree phase
     rotation plus a slope across the band, so it changes waveform shape and
@@ -584,7 +607,15 @@ def main():
         drops = [r for r in rows
                  if r["burst_id"] == burst_id and r["nano_available"]]
     drops.sort(key=lambda r: r["utc_time"])
-    nano_name = drops[0]["nano_file"]
+    # 40 of the 49 bursts span two Nano files. Section the middle drop, so read
+    # the file the MIDDLE drop lives in and keep only the drops sharing it,
+    # otherwise section_around indexes the wrong file and returns None.
+    nano_name = drops[len(drops) // 2]["nano_file"]
+    same = [d for d in drops if d["nano_file"] == nano_name]
+    if len(same) != len(drops):
+        print(f"burst spans {len({d['nano_file'] for d in drops})} Nano files; "
+              f"keeping the {len(same)}/{len(drops)} drops in {nano_name}")
+    drops = same
     tag = f"burst {burst_id}, {len(drops)} drops, {drops[0]['utc_time']:%Y-%m-%d %H:%M} UTC"
     print(f"burst {burst_id}: {len(drops)} drops, nano file {nano_name}")
 
@@ -606,6 +637,7 @@ def main():
         nano_def_all = None
 
     t_drop = drops[len(drops) // 2]["utc_time"]
+    i_sec = int((t_drop - t_nano).total_seconds() * fs_n) - int(PRE_S * fs_n)
     nano_sec = section_around(nano_all, fs_n, t_nano, t_drop)
     nano_def_sec = (section_around(nano_def_all, fs_n, t_nano, t_drop)
                     if nano_def_all is not None else None)
@@ -632,7 +664,7 @@ def main():
     fig04_spectrogram(nano_all, fs_n, t_nano, drops, tag)
     qc = fig05_channel_qc(nano_all, fs_n, tag)
     peaks, ptimes = fig06_repeatability(nano_all, fs_n, t_nano, drops, tag)
-    rms_ladder = fig07_processing_ladder(nano_sec, nano_def_sec, fs_n, tag)
+    rms_ladder = fig07_processing_ladder(nano_all, i_sec, nano_def_sec, fs_n, tag)
     fig08_units(deep_sec, fs_d, tag)
     cm = fig09_common_mode(nano_sec, fs_n, tag)
 
@@ -641,7 +673,8 @@ def main():
              nano_section=nano_sec.astype(np.float32),
              deep_section=(deep_sec.astype(np.float32) if deep_sec is not None
                            else np.zeros((0, 0), np.float32)),
-             drop_peaks=peaks,
+             drop_peak_depths=np.asarray(sorted(peaks)),
+             drop_peaks=np.array([peaks[d] for d in sorted(peaks)]),
              drop_times=np.array([str(t) for t in ptimes]),
              ladder_rms=np.asarray(rms_ladder),
              **{f"qc_{k}": v for k, v in qc.items()},
@@ -655,9 +688,12 @@ def main():
     lo = np.percentile(qc["rms"][qc["rms"] > 0], 1)
     print(f"1st-pct RMS         {lo:.4g}  (median {np.median(qc['rms']):.4g})")
     print(f"|lag1| < 0.05 on    {int((np.abs(qc['lag1']) < 0.05).sum())} channels")
-    if peaks.size:
-        print(f"drop peak amplitude {peaks.min():.4g} .. {peaks.max():.4g}  "
-              f"(median {np.median(peaks):.4g}, CV {peaks.std() / peaks.mean():.2%})")
+    for d in sorted(peaks):
+        v = peaks[d]
+        if v.size:
+            print(f"drop peak amplitude at {d:5.0f} m: {v.min():.4g} .. {v.max():.4g}  "
+                  f"(median {np.median(v):.4g}, drop-to-drop CV {v.std() / v.mean():.1%}, "
+                  f"n={v.size})")
     print("\nwrote", OUT_DIR)
 
 
