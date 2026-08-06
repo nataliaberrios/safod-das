@@ -1,0 +1,102 @@
+{
+  "generated_by": "deep_dvv_injection_recovery.py --stage freeze",
+  "discovery_epochs": 23,
+  "discovery_parity": "epoch % 2 == 1 (inherited from deep_tube_validation.py)",
+  "validation_parity": "epoch % 2 == 0",
+  "fs_hz": 1000.0,
+  "dx_deep_m": 2.0419,
+  "turnaround_channel": 1702,
+  "coordinate_range_m": [
+    200.0,
+    3000.0
+  ],
+  "channel_stride": 6,
+  "slowness_search_range_s_per_m": [
+    0.0005555555555555556,
+    0.0007692307692307692
+  ],
+  "aperture_m": 400.0,
+  "aperture_step_m": 200.0,
+  "min_aperture_correlation": 0.3,
+  "min_apertures": 6,
+  "injected_levels": [
+    -0.01,
+    -0.005,
+    -0.002,
+    -0.001,
+    -0.0005,
+    -0.0002,
+    -0.0001,
+    0.0,
+    0.0001,
+    0.0002,
+    0.0005,
+    0.001,
+    0.002,
+    0.005,
+    0.01
+  ],
+  "seed": 20260806,
+  "trajectories": {
+    "outbound|15_30": {
+      "semblance": 0.3302823210335266,
+      "slowness_s_per_m": 0.0006474358974358974,
+      "intercept_s": 0.10000000000000017,
+      "velocity_mps": 1544.5544554455446,
+      "semblance_grid_max": 0.3302823210335266,
+      "n_channels": 229,
+      "lever_arm_s": 1.808495123076923,
+      "role": "primary"
+    },
+    "outbound|3_15": {
+      "semblance": 0.2921721128691526,
+      "slowness_s_per_m": 0.0006282051282051282,
+      "intercept_s": -0.06199999999999997,
+      "velocity_mps": 1591.8367346938776,
+      "semblance_grid_max": 0.2921721128691526,
+      "n_channels": 229,
+      "lever_arm_s": 1.7547774461538461,
+      "role": "secondary"
+    },
+    "outbound|60_120": {
+      "semblance": 0.025462546956685702,
+      "slowness_s_per_m": 0.0006217948717948718,
+      "intercept_s": 0.11800000000000019,
+      "velocity_mps": 1608.2474226804122,
+      "semblance_grid_max": 0.025462546956685702,
+      "n_channels": 229,
+      "lever_arm_s": 1.7368715538461539,
+      "role": "control_band"
+    },
+    "return|15_30": {
+      "semblance": 0.2516765795238768,
+      "slowness_s_per_m": 0.0006452991452991453,
+      "intercept_s": 0.3460000000000004,
+      "velocity_mps": 1549.6688741721853,
+      "semblance_grid_max": 0.2516765795238768,
+      "n_channels": 229,
+      "lever_arm_s": 1.8025264923076922,
+      "role": "primary"
+    },
+    "return|3_15": {
+      "semblance": 0.12046807249136118,
+      "slowness_s_per_m": 0.0006388888888888889,
+      "intercept_s": 0.39600000000000046,
+      "velocity_mps": 1565.2173913043478,
+      "semblance_grid_max": 0.12046807249136118,
+      "n_channels": 229,
+      "lever_arm_s": 1.7846206,
+      "role": "secondary"
+    },
+    "return|60_120": {
+      "semblance": 0.034455241695047364,
+      "slowness_s_per_m": 0.0006901709401709402,
+      "intercept_s": 0.25400000000000034,
+      "velocity_mps": 1448.9164086687306,
+      "semblance_grid_max": 0.034455241695047364,
+      "n_channels": 229,
+      "lever_arm_s": 1.9278677384615384,
+      "role": "control_band"
+    }
+  }
+}

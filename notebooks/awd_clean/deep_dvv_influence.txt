@@ -1,0 +1,27 @@
+Deep guided mode: single-aperture and single-burst influence
+======================================================================
+Population: heldout; band: 15-30 Hz; primary pass.
+
+outbound
+----------------------------------------------------------------------
+  empirical 95% null threshold        1.8364e-03
+  aperture yield  median 12.0, min 12, below MIN_APERTURES=6: 0.000 of trials
+  leave-one-aperture-out shift        median 5.434e-04 (0.30x threshold), p95 1.005e-03 (0.55x threshold)
+  leave-one-burst-out, level median   worst 5.433e-05 (0.03x threshold) at injected -5.0e-03, epoch 2
+  leave-one-burst-out, null threshold worst 3.019e-04 (0.16x threshold), epoch 20
+
+return
+----------------------------------------------------------------------
+  empirical 95% null threshold        3.0483e-03
+  aperture yield  median 12.0, min 11, below MIN_APERTURES=6: 0.000 of trials
+  leave-one-aperture-out shift        median 6.526e-04 (0.21x threshold), p95 1.589e-03 (0.52x threshold)
+  leave-one-burst-out, level median   worst 2.027e-04 (0.07x threshold) at injected 5.0e-04, epoch 4
+  leave-one-burst-out, null threshold worst 8.111e-04 (0.27x threshold), epoch 12
+
+Reading these numbers: a ratio well below 1 means no single aperture or
+burst can move the result by as much as the null threshold, so the estimate
+is not carried by one measurement. A ratio near or above 1 satisfies the
+pre-registered 'strong dependence on one aperture or one burst' failure
+criterion. The pre-registration did not fix a numerical cutoff, so none is
+asserted here.
+

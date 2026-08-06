@@ -1,0 +1,6 @@
+observable,null_threshold_dvv,reliable_detection,reliable_sign_only,null_scatter_mad,zero_injection_bias,false_positive_rate,vs_outbound_threshold,vs_nano_threshold
+Deep outbound (benchmark),0.00183641,0.005,0.002,0.00119824,2.3169e-06,0.0870,1.000,1.768
+Deep return,0.00304834,0.01,0.005,0.00132166,6.76717e-05,0.0870,0.602,1.065
+"Deep paired, equal weight",0.00182187,0.005,0.002,0.000883648,-7.55968e-05,0.0870,1.008,1.782
+"Deep paired, inverse-variance",0.00153397,0.005,0.002,0.000811581,-7.59073e-05,0.0870,1.197,2.116
+"Deep paired, covariance-aware",0.00166842,0.005,0.002,0.000786896,7.60315e-05,0.0870,1.101,1.946

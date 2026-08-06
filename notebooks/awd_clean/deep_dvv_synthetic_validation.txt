@@ -1,0 +1,16 @@
+Deep guided mode: per-leg synthetic geometry and injection validation
+======================================================================
+Pre-registration criterion 'SNR-limited 1'. Noiseless synthetic mode on the
+real Deep geometry, using each leg's own frozen trajectory.
+
+outbound  15_30   PASS  worst scale error 0.0048, zero-injection |eps| 0.00e+00, physical-vs-pipeline 2.41e-07, signs all correct
+outbound  3_15    PASS  worst scale error 0.0010, zero-injection |eps| 0.00e+00, physical-vs-pipeline 5.20e-08, signs all correct
+outbound  60_120  FAIL  worst scale error 0.0783, zero-injection |eps| 0.00e+00, physical-vs-pipeline 3.93e-06, signs all correct
+return    15_30   PASS  worst scale error 0.0040, zero-injection |eps| 0.00e+00, physical-vs-pipeline 1.82e-07, signs all correct
+return    3_15    PASS  worst scale error 0.0006, zero-injection |eps| 0.00e+00, physical-vs-pipeline 1.81e-08, signs all correct
+return    60_120  FAIL  worst scale error 0.0668, zero-injection |eps| 0.00e+00, physical-vs-pipeline 3.06e-06, signs all correct
+
+A leg that fails here cannot have a weaker real result attributed to
+signal-to-noise; the pre-registration classifies that as a trajectory,
+geometry, or estimator failure instead.
+

@@ -1,0 +1,103 @@
+SAFOD AWD Deep guided-mode blind injection--recovery
+========================================================
+Input: canonical_epoch_stacks_paired_deep_all.npz
+Held-out bursts: epoch % 2 == 0 (epoch % 2 == 0); trajectory selected on 23 discovery bursts
+Analysis range: 200-3000 m along leg, stride 6 (12.3 m)
+Apertures: 400 m wide, 200 m step
+
+Frozen trajectories
+--------------------------------------------------------
+  outbound|15_30       v= 1544.6 m/s  t0=+0.100 s  lever arm=1.808 s  semblance=0.3303  [primary]
+  outbound|3_15        v= 1591.8 m/s  t0=-0.062 s  lever arm=1.755 s  semblance=0.2922  [secondary]
+  outbound|60_120      v= 1608.2 m/s  t0=+0.118 s  lever arm=1.737 s  semblance=0.0255  [control_band]
+  return|15_30         v= 1549.7 m/s  t0=+0.346 s  lever arm=1.803 s  semblance=0.2517  [primary]
+  return|3_15          v= 1565.2 m/s  t0=+0.396 s  lever arm=1.785 s  semblance=0.1205  [secondary]
+  return|60_120        v= 1448.9 m/s  t0=+0.254 s  lever arm=1.928 s  semblance=0.0345  [control_band]
+
+Nano reference (nano_dvv_injection_recovery.npz)
+--------------------------------------------------------
+  lever arm                0.1210 s
+  95% null threshold       0.00324613
+  false-positive rate      0.0652
+  reliable level           0.01
+
+Deep primary pass
+--------------------------------------------------------
+  heldout   outbound  15_30  [primary]
+      lever arm 1.808 s (14.9x Nano); null n=23
+      95% null threshold  0.00183641 (1.8x better than Nano)
+      false-positive rate 0.0870
+      reliable level      detection 0.005, sign-only 0.002
+  heldout   outbound  3_15   [secondary]
+      lever arm 1.755 s (14.5x Nano); null n=23
+      95% null threshold  0.0022719 (1.4x better than Nano)
+      false-positive rate 0.0870
+      reliable level      detection 0.005, sign-only 0.002
+  heldout   outbound  60_120 [control_band]
+      lever arm 1.737 s (14.4x Nano); null n=22
+      95% null threshold  0.00878941 (0.4x better than Nano)
+      false-positive rate 0.0909
+      reliable level      detection nan, sign-only nan
+  heldout   return    15_30  [primary]
+      lever arm 1.803 s (14.9x Nano); null n=23
+      95% null threshold  0.00304834 (1.1x better than Nano)
+      false-positive rate 0.0870
+      reliable level      detection 0.01, sign-only 0.005
+  heldout   return    3_15   [secondary]
+      lever arm 1.785 s (14.7x Nano); null n=23
+      95% null threshold  0.00196756 (1.6x better than Nano)
+      false-positive rate 0.0870
+      reliable level      detection 0.005, sign-only 0.002
+  heldout   return    60_120 [control_band]
+      lever arm 1.928 s (15.9x Nano); null n=23
+      95% null threshold  0.00843584 (0.4x better than Nano)
+      false-positive rate 0.0870
+      reliable level      detection nan, sign-only nan
+  allbursts outbound  15_30  [primary]
+      lever arm 1.808 s (14.9x Nano); null n=46
+      95% null threshold  0.00219341 (1.5x better than Nano)
+      false-positive rate 0.0652
+      reliable level      detection 0.005, sign-only 0.002
+  allbursts outbound  3_15   [secondary]
+      lever arm 1.755 s (14.5x Nano); null n=46
+      95% null threshold  0.00269658 (1.2x better than Nano)
+      false-positive rate 0.0652
+      reliable level      detection 0.01, sign-only 0.005
+  allbursts outbound  60_120 [control_band]
+      lever arm 1.737 s (14.4x Nano); null n=41
+      95% null threshold  0.0116233 (0.3x better than Nano)
+      false-positive rate 0.0488
+      reliable level      detection nan, sign-only nan
+  allbursts return    15_30  [primary]
+      lever arm 1.803 s (14.9x Nano); null n=46
+      95% null threshold  0.00238691 (1.4x better than Nano)
+      false-positive rate 0.0652
+      reliable level      detection 0.005, sign-only 0.005
+  allbursts return    3_15   [secondary]
+      lever arm 1.785 s (14.7x Nano); null n=46
+      95% null threshold  0.0021259 (1.5x better than Nano)
+      false-positive rate 0.0652
+      reliable level      detection 0.005, sign-only 0.005
+  allbursts return    60_120 [control_band]
+      lever arm 1.928 s (15.9x Nano); null n=43
+      95% null threshold  0.0092634 (0.4x better than Nano)
+      false-positive rate 0.0698
+      reliable level      detection nan, sign-only nan
+
+Timing controls (eps must stay inside the null)
+--------------------------------------------------------
+  constant_shift  outbound  injected shift +5.000 ms -> eps -4.252e-05, intercept +4.451 ms, beyond null 0.043
+  constant_shift  return    injected shift +5.000 ms -> eps +7.000e-07, intercept +4.866 ms, beyond null 0.087
+  source_jitter   outbound  injected shift +0.027 ms -> eps -6.120e-05, intercept -0.527 ms, beyond null 0.043
+  source_jitter   return    injected shift -0.212 ms -> eps +3.163e-05, intercept -0.073 ms, beyond null 0.087
+
+Interpretation limits
+--------------------------------------------------------
+  The recovered quantity is a fractional change in the apparent along-fibre
+  speed of the selected Deep guided mode. It is not formation Vp or Vs, not
+  fault-zone stress, pore pressure, permeability, fracture compliance, or
+  tectonic strain, and it carries no depth resolution. Converting it into any
+  of those requires guided-wave physics and forward modelling not done here.
+  The all-burst population is trajectory-contaminated and is reported only as
+  a check that the held-out threshold is not an artefact of 23 null trials.
+

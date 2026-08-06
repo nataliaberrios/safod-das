@@ -1,0 +1,14 @@
+observable,band_hz,leg,population,lever_arm_s,null_threshold_dvv,false_positive_rate,reliable_level_detection,reliable_level_sign_only
+Nano apparent moveout,30-60,single,all 46 bursts,0.1210,0.00324613,0.0652,0.01,not computed by nano script
+Deep guided mode (primary),15-30,outbound,heldout,1.8085,0.00183641,0.0870,0.005,0.002
+Deep guided mode (secondary),3-15,outbound,heldout,1.7548,0.0022719,0.0870,0.005,0.002
+Deep guided mode (control_band),60-120,outbound,heldout,1.7369,0.00878941,0.0909,nan,nan
+Deep guided mode (primary),15-30,return,heldout,1.8025,0.00304834,0.0870,0.01,0.005
+Deep guided mode (secondary),3-15,return,heldout,1.7846,0.00196756,0.0870,0.005,0.002
+Deep guided mode (control_band),60-120,return,heldout,1.9279,0.00843584,0.0870,nan,nan
+Deep guided mode (primary),15-30,outbound,allbursts,1.8085,0.00219341,0.0652,0.005,0.002
+Deep guided mode (secondary),3-15,outbound,allbursts,1.7548,0.00269658,0.0652,0.01,0.005
+Deep guided mode (control_band),60-120,outbound,allbursts,1.7369,0.0116233,0.0488,nan,nan
+Deep guided mode (primary),15-30,return,allbursts,1.8025,0.00238691,0.0652,0.005,0.005
+Deep guided mode (secondary),3-15,return,allbursts,1.7846,0.0021259,0.0652,0.005,0.005
+Deep guided mode (control_band),60-120,return,allbursts,1.9279,0.0092634,0.0698,nan,nan
