@@ -71,7 +71,7 @@ import matplotlib.pyplot as plt
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import moveout_test as MT                                       # noqa: E402
-from dvv_core import sub_sample_delay, slope_dvv                # noqa: E402
+from dvv_core import sub_sample_delay, slope_dvv, bulk_align     # noqa: E402
 
 CACHE_HF = os.path.join(HERE, 'cache_hf')
 FS_TARGET = 500.0
@@ -79,8 +79,10 @@ BAND = (5.0, 80.0)          # frozen: 5-80 Hz, the usable band per hf_snr_test
 GAUGE_CH = 16               # 16.335 m gauge / 1.021 m spacing
 WIN_P = (-0.2, 1.5)         # about the picked P, seconds
 WIN_CODA = (2.0, 12.0)      # coda, from coda_window_survey's usable range
-DELAY_MAX_LAG = 0.05        # per-channel residual search; the pair is pre-aligned
-MIN_COH = 0.6               # phase-stability floor from sub_sample_delay
+DELAY_MAX_LAG = 0.05        # per-channel RESIDUAL search only -- valid because
+                            # prep_pair() removes the bulk inter-event lag first
+MIN_COH = 0.3               # phase-stability floor from sub_sample_delay;
+                            # 0.6 kept only 0-20 of ~700 channels
 INJECT = [0.001, 0.003, 0.010]
 WINDOWS = {'P': WIN_P, 'coda': WIN_CODA}
 
@@ -174,8 +176,27 @@ def prep_pair(tag_a, tag_b):
     # SAME shift to both -- see docstring point 1
     Ba = MT.align(Aa, zc, fsa, pbar)
     Bb = MT.align(Ab, zc, fsb, pbar)
+
+    # BULK-ALIGN THE TWO EVENTS TO EACH OTHER. Aligning channels for moveout does
+    # NOT align event B to event A: catalog origin times carry 0.1-0.5 s of error,
+    # and the per-channel residual search below is only +/-50 ms. Omitting this
+    # returned 0-20 usable channels out of ~700 with 46 ms rms. dvv_core.bulk_align
+    # says "NECESSARY, NOT OPTIONAL" and names dvv_hrsn and coda_window_survey as
+    # the two scripts that forgot it; this was the third.
+    #
+    # The shift is rigid -- identical for every channel -- so it lands entirely in
+    # the intercept of dt(z) = a + b*z and cannot bias the slope b, which is the
+    # measurement. It is bookkeeping, not signal.
+    #
+    # Stored as a sample offset applied to B's WINDOW INDICES rather than by
+    # np.roll: rolling a cut window folds its tail back in at the front, which is a
+    # bug already made once in beta_similarity.py.
+    sa_ = Ba.mean(axis=0)
+    sb_ = Bb.mean(axis=0)
+    _, lag_s = bulk_align(sa_, sb_, fsa, max_lag_s=2.0)
+    shift = int(round(lag_s * fsa))
     return dict(A=Ba, B=Bb, z=zc, fs=fsa, p=pbar, tp=0.5 * (tpa + tpb),
-                pa=pa, pb=pb, raw_A=Aa, raw_B=Ab)
+                pa=pa, pb=pb, shift=shift, lag_s=float(lag_s))
 
 
 def per_channel_delays(P, invert_eps=None, reverse_b=False, win=WIN_P):
@@ -189,12 +210,16 @@ def per_channel_delays(P, invert_eps=None, reverse_b=False, win=WIN_P):
         B = B[:, ::-1]
     i0 = int((P['tp'] + win[0]) * fs)
     i1 = int((P['tp'] + win[1]) * fs)
-    if i0 < 0 or i1 > A.shape[1]:
+    # B's window is offset by the rigid inter-event lag; slicing rather than
+    # rolling so nothing wraps around
+    sh = int(P.get('shift', 0))
+    j0, j1 = i0 + sh, i1 + sh
+    if i0 < 0 or i1 > A.shape[1] or j0 < 0 or j1 > B.shape[1]:
         return None, None, None
     dt = np.full(A.shape[0], np.nan)
     coh = np.zeros(A.shape[0])
     for k in range(A.shape[0]):
-        d_, c_ = sub_sample_delay(A[k, i0:i1], B[k, i0:i1], fs, BAND,
+        d_, c_ = sub_sample_delay(A[k, i0:i1], B[k, j0:j1], fs, BAND,
                                   max_lag_s=DELAY_MAX_LAG)
         dt[k], coh[k] = d_, c_
     tau = p * z                      # one-way travel time from measured slowness
@@ -227,7 +252,30 @@ def predicted_contamination(ev, pa, i_idx, j_idx, z_arr=0.43):
     inc = 0.5 * (out[0][0] + out[1][0])
     r = max(out[0][1], out[1][1])
     R = 0.5 * (out[0][2] + out[1][2])
-    return float(np.tan(np.radians(inc)) * r / R), float(inc)
+    return float(np.tan(np.radians(inc)) * r / R), float(inc), float(r), float(R)
+
+
+def offset_from_slope(dpp, inc_deg, R):
+    """Invert delta_p/p = tan(i) * delta / R for the relative source offset.
+
+    THE SAME-PATCH TEST. This is the identical measurement as the dv/v above, read
+    the other way round: what was 'contamination' for a medium change IS the signal
+    for source geometry. With 500 Hz + aligned stacking the block-bootstrapped
+    sigma(delta_p/p) is ~2.7e-4, which over these incidences (15-65 deg) and
+    distances (2.9-8.5 km) resolves a relative offset of 1.2-13.7 m, median 1.9 m
+    -- against source radii of 14-48 m. So the array can say whether two ruptures
+    overlap, which waveform similarity alone cannot (Gao, Kao & Wang 2021,
+    doi:10.1029/2021gl092815).
+
+    A velocity change contributes to delta_p/p as well and is NOT separable per
+    pair. It is separable at the population level, because it is common to family
+    and control pairs while the source offset is not -- which is why the
+    family-vs-control comparison, not the single number, is the test.
+    """
+    t = np.tan(np.radians(inc_deg))
+    if not np.isfinite(t) or abs(t) < 1e-6:
+        return np.nan
+    return float(abs(dpp) * R / t)
 
 
 def main():
@@ -263,13 +311,16 @@ def main():
             if P is None:
                 continue
             m = measure(P, win=win)
-            contam, inc = predicted_contamination(ev, pa, int(r.i), int(r.j))
+            contam, inc, rr_, RR_ = predicted_contamination(ev, pa,
+                                                            int(r.i), int(r.j))
             lab = f'{ev.tag[int(r.i)][3:11]}/{ev.tag[int(r.j)][3:11]}'
             print(f'{lab:>22}{100*m["dvv"]:10.4f}{100*m["err"]:9.4f}{m["n"]:6d}'
                   f'{1e3*m.get("rms",np.nan):9.3f}{100*contam:14.3f}{inc:8.1f}',
                   flush=True)
             rows.append(dict(kind='repeater', win=wname, i=int(r.i), j=int(r.j),
-                             lab=lab, contam=contam, inc=inc, **m))
+                             lab=lab, contam=contam, inc=inc, rad=rr_, R=RR_,
+                             offset_m=offset_from_slope(m['dvv'], inc, RR_),
+                             **m))
 
         for _, r in rep.iterrows():
             P = get(int(r.i), int(r.j))
@@ -277,14 +328,19 @@ def main():
                 continue
             m = measure(P, reverse_b=True, win=win)
             rows.append(dict(kind='acausal', win=wname, i=int(r.i), j=int(r.j),
-                             lab='rev', contam=np.nan, inc=np.nan, **m))
+                             lab='rev', contam=np.nan, inc=np.nan,
+                             rad=np.nan, R=np.nan, offset_m=np.nan, **m))
         for _, r in ctl.iterrows():
             P = get(int(r.i), int(r.j))
             if P is None:
                 continue
             m = measure(P, win=win)
+            c_, inc_, rr_, RR_ = predicted_contamination(ev, pa,
+                                                         int(r.i), int(r.j))
             rows.append(dict(kind='null', win=wname, i=int(r.i), j=int(r.j),
-                             lab='ctl', contam=np.nan, inc=np.nan, **m))
+                             lab='ctl', contam=c_, inc=inc_, rad=rr_, R=RR_,
+                             offset_m=offset_from_slope(m['dvv'], inc_, RR_),
+                             **m))
         print(flush=True)
 
     D0 = pd.DataFrame(rows)
@@ -323,6 +379,50 @@ def main():
     print('  interpretation fixed in advance (see header): strong in P and weak in')
     print('  coda -> use coda. Strong in both -> the number is geometry; report a')
     print('  bound. Weak in both -> check against the null before believing it.')
+
+    # ---------------------------------------------------------------- same-patch
+    # The identical slope, read as source geometry instead of as a medium change.
+    # This is the test Ellsworth's "repeaters or neighbours" question actually
+    # asks, and the one waveform similarity cannot answer (Gao et al. 2021).
+    #
+    # A velocity change also enters the slope and is NOT separable per pair. It IS
+    # separable here, because it is common to family and control pairs while the
+    # source offset is not. So the statistic is the family-vs-control CONTRAST,
+    # never a single pair's number.
+    print('\n--- SAME-PATCH TEST: inferred relative source offset ---')
+    print(f'{"window":>8}{"group":>10}{"n":>5}{"offset med m":>14}'
+          f'{"offset IQR m":>14}{"rupture rad m":>15}{"overlap?":>10}')
+    same_patch = {}
+    for wname in WINDOWS:
+        for grp, kind in (('family', 'repeater'), ('control', 'null')):
+            s = D0[(D0.kind == kind) & (D0.win == wname)].dropna(
+                subset=['offset_m', 'rad'])
+            if len(s) < 3:
+                continue
+            med = float(np.median(s.offset_m))
+            q1, q3 = np.percentile(s.offset_m, [25, 75])
+            rad = float(np.median(s.rad))
+            print(f'{wname:>8}{grp:>10}{len(s):5d}{med:14.1f}'
+                  f'{q3-q1:14.1f}{rad:15.1f}'
+                  f'{"YES" if med < rad else "no":>10}')
+            same_patch[(wname, grp)] = (med, len(s), s.offset_m.values)
+    print('\n  contrast (this is the statistic, not the individual numbers):')
+    for wname in WINDOWS:
+        f_ = same_patch.get((wname, 'family'))
+        c_ = same_patch.get((wname, 'control'))
+        if not (f_ and c_):
+            continue
+        try:
+            from scipy.stats import mannwhitneyu
+            u, pv = mannwhitneyu(f_[2], c_[2], alternative='less')
+        except Exception:
+            pv = np.nan
+        print(f'    {wname:>6}: family {f_[0]:7.1f} m vs control {c_[0]:7.1f} m'
+              f'   ratio {f_[0]/max(c_[0],1e-9):5.2f}   Mann-Whitney p={pv:.4f}')
+    print('  family offsets must be BOTH smaller than controls AND below the')
+    print('  rupture radius for the same-patch assumption to hold. If family and')
+    print('  control are indistinguishable, waveform similarity is not selecting')
+    print('  co-located ruptures and recurrence-based creep inherits that.')
 
     print('\n--- G2 synthetic recovery (inject into event B) ---', flush=True)
     print(f'{"injected %":>12}{"recovered %":>14}{"err %":>9}{"bias %":>9}'
