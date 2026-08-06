@@ -1,20 +1,23 @@
 """The same plain looks as `plain_look.py`, redrawn to be readable on first sight.
 
-`plain_look.py` produces diagnostic figures: six panels at a time, dense, written
-for someone who already knows what a record section is. This produces the same
-information as four large figures that explain themselves on the page --
-annotated, one idea each, with the takeaway written in the title rather than left
-to be inferred.
+`plain_look.py` produces diagnostic figures: six panels at a time, dense, with no
+annotation. This produces the same information as four presentation figures --
+one result each, annotated, with the measured quantity in the title.
+
+Register: written for a scientist who is not an active-source seismologist.
+Acquisition terms are used, not avoided, but glossed on first use, and every
+claim carries the number behind it. The point is to remove the jargon barrier,
+not the content.
 
 Nothing is recomputed differently. Same data, same burst, same bands. Only the
 drawing changes. The detailed versions stay where they are.
 
 Design rules used here, since they are the whole point:
-  * one question per figure, answered in the title;
-  * arrows and text on the image pointing at the thing to look at;
-  * every axis and colour bar carries units, or says "normalised" explicitly;
-  * a plain-English caption box on the figure itself, so it survives being
-    pasted into a slide with no surrounding text.
+  * one result per figure, quantified in the title;
+  * annotation on the image identifying the arrival and the aperture limit;
+  * every axis and colour bar in physical units;
+  * a self-contained caption, so the figure survives being pasted into a poster
+    with no surrounding text.
 
 Outputs
 -------
@@ -70,11 +73,11 @@ def section_image(ax, sec, fs, dx, band_label, zmax=None, cmap="seismic"):
     ax.invert_yaxis()
     if zmax:
         ax.set_ylim(zmax, 0)
-    ax.set_xlabel("time since the weight hit the ground (seconds)", fontsize=11)
-    ax.set_ylabel("distance down the fiber (metres)", fontsize=11)
+    ax.set_xlabel("time since drop (s)", fontsize=11)
+    ax.set_ylabel("distance along fiber (m)", fontsize=11)
     cb = plt.colorbar(im, ax=ax)
-    cb.set_label(f"ground motion, {band_label}\n"
-                 r"(microstrain s$^{-1}$, one scale for all traces)", fontsize=9)
+    cb.set_label(f"strain rate, {band_label}\n"
+                 r"($\mu\varepsilon$ s$^{-1}$, common scale)", fontsize=9)
     return im
 
 
@@ -89,16 +92,16 @@ def simple01(sec, fs, tag):
     section_image(ax[0], filt, fs, DX_NANO, "20-50 Hz", zmax=600)
     zz = np.linspace(0, 600, 50)
     ax[0].plot(zz / V_DIRECT, zz, "k--", lw=1.6, alpha=0.8)
-    ax[0].annotate("the wave, travelling down\n(~3000 m every second)",
-                   xy=(0.10, 300), xytext=(0.55, 200), fontsize=12,
+    ax[0].annotate(f"direct arrival, {V_DIRECT:.0f} m s$^{{-1}}$ apparent",
+                   xy=(0.10, 300), xytext=(0.55, 190), fontsize=12,
                    arrowprops=dict(arrowstyle="->", lw=2, color="k"),
                    bbox=dict(boxstyle="round,pad=0.4", fc="white", ec="k", alpha=0.9))
-    ax[0].annotate("below ~450 m there is\nnothing left to see",
-                   xy=(0.6, 520), xytext=(1.3, 480), fontsize=12,
+    ax[0].annotate("aperture limit: arrival indistinguishable\nfrom noise below ~450 m",
+                   xy=(0.6, 520), xytext=(1.05, 470), fontsize=12,
                    arrowprops=dict(arrowstyle="->", lw=2, color="0.3"),
                    bbox=dict(boxstyle="round,pad=0.4", fc="white", ec="0.3", alpha=0.9))
     ax[0].set_xlim(-0.3, 2.0)
-    ax[0].set_title("Every horizontal line is one point on the fiber", fontsize=13)
+    ax[0].set_title("Record section: one row per channel, 1.27 m spacing", fontsize=13)
 
     # the same thing as ordinary wiggly lines, which is what it really is
     depths = (75, 150, 225, 300, 375, 450, 525)
@@ -110,24 +113,28 @@ def simple01(sec, fs, tag):
         ax[1].plot(t[win], scale * tr + zq, "k", lw=1.1)
         ax[1].text(-0.095, zq - 22, f"{zq} m", fontsize=10, color="0.35")
     ax[1].plot(zz / V_DIRECT, zz, "r--", lw=2.0, alpha=0.85,
-               label="the wave arriving later, deeper down")
+               label=f"{V_DIRECT:.0f} m s$^{{-1}}$ moveout")
     ax[1].invert_yaxis()
     ax[1].set_xlim(-0.1, 0.6)
     ax[1].set_ylim(600, 0)
-    ax[1].set_xlabel("time since the weight hit the ground (seconds)", fontsize=11)
-    ax[1].set_ylabel("distance down the fiber (metres)", fontsize=11)
+    ax[1].set_xlabel("time since drop (s)", fontsize=11)
+    ax[1].set_ylabel("distance along fiber (m)", fontsize=11)
     ax[1].legend(fontsize=10, loc="lower right")
-    ax[1].set_title("The same seven lines, drawn as wiggles", fontsize=13)
+    ax[1].set_title("Seven of those channels as individual traces", fontsize=13)
 
-    fig.suptitle("1.  A weight is dropped at the surface. The fiber in the "
-                 "borehole records the wave going down.", fontsize=15)
+    fig.suptitle("1.  Surface weight drop recorded on borehole fiber: direct "
+                 f"arrival at {V_DIRECT:.0f} m s$^{{-1}}$ apparent velocity, "
+                 "usable to ~450 m", fontsize=15)
     caption(fig,
-            "Left: the whole fiber at once. Each row of colour is one sensing point; "
-            "red and blue are just\nthe ground moving one way or the other. Right: the "
-            "same data as ordinary seismograms.\n\n"
-            "The wave arrives LATER the DEEPER you go, which is why the pattern leans "
-            "over. How steeply it\nleans tells you the speed. Here it works out to "
-            "about 3000 metres per second.\n\n"
+            "A \"record section\" is the wavefield u(z, t) as an image: one row per "
+            "fiber channel, time across,\namplitude in colour. The right panel is the "
+            "same data as seven individual traces, which is what\neach row actually "
+            "is.\n\n"
+            "Arrival time increases linearly with depth, t(z) = z/v, so the arrival "
+            "appears as a straight line whose\nslope is 1/v. Fitting that slope gives "
+            f"{V_DIRECT:.0f} m/s. \"Apparent\" because DAS is sensitive only to "
+            "strain along\nthe fiber, so a wave crossing it obliquely measures faster "
+            "than it travels.\n\n"
             f"{tag}")
     fig.savefig(OUT_DIR / "simple01_what_we_record.png", dpi=140,
                 bbox_inches="tight")
@@ -136,10 +143,10 @@ def simple01(sec, fs, tag):
 
 def simple02(sec, fs, tag):
     """Which frequencies carry the signal -- four panels, each with a verdict."""
-    picks = [(None, "no filter at all", "just noise"),
-             ((1.0, 5.0), "very low, 1-5 Hz", "background rumble, not our wave"),
-             ((20.0, 50.0), "middle, 20-50 Hz", "THE SIGNAL LIVES HERE"),
-             ((100.0, 250.0), "high, 100-250 Hz", "nothing")]
+    picks = [(None, "broadband, unfiltered", "noise-dominated"),
+             ((1.0, 5.0), "1-5 Hz", "coherent, but zero moveout: not a body wave"),
+             ((20.0, 50.0), "20-50 Hz", "signal band: clear moveout to ~450 m"),
+             ((100.0, 250.0), "100-250 Hz", "below the noise floor")]
     fig, axes = plt.subplots(1, 4, figsize=(19, 10.5), sharey=True)
     for a, (band, label, verdict) in zip(axes, picks):
         filt = bandpass(sec, fs, band) if band else sec
@@ -152,30 +159,33 @@ def simple02(sec, fs, tag):
         a.set_xlim(-0.2, 1.5)
         a.set_ylim(600, 0)
         a.set_xlabel("time (s)", fontsize=11)
-        good = verdict.startswith("THE")
+        good = verdict.startswith("signal band")
         a.set_title(f"{label}\n{verdict}", fontsize=12,
                     color=("darkgreen" if good else "0.35"),
                     fontweight=("bold" if good else "normal"))
         for sp in a.spines.values():
             sp.set_edgecolor("darkgreen" if good else "0.8")
             sp.set_linewidth(3 if good else 1)
-    axes[0].set_ylabel("distance down the fiber (metres)", fontsize=11)
+    axes[0].set_ylabel("distance along fiber (m)", fontsize=11)
     sm = plt.cm.ScalarMappable(cmap="seismic", norm=plt.Normalize(-1, 1))
     cb = fig.colorbar(sm, ax=axes, fraction=0.02, pad=0.01)
     cb.set_ticks([-1, 0, 1])
-    cb.set_ticklabels(["one way", "still", "other way"])
-    cb.set_label("ground motion (each panel on its own scale)", fontsize=10)
+    cb.set_ticklabels(["$-$", "0", "$+$"])
+    cb.set_label(r"strain rate, each panel scaled to its own 99.5th percentile",
+                 fontsize=10)
 
-    fig.suptitle("2.  The signal only exists in a narrow band of frequencies. "
-                 "This is how we know which one to use.", fontsize=15)
+    fig.suptitle("2.  Band decomposition: coherent moveout is confined to "
+                 "20-50 Hz", fontsize=15)
     caption(fig,
-            "The same single weight drop, four times. Each panel throws away all "
-            "frequencies except one range,\nthe way you would with the bass and treble "
-            "knobs on a stereo.\n\n"
-            "Unfiltered you see nothing. Filter to 20-50 Hz and a clean leaning "
-            "pattern appears. That is why every\nother analysis in this project works "
-            "at 20-50 Hz -- not by convention, but because that is the only\nplace the "
-            "signal is.\n\n"
+            "One drop, bandpass-filtered into four ranges (4th-order Butterworth, "
+            "zero-phase). Each panel is\nscaled independently, so a band carrying no "
+            "signal reads as empty rather than being stretched to\nlook like signal.\n\n"
+            "Broadband is noise-dominated. The 1-5 Hz energy is coherent across the "
+            "array but arrives with zero\nmoveout and starts before t=0, so it is "
+            "ambient rather than source-generated. Above 100 Hz there is\nnothing above "
+            "the noise floor. The 20-50 Hz band is the only one showing a "
+            "moveout-consistent\narrival, which is why the rest of the analysis uses "
+            "it -- an empirical choice, not an inherited one.\n\n"
             f"{tag}")
     fig.savefig(OUT_DIR / "simple02_where_the_signal_is.png", dpi=140,
                 bbox_inches="tight")
@@ -185,9 +195,7 @@ def simple02(sec, fs, tag):
 def simple03(nano_all, fs, t_file, drops, tag):
     """How repeatable the source is, and how deep it stays usable."""
     depths = [150.0, 350.0, 550.0]
-    verdicts = ["excellent: they lie on top of each other",
-                "weaker, and starting to disagree",
-                "weakest, and mostly disagreeing"]
+    verdicts = None   # computed below from the data
     # Filter a LONG window and display a short one. Filtering the display window
     # directly puts the biggest excursions on the figure at its two edges, and
     # those are filter ringing, not data.
@@ -210,14 +218,30 @@ def simple03(nano_all, fs, t_file, drops, tag):
 
     # one shared vertical scale, so the amplitude really does fall with depth
     vmax = max(np.max(np.abs(tr)) for kept in per_depth for _, tr in kept)
+
+    # quantify rather than assert: median pairwise normalised cross-correlation
+    # between drops, and the coefficient of variation of their peak amplitudes
+    verdicts, stats = [], []
+    for kept in per_depth:
+        M = np.asarray([tr for _, tr in kept])
+        M = M - M.mean(axis=1, keepdims=True)
+        nrm = np.linalg.norm(M, axis=1)
+        C = (M @ M.T) / np.outer(nrm, nrm)
+        iu = np.triu_indices(len(M), k=1)
+        cc = float(np.median(C[iu]))
+        pk = np.max(np.abs(M), axis=1)
+        cv = float(pk.std() / pk.mean())
+        stats.append((cc, cv))
+        verdicts.append(f"CC = {cc:.2f}    CV = {cv:.0%}")
+
     for a, zq, verdict, kept in zip(axes, depths, verdicts, per_depth):
         for t, tr in kept:
             a.plot(t, tr, lw=0.9, alpha=0.6)
-        good = verdict.startswith("excellent")
-        a.set_title(f"{zq:.0f} m down\n{verdict}", fontsize=13, pad=14,
+        good = stats[depths.index(zq)][0] > 0.9
+        a.set_title(f"{zq:.0f} m along fiber\n{verdict}", fontsize=12, pad=12,
                     color=("darkgreen" if good else "0.35"),
                     fontweight=("bold" if good else "normal"))
-        a.set_xlabel("time since the weight hit the ground (seconds)", fontsize=11)
+        a.set_xlabel("time since drop (s)", fontsize=11)
         a.grid(alpha=0.3)
         a.set_xlim(show_lo, show_hi)
         a.set_ylim(-1.1 * vmax, 1.1 * vmax)
@@ -225,18 +249,20 @@ def simple03(nano_all, fs, t_file, drops, tag):
             for sp in a.spines.values():
                 sp.set_edgecolor("darkgreen")
                 sp.set_linewidth(2.5)
-    axes[0].set_ylabel("ground motion (microstrain per second)", fontsize=11)
-    fig.suptitle(f"3.  Drop the weight {len(drops)} times and overlay the results. "
-                 "They agree near the surface and not deep down.", fontsize=15)
+    axes[0].set_ylabel(r"strain rate ($\mu\varepsilon$ s$^{-1}$)", fontsize=11)
+    fig.suptitle(f"3.  Source repeatability against depth: {len(drops)} drops from one "
+                 f"burst, CC {stats[0][0]:.2f} at 150 m falling to "
+                 f"{stats[-1][0]:.2f} at 550 m", fontsize=15)
     caption(fig,
-            f"Each panel shows all {len(drops)} weight drops from one burst, drawn on "
-            "top of one another, at one depth.\nIf the source and the ground were "
-            "perfectly repeatable, the lines would coincide exactly.\n\n"
-            "All three panels share the same vertical scale, so the shrinking of the "
-            "wiggles with depth is real\nand not a trick of the axis. At 150 m the "
-            "twenty lines nearly coincide. By 550 m they are much\nweaker and largely "
-            "disagree -- there is still some shared shape, but not enough to measure "
-            "with.\n\n"
+            f"All {len(drops)} drops of one burst overlaid, at three fiber positions, "
+            "20-50 Hz. Perfect source and\npath repeatability would put the traces "
+            "exactly on top of each other, so the spread is the combined\n"
+            "source-plus-medium variability.\n\n"
+            "CC is the median pairwise normalised cross-correlation between drops; "
+            "CV is the coefficient of\nvariation of their peak amplitudes. All three panels share one vertical scale, so the\namplitude "
+            "decay with depth is real rather than an artefact of autoscaling. Traces "
+            "are filtered over a\nlonger window than is displayed, so the plotted "
+            "range is free of filter edge transients.\n\n"
             f"{tag}")
     fig.savefig(OUT_DIR / "simple03_how_repeatable.png", dpi=140,
                 bbox_inches="tight")
@@ -251,32 +277,33 @@ def simple04(sec, fs, tag):
     removed_pct = 100 * np.sqrt(np.mean(med ** 2)) / np.sqrt(np.mean(filt ** 2))
 
     fig, ax = plt.subplots(1, 3, figsize=(17, 10.5), sharey=True)
-    for a, data, title in [(ax[0], filt, "BEFORE cleanup"),
-                           (ax[1], after, "AFTER cleanup"),
-                           (ax[2], filt - after, "what was thrown away")]:
+    for a, data, title in [(ax[0], filt, "before common-mode removal"),
+                           (ax[1], after, "after common-mode removal"),
+                           (ax[2], filt - after, "the removed component")]:
         t = np.arange(data.shape[1]) / fs - PRE_S
         z = np.arange(data.shape[0]) * DX_NANO
         v = np.percentile(np.abs(filt), 99.0)
         im = a.pcolormesh(t, z, data, cmap="seismic", vmin=-v, vmax=v, shading="auto")
         a.set_ylim(600, 0)
         a.set_xlim(-0.3, 2.0)
-        a.set_xlabel("time since the weight hit the ground (seconds)", fontsize=11)
+        a.set_xlabel("time since drop (s)", fontsize=11)
         a.set_title(title, fontsize=13)
-    ax[0].set_ylabel("distance down the fiber (metres)", fontsize=11)
+    ax[0].set_ylabel("distance along fiber (m)", fontsize=11)
     cb = fig.colorbar(im, ax=ax, fraction=0.02, pad=0.01)
-    cb.set_label("ground motion (microstrain per second)", fontsize=10)
+    cb.set_label(r"strain rate ($\mu\varepsilon$ s$^{-1}$), common scale", fontsize=10)
 
-    fig.suptitle("4.  A standard cleanup step is applied to this data automatically. "
-                 f"It removes {removed_pct:.1f}% of the signal.", fontsize=15)
+    fig.suptitle("4.  Common-mode removal accounts for "
+                 f"{removed_pct:.1f}% of section RMS at 20-50 Hz", fontsize=15)
     caption(fig,
-            "The software that reads this data automatically subtracts whatever every "
-            "sensing point sees at the\nsame instant, on the assumption that anything "
-            "simultaneous everywhere is instrument noise rather\nthan ground motion.\n\n"
-            "The worry was that it might also be deleting real signal. The right-hand "
-            f"panel is everything it removed:\nit is {removed_pct:.1f}% of the total, "
-            "and the first two panels are indistinguishable. So at these frequencies\n"
-            "this step is doing essentially nothing, and none of the results depend on "
-            "it.\n\n"
+            "The DAS reader subtracts the across-channel median at every time sample by "
+            "default, on the\nassumption that anything simultaneous on all channels is "
+            "interrogator noise. It is applied silently,\nso it is worth knowing what "
+            "it costs.\n\n"
+            "The concern is that it also removes any genuine arrival with zero moveout. "
+            f"Here the removed\ncomponent is {removed_pct:.2f}% of the section RMS and "
+            "the first two panels are visually identical, so no\nresult in the "
+            "20-50 Hz band depends on this choice either way. It matters more at low "
+            "frequency,\nwhere the common mode carries most of the coherent energy.\n\n"
             f"{tag}")
     fig.savefig(OUT_DIR / "simple04_does_cleanup_matter.png", dpi=140,
                 bbox_inches="tight")
