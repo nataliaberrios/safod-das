@@ -47,6 +47,25 @@ NOTE = dict(fontsize=10.5, va="top", ha="left",
             bbox=dict(boxstyle="round,pad=0.5", fc="#f5f5f5", ec="#aaaaaa"))
 
 
+def despike_channels(sec, factor=3.0, half=40):
+    """Replace channels whose RMS is far above their neighbours' by interpolation.
+
+    fig11_bad_channels.py identified these as optical artifacts narrower than the
+    16.5 m gauge length, so they cannot be ground motion. Left in, they draw
+    horizontal stripes across the whole record and are the first thing the eye
+    lands on. Replaced by the mean of the nearest clean channels either side."""
+    rms = np.sqrt(np.mean(np.asarray(sec, float) ** 2, axis=1))
+    base = np.array([np.median(rms[max(0, i - half):i + half + 1])
+                     for i in range(rms.size)])
+    bad = rms > factor * base
+    out = np.array(sec, dtype=float, copy=True)
+    good = np.flatnonzero(~bad)
+    for i in np.flatnonzero(bad):
+        nb = good[np.argsort(np.abs(good - i))[:2]]
+        out[i] = out[nb].mean(axis=0)
+    return out, int(bad.sum())
+
+
 def note(fig, what, why):
     """Two short lines under the panel: what it is, then why it matters.
 
@@ -57,30 +76,36 @@ def note(fig, what, why):
 
 
 def draw_section(sec, fs, band, title, fname, what, why, annotate=False):
+    sec, n_bad = despike_channels(sec)
     fig, ax = plt.subplots(figsize=FIGSIZE)
     t = np.arange(sec.shape[1]) / fs - PRE_S
     z = np.arange(sec.shape[0]) * DX_NANO
-    v = np.percentile(np.abs(sec), 99.0)
-    im = ax.pcolormesh(t, z, sec, cmap="seismic", vmin=-v, vmax=v, shading="auto")
+    v = np.percentile(np.abs(sec), 99.7)   # only the strongest 0.3% saturates,
+    im = ax.pcolormesh(t, z, sec, cmap="seismic",   # so ambient noise stays pale
+                       vmin=-v, vmax=v, shading="auto")
     ax.set_ylim(600, 0)
-    ax.set_xlim(-0.3, 2.0)
+    ax.set_xlim(-0.1, 0.8)                 # the arrival lives here; 0.8-2.0 s was
+                                           # half the panel and all of it noise
     ax.set_xlabel("time since drop (s)", fontsize=12)
     ax.set_ylabel("distance along fiber (m)", fontsize=12)
     ax.set_title(title, fontsize=14, pad=12)
     cb = plt.colorbar(im, ax=ax)
     cb.set_label(r"strain rate ($\mu\varepsilon$ s$^{-1}$)", fontsize=11)
     if annotate:
-        zz = np.linspace(0, 600, 50)
+        # stop the guide line where the arrival is still traceable, so it does
+        # not run through the region the annotation calls empty
+        zz = np.linspace(0, 450, 50)
         ax.plot(zz / V_DIRECT, zz, "k--", lw=1.8, alpha=0.85)
         ax.annotate(f"direct arrival, {V_DIRECT:.0f} m s$^{{-1}}$",
-                    xy=(0.10, 300), xytext=(0.62, 205), fontsize=13,
+                    xy=(0.105, 300), xytext=(0.33, 200), fontsize=13,
                     arrowprops=dict(arrowstyle="->", lw=2, color="k"),
                     bbox=dict(boxstyle="round,pad=0.4", fc="white", ec="k"))
-        ax.annotate("no arrival distinguishable below ~450 m",
-                    xy=(0.45, 500), xytext=(0.78, 545), fontsize=12,
+        ax.annotate("no arrival distinguishable\nbelow ~450 m",
+                    xy=(0.22, 510), xytext=(0.36, 540), fontsize=12,
+                    ha="left", annotation_clip=True,
                     arrowprops=dict(arrowstyle="->", lw=1.8, color="0.3"),
                     bbox=dict(boxstyle="round,pad=0.4", fc="white", ec="0.3"))
-    note(fig, what, why)
+    note(fig, what + f"\n{n_bad} instrumental bad channels interpolated over.", why)
     fig.savefig(OUT_DIR / fname, dpi=150)
     plt.close(fig)
 
@@ -216,13 +241,14 @@ def main():
                  annotate=True)
 
     draw_section(sec, fs, None,
-                 f"The same drop with no filter: the arrival is invisible\n"
+                 "The same drop unfiltered: the arrival survives only to ~100 m\n"
                  f"(burst {burst_id})",
                  "look02_section_unfiltered.png",
-                 "Identical data, no bandpass applied. Compare with the previous\n"
-                 "figure, which is this same drop filtered to 20-50 Hz.",
-                 "filtering is not cosmetic here. Without it there is no visible signal\n"
-                 "at all, so every result depends on having picked the right band.")
+                 "Identical data, no bandpass. Compare with the previous figure, which\n"
+                 "is this same drop filtered to 20-50 Hz.",
+                 "filtering is what buys the aperture. Unfiltered the arrival is clear\n"
+                 "in the top ~100 m and lost below it; at 20-50 Hz it is traceable to\n"
+                 "~450 m. Same data, four times the usable range.")
 
     draw_traces(sec, fs, "look03_traces.png")
 
