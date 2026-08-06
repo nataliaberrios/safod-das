@@ -198,7 +198,7 @@ def fig02_bands(sec, fs, dx, name, tag):
         im = image(a, norm_rows(filt), fs, dx)
         label = "unfiltered" if band is None else f"{band[0]:g}-{band[1]:g} Hz"
         a.set_title(label)
-        plt.colorbar(im, ax=a)
+        plt.colorbar(im, ax=a, label="amplitude / trace peak")
     fig.suptitle(
         f"2  {name}: one drop, trace-normalised, band by band -- {tag}", fontsize=13
     )
@@ -416,7 +416,7 @@ def fig07_processing_ladder(nano_file_raw, i_start, nano_default, fs_n, tag,
     for a, (title, s) in zip(axes.ravel(), steps):
         im = image(a, s, fs_n, DX_NANO)
         a.set_title(title, fontsize=10)
-        plt.colorbar(im, ax=a)
+        plt.colorbar(im, ax=a, label=r"$\mu\varepsilon$/s")
 
     a = axes.ravel()[5]
     a.plot(t, med, lw=0.9, label="common mode removed at step 5")
@@ -439,10 +439,10 @@ def fig07_processing_ladder(nano_file_raw, i_start, nano_default, fs_n, tag,
         fig, ax = plt.subplots(1, 3, figsize=(16, 5))
         im = image(ax[0], steps[-1][1], fs_n, DX_NANO)
         ax[0].set_title("ladder rebuilt by hand (step 5)")
-        plt.colorbar(im, ax=ax[0])
+        plt.colorbar(im, ax=ax[0], label=r"$\mu\varepsilon$/s")
         im = image(ax[1], nano_default, fs_n, DX_NANO)
         ax[1].set_title("readFile_protobuf with its defaults")
-        plt.colorbar(im, ax=ax[1])
+        plt.colorbar(im, ax=ax[1], label=r"$\mu\varepsilon$/s")
         ax[2].plot(t, steps[-1][1][ch_at(250.0, DX_NANO, nano_raw.shape[0])],
                    lw=0.9, label="hand-built")
         ax[2].plot(t, nano_default[ch_at(250.0, DX_NANO, nano_default.shape[0])],
@@ -486,7 +486,7 @@ def fig09_common_mode(nano_raw, fs_n, tag, band=(20.0, 50.0)):
         a.set_xlabel("time after drop (s)")
         a.set_ylabel("distance along fiber (m)")
         a.set_title(title, fontsize=10)
-        plt.colorbar(im, ax=a)
+        plt.colorbar(im, ax=a, label=r"$\mu\varepsilon$/s")
 
     # single traces, same vertical scale, so the change is readable
     for depth, off in zip([150.0, 350.0, 550.0], [0, 1, 2]):
@@ -560,10 +560,10 @@ def fig08_units(deep_raw, fs_d, tag):
     fig, ax = plt.subplots(2, 2, figsize=(14, 9))
     im = image(ax[0, 0], norm_rows(deep_raw), fs_d, DX_DEEP)
     ax[0, 0].set_title("Deep as read: strain")
-    plt.colorbar(im, ax=ax[0, 0])
+    plt.colorbar(im, ax=ax[0, 0], label="amplitude / trace peak")
     im = image(ax[0, 1], norm_rows(rate), fs_d, DX_DEEP)
     ax[0, 1].set_title("Deep differentiated: strain rate, matching Nano")
-    plt.colorbar(im, ax=ax[0, 1])
+    plt.colorbar(im, ax=ax[0, 1], label="amplitude / trace peak")
 
     ax[1, 0].plot(t, deep_raw[c] / np.max(np.abs(deep_raw[c])), lw=0.9, label="strain")
     ax[1, 0].plot(t, rate[c] / np.max(np.abs(rate[c])), lw=0.9, ls="--",

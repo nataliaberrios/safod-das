@@ -198,7 +198,7 @@ def main():
             im = draw(a, lags, norm_rows(data[c]), z,
                       f"virtual source at {z[c]:.0f} m",
                       v_ref=v_ref, z_src=z[c])
-            plt.colorbar(im, ax=a)
+            plt.colorbar(im, ax=a, label="amplitude / trace peak")
         fig.suptitle(
             f"AWD virtual-source gathers by {name} -- {note}\n"
             f"{n_drops} drops, {BAND[0]:g}-{BAND[1]:g} Hz, traces normalised; "
@@ -212,9 +212,9 @@ def main():
     c = src_ch[1]
     fig, ax = plt.subplots(1, 3, figsize=(17, 6.5))
     im = draw(ax[0], lags, norm_rows(corr[c]), z, "correlation", v_ref, z[c])
-    plt.colorbar(im, ax=ax[0])
+    plt.colorbar(im, ax=ax[0], label="amplitude / trace peak")
     im = draw(ax[1], lags, norm_rows(deco[c]), z, "deconvolution", v_ref, z[c])
-    plt.colorbar(im, ax=ax[1])
+    plt.colorbar(im, ax=ax[1], label="amplitude / trace peak")
 
     step = max(1, sec.shape[0] // 40)
     for k in range(0, sec.shape[0], step):
@@ -245,20 +245,53 @@ def main():
              correlation=np.stack([corr[c] for c in src_ch]).astype(np.float32),
              deconvolution=np.stack([deco[c] for c in src_ch]).astype(np.float32))
 
-    # plain numbers, so the figures are not the only record
-    print("\n--- lag of peak |amplitude| away from the virtual source ---")
+    # plain numbers, so the figures are not the only record.
+    #
+    # A per-channel max|amplitude| pick is not a usable moveout estimator on
+    # these gathers: the largest sample on a trace is as often noise or the
+    # near-zero-lag peak as it is the arrival, so the fitted slope is garbage.
+    # Slant-stack instead -- sum along each trial moveout and take the trial
+    # that maximises coherent energy. Standard, and it uses the whole gather
+    # rather than one sample per trace.
+    print("\n--- slant-stack apparent speed of the redatumed arrival ---")
+    v_grid = np.arange(1000.0, 6000.0, 25.0)
+    speeds = {}
     for c in src_ch:
         g = deco[c]
-        far = np.abs(z - z[c]) > 100.0
-        if not far.any():
+        offset = z - z[c]
+        use = offset > 60.0          # causal side, clear of the source itself
+        if use.sum() < 20:
             continue
-        pk = np.abs(lags[np.argmax(np.abs(g[far]), axis=1)])
-        dist = np.abs(z - z[c])[far]
-        ok = pk > 1.0 / fs
-        if ok.sum() > 5:
-            slope = np.polyfit(pk[ok], dist[ok], 1)[0]
-            print(f"  source {z[c]:5.0f} m: apparent speed from peak lags "
-                  f"{slope:7.0f} m/s over {int(ok.sum())} channels")
+        gg, off = g[use], offset[use]
+        best = (np.nan, -1.0)
+        curve = []
+        for v in v_grid:
+            shift = np.round(off / v * fs).astype(int)
+            idx = shift + (len(lags) // 2)
+            ok = (idx >= 0) & (idx < gg.shape[1])
+            if ok.sum() < 20:
+                curve.append(0.0)
+                continue
+            amp = gg[np.arange(gg.shape[0])[ok], idx[ok]]
+            # semblance: coherent energy over total energy along the trajectory
+            s = float(amp.sum() ** 2 / (ok.sum() * np.sum(amp ** 2))) \
+                if np.any(amp) else 0.0
+            curve.append(s)
+            if s > best[1]:
+                best = (v, s)
+        speeds[c] = (best[0], best[1], np.asarray(curve))
+        print(f"  source {z[c]:5.0f} m: {best[0]:6.0f} m/s "
+              f"(semblance {best[1]:.3f}, {int(use.sum())} channels)")
+    if speeds:
+        vals = np.array([speeds[c][0] for c in speeds])
+        print(f"  across {len(vals)} virtual sources: median {np.median(vals):.0f} m/s, "
+              f"spread {vals.min():.0f}-{vals.max():.0f}")
+        np.savez(OUT_DIR / "awd_virtual_source_speeds.npz",
+                 v_grid=v_grid,
+                 source_depths=np.asarray([z[c] for c in speeds]),
+                 best_v=vals,
+                 best_semblance=np.asarray([speeds[c][1] for c in speeds]),
+                 curves=np.stack([speeds[c][2] for c in speeds]))
     print("\nwrote", OUT_DIR)
 
 

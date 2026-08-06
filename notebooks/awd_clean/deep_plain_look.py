@@ -25,6 +25,11 @@ the taper rather than the Earth, it shows up there.
 
 Reader settings: `filter=False, median=False, detrend=False, tapering=False`.
 
+**Units.** OptaSense (Deep) stores strain; Sintela (Nano) stores strain *rate*.
+Everything after figure 1 is differentiated to strain rate so it is the same
+quantity as the Nano figures and the two fibers can actually be compared.
+Figure 1 shows both, so the as-stored data is still visible.
+
 Outputs
 -------
 figures/awd_2026/plain_look/deep_fig01..deep_fig06*.png
@@ -120,6 +125,17 @@ def read_deep(name):
     return d, float(info["fs"])
 
 
+def to_rate(strain, fs):
+    """OptaSense stores strain; Sintela (Nano) stores strain RATE.
+
+    Differentiating puts Deep in the same quantity as Nano, so amplitudes,
+    spectra and waveform shapes can be compared between the two fibers at all.
+    Without this the two differ by a factor of omega -- a slope across the band
+    and a 90 degree phase rotation. readFile_HDF would do this with diff=True,
+    but no AWD caller passes it, so it is done explicitly here."""
+    return np.gradient(np.asarray(strain, dtype=np.float64), 1.0 / fs, axis=-1)
+
+
 def cut(data, fs, t_file, t_drop, pre=PRE_S, post=POST_S):
     i = int((t_drop - t_file).total_seconds() * fs)
     i0, i1 = i - int(pre * fs), i + int(post * fs)
@@ -165,27 +181,33 @@ def main():
 
     d_all, fs = read_deep(ref["file"])
     print(f"  deep {d_all.shape} fs={fs}", flush=True)
-    sec = cut(d_all, fs, deep_time(ref["file"]), ref["t"])
+    sec_strain = cut(d_all, fs, deep_time(ref["file"]), ref["t"])
+    sec = to_rate(sec_strain, fs)          # strain rate, comparable to Nano
     tag = (f"burst {ref['burst']}, {ref['t']:%Y-%m-%d %H:%M} UTC, "
            f"taper weight {ref['w']:.2f}, window ramp {ref['ramp']:.2f}")
 
     out, ret = legs(sec)
+    out_strain, _ = legs(sec_strain)
     z_out = np.arange(out.shape[0]) * DX
     z_ret = np.arange(ret.shape[0]) * DX
 
     # ---------------------------------------------------------------- fig 1
-    fig, ax = plt.subplots(1, 3, figsize=(17, 6))
-    im = image(ax[0], norm_rows(out), fs, z_out)
-    ax[0].set_title(f"outbound leg, ch 0-{TURNAROUND_CH} (down the hole)")
-    plt.colorbar(im, ax=ax[0])
-    im = image(ax[1], norm_rows(ret), fs, z_ret)
-    ax[1].set_title(f"return leg, ch {TURNAROUND_CH}-{sec.shape[0]} (reversed)")
-    plt.colorbar(im, ax=ax[1])
+    fig, ax = plt.subplots(1, 4, figsize=(21, 6))
+    im = image(ax[0], norm_rows(out_strain), fs, z_out)
+    ax[0].set_title("outbound leg, AS STORED: strain")
+    plt.colorbar(im, ax=ax[0], label="amplitude / trace peak")
+    im = image(ax[1], norm_rows(out), fs, z_out)
+    ax[1].set_title(r"outbound leg, differentiated: strain rate"
+                    "\n(same quantity as Nano)")
+    plt.colorbar(im, ax=ax[1], label="amplitude / trace peak")
+    im = image(ax[2], norm_rows(ret), fs, z_ret)
+    ax[2].set_title(f"return leg, ch {TURNAROUND_CH}-{sec.shape[0]} (reversed),\nstrain rate")
+    plt.colorbar(im, ax=ax[2], label="amplitude / trace peak")
     n = min(out.shape[0], ret.shape[0])
-    im = image(ax[2], norm_rows(out[:n] + ret[:n]), fs, z_out[:n])
-    ax[2].set_title("legs folded and summed")
-    plt.colorbar(im, ax=ax[2])
-    fig.suptitle(f"Deep 1  Raw, unfiltered, hairpin split at ch {TURNAROUND_CH} -- {tag}",
+    im = image(ax[3], norm_rows(out[:n] + ret[:n]), fs, z_out[:n])
+    ax[3].set_title("legs folded and summed, strain rate")
+    plt.colorbar(im, ax=ax[3], label="amplitude / trace peak")
+    fig.suptitle(f"Deep 1  Unfiltered, hairpin split at ch {TURNAROUND_CH} -- {tag}",
                  fontsize=12)
     fig.tight_layout()
     fig.savefig(OUT_DIR / "deep_fig01_raw_legs.png", dpi=140)
@@ -196,14 +218,14 @@ def main():
     for a, band in zip(axes.ravel(), BANDS):
         im = image(a, norm_rows(bandpass(out, fs, band)), fs, z_out)
         a.set_title("unfiltered" if band is None else f"{band[0]:g}-{band[1]:g} Hz")
-        plt.colorbar(im, ax=a)
-    fig.suptitle(f"Deep 2  Outbound leg band by band -- {tag}", fontsize=12)
+        plt.colorbar(im, ax=a, label="amplitude / trace peak")
+    fig.suptitle(f"Deep 2  Outbound leg (strain rate) band by band -- {tag}", fontsize=12)
     fig.tight_layout()
     fig.savefig(OUT_DIR / "deep_fig02_bands.png", dpi=140)
     plt.close(fig)
 
     # ---------------------------------------------------------------- fig 3
-    x = d_all.astype(np.float64)
+    x = to_rate(d_all, fs)   # strain rate for QC too, so it matches Nano's fig05
     rms = np.sqrt(np.mean(x ** 2, axis=1))
     dc = np.mean(x, axis=1)
     xc = x - dc[:, None]
@@ -215,7 +237,7 @@ def main():
     ax[0, 0].semilogy(ch, np.where(rms > 0, rms, np.nan), lw=0.6)
     ax[0, 0].axvline(TURNAROUND_CH, color="C3", lw=1.2, label="hairpin")
     ax[0, 0].set_xlabel("channel")
-    ax[0, 0].set_ylabel("RMS")
+    ax[0, 0].set_ylabel(r"RMS ($\mu\varepsilon$/s)")
     ax[0, 0].set_title(f"RMS per channel ({int((rms <= 0).sum())} exactly zero)")
     ax[0, 0].legend(fontsize=8)
     ax[0, 0].grid(alpha=0.3)
@@ -223,7 +245,7 @@ def main():
     ax[0, 1].plot(ch, dc, lw=0.6)
     ax[0, 1].axvline(TURNAROUND_CH, color="C3", lw=1.2)
     ax[0, 1].set_xlabel("channel")
-    ax[0, 1].set_ylabel("mean")
+    ax[0, 1].set_ylabel(r"mean ($\mu\varepsilon$/s)")
     ax[0, 1].set_title("DC offset per channel")
     ax[0, 1].grid(alpha=0.3)
 
@@ -240,7 +262,7 @@ def main():
     ax[1, 1].semilogy(z_out[:n], rms[:n], lw=0.7, label="outbound")
     ax[1, 1].semilogy(z_out[:n], rms[TURNAROUND_CH:][::-1][:n], lw=0.7, label="return")
     ax[1, 1].set_xlabel("distance along leg (m)")
-    ax[1, 1].set_ylabel("RMS")
+    ax[1, 1].set_ylabel(r"RMS ($\mu\varepsilon$/s)")
     ax[1, 1].set_title("Same fiber, both legs: should agree if depth-mapped")
     ax[1, 1].legend(fontsize=8)
     ax[1, 1].grid(alpha=0.3)
@@ -327,11 +349,11 @@ def main():
                 a.plot(np.arange(tr.size) / fs - 0.1, tr, lw=0.6, alpha=0.55)
                 used += 1
             a.set_xlabel("time after drop (s)")
-            a.set_ylabel("microstrain")
+            a.set_ylabel(r"$\mu\varepsilon$/s")
             a.set_title(f"{zq:.0f} m, "
                         f"{'unfiltered' if band is None else '5-20 Hz'} -- {used} drops")
             a.grid(alpha=0.3)
-    fig.suptitle(f"Deep 5  Drop-to-drop repeatability, every trace drawn -- {tag}",
+    fig.suptitle(f"Deep 5  Drop-to-drop repeatability (strain rate), every trace drawn -- {tag}",
                  fontsize=12)
     fig.tight_layout()
     fig.savefig(OUT_DIR / "deep_fig05_repeatability.png", dpi=140)
@@ -370,7 +392,7 @@ def main():
         im = image(ax[0, col], norm_rows(bandpass(s, fs, (5.0, 20.0))), fs, z_out)
         ax[0, col].set_title(f"{name}: burst {r['burst']}, weight {r['w']:.2f}, "
                              f"ramp {r['ramp']:.2f}", fontsize=10)
-        plt.colorbar(im, ax=ax[0, col])
+        plt.colorbar(im, ax=ax[0, col], label="amplitude / trace peak")
 
     # energy against time: what the taper does to the late record
     for s, r, lab in [(out, ref, "flat"), (out_bad, bad, "ramped")]:
