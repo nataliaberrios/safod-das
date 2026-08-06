@@ -21,6 +21,7 @@ apparent-moveout observable?
 | Recovery is unbiased on the primary branch | **Established** | bias ≤6×10⁻⁵ at every level, outbound |
 | Result carried by one aperture or one burst | **Refuted** | no single aperture moves it >0.55× threshold, no burst >0.27× |
 | Combining the two legs improves sensitivity | **Partial — improves the noise floor, not the detection level** | scatter 1.36–1.48× better; reliable detection unchanged at 5×10⁻³ |
+| A more sensitive observable lowers the tidal upper limit | **Refuted** | UL 1.25×10⁻³ = 2.5× De Fazio; comparable to Nano at matched burst count |
 | Return-leg weakness is SNR-limited | **Unresolved** | 5 of 6 pre-registered criteria met; the 6th rests on a control that turned out non-diagnostic |
 | Sensitivity is attributable to the guided mode specifically | **Inherited, not shown here** | rests on the earlier permutation nulls (p = 0.002), not on this experiment |
 
@@ -108,7 +109,46 @@ Recommended framing: outbound remains the headline observable, with the paired
 inverse-variance estimator reported as a 1.4× noise-floor reduction that does not
 cross to the next tested level.
 
-## 5. Return leg — why it is not classified
+## 5. Solid-Earth-tide upper limit
+
+Better per-burst precision does **not** buy a better tidal limit. This was tested
+because a scatter-ratio projection suggested the Deep observable might push the
+tidal upper limit below the De Fazio et al. (1973) scale of 5×10⁻⁴, which Paper 1
+reports as out of reach at 7.98×10⁻⁴ (1.6×). It does not.
+
+The zero-injection trials are already a dv/v time series, so the tide model was
+regressed directly onto them, with a constant and a linear trend, and inference by
+999-realisation surrogate null (`deep_dvv_tidal_fit.py`).
+
+| Observable | Amplitude | σ | p | 95% UL | ×De Fazio |
+|---|---|---|---|---|---|
+| Deep outbound | +3.64×10⁻⁴ | 4.58×10⁻⁴ | 0.576 | 1.26×10⁻³ | 2.52 |
+| Deep return | +6.85×10⁻⁴ | 7.23×10⁻⁴ | 0.378 | 2.10×10⁻³ | 4.20 |
+| Deep paired, inverse-variance | +4.60×10⁻⁴ | 4.02×10⁻⁴ | 0.517 | **1.25×10⁻³** | **2.50** |
+| Deep paired, covariance-aware | +4.62×10⁻⁴ | 4.08×10⁻⁴ | 0.476 | 1.26×10⁻³ | 2.52 |
+
+Every p-value is a clean null; no tidal signal is detected and none is claimed.
+Fitted amplitudes sit close to Paper 1's +3.4×10⁻⁴ and the p-values close to its
+0.51, so the two analyses agree.
+
+**The projection was wrong by ~3.7×, for two reasons worth stating in the paper.**
+This fit uses 23 held-out bursts against Paper 1's 46, a √2 penalty on its own; and
+the tidal amplitude uncertainty runs ~1.5× larger than per-burst scatter predicts,
+because over a 22-hour record the diurnal tidal shape is not orthogonal to
+instrumental drift. Removing the trend term changes the limits by only 1.01–1.13×,
+so the degeneracy inflates the *uncertainty* rather than biasing the amplitude.
+
+Correcting for burst count alone, 1.25×10⁻³ × √(23/46) = 8.8×10⁻⁴, essentially
+Paper 1's 7.98×10⁻⁴. **At matched burst count the Deep tidal limit is comparable to
+Nano's, not better.** The binding constraint on a tidal search here is the 24-hour
+survey duration, not the choice of observable.
+
+This is the same *style* of regression as Paper 1's registered null, not a re-run:
+that fit used the depth-median dv/v chain with common-mode removal over 46 epochs.
+The limits are comparable in scale but not identical in construction, and should be
+reported that way.
+
+## 6. Return leg — why it is not classified
 
 Of the six pre-registered criteria for calling the return result SNR-limited:
 
@@ -150,7 +190,7 @@ A correctly specified version would inject only inside a time gate around the
 trajectory, so the perturbation attaches to the mode rather than the whole trace.
 That is a re-run and is exploratory now.
 
-## 6. Defect found and fixed during this analysis
+## 7. Defect found and fixed during this analysis
 
 The first complete run produced a corrupted held-out result: `n_recovered`
 exceeded the 23 available bursts, and no reliable-detection level was reached at
@@ -176,7 +216,7 @@ burst — the check that would have caught this immediately.
 and has been deleted.** Any figure or number matching thresholds 1.53×10⁻³
 (outbound) or 9.94×10⁻³ (return) is from the corrupted run and must be discarded.
 
-## 7. Interpretation ceiling
+## 8. Interpretation ceiling
 
 The recovered quantity is a fractional change in the apparent along-fibre speed
 of the selected Deep guided mode. It is not formation Vp or Vs, not fault-zone
@@ -187,7 +227,7 @@ This experiment measures the sensitivity of the observable *as constructed*.
 Attribution of that sensitivity to the guided mode specifically rests on the
 prior permutation nulls in `deep_tube_validation` (p = 0.002), not on this test.
 
-## 8. Known caveats
+## 9. Known caveats
 
 - The return 3–15 Hz trajectory intercept selected at +0.396 s against a search
   ceiling of +0.400 s — a grid-edge hit. Secondary band only; the primary 15–30 Hz
@@ -201,7 +241,7 @@ prior permutation nulls in `deep_tube_validation` (p = 0.002), not on this test.
   a check that the held-out threshold is not a small-N artefact. With 46 bursts
   the return leg also reaches 5×10⁻³.
 
-## 9. Files
+## 10. Files
 
 | File | Role |
 |---|---|

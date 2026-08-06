@@ -1,0 +1,44 @@
+Deep guided mode: solid-Earth-tide regression
+==========================================================================
+23 held-out bursts over 21.98 h; tide proxy 78.2 nanostrain peak to peak.
+Leave-one-out inflation removed (factor 0.9565).
+Surrogate null: 999 random time shifts of the tide predictor.
+
+Primary model, tidal term plus constant plus linear trend
+--------------------------------------------------------------------------
+observable                          amplitude       sigma       p      95% UL  /DeFazio
+Deep outbound                      +3.640e-04   4.577e-04   0.576   1.261e-03      2.52
+Deep return                        +6.851e-04   7.226e-04   0.378   2.101e-03      4.20
+Deep paired, equal weight          +5.245e-04   4.331e-04   0.454   1.373e-03      2.75
+Deep paired, inverse-variance      +4.600e-04   4.021e-04   0.517   1.248e-03      2.50
+Deep paired, covariance-aware      +4.615e-04   4.076e-04   0.476   1.260e-03      2.52
+
+Sensitivity to the trend term (24 h span makes diurnal tide and drift
+degenerate; a large change here means the tidal term is absorbing drift)
+--------------------------------------------------------------------------
+  Deep outbound                    UL 1.261e-03 with trend, 1.426e-03 without (1.13x)
+  Deep return                      UL 2.101e-03 with trend, 2.115e-03 without (1.01x)
+  Deep paired, equal weight        UL 1.373e-03 with trend, 1.488e-03 without (1.08x)
+  Deep paired, inverse-variance    UL 1.248e-03 with trend, 1.392e-03 without (1.12x)
+  Deep paired, covariance-aware    UL 1.260e-03 with trend, 1.410e-03 without (1.12x)
+
+Benchmarks
+--------------------------------------------------------------------------
+  De Fazio et al. (1973) scale      5.00e-04
+  Niu et al. (2008) SAFOD scale     5.76e-05
+  Paper 1 Nano 95% upper limit      7.98e-04 (1.60x De Fazio)
+
+  Best Deep upper limit: Deep paired, inverse-variance, 1.248e-03 = 2.50x De Fazio, 21.7x Niu
+
+Reading this
+--------------------------------------------------------------------------
+  Every surrogate p-value should be read as a null result unless it is
+  small: no tidal detection is claimed here. The quantity of interest is
+  the upper limit, which states what the experiment could have excluded.
+  This is the same style of regression as Paper 1's registered tidal null,
+  not a re-run of it: that fit used the depth-median dv/v chain with
+  common-mode removal over 46 epochs. The limits are comparable in scale
+  but not identical in construction.
+  The limit applies to an apparent guided-mode velocity change and is not
+  a formation Vp or Vs limit.
+
