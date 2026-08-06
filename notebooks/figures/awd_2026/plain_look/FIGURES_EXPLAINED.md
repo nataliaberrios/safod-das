@@ -317,42 +317,49 @@ as a spatial sampling grid: the fiber is a 1-D array of ~732 sensors.
 
 **Gather.** A set of traces plotted together, usually as an image with time on
 one axis and position on the other. "Record section" and "shot gather" are the
-same thing for our purposes. It is just the 2-D field $u(z,t)$ rendered as a
+same thing for our purposes. It is just the 2-D field u(z, t) rendered as a
 picture.
 
-**Moveout.** How arrival time varies with distance, $t(z)$. For a wave of speed
-$v$ travelling along the array, $t(z) = t_0 + z/v$ — a straight line in the
-$(t,z)$ plane, which is why arrivals look like diagonal streaks. "Apparent"
+**Moveout.** How arrival time varies with distance. For a wave of speed v
+travelling along the array,
+
+        t(z) = t0 + z / v
+
+a straight line in the (time, distance) plane — which is why arrivals look like
+diagonal streaks. "Apparent"
 speed because you only measure the component along the fiber; a wave crossing
 the fiber obliquely looks faster than it is.
 
-**Slant stack.** Integrate the wavefield along lines $t = t_0 + z/v$ for a range
-of $v$. A Radon transform. The output tells you which speeds carry coherent
-energy without picking any arrival by hand.
+**Slant stack.** Integrate the wavefield along those straight lines for a whole
+range of trial speeds v. This is a Radon transform. The output tells you which
+speeds carry coherent energy, without picking any arrival by hand.
 
-**Semblance.** Normalised coherence along a trial path. For $N$ trace amplitudes
-$a_i$ sampled along the path,
-$$S = \frac{(\sum_i a_i)^2}{N \sum_i a_i^2} \in [0,1]$$
-by Cauchy--Schwarz. $S=1$ means all traces identical; independent noise gives
-$S \approx 1/N$. So with 300 traces, $S = 0.45$ is enormous and $S = 0.05$ is
-marginal.
+**Semblance.** Normalised coherence along a trial path. Take the N trace
+amplitudes a1 ... aN sampled along the path, then
 
-**F--K.** The 2-D Fourier transform of the gather, frequency $f$ against
-wavenumber $k$. A plane wave of apparent speed $v$ maps to the line $f = vk$, so
-selecting a wedge in $(f,k)$ selects a range of speeds. Sign of $k$ = direction
-of travel. "Signed F--K" just means keeping the two directions separate.
+        S  =  (a1 + a2 + ... + aN)^2  /  ( N * (a1^2 + a2^2 + ... + aN^2) )
+
+Cauchy-Schwarz puts S between 0 and 1. S = 1 means every trace is identical
+(perfectly in phase). Independent noise gives S about 1/N. So with 300 traces,
+S = 0.45 is enormous and S = 0.05 is marginal.
+
+**F-K.** The 2-D Fourier transform of the gather: frequency f against wavenumber
+k. A plane wave of apparent speed v maps onto the straight line f = v * k, so
+selecting a wedge in the (f, k) plane selects a range of speeds. The sign of k
+gives the direction of travel; "signed F-K" just means keeping the two
+directions separate.
 
 **Strain vs strain rate.** DAS measures how much a fiber segment stretches.
-Some interrogators report strain $\varepsilon$, others its time derivative
-$\dot\varepsilon$. Nano reports rate, Deep reports strain. They differ by a
-factor of $i\omega$ in the frequency domain — an amplitude slope across the band
-and a 90-degree phase rotation. Harmless within one fiber, wrong if you compare
-the two without converting.
+Some interrogators report strain, others report its time derivative, the strain
+rate. Nano reports rate; Deep reports strain. In the frequency domain the two
+differ by a factor of i*omega -- an amplitude slope rising across the band, plus
+a 90-degree phase rotation. Harmless within one fiber, wrong if you compare the
+two without converting.
 
 **Taper.** A smooth window multiplying the record, fading in at the start and out
 at the end, so the FFT does not see a step discontinuity at the edges. A Tukey
-window with $\alpha = 0.4$ is flat over the middle 60% and cosine-tapered over
-the outer 20% at each end. Standard and harmless — unless, as here, it is applied
+window with alpha = 0.4 is flat over the middle 60% and cosine-tapered over the
+outer 20% at each end. Standard and harmless — unless, as here, it is applied
 over a different span than you assumed.
 
 **Common mode.** The part of the signal identical on every channel at a given
@@ -369,17 +376,19 @@ B. The source term is common to both and cancels; what survives behaves as if a
 source sat at A and was recorded at B. You have moved the source from the surface
 to a point inside the borehole without moving any equipment.
 
-**Deconvolution interferometry.** Same idea, but divide $B(\omega)$ by
-$A(\omega)$ instead of multiplying by its conjugate. Cancels the source spectrum
-as well as the source timing, at the cost of noise amplification where $|A|$ is
-small — hence the "water level", a small constant added to the denominator.
+**Deconvolution interferometry.** Same idea, but divide B by A in the frequency
+domain instead of multiplying by A's conjugate. That cancels the source spectrum
+as well as the source timing, at the cost of blowing up noise wherever A is
+small -- hence the "water level", a small constant added to the denominator to
+stop it dividing by nearly zero.
 
-**SNR in dB.** $10\log_{10}$ of a power ratio. 0 dB means signal equals noise,
-10 dB means ten times the power, 20 dB a hundred times.
+**SNR in dB.** Ten times the base-10 logarithm of a power ratio. 0 dB means
+signal equals noise, 10 dB means ten times the power, 20 dB a hundred times.
 
 **Burst.** A group of weight drops fired close together in time. 989 drops in
 this survey, grouped into 49 bursts of roughly 20.
 
-**Stack.** Average repeated records. Coherent signal adds as $N$, incoherent
-noise as $\sqrt N$, so SNR improves as $\sqrt N$. This is why 859 stacked drops
-show structure a single drop does not.
+**Stack.** Average repeated records. Coherent signal adds in proportion to N
+while incoherent noise adds only as the square root of N, so signal-to-noise
+improves as sqrt(N). This is why 859 stacked drops show structure that a single
+drop does not.
