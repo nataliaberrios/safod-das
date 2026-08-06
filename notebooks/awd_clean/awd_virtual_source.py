@@ -1,0 +1,266 @@
+"""Virtual-source gathers on the June 2026 AWD data, by correlation and by deconvolution.
+
+Why this is not the ambient interferometry already in this repo
+--------------------------------------------------------------
+`stack_daily.py`, `sanity/sanity_cc.py` and
+`ambient_transfer_test.normalized_corr_pairs` all cross-correlate a virtual
+source against the array, but all three run on 2024-25 *ambient noise*, where
+you correlate because you do not know when or where the source was.
+
+Here the source is known. The point of correlating is not to find a Green's
+function -- it is to **remove the source**. Correlating channel A with channel B
+cancels the source term common to both and leaves the response between A and B,
+as though a source sat at A. That redatums the surface weight drop down into the
+borehole and takes the near-surface path with it (Bakulin & Calvert 2006, "the
+virtual source method").
+
+That matters here specifically. `docs/paper1/STATUS.md` already concludes the
+source is the limiter -- sigma_alpha ~ 0.30 ms common-mode timing and a 39%
+amplitude CV. Anything that cancels the source term attacks the measured
+bottleneck directly.
+
+Correlation and deconvolution, and why both
+-------------------------------------------
+Classic Bakulin-Calvert sums over a *range* of surface source positions to
+satisfy stationary phase. The AWD did not move (`README.md`: fixed for the
+survey, ~15 m from the Nano wellhead), so that construction is not available and
+the correlation gather here should be read as a redatumed section, not as a
+clean Green's function.
+
+Deconvolution interferometry does not need a source aperture. Dividing B by A in
+the frequency domain cancels the source spectrum whatever its shape, which is
+the Snieder & Safak (2006) construction later applied to borehole arrays by
+Nakata & Snieder. For *monitoring* that is the useful one: you do not need a
+correct Green's function, you need a repeatable waveform whose changes track the
+medium.
+
+Both are computed so they can be compared. Deconvolution is the one to trust for
+source cancellation; correlation is the one with the better SNR.
+
+A side benefit worth stating: both operations cancel any gain applied equally to
+the whole record, so the read-time Tukey taper documented in `PREPROCESSING.md`
+cannot bias these gathers.
+
+What this deliberately does NOT do
+----------------------------------
+No F-K filter, no velocity wedge, no semblance scan, no permutation null. This
+is a plain gather -- lag against distance -- so the wavefield can be looked at
+before any selection is applied to it. Several virtual-source channels are used
+so the result cannot be an artifact of always sitting at channel 0.
+
+Input
+-----
+`canonical_epoch_stacks_paired_deep_all.npz` (859 paired drops in 46 burst
+stacks, built by `paired_stack_job_deep_all.py`).
+
+Outputs
+-------
+figures/awd_2026/plain_look/vs_fig01_correlation_gathers.png
+figures/awd_2026/plain_look/vs_fig02_deconvolution_gathers.png
+figures/awd_2026/plain_look/vs_fig03_moveout_and_wiggles.png
+figures/awd_2026/plain_look/awd_virtual_source.npz
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from scipy.signal import butter, sosfiltfilt
+
+HERE = Path(__file__).resolve().parent
+STACKS = HERE / "canonical_epoch_stacks_paired_deep_all.npz"
+OUT_DIR = Path(
+    "/home/groups/ettore88/nberrios/safod_das_git/notebooks/figures/awd_2026/plain_look"
+)
+
+PRE_S = 0.5                     # the stacks are cut -0.5 to +3.0 s
+BAND = (20.0, 50.0)             # the Nano working band, from fig02 of plain_look
+APERTURE_M = (0.0, 600.0)       # signal dies well before the 926 m fiber end
+MAX_LAG_S = 0.35
+WATER_LEVEL = 0.01              # fraction of mean |A|^2, standard spectral-division floor
+
+# Several virtual-source positions, so the result is not a channel-0 artifact.
+SOURCE_DEPTHS_M = [50.0, 150.0, 250.0, 350.0]
+
+
+def bandpass(x, fs, band):
+    sos = butter(4, list(band), btype="bandpass", fs=fs, output="sos")
+    return sosfiltfilt(sos, np.asarray(x, float), axis=-1)
+
+
+def weighted_stack(stacks, counts):
+    """Drop-count-weighted mean over bursts, as every other script here does."""
+    good = counts > 0
+    w = counts[good].astype(float)
+    return np.tensordot(w, stacks[good], axes=(0, 0)) / w.sum(), int(w.sum())
+
+
+def _spectra(section, source_trace, nfft):
+    B = np.fft.rfft(section, n=nfft, axis=-1)
+    A = np.fft.rfft(source_trace, n=nfft)
+    return A, B
+
+
+def correlate_gather(section, source_trace, fs, max_lag=MAX_LAG_S):
+    """B correlated with A: cancels the source term, keeps its spectrum."""
+    n = section.shape[-1]
+    nfft = 1 << int(np.ceil(np.log2(2 * n - 1)))
+    A, B = _spectra(section, source_trace, nfft)
+    cc = np.fft.irfft(B * np.conj(A)[None, :], n=nfft, axis=-1)
+    return _center(cc, fs, max_lag)
+
+
+def deconvolve_gather(section, source_trace, fs, max_lag=MAX_LAG_S,
+                      water=WATER_LEVEL):
+    """B deconvolved by A: cancels the source term *and* its spectrum.
+
+    Water-level regularisation, the standard guard against dividing by the
+    near-zeros of |A|. eps is a fraction of the mean power of A, so the floor
+    scales with the trace rather than being an absolute number."""
+    n = section.shape[-1]
+    nfft = 1 << int(np.ceil(np.log2(2 * n - 1)))
+    A, B = _spectra(section, source_trace, nfft)
+    power = np.abs(A) ** 2
+    eps = water * float(np.mean(power))
+    dec = np.fft.irfft(B * np.conj(A)[None, :] / (power + eps)[None, :],
+                       n=nfft, axis=-1)
+    return _center(dec, fs, max_lag)
+
+
+def _center(x, fs, max_lag):
+    """Roll zero lag to the middle and trim to +/- max_lag."""
+    ml = int(round(max_lag * fs))
+    out = np.concatenate((x[:, -ml:], x[:, :ml + 1]), axis=-1)
+    lags = np.arange(-ml, ml + 1) / fs
+    return lags, out
+
+
+def norm_rows(g):
+    p = np.max(np.abs(g), axis=1, keepdims=True)
+    return g / np.where(p > 0, p, 1.0)
+
+
+def draw(ax, lags, gather, z, title, v_ref=None, z_src=None):
+    v = np.percentile(np.abs(gather), 99.0)
+    im = ax.pcolormesh(lags, z, gather, cmap="seismic", vmin=-v, vmax=v,
+                       shading="auto")
+    if v_ref is not None and z_src is not None:
+        # the moveout a wave leaving the virtual source would follow
+        for sign in (+1, -1):
+            ax.plot(sign * np.abs(z - z_src) / v_ref, z, "k--", lw=0.9, alpha=0.6)
+    if z_src is not None:
+        ax.axhline(z_src, color="lime", lw=1.0, alpha=0.8)
+    ax.set_xlabel("lag (s)")
+    ax.set_ylabel("distance along fiber (m)")
+    ax.set_title(title, fontsize=10)
+    ax.invert_yaxis()
+    return im
+
+
+def main():
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    d = np.load(STACKS)
+    fs = float(d["fs"])
+    dx = float(d["dx_nano"])
+    counts = d["n_common"]
+    nano, n_drops = weighted_stack(d["nano_stacks"], counts)
+    print(f"Nano stack {nano.shape}, fs={fs}, dx={dx:.6f}, "
+          f"{n_drops} drops over {int((counts > 0).sum())} bursts", flush=True)
+
+    c0, c1 = int(APERTURE_M[0] / dx), min(int(APERTURE_M[1] / dx), nano.shape[0])
+    sec = bandpass(nano[c0:c1], fs, BAND)
+    z = (np.arange(c0, c1)) * dx
+    src_ch = [min(int(round(zs / dx)) - c0, sec.shape[0] - 1)
+              for zs in SOURCE_DEPTHS_M]
+    print(f"aperture {z[0]:.0f}-{z[-1]:.0f} m ({sec.shape[0]} channels); "
+          f"virtual sources at {[f'{z[c]:.0f} m' for c in src_ch]}", flush=True)
+
+    corr, deco = {}, {}
+    for c in src_ch:
+        lags, corr[c] = correlate_gather(sec, sec[c], fs)
+        _, deco[c] = deconvolve_gather(sec, sec[c], fs)
+
+    # v_ref only draws a reference moveout; it is not fitted here.
+    v_ref = 2975.0
+
+    for name, data, fname, note in [
+        ("cross-correlation", corr, "vs_fig01_correlation_gathers.png",
+         "source term cancelled, source spectrum retained"),
+        ("deconvolution", deco, "vs_fig02_deconvolution_gathers.png",
+         "source term and spectrum both cancelled"),
+    ]:
+        fig, axes = plt.subplots(1, len(src_ch), figsize=(4.2 * len(src_ch), 6.5),
+                                 sharey=True)
+        for a, c in zip(np.atleast_1d(axes), src_ch):
+            im = draw(a, lags, norm_rows(data[c]), z,
+                      f"virtual source at {z[c]:.0f} m",
+                      v_ref=v_ref, z_src=z[c])
+            plt.colorbar(im, ax=a)
+        fig.suptitle(
+            f"AWD virtual-source gathers by {name} -- {note}\n"
+            f"{n_drops} drops, {BAND[0]:g}-{BAND[1]:g} Hz, traces normalised; "
+            f"dashed = {v_ref:g} m/s reference moveout, green = source channel",
+            fontsize=12)
+        fig.tight_layout()
+        fig.savefig(OUT_DIR / fname, dpi=140)
+        plt.close(fig)
+
+    # ---- a plain side-by-side, plus wiggles, at one source position -------
+    c = src_ch[1]
+    fig, ax = plt.subplots(1, 3, figsize=(17, 6.5))
+    im = draw(ax[0], lags, norm_rows(corr[c]), z, "correlation", v_ref, z[c])
+    plt.colorbar(im, ax=ax[0])
+    im = draw(ax[1], lags, norm_rows(deco[c]), z, "deconvolution", v_ref, z[c])
+    plt.colorbar(im, ax=ax[1])
+
+    step = max(1, sec.shape[0] // 40)
+    for k in range(0, sec.shape[0], step):
+        tr = deco[c][k]
+        pk = np.max(np.abs(tr))
+        if pk > 0:
+            ax[2].plot(lags, 2.2 * step * dx * tr / pk + z[k], "k", lw=0.5)
+    ax[2].axhline(z[c], color="lime", lw=1.0)
+    for sign in (+1, -1):
+        ax[2].plot(sign * np.abs(z - z[c]) / v_ref, z, "r--", lw=1.0, alpha=0.7)
+    ax[2].invert_yaxis()
+    ax[2].set_xlim(lags[0], lags[-1])
+    ax[2].set_xlabel("lag (s)")
+    ax[2].set_ylabel("distance along fiber (m)")
+    ax[2].set_title("deconvolution, wiggles", fontsize=10)
+
+    fig.suptitle(f"AWD virtual source at {z[c]:.0f} m: correlation vs deconvolution "
+                 f"-- {n_drops} drops, {BAND[0]:g}-{BAND[1]:g} Hz", fontsize=12)
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "vs_fig03_moveout_and_wiggles.png", dpi=140)
+    plt.close(fig)
+
+    np.savez(OUT_DIR / "awd_virtual_source.npz",
+             lags=lags, z=z, fs=fs, dx=dx, band=np.asarray(BAND),
+             n_drops=n_drops, water_level=WATER_LEVEL,
+             source_channels=np.asarray(src_ch),
+             source_depths=np.asarray([z[c] for c in src_ch]),
+             correlation=np.stack([corr[c] for c in src_ch]).astype(np.float32),
+             deconvolution=np.stack([deco[c] for c in src_ch]).astype(np.float32))
+
+    # plain numbers, so the figures are not the only record
+    print("\n--- lag of peak |amplitude| away from the virtual source ---")
+    for c in src_ch:
+        g = deco[c]
+        far = np.abs(z - z[c]) > 100.0
+        if not far.any():
+            continue
+        pk = np.abs(lags[np.argmax(np.abs(g[far]), axis=1)])
+        dist = np.abs(z - z[c])[far]
+        ok = pk > 1.0 / fs
+        if ok.sum() > 5:
+            slope = np.polyfit(pk[ok], dist[ok], 1)[0]
+            print(f"  source {z[c]:5.0f} m: apparent speed from peak lags "
+                  f"{slope:7.0f} m/s over {int(ok.sum())} channels")
+    print("\nwrote", OUT_DIR)
+
+
+if __name__ == "__main__":
+    main()

@@ -29,8 +29,33 @@ So the likely readings of the ask, in order of plausibility:
    channel 0 (`ambient_fk_full_pipeline_null_v2.py` keeps channel 0 at
    coordinate zero even in its surrogates).
 
-**To ask:** which of these? Ambient or AWD? And is this meant as a figure or as a
-new measurement?
+**RESOLVED 2026-08-05.** Reading 1 + 2 + 3 together, and the advisor also said
+"deconvolution", which settles it. On a known active source you do not correlate
+to *find* a Green's function -- you correlate to **remove the source**.
+Correlating channel A with channel B cancels the source term common to both and
+leaves the response between them, as though a source sat at A. That is the
+virtual source method (Bakulin & Calvert 2006), and it redatums the surface
+weight drop into the borehole.
+
+Why it is the right move here: `docs/paper1/STATUS.md` already concludes the
+source is the limiter (sigma_alpha ~ 0.30 ms common-mode, 39% amplitude CV).
+Source cancellation attacks the measured bottleneck head-on, and would add an
+entry to the 65x -> 5.7x -> 3.1x -> 1.6x sensitivity lineage.
+
+Caveat: classic Bakulin-Calvert sums over a range of surface source positions to
+satisfy stationary phase, and the AWD never moved. Deconvolution interferometry
+needs no source aperture -- dividing B by A cancels the source spectrum whatever
+its shape (Snieder & Safak 2006; applied to borehole arrays by Nakata & Snieder).
+That is presumably why the advisor mentioned deconvolution.
+
+Implemented in `awd_virtual_source.py`: correlation and deconvolution gathers on
+the canonical stacks, four virtual-source positions (50/150/250/350 m) so the
+result cannot be a channel-0 artifact, plain lag-vs-distance gathers with no F-K
+filter, no wedge, no semblance and no null. Both operations also cancel any gain
+applied equally to the whole record, so the read-time taper cannot bias them.
+
+`LITERATURE.md` section 6 is missing Bakulin & Calvert 2006 and Snieder & Safak
+2006; both should be added.
 
 ---
 
