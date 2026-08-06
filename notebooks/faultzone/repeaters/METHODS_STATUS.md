@@ -666,3 +666,91 @@ paper. That came from a search summary, not from reading the paper, and the summ
 did not distinguish between Atterholt, Zhan & Yang 2022
 (doi:10.1029/2022JB025052) and Atterholt, Zhan, Yang & Zhu 2024. The attribution is
 unverified.
+
+
+---
+
+## 16. The published-method pipeline, end to end (2026-08-05)
+
+Replaces the ad-hoc sequence of scripts that produced the earlier "8 confirmed
+pairs". Follows Nadeau's Parkfield procedure, with each threshold traced to source.
+
+### Ellsworth's actual guidance (email, 2026-05-20/21)
+
+DDRT catalog, NCEDC, 2024/05/01–2026/04/01, `delta=35.982,-120.544,0,15` → 329
+events. *"Spots with multiple colors are the ones I would focus on. Larger events
+would be better too."* And the framing sentence: *"you will want to find events
+that are close in magnitude and location, **which will then need to be verified as
+either repeaters or neighbors**."*
+
+### The pipeline
+
+| step | script | output |
+|---|---|---|
+| coverage audit, both manifests, file-interval resolution | `phaseA_coverage.py` | 208/329 events, 21,528 pairs |
+| similarity β on HRSN, 3C, P and S | `beta_similarity.py` | `beta_similarity.csv` |
+| clusters → sequences → creep | `sequences_and_creep.py` | `sequences_creep.csv` |
+| presentation | `REPEATERS_dashboard.ipynb` | validated, all cells OK |
+
+### Result
+
+**2 sequences pass every published gate.**
+
+| seq | events | interval | ΔM | radius | crack | Nadeau–Johnson |
+|---|---|---|---|---|---|---|
+| 0 | 2024-05-13 M0.78 → 2025-07-27 M0.84 | 440 d | 0.06 | 14.4 m | 0.87 mm/yr | **31.8 mm/yr** |
+| 3 | 2024-07-08 M0.65 → 2025-04-06 M0.81 | 272 d | 0.16 | 13.2 m | 1.29 mm/yr | **49.1 mm/yr** |
+
+N&J rates bracket Parkfield's geodetic creep (~25–30 mm/yr). The crack model is 25×
+low — the known small-repeater underestimate that motivated N&J.
+
+**The agreement is partly circular**: N&J was calibrated against geodetic creep at
+Parkfield, so reproducing it is a consistency check, not an independent measurement.
+
+### β does not reach Nadeau's 0.98, and why that is not a null
+
+Max β = 0.9695; zero pairs at 0.98. But Nadeau found 63% of 1700 events in clusters,
+so a fall to zero is not credible — the absolute scale differs by ~0.02 (band,
+window, aggregation, 1987-era instruments). The *population* matches: their 294
+clusters from 1700 events implies ~0.1% of pairs above threshold; we have 0.06%
+above 0.90. β ≥ 0.90 is used as the scale-shifted equivalent.
+
+**Caveat, stated because it is a judgement not a measurement:** our cluster count
+declines monotonically (20, 20, 17, 16, 13, 10, 7, 5, 2, 0) with no plateau, so
+Nadeau's own stability criterion does not select a value in our data.
+
+### Three estimator errors found and fixed here
+
+1. **Inflated null.** Maximising over ±1 s of lag inside a 1.5 s window maximises
+   over ~30 lags of a ~45-DOF correlation; expected max ≈ 0.4, and the measured null
+   median was 0.427. Fixed by one bulk alignment per station then ±0.1 s residual.
+   Null median fell to 0.270.
+2. **Window wraparound.** The bulk shift was applied with `np.roll` to an
+   already-cut window; a 0.5 s shift is 125 samples against a 375-sample window, so
+   a third of it folded in from the opposite end. Fixed by shifting the extraction
+   indices.
+3. **Bursts as recurrence.** Clusters with events 0–2 days apart gave creep rates up
+   to 866,000 mm/yr. Waldhauser & Ellsworth's 1-month rule was in the plan and not
+   implemented; now applied, collapsing bursts to one loading cycle.
+
+### Retraction
+
+An earlier note reported separations of 1–8 m for the confirmed pairs and concluded
+source overlap was "decisively satisfied". That came from a broken
+`horizontal_separation_km` column in a prior screen (its depth column was correct).
+Real DDRT separations are **167–771 m**. Nadeau 1995 predicts exactly this: routine
+locations scatter genuine repeaters over ~200 m, and only waveform-based relative
+relocation tightens them to 10–20 m. **Collocation therefore cannot be tested with
+DDRT** and is reported, never gated on.
+
+### Settled along the way
+
+- **Wellhead coordinate.** The surveyed PGSI collar is 216 m from the notebook value
+  (35.974204, −120.552141 ≈ MH029) and 1243 m from Ellsworth's 35.982, −120.544.
+  Use the notebook value; "MH030" is a different monument.
+- **2017 data unnecessary.** 23 events near SAFOD in the 10-day 2017 window, but
+  0 of 26 sequence locations had one within 500 m. The 8.4 TB on scratch adds
+  nothing to this analysis. Disk 1 (with the tap test) had already purged.
+- **The other student's catalog** is `ettore/research/projects/SAFOD/Catalogs/
+  RepeatingEq.csv`, 10 events, Oct 2025. Four are absent from DDRT, so it used a
+  different catalog; it shares **zero** events with this analysis.
