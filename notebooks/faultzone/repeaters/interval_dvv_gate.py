@@ -81,8 +81,14 @@ WIN_P = (-0.2, 1.5)         # about the picked P, seconds
 WIN_CODA = (2.0, 12.0)      # coda, from coda_window_survey's usable range
 DELAY_MAX_LAG = 0.05        # per-channel RESIDUAL search only -- valid because
                             # prep_pair() removes the bulk inter-event lag first
-MIN_COH = 0.3               # phase-stability floor from sub_sample_delay;
-                            # 0.6 kept only 0-20 of ~700 channels
+# COHERENCE IS A WEIGHT, NOT A GATE. A hard floor of 0.6 kept 0-20 of ~700
+# channels; 0.3 still emptied the null completely -- 0 of 40 control pairs -- and
+# left only 4 of 10 repeater pairs. That is a design error, not a tuning problem:
+# random pairs ARE incoherent, so a gate that drops incoherent channels drops the
+# entire null, and a measurement with no measurable noise floor cannot be believed.
+# slope_dvv already accepts per-channel weights, so coherence enters there. MIN_COH
+# now only rejects numerically dead channels.
+MIN_COH = 0.02
 INJECT = [0.001, 0.003, 0.010]
 WINDOWS = {'P': WIN_P, 'coda': WIN_CODA}
 
@@ -232,10 +238,12 @@ def measure(P, **kw):
         return dict(dvv=np.nan, err=np.nan, n=0, rms=np.nan)
     m = np.isfinite(dt) & (coh > MIN_COH)
     if m.sum() < 20:
-        return dict(dvv=np.nan, err=np.nan, n=int(m.sum()), rms=np.nan)
-    dvv, err, n, rms = slope_dvv(dt[m], tau[m], weights=coh[m],
+        return dict(dvv=np.nan, err=np.nan, n=int(m.sum()), rms=np.nan,
+                    coh_med=float(np.nanmedian(coh)) if coh.size else np.nan)
+    dvv, err, n, rms = slope_dvv(dt[m], tau[m], weights=coh[m] ** 2,
                                  block=GAUGE_CH, n_boot=400)
-    return dict(dvv=dvv, err=err, n=n, rms=rms, tau_span=float(np.ptp(tau[m])))
+    return dict(dvv=dvv, err=err, n=n, rms=rms, tau_span=float(np.ptp(tau[m])),
+                coh_med=float(np.median(coh[m])))
 
 
 def predicted_contamination(ev, pa, i_idx, j_idx, z_arr=0.43):
@@ -439,7 +447,11 @@ def main():
                          and x['win'] == 'P'
                          and x['i'] == int(r.i) and x['j'] == int(r.j)), np.nan)
             if np.isfinite(m['dvv']) and np.isfinite(base):
-                got.append(m['dvv'] - base)      # differential removes any real dv/v
+                # align(-eps*p) delays B by eps*tau, so d(dt)/d(tau) = +eps and
+                # slope_dvv returns -eps. Verified numerically: recovered/(-eps)
+                # = 0.93. The first run compared against +eps and reported a
+                # spurious catastrophic bias.
+                got.append(-(m['dvv'] - base))   # differential removes any real dv/v
                 ers.append(m['err'])
         if got:
             recov[eps] = (float(np.median(got)), float(np.median(ers)), len(got))
