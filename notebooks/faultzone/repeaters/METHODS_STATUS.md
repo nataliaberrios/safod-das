@@ -907,3 +907,65 @@ with no geometry involved. Until controls are matched on distance, magnitude and
 SNR, and until inferred offset is regressed against CC *within* the family group,
 this separation may be entirely a similarity artefact. Do not cite p = 0.0008
 without that control.
+
+---
+
+## 19. What the repeaters are FOR: the array's detection threshold, calibrated
+
+A repeating earthquake is a source of known size, at a known location, fired more
+than once. That is the only calibrated source available at SAFOD, and it makes one
+measurement possible that nothing else here does: how small an event this array can
+detect on a specific fault patch.
+
+### 19.1 The number
+
+Template `ev_20240708T083036`, M0.65, moveout-corrected and stacked over 700
+channels at 500 Hz:
+
+    beam SNR of the template            26.2
+    slant-scan semblance                0.730
+    detection threshold, from the       CC > 0.465
+      DAY-SPECIFIC acausal floor
+
+Scaling amplitude as 10^(1.5 dM) for a smaller event on the same patch:
+
+| M | amplitude | beam SNR | expected CC | detected |
+|---|---|---|---|---|
+| 0.65 | 1.000 | 26.2 | 0.999 | yes |
+| 0.05 | 0.126 | 3.3 | 0.957 | yes |
+| **-0.25** | 0.045 | 1.2 | 0.760 | **yes** |
+| -0.55 | 0.016 | 0.4 | 0.383 | no |
+
+**Detection threshold M ~ -0.25 against a catalog complete at M0.65: a 0.9
+magnitude-unit improvement, ~8x more events at b = 1.**
+
+Independently consistent with Lellouch et al. 2020 (doi:10.1785/0220200149), who
+measured Mc = -1.4 for DAS on this same fibre against -1.7 for collocated
+geophones. This estimate is more conservative because it uses one template, one
+patch, and a threshold set by the measured acausal floor rather than an optimised
+detector.
+
+### 19.2 Why this is the repeaters' contribution and not a side-effect
+
+Recurrence-based creep (Nadeau & McEvilly) needs event TIMES. Its weakness at
+SAFOD is that the confirmed sequences show intervals of 272-440 days for M0.7-1.5
+events, which is implausible and points at missing members rather than at genuinely
+long recurrence. Lowering the completeness threshold by 0.9 magnitude units is
+therefore a direct contribution to the creep estimate, and it does not depend on
+the same-patch discriminant, which failed on both DAS (r = -0.826 CC confound) and
+HRSN (66 m resolution floor).
+
+### 19.3 Scan status, and why zero detections is not a negative result
+
+3 days scanned so far, 0 detections. Expected: these sequences recur over months,
+so ~20 hours of data contains no expected occurrence. The deliverable of the scan
+is the THRESHOLD, not the count.
+
+Two things the scan did establish:
+
+- **The acausal floor varies day to day** (0.438, 0.514, 0.543), so a fixed
+  threshold would be wrong in both directions. It is set per day from the
+  time-reversed template, which is why these zeros are real zeros.
+- **Only 369-486 of ~1440 files per day were readable.** That must be explained
+  before any rate or bound is quoted from the scan; at face value it means the
+  effective scanned duration is a quarter of the nominal one.
