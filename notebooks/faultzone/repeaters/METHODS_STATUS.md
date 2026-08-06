@@ -13,7 +13,9 @@ project stands, so none of it lives only in terminal scrollback.
 | Repeating earthquakes recorded during DAS period | **Established** | HRSN control: 7 pairs, CC 0.917–0.995, baselines 39–440 d |
 | DAS detects those repeaters | **Established** | DAS CC 0.63–0.79 vs DAS null max 0.328 |
 | DAS CC systematically below HRSN | **Established** | 0.15–0.30 deficit, identical pairs |
-| Cause of the deficit | **Diagnosed, under test** | job 37524673, `moveout_test.py` |
+| Cause of the deficit | **Confirmed** — flat stacking. Aligned CC 0.956 vs HRSN 0.954 | `moveout_test.csv` (§17) |
+| The +0.124 null bias has the same cause | **REFUTED.** Alignment raises the null to +0.376 | §2.5, §17 |
+| Moveout correction improves *detection* | **REFUTED.** d′ falls 2.18 → 1.74 | §17 |
 | dv/v at HRSN depth (251–284 m) | **NULL, quantified** | G3: 0/10 pairs above a 1.94% control floor (§12) |
 | dv/v in the shallow DAS interval | **Estimator not yet trustworthy** | G5 first run: common-mode systematic (§13) |
 | Depth of any velocity change | Open — the remaining question | bounded above 75 m only once §13 is fixed |
@@ -85,16 +87,21 @@ signal survives as |sinc(πfT)|, noise falls as 1/√N.
 **A 700-channel stack is buying ~1 dB over a single channel.** Correcting the
 moveout gives √700 = 28.5 dB, i.e. **+27 dB recovery** — the whole deficit.
 
-### 2.5 The same bug explains the +0.124 null bias
+### 2.5 The same bug explains the +0.124 null bias — **REFUTED, see §17**
 
-For independent signals CC must be zero-mean. HRSN's null sits at −0.004; DAS's at
+~~For independent signals CC must be zero-mean. HRSN's null sits at −0.004; DAS's at
 **+0.124** under identical processing. Boxcar smearing of width T imposes nearly
 the same narrowband ringing on every event, so the stack's own impulse response
 dominates the waveform shape and every pair correlates positively. **Two symptoms,
-one cause** — the consistency is what makes the diagnosis credible. Artifact-
-corrected, (ρ−0.124)/(1−0.124), the repeaters are really 0.579–0.763.
+one cause** — the consistency is what makes the diagnosis credible.~~
 
-Independent prediction: correcting moveout must pull the DAS null toward 0.000.
+**This was wrong.** The prediction below was written to be falsifiable and it
+failed: correcting the moveout drove the null the *opposite* way, +0.124 → +0.376.
+The two symptoms do not share one cause. §2.4 stands on its own; the origin of the
+null bias is **still undiagnosed**. Do not cite "two symptoms, one cause" as support
+for the moveout diagnosis — that support is withdrawn.
+
+~~Independent prediction: correcting moveout must pull the DAS null toward 0.000.~~
 
 ### 2.6 Cause #2 — genuinely noisier per channel. Real and published.
 
@@ -754,3 +761,75 @@ DDRT** and is reported, never gated on.
 - **The other student's catalog** is `ettore/research/projects/SAFOD/Catalogs/
   RepeatingEq.csv`, 10 events, Oct 2025. Four are absent from DDRT, so it used a
   different catalog; it shares **zero** events with this analysis.
+
+---
+
+## 17. Moveout correction: the deficit is confirmed, the null prediction is refuted
+
+`moveout_test.py`, run 2026-08-04, results in `moveout_test.csv`. The output sat
+unread for a day while four other directions were pursued and abandoned. Read the
+results before building anything downstream.
+
+Four variants isolate the two factors. "Aligned" applies one rigid per-channel time
+shift per event, set by a slowness scan that **includes p = 0**, so the data chooses
+between flat and dipping rather than the argument choosing.
+
+| variant | rep median | HRSN | null median | null MAD | d′ | repMIN − nullMAX |
+|---|---|---|---|---|---|---|
+| published (flat / origin win) | 0.680 | 0.954 | +0.124 | 0.255 | **2.18** | **+0.299** |
+| flat / origin | 0.679 | | −0.017 | 0.283 | 2.45 | +0.275 |
+| **aligned / origin** | **0.944** | | +0.184 | 0.455 | 1.67 | +0.217 |
+| flat / P window | 0.720 | | +0.289 | 0.165 | 2.61 | +0.221 |
+| **aligned / P window** | **0.956** | | +0.376 | 0.333 | 1.74 | +0.177 |
+
+### 17.1 Confirmed — §2.4 was right about coherent signal
+
+Median repeater CC **0.680 → 0.956** against an HRSN median of 0.954. The deficit
+vs HRSN goes 0.212 → **−0.006**: parity. All 10 pairs improve; the weakest goes
+0.627 → 0.880. `correlate_all.py:69` was stacking 700 channels across an
+uncorrected 0.31 s moveout, and that single line accounts for the whole
+DAS/HRSN gap.
+
+**`correlate_all.py` still contains the wrong physics in a confident comment**
+(lines 61–64, "the arrival is FLAT across all 900 channels"). `correlate_perchannel.py`
+and `g5_shallow_dvv.py` were fixed; this one was not. Every DAS CC number published
+in this document above §17 came from the unfixed path.
+
+### 17.2 Refuted — the null moves the wrong way
+
+The written prediction was that the null must fall toward 0.000. It rose to
+**+0.376**, tripling, with its spread growing too. §2.5 is withdrawn.
+
+The cause appears to be physical rather than a coding error: alignment turns every
+event's stack into a clean coherent P wavelet, and P wavelets from comparable
+distances resemble one another. Coherence rises for unrelated pairs as well as for
+repeaters. What discriminates a repeater lives in the scattered coda detail, which
+an aligned P-window stack suppresses. Consistent with this, the *narrowest* null
+(MAD 0.165) is flat / P, and the widest is aligned / origin.
+
+### 17.3 Consequence — this does NOT buy detection
+
+On every discrimination metric, correction makes things **worse**: d′ 2.18 → 1.74,
+and the gap between the weakest repeater and the strongest control 0.299 → 0.177.
+
+Therefore **moveout correction does not open template matching, catalog
+enhancement, or detection below completeness.** That inference was drawn and is
+retracted before use.
+
+Where it does help is *waveform fidelity*, which is a different quantity from
+discrimination and does not involve the null: dv/v, spectral fitting, differential
+timing. Every such measurement in this project so far was made on a 0.68-coherence
+stack when 0.956 was available — including the ±3.6 % dv/v figure recorded as a
+negative result.
+
+### 17.4 Limits of this test
+
+- The null is **40 control pairs**, against 21,528 for the published null. The d′
+  ordering is indicative, not established. Rebuild the null at full size before
+  treating the detection conclusion as final.
+- 0 of 40 controls exceed the weakest repeater in *any* variant, so all four
+  configurations separate perfectly at this sample size; the d′ differences are
+  margin, not error rate.
+- Everything here is at **100 Hz** (`extract_all.py:57`, `desampling=True`), one
+  fifth of the 500 Hz the files actually carry. Orthogonal to the moveout question
+  and still untested.

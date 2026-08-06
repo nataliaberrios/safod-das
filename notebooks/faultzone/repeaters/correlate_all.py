@@ -58,12 +58,29 @@ def main():
         X, fs = d['X'], float(d['fs'])
         sos = butter(4, list(BAND), btype='band', fs=fs, output='sos')
         Xb = sosfiltfilt(sos, X[CH_LO:CH_HI].astype(np.float64), axis=-1)
-        # DO NOT subtract the across-channel median here. G1 showed the arrival is
-        # FLAT across all 900 channels -- near-vertical incidence means the
-        # earthquake IS the common mode. Median subtraction is the standard DAS
-        # trick for common-mode NOISE, but here it deletes the signal; and
-        # following it with mean(axis=0) computes (mean - median) ~ 0, so the
-        # previous run correlated residual noise and produced a spurious null.
+        # DO NOT subtract the across-channel median here. Median subtraction is the
+        # standard DAS trick for common-mode NOISE, but following it with
+        # mean(axis=0) computes (mean - median) ~ 0, so an earlier run correlated
+        # residual noise and produced a spurious null.
+        #
+        # THE FLAT STACK BELOW IS DELIBERATE, BUT NOT FOR THE REASON ORIGINALLY
+        # WRITTEN HERE. This comment used to assert the arrival is flat across the
+        # 900 channels because incidence is near-vertical. That is backwards: for a
+        # VERTICAL fiber, near-vertical incidence gives the steepest moveout the
+        # geometry allows (~0.31 s end to end). See METHODS_STATUS 2.4.
+        #
+        # moveout_test.py measured both ways on the 10 HRSN-confirmed pairs
+        # (METHODS_STATUS 17). Aligning before stacking raises repeater CC from
+        # 0.680 to 0.956 -- HRSN parity -- so the moveout is unambiguously real.
+        # But it raises the random-pair null further still, 0.124 -> 0.376, because
+        # an aligned stack is a clean P wavelet and all P wavelets at similar
+        # distance resemble each other. Detection margin therefore DROPS:
+        # d' 2.18 -> 1.74, and repMIN - nullMAX 0.299 -> 0.177.
+        #
+        # This script's job is DISCRIMINATION, so the flat stack is kept. Use
+        # aligned stacking for anything needing waveform FIDELITY -- dv/v, spectra,
+        # differential timing -- where the null is irrelevant. Do not "fix" this
+        # line without re-reading section 17.
         i0 = int((PRE_S + WIN[0]) * fs)
         i1 = int((PRE_S + WIN[1]) * fs)
         s = Xb[:, i0:i1].mean(axis=0)          # channel stack -> one trace
