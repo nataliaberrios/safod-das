@@ -78,14 +78,31 @@ The gain is exactly what independent averaging predicts:
 | inverse-variance | 8.88×10⁻⁴ | 8.12×10⁻⁴ |
 
 Agreement to ~1% for equal weight. **But the reliable-detection level does not
-move**: all three combinations stay at 5×10⁻³. Detection probability at 2×10⁻³
-rises only from 0.63 (outbound) to 0.74 (inverse-variance), short of 0.95. The
-injection grid jumps 2×10⁻³ → 5×10⁻³, so a real improvement of ~1.4× cannot
-resolve into a new tested level.
+move**: all three combinations stay at 5×10⁻³. The injection grid jumps
+2×10⁻³ → 5×10⁻³, so a real improvement of ~1.4× cannot resolve into a new tested
+level.
 
-Contrary to expectation, equal weighting does **not** degrade the result. The two
-legs have nearly equal ε-variance (1.20 vs 1.32×10⁻³, 10% apart) despite a 2.4×
-beam-power difference.
+At 2×10⁻³, the next lower tested change, the effect depends on the weighting.
+Do not summarise this as "pairing improves detection" — only one of the three
+weightings does:
+
+| | outbound | equal | inverse-variance | covariance-aware |
+|---|---|---|---|---|
+| correct-sign detection at 2×10⁻³ | 0.63 | **0.54** | 0.74 | 0.63 |
+
+None approach 0.95. Equal weighting *reduces* detection even though it reduces
+scatter, because detection also requires exceeding the empirical threshold and
+equal weighting's threshold barely moved (1.822 vs 1.836×10⁻³) while its MAD fell
+26% — a heavier-tailed null relative to its core.
+
+The 0.74 figure is the least robust number in this section. Inverse-variance has
+the lowest threshold of the three (1.53×10⁻³), and with 23 nulls that threshold is
+the ~22nd order statistic, so part of the gain reflects a favourable tail draw
+rather than better precision. Rest precision claims on the MAD, not on detection
+probability or threshold.
+
+Equal weighting does not degrade *precision*: the two legs have nearly equal
+ε-variance (1.20 vs 1.32×10⁻³, 10% apart) despite a 2.4× beam-power difference.
 
 Recommended framing: outbound remains the headline observable, with the paired
 inverse-variance estimator reported as a 1.4× noise-floor reduction that does not
