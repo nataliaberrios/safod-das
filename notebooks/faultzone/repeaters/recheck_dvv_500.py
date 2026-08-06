@@ -52,7 +52,12 @@ BANDS = [(5.0, 20.0), (5.0, 40.0), (5.0, 80.0)]
 PRE_S = 5.0
 LAPSE = [(1.0, 6.0), (2.0, 12.0), (4.0, 14.0)]   # same windows G3 used
 EPS_MAX = 0.04
-SUBARRAYS = 4        # independent depth thirds+ for a split-aperture check
+# BOOTSTRAP SAMPLE SIZE. The first run used 4 subarrays, so stretch_dvv_bootstrap
+# resampled 4 traces and the resulting +/-0.033 % error bar came from 4 samples --
+# not trustworthy, and flagged as provisional in METHODS_STATUS 18.2. 24 subarrays
+# of ~29 channels each still exceeds one 16-channel gauge length per subarray, so
+# the samples stay quasi-independent while the bootstrap becomes meaningful.
+SUBARRAYS = 24
 
 
 def load(tag):
