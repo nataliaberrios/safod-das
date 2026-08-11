@@ -1,0 +1,120 @@
+{
+  "workflow_version": "ambient_fk_prefilter_energy_v1_aggregate",
+  "date": "2024-12-20",
+  "start": 0,
+  "requested_files": 300,
+  "used_files": 300,
+  "null_realizations": 20,
+  "null_realization_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "random_seed": 20260810,
+  "passband_hz": [
+    5.0,
+    20.0
+  ],
+  "target_velocity_m_s": [
+    2500.0,
+    4500.0
+  ],
+  "reference_velocity_m_s": [
+    1200.0,
+    6500.0
+  ],
+  "statistic": "mean across files of log(mean target F-K power per cell / mean broad signed-reference F-K power per cell), measured before filtering",
+  "preprocessing": "linear detrend, 5-20 Hz Butterworth bandpass, 5-s running-absolute-mean normalization, 2x temporal and spatial decimation, 10% Tukey tapers",
+  "observed": {
+    "negative": {
+      "mean_log_enrichment": -0.04888473017367099,
+      "geometric_enrichment_ratio": 0.9522908937780806
+    },
+    "positive": {
+      "mean_log_enrichment": -0.048911761537560126,
+      "geometric_enrichment_ratio": 0.9522651524043164
+    }
+  },
+  "observed_familywise": -0.04888473017367099,
+  "distributed_reproducibility": {
+    "maximum_observed_mean_log_enrichment_spread": 2.225325798785316e-06,
+    "maximum_observed_power_relative_spread": 1.850147055948447e-05,
+    "input_file_lists_identical": true,
+    "handling": "average cross-node observed products after bounded-spread checks"
+  },
+  "null_results": {
+    "channel_permutation": {
+      "branches": {
+        "negative": {
+          "observed_mean_log_enrichment": -0.04888473017367099,
+          "observed_geometric_enrichment_ratio": 0.9522908937780806,
+          "null_median": 0.031699128415064545,
+          "null95": 0.0367006205155867,
+          "p_upper": 1.0
+        },
+        "positive": {
+          "observed_mean_log_enrichment": -0.048911761537560126,
+          "observed_geometric_enrichment_ratio": 0.9522651524043164,
+          "null_median": 0.03298126255427321,
+          "null95": 0.03768399787510327,
+          "p_upper": 1.0
+        }
+      },
+      "familywise": {
+        "observed_maximum_across_branches": -0.04888473017367099,
+        "null_median": 0.033215248610353444,
+        "null95": 0.03768399787510327,
+        "p_upper": 1.0
+      }
+    },
+    "circular_time_shift": {
+      "branches": {
+        "negative": {
+          "observed_mean_log_enrichment": -0.04888473017367099,
+          "observed_geometric_enrichment_ratio": 0.9522908937780806,
+          "null_median": -0.0280245644956958,
+          "null95": -0.026381367916053645,
+          "p_upper": 1.0
+        },
+        "positive": {
+          "observed_mean_log_enrichment": -0.048911761537560126,
+          "observed_geometric_enrichment_ratio": 0.9522651524043164,
+          "null_median": -0.026958397053714986,
+          "null95": -0.023827511348010963,
+          "p_upper": 1.0
+        }
+      },
+      "familywise": {
+        "observed_maximum_across_branches": -0.04888473017367099,
+        "null_median": -0.02683376671991064,
+        "null95": -0.023827511348010963,
+        "p_upper": 1.0
+      }
+    }
+  },
+  "decision_rule": "The raw input supports target-slowness enrichment only if both separately reported familywise null probabilities are <= 0.05; passing does not establish Green's-function convergence or formation velocity.",
+  "limitations": [
+    "The statistic tests raw directional spectral concentration, not Green's-function convergence.",
+    "The velocity interval is a prior from the Lellouch comparison and the existing production mask.",
+    "The broad-reference normalization does not remove all colored spatial-noise structure.",
+    "Channel permutation and independent time shifts are artificial nulls and are reported separately."
+  ],
+  "passes_both_familywise_nulls": false
+}

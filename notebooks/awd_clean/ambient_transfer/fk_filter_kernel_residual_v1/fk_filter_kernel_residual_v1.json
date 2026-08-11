@@ -1,0 +1,61 @@
+{
+  "workflow_version": "ambient_fk_filter_kernel_residual_v1",
+  "input_dir": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/ambient_transfer/fk_full_pipeline_null_v2_n300_r20",
+  "null_realizations": 20,
+  "maximum_distributed_observed_top_difference": 7.03429444039172e-06,
+  "residual_definition": "observed minus mean surrogate top; each surrogate minus the leave-one-out mean of the remaining surrogate tops",
+  "selection_statistic": "maximum signed-positive median correlation inside 2.5-4.5 km/s; familywise maximum across both signed branches",
+  "methods": {
+    "channel_permutation": {
+      "branches": {
+        "negative": {
+          "observed_positive_peak": 0.01222414354793109,
+          "observed_peak_velocity_m_s": 4450.0,
+          "peak_is_near_search_boundary": true,
+          "observed_score_3200": -0.057007260593852666,
+          "null95_positive_peak": 0.003565493505894735,
+          "p_upper": 0.047619047619047616
+        },
+        "positive": {
+          "observed_positive_peak": 0.01171614500598922,
+          "observed_peak_velocity_m_s": 4450.0,
+          "peak_is_near_search_boundary": true,
+          "observed_score_3200": -0.05464668099801352,
+          "null95_positive_peak": 0.0033690152560450254,
+          "p_upper": 0.047619047619047616
+        }
+      },
+      "familywise": {
+        "observed_maximum_across_branches": 0.01222414354793109,
+        "null95": 0.0043438228539628,
+        "p_upper": 0.047619047619047616
+      }
+    },
+    "circular_time_shift": {
+      "branches": {
+        "negative": {
+          "observed_positive_peak": 0.00010562631197112704,
+          "observed_peak_velocity_m_s": 4450.0,
+          "peak_is_near_search_boundary": true,
+          "observed_score_3200": -0.04211924117227579,
+          "null95_positive_peak": 0.0028954907579598274,
+          "p_upper": 0.9523809523809523
+        },
+        "positive": {
+          "observed_positive_peak": -0.00027601602097816064,
+          "observed_peak_velocity_m_s": 4450.0,
+          "peak_is_near_search_boundary": true,
+          "observed_score_3200": -0.03927684733351808,
+          "null95_positive_peak": 0.0032414456209687364,
+          "p_upper": 1.0
+        }
+      },
+      "familywise": {
+        "observed_maximum_across_branches": 0.00010562631197112704,
+        "null95": 0.0032414456209687364,
+        "p_upper": 1.0
+      }
+    }
+  },
+  "decision": "Exploratory only. Null-family disagreement or a near-boundary peak prevents promotion as physical-wave evidence."
+}

@@ -55,7 +55,7 @@ $1.4$--$1.56~\mathrm{km\,s^{-1}}$ low-frequency mode is validated on the
 wireline Deep array.  The former is not yet securely identified as direct P;
 the latter is consistent with, but not yet proven to be, a borehole tube wave.
 The document follows the current results notebook,
-\path{AWD_results_dashboard.ipynb}, version v44.  The hierarchical
+\path{AWD_results_dashboard.ipynb}, version v45.  The hierarchical
 individual-drop/burst repeatability analysis and the split-sample Deep
 time-gated branch search are now promoted into the authoritative results
 record.  A six-figure core presentation set plus an advisor-facing figure
@@ -1756,51 +1756,107 @@ measurement.
 \caption{\textbf{Held-out sensitivity of the ambient transfer observable to the F--K mask.} The 2024-12-20 development date is separated from seven preselected held-out dates spanning the available seasonal archive. Each date is processed independently with Nano channel~0 as the virtual source, 5--20~Hz preprocessing, and running-absolute-mean temporal normalization; dates receive equal weight in the held-out aggregate. Columns compare the frozen production wedge (2.5--4.5~km~s$^{-1}$), a narrow wedge (2.8--3.8~km~s$^{-1}$), a broad wedge (2.0--5.5~km~s$^{-1}$), and signed-direction-only filtering without a velocity restriction. The $F K<0$ and $F K>0$ branches are evaluated on positive and negative physical lags, respectively. Receiver-order permutations quantify ordered moveout after F--K selection; they are not full-pipeline selection nulls. Persistence of the production-wedge score establishes temporal repeatability of the selected observable, whereas the large mask-dependent changes in ridge position and strength demonstrate that the approximately 3.1~km~s$^{-1}$ value is not an independent or unbiased estimate of formation velocity.}
 \end{figure}
 
-\subsection{Pre-F--K full-pipeline null tests}
-\figquestion{Does the frozen velocity wedge produce an apparently coherent
-ridge after the input wavefield's spatial or phase coherence has been
-destroyed?}
+\subsection{Correction to the selection-conditioned full-pipeline statistic}
+\figquestion{What did the v44 surrogate calculation actually test?}
 
-The nulls are applied before F--K selection.  Channel permutation preserves
-individual trace spectra but destroys the receiver ordering.  Independent
-circular time shifts approximately preserve each trace's spectrum and
-amplitude distribution but disrupt interchannel phase alignment.  Every
-surrogate is then passed through the same 5--20~Hz processing, frozen
-2.5--4.5~km~s$^{-1}$ signed wedge, channel-0 correlation, stacking, and
-velocity scan.  The familywise statistic is the maximum across both physical
-lag branches and the scanned velocity range.
+The v44 probabilities remain reproducible, but their physical interpretation
+was overextended. Channel permutations and independent circular shifts were
+applied before F--K filtering, yet every observed and surrogate record was
+then restricted to the same 2.5--4.5~km~s$^{-1}$ corridor and scored by a
+velocity search inside that corridor. A velocity-wedge filter necessarily
+imposes a compatible space--time covariance on its output. The statistic
+therefore measures the response of the selected filter-plus-score operator to
+coherence-disrupted inputs; it is not an independent test for a physical wave.
 
-For the 30-file pilot, channel permutation: negative p = 1, positive p = 1, familywise p = 1; circular time shift: negative p = 1, positive p = 1, familywise p = 1.  A large probability means
-that the observed maximum is common among the stated surrogates and therefore
-does not reject that null; it does not show that a physical signal is absent.
+The earlier decision to withdraw the ridge is superseded. Equally, the large
+probabilities do not confirm the ridge. F--K filtering remains a valid
+directional wavefield operation; the selected ambient ridge is
+\textbf{unresolved} pending a statistic measured before the mask or fixed
+independently of the selected velocity support.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.99\linewidth]{ambient_transfer/fk_full_pipeline_null_v2_pilot_n30_r20/fk_full_pipeline_null_v2_aggregate_figure.png}
-\caption{\textbf{Thirty-minute pre-F--K full-pipeline null pilot.} The observed negative-branch, positive-branch, and branch-plus-velocity familywise peak median-correlation statistics are compared with 20 channel-permutation and 20 independent-circular-time-shift realizations. Each surrogate is constructed before F--K filtering and passes through the same Nano channel-0 virtual-source workflow, 5--20~Hz preprocessing, frozen 2.5--4.5~km~s$^{-1}$ signed wedge, physical-lag correlation, stack, and velocity scan as the unmodified 30-file record. Black vertical lines show observed statistics, dotted lines show surrogate 95th percentiles, and one-sided empirical probabilities use a plus-one correction. The pilot does not reject either coherence-destroying null. It therefore cannot establish that the selected ridge depends on preserved wave propagation, and it does not identify wave type or formation velocity.}
+\caption{\textbf{Superseded 30-minute selected-operator diagnostic.} Observed branch-specific peak correlation statistics are compared with 20 channel-permutation and 20 independent-circular-shift realizations. Surrogates are generated before filtering, but every realization is subsequently restricted to the same 2.5--4.5~km~s$^{-1}$ F--K corridor and scored by a velocity search within it. The probabilities therefore quantify the response of the complete selected operator to coherence-disrupted inputs. Because selection and score share the same velocity support, the figure cannot reject F--K filtering or establish a propagating ambient-noise arrival. It is retained to document the superseded v44 decision path.}
 \end{figure}
-
-The 300-file test gives channel permutation: negative p = 1, positive p = 1, familywise p = 1; circular time shift: negative p = 1, positive p = 1, familywise p = 1.  It increases stack duration
-tenfold while retaining the identical mask and test statistic, so differences
-from the pilot describe stack-length sensitivity rather than a changed
-selection rule.
-
-\textbf{Decision.} The five-hour result fails the predeclared requirement that both familywise nulls be rejected at $\alpha=0.05$.  The ambient ridge is therefore withdrawn as physical-wave evidence and retained only as a processing-sensitive diagnostic. Longer stacking of the same selected statistic is not treated as a remedy.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.99\linewidth]{ambient_transfer/fk_full_pipeline_null_v2_n300_r20/fk_full_pipeline_null_v2_aggregate_figure.png}
-\caption{\textbf{Five-hour pre-F--K full-pipeline null test.} The full null construction is repeated for 300 one-minute files with the same Nano channel-0 geometry, 5--20~Hz band, temporal normalization, 2.5--4.5~km~s$^{-1}$ signed wedge, branch-specific physical lag conventions, and maximum-across-branches-and-velocity familywise statistic used in the pilot. Channel permutations test reliance on spatial ordering; independent circular shifts test reliance on interchannel phase alignment. Both surrogate classes precede F--K filtering, so this is a direct test of whether the fixed selection can recover similar statistics from these coherence-destroyed inputs. The nulls do not span every possible spatially correlated ambient source field. The figure constrains processing-selection risk; it does not prove Green's-function convergence, identify the mode, establish causality, or convert a conditional ridge peak into formation $V_P$.}
+\caption{\textbf{Superseded five-hour selected-operator diagnostic.} The 300-file calculation repeats the pilot with unchanged Nano channel-0 geometry, 5--20~Hz preprocessing, temporal normalization, signed 2.5--4.5~km~s$^{-1}$ wedge, physical-lag convention, and maximum-over-velocity statistic. Surrogate selected scores are comparable to or greater than the observation. This demonstrates a strong corridor-conditioned filter-plus-score response; it does not demonstrate that F--K filtering is invalid or that a physical wave is absent.}
 \end{figure}
 
-\takeaway{The production-wedge observable repeats on seven held-out dates, but it does not exceed both stated five-hour pre-F--K surrogate ensembles.  It is therefore withdrawn as physical-wave evidence.  The approximately 3.1~km~s$^{-1}$ feature must not be presented as Green's-function convergence, a propagating mode, or formation $V_P$.}
+\subsection{Independent pre-filter F--K energy validation (v45)}
+\figquestion{Does the input wavefield contain excess ordered target-slowness
+energy before any F--K mask is applied?}
 
+For file $j$, let $P_j(f,k)$ be F--K power after detrending, 5--20~Hz
+bandpass filtering, 5-s running-absolute-mean normalization, twofold temporal
+and spatial decimation, and 10\% Tukey tapers, but before directional
+selection. For branch $b$,
+\[
+S_b={1\over N}\sum_{j=1}^{N}\log\left[
+{\operatorname{mean}_{(f,k)\in T_b}P_j(f,k)\over
+ \operatorname{mean}_{(f,k)\in R_b}P_j(f,k)}\right],
+\]
+where $T_b$ is the predeclared 2.5--4.5~km~s$^{-1}$ target support and
+$R_b$ is the broader 1.2--6.5~km~s$^{-1}$ signed reference support. The
+statistic is never evaluated on an F--K-filtered correlation section.
+
+Channel permutation retains individual trace spectra while destroying receiver
+order. Independent circular time shifts retain each trace spectrum while
+disrupting interchannel phase alignment. The familywise statistic is the
+maximum of the two signed branches, and the predeclared criterion requires
+upper-tail $p\leq0.05$ for \emph{both} null families. Synthetic controls
+pass: a 3.2~km~s$^{-1}$ plane wave enriches the correct branch, an
+off-target 1.8~km~s$^{-1}$ wave is rejected, and noise is not forced into
+the target interval.
+
+The completed 300-file test gives geometric target/reference ratios 0.95229
+for $F K<0$ and 0.95227 for $F K>0$. Both channel-permutation and
+independent-time-shift familywise probabilities are $p=1.000$. The raw
+normalized wavefield therefore has no excess target-corridor power under this
+statistic. This does not invalidate F--K filtering; it means the selected
+correlation ridge is not independently corroborated as a physical ambient
+arrival by the current pre-filter and unfiltered controls.
+
+\IfFileExists{ambient_transfer/fk_prefilter_energy_v1_n300_r20/fk_prefilter_energy_v1_aggregate_figure.png}{
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.99\linewidth]{ambient_transfer/fk_prefilter_energy_v1_n300_r20/fk_prefilter_energy_v1_aggregate_figure.png}
+\caption{\textbf{Independent pre-filter F--K energy validation.} The upper-left panel shows mean 5--20~Hz F--K power before any velocity mask or channel-pair correlation; white curves delimit the predeclared target corridors for both signs of $F K$. The upper-right and lower-left panels compare observed mean log target/reference enrichment with channel-permutation and independent-time-shift null ensembles; colored lines are observed branch values and the dotted line is the familywise 95th percentile. The lower-right panel shows geometric target/reference ratios, for which unity denotes no enrichment relative to the broader signed support. The observed geometric ratios are 0.95229 and 0.95227 and both familywise probabilities are $p=1.000$, so the predeclared $p\leq0.05$ requirement is not met. The result supplies no independent target-power enrichment and does not support a physical ambient arrival under this statistic. It does not invalidate F--K filtering, prove absence of weak coherent energy, identify wave type, or establish formation velocity.}
+\end{figure}
+}{
+\noindent\textit{The completed aggregate product is missing from this copy.
+Re-run the versioned aggregation command; do not substitute the 10-file pilot.}
+}
+
+\subsection{Independent and secondary controls}
+
+The exact-resolution unfiltered aggregate contains 11,523 weighted one-minute
+files. On the fixed 3.2~km~s$^{-1}$ trajectory, the causal score is 0.002711
+with permutation $p=0.341$ and the anti-causal score is 0.0000929 with
+$p=0.202$. These tests do not independently confirm the ridge, but they do
+not test whether F--K filtering is legitimate.
+
+Subtracting the mean surrogate correlation section as an estimated filter
+kernel gives inconsistent secondary results. The channel-permutation residual
+peaks near the upper search edge at 4.45~km~s$^{-1}$, only 0.05~km~s$^{-1}$ below the 4.5~km~s$^{-1}$ limit, with $p=0.0476$,
+whereas the independent-time-shift residual gives $p=0.952$ or larger and
+the 3.2~km~s$^{-1}$ residual score is negative. Disagreement between null
+families and the upper-edge peak preclude promotion as physical evidence.
+
+\takeaway{F--K filtering is valid, and the selected ambient observable repeats
+across held-out dates. Its physical interpretation remains unresolved: the
+v44 rejection was circular, the strict unfiltered control is weak, and the
+independent pre-filter test finds no target-power enrichment. No Green's-function, mode, or
+formation-$V_P$ claim is assigned until the validation is complete.}
 
 \subsection{Corrected seasonal signed-lag status}
 The corrected eight-day causal/anti-causal aggregation remains pending under
 retry array 38562360 and after-success postprocess
 38562403.  Consequently, no seasonal branch-amplitude
-asymmetry is promoted in v44.  This status is deliberately separate from the
+asymmetry is promoted in v45.  This status is deliberately separate from the
 completed held-out mask-sensitivity test, which used its own versioned
 products.
 
