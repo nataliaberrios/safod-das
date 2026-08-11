@@ -48,9 +48,11 @@ preferred in every band with bootstrap probability 1.000.
 speed varies by ~12% across the scanned bands.
 
 This matters for interpretation and should be stated rather than buried. Resolved
-dispersion is compatible with, but not unique to, guided propagation; unresolved
-dispersion would have been necessary but not sufficient evidence for direct
-body-wave propagation. **This test cannot separate direct P energy from a weakly
+dispersion excludes a direct arrival through a homogeneous medium, but it is
+equally produced by a refracted wave turning in a vertical velocity gradient — and
+Hole et al. (2006) map 1.5–3.5 km s⁻¹ in the shallow sedimentary section above the
+Salinian basement top at 0.77 km, which contains the whole Nano aperture and
+brackets 2950 m s⁻¹. **This test cannot separate refracted P from a weakly
 dispersive guided or coupled mode.** The Nano apparent speed is consequently
 reported as a property of a coherent fast apparent mode and not as a formation
 V_P.

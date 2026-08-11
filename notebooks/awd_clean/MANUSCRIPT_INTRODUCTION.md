@@ -39,9 +39,11 @@ The wavefield at SAFOD is also known not to be a simple body-wave field.
 Ellsworth & Malin showed that the SAFOD borehole crosses a channel of damaged,
 low-velocity fault-zone rock at 2.7 km depth which supports Love-type and
 Rayleigh-type fault-zone-guided waves along with a leaky mode travelling in the
-fault core. Guided propagation is therefore expected here, and an apparent
-velocity measured along a borehole should not be assumed to be a formation
-velocity. Lellouch et al. (2019) subsequently recorded the same site with
+fault core. Guided propagation is therefore expected here, and an apparent velocity measured
+along a borehole cannot be assumed to be a formation velocity without argument —
+though neither can it be assumed to be guided, since the shallow section carries a
+strong vertical velocity gradient (1.5–3.5 km s⁻¹ above the Salinian basement top
+at 0.77 km; Hole et al. 2006) that produces dispersion in refracted arrivals too. Lellouch et al. (2019) subsequently recorded the same site with
 downhole DAS and estimated P- and S-wave velocities from passive records,
 demonstrating that fibre in this hole resolves structure but also that the
 relationship between a DAS observable and a formation property requires care.

@@ -26,14 +26,24 @@ expectation. **This is a proposed mechanism, not a measured one.** No forward
 model of either installation was computed here, and the mode's generation point
 is not established.
 
-One observation sharpens the framing and cuts against the obvious reading. The
-Nano mode is *also* dispersive: frequency-dependent slowness is resolved at
-0.483 [0.414, 0.549] µs m⁻¹ Hz⁻¹, with apparent speed varying ~12% across
-15–80 Hz. The contrast is therefore **not** between a clean body wave on the
-cemented fibre and a guided wave on the wireline fibre. Both observables carry
-guided or coupled character, and neither apparent speed should be read as a
-formation velocity. What the installations differ in is *which* guided mode they
-present and how repeatably they present it.
+The Nano mode is *also* dispersive — frequency-dependent slowness is resolved at
+0.483 [0.414, 0.549] µs m⁻¹ Hz⁻¹, apparent speed falling ~12% from 15 to 80 Hz —
+but this does **not** establish guided character, and it should not be presented
+as if it did. Resolved dispersion rules out a direct arrival through a
+homogeneous medium. It is equally consistent with a refracted or diving wave in a
+vertical velocity gradient, where lower frequencies turn deeper in faster
+material, and the shallow section at this site has exactly such a gradient: Hole
+et al. (2006) map 1.5–3.5 km s⁻¹ in the late Cenozoic sedimentary rocks above the
+Salinian basement top at 0.77 km. The Nano aperture lies wholly within that
+interval, and 2950 m s⁻¹ falls squarely inside the mapped range.
+
+The honest position is therefore narrower than "both modes are guided". The Deep
+observable has positive evidence of guided character — a speed near borehole-fluid
+velocity, coherent on both limbs, surviving channel-order permutation. For Nano,
+a refracted P interpretation and a guided or coupled interpretation both remain
+viable, and this experiment does not separate them. Reporting the Nano
+observable by its apparent speed and frequency content, without a phase name, is
+a deliberate choice to avoid deciding a question the data leave open.
 
 ### Guided modes are the norm in this measurement class, not an anomaly
 
@@ -44,15 +54,17 @@ authors identify as "a Rayleigh wave-like tube wave along the service shaft
 surface" — a mode guided by a 300 m inclined mine shaft at 500 Hz, with
 c ≈ 3000 m s⁻¹.
 
-Two consequences follow.
+A numerical coincidence here is worth defusing rather than exploiting. De Fazio's
+mode also travels at ~3000 m s⁻¹, close to the Nano apparent speed, but the two
+numbers mean different things. Franklin marble has Vp ≈ 6000–6500 m s⁻¹ and
+Vs ≈ 3200–3400 m s⁻¹, so 3000 m s⁻¹ is roughly half the P velocity of their host
+rock and sits right at its Rayleigh velocity — which is why their Rayleigh-like
+identification is self-consistent. At SAFOD the same figure lies inside the
+mapped shallow Vp range. Equal apparent speeds in different rock, at 500 Hz
+against 30–60 Hz, in an air-filled shaft against a cemented borehole, imply no
+kinship between the modes.
 
-First, at ~3000 m s⁻¹ their guided mode is close in speed to the Nano observable
-(~2950 m s⁻¹) and far from the Deep one (~1547 m s⁻¹) — unsurprising, since an
-air-filled shaft guides a wall-hosted Rayleigh-like mode whereas a fluid-filled
-borehole supports a Stoneley/tube wave near fluid velocity. The two installations
-here plausibly sample opposite ends of that family.
-
-Second, and more usefully, **the comparison against the De Fazio benchmark is
+What does carry over is the interpretive category. **The comparison against the De Fazio benchmark is
 closer than it appears.** We are not comparing a guided-mode sensitivity against
 a formation-velocity prediction; we are comparing a guided-mode tidal response
 against another guided-mode tidal response, measured with a different source in a
