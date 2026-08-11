@@ -11,6 +11,10 @@ kind of data would make first, one per file, properly labelled.
   basic06  RMS amplitude against distance, signal and noise
   basic07  SNR against distance
   basic08  relative traveltime by inter-channel cross-correlation
+  basic09  the same drop bandpassed into six bands
+  basic10  spectrogram of one whole raw file at one channel
+  basic11  amplitude spectrum against distance
+  basic12  drops per burst across the survey
 
 Sources: `canonical_epoch_stacks_paired_deep_all.npz` for anything stacked, and
 one raw Nano file for the single drop.
@@ -96,7 +100,6 @@ def main():
     gather(despike(bandpass(one, fs, BAND)), fs,
            f"Shot gather, one drop (burst {burst_id}, {BAND[0]:g}-{BAND[1]:g} Hz)",
            "basic01_gather_one_drop.png")
-    del nano
 
     # ---- 02 stacked gather --------------------------------------------
     gather(S, fs, f"Shot gather, {n_drops} drops stacked "
@@ -250,6 +253,94 @@ def main():
     ax.grid(alpha=0.3)
     fig.tight_layout()
     fig.savefig(OUT_DIR / "basic08_moveout.png", dpi=150)
+    plt.close(fig)
+
+
+    # ---- 09 band comparison ---------------------------------------------
+    bands = [None, (1.0, 5.0), (5.0, 20.0), (20.0, 50.0), (50.0, 100.0),
+             (100.0, 250.0)]
+    fig, axes = plt.subplots(2, 3, figsize=(16, 9), sharex=True, sharey=True)
+    tt1 = np.arange(one.shape[1]) / fs - PRE_S
+    zz1 = np.arange(one.shape[0]) * DX_NANO
+    for a, bd in zip(axes.ravel(), bands):
+        x = despike(bandpass(one, fs, bd) if bd else one)
+        v = np.percentile(np.abs(x), 99.7)
+        im = a.pcolormesh(tt1, zz1, x, cmap="seismic", vmin=-v, vmax=v,
+                          shading="auto")
+        a.set_title("unfiltered" if bd is None else f"{bd[0]:g}-{bd[1]:g} Hz")
+        plt.colorbar(im, ax=a, label=r"$\mu\varepsilon$ s$^{-1}$")
+    axes[0, 0].set_ylim(ZMAX, 0)
+    axes[0, 0].set_xlim(-0.1, 0.8)
+    for a in axes[1]:
+        a.set_xlabel("time (s)")
+    for a in axes[:, 0]:
+        a.set_ylabel("distance along fiber (m)")
+    fig.suptitle(f"One drop bandpassed into six bands (burst {burst_id})")
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "basic09_bands.png", dpi=150)
+    plt.close(fig)
+
+    # ---- 10 spectrogram --------------------------------------------------
+    from scipy.signal import spectrogram as _spec
+    c_spec = min(int(150.0 / DX_NANO), nano.shape[0] - 1)
+    ff, ts_, Sxx = _spec(nano[c_spec].astype(float), fs=fs, nperseg=2048,
+                         noverlap=1024)
+    db = 10 * np.log10(Sxx + 1e-30)
+    fig, ax = plt.subplots(figsize=(12, 6.5))
+    im = ax.pcolormesh(ts_, ff, db, cmap="magma", shading="auto",
+                       vmin=np.percentile(db, 5), vmax=np.percentile(db, 99.5))
+    for dr in drops:
+        ax.axvline((dr["utc_time"] - nano_time(name)).total_seconds(),
+                   color="c", lw=0.6, alpha=0.75)
+    ax.set_ylim(0, 200)
+    ax.set_xlabel("seconds into the 5-minute raw file")
+    ax.set_ylabel("frequency (Hz)")
+    ax.set_title(f"Spectrogram at {c_spec * DX_NANO:.0f} m "
+                 f"(cyan = drop times from the manifest)")
+    plt.colorbar(im, ax=ax, label="dB")
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "basic10_spectrogram.png", dpi=150)
+    plt.close(fig)
+    del nano
+
+    # ---- 11 spectrum against distance ------------------------------------
+    nfft = sig.shape[1]
+    A = np.abs(np.fft.rfft(sig, axis=1))
+    fq = np.fft.rfftfreq(nfft, 1 / fs)
+    m = (fq >= 1) & (fq <= 200)
+    AdB = 20 * np.log10(A[:, m] + 1e-30)
+    fig, ax = plt.subplots(figsize=(10, 7.5))
+    im = ax.pcolormesh(fq[m], z, AdB, cmap="magma", shading="auto",
+                       vmin=np.percentile(AdB, 5), vmax=np.percentile(AdB, 99.5))
+    ax.set_ylim(ZMAX, 0)
+    ax.set_xscale("log")
+    ax.set_xlabel("frequency (Hz)")
+    ax.set_ylabel("distance along fiber (m)")
+    ax.set_title(f"Signal amplitude spectrum against distance, "
+                 f"{n_drops}-drop stack")
+    plt.colorbar(im, ax=ax, label="dB")
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "basic11_spectrum_vs_distance.png", dpi=150)
+    plt.close(fig)
+
+    # ---- 12 survey fold ---------------------------------------------------
+    from collections import Counter
+    per = Counter(r["burst_id"] for r in rows if r["nano_available"])
+    bids = sorted(per)
+    t0 = min(r["utc_time"] for r in rows)
+    hrs = []
+    for b in bids:
+        ts = [r["utc_time"] for r in rows if r["burst_id"] == b]
+        hrs.append((min(ts) - t0).total_seconds() / 3600.0)
+    fig, ax = plt.subplots(figsize=(11, 5.5))
+    ax.bar(hrs, [per[b] for b in bids], width=0.25, color="0.35")
+    ax.set_xlabel("hours into the survey")
+    ax.set_ylabel("drops in burst")
+    ax.set_title(f"Survey timeline: {sum(per.values())} drops in "
+                 f"{len(bids)} bursts")
+    ax.grid(alpha=0.3, axis="y")
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "basic12_survey_fold.png", dpi=150)
     plt.close(fig)
 
     j = np.argmin(np.abs(z - 460))
