@@ -10,7 +10,7 @@ installations behave differently.
 
 ---
 
-## 5.1 Why the two installations recover different modes
+### 5.1 Why the two installations recover different modes
 
 The cemented Nano fibre records a coherent mode near 2950 m s⁻¹, strongest at
 30–60 Hz. The wireline Deep fibre records a mode near 1547 m s⁻¹, strongest at
@@ -45,7 +45,7 @@ viable, and this experiment does not separate them. Reporting the Nano
 observable by its apparent speed and frequency content, without a phase name, is
 a deliberate choice to avoid deciding a question the data leave open.
 
-### Guided modes are the norm in this measurement class, not an anomaly
+#### Guided modes are the norm in this measurement class, not an anomaly
 
 It is worth noting how much company these observables keep. Ellsworth & Malin
 document fault-zone-guided waves crossing the SAFOD borehole at 2.7 km. And the
@@ -86,7 +86,7 @@ guided mode's sensitivity to strain is a property of the guiding structure as
 much as of the rock. That is precisely why this paper reports apparent
 guided-mode velocity changes and does not convert them into formation properties.
 
-## 5.2 A repeatable source is not a precision source
+### 5.2 A repeatable source is not a precision source
 
 The accelerated weight drop is unambiguously repeatable at the level of waveform
 similarity. Median within-burst drop correlation is 0.889 in the signal window
@@ -113,7 +113,7 @@ per second and stacked to one high-SNR record every ~45 min. A repeated impact
 source occupies a different regime: it is cheap and portable, its individual
 realisations are noisy, and its usable precision is bought entirely by stacking.
 
-## 5.3 A longer lever arm does not convert one-for-one
+### 5.3 A longer lever arm does not convert one-for-one
 
 This is the paper's central quantitative result and the one that generalises.
 
@@ -144,7 +144,7 @@ Stated as design guidance: for a target fractional sensitivity, an experiment
 must specify both terms. Reporting aperture or depth alone does not constrain
 monitoring performance.
 
-## 5.4 Why the return branch does not support an installation-wide claim
+### 5.4 Why the return branch does not support an installation-wide claim
 
 Sensitivity is not uniform across the wireline installation. The outbound branch
 reaches a reliable-detection level of 0.5%; the return branch reaches 1.0%,
@@ -172,7 +172,7 @@ wrong-observable controls should fail — could not be evaluated, because those
 controls proved non-diagnostic (§5.5). Rather than reinterpret a frozen criterion
 after seeing the result, the branch is reported as unclassified.
 
-## 5.5 What these measurements do and do not represent
+### 5.5 What these measurements do and do not represent
 
 The recovered quantity is a fractional change in the apparent along-fibre speed
 of a selected guided mode. It is not a formation V_P or V_S change, and it is not
@@ -200,7 +200,7 @@ whether the selected mode is uniquely responsible, and they behave identically o
 both legs. The 60–120 Hz band, where no mode was validated and no reliable
 detection level is reached, is the wrong-observable control that does work.
 
-## 5.6 Implications for repeated-source borehole DAS monitoring
+### 5.6 Implications for repeated-source borehole DAS monitoring
 
 Four points follow for anyone designing a comparable experiment.
 
@@ -224,7 +224,7 @@ of ρ = 0.121. It did not lower the smallest tested reliable-detection level,
 which remained 0.5% for every weighting. Precision gains show up continuously;
 detection levels move in discrete steps.
 
-## 5.7 Small-signal benchmark and the limits of this survey
+### 5.7 Small-signal benchmark and the limits of this survey
 
 Two distinct literature scales appear below and must not be conflated. The
 **Niu SAFOD expected-response scale** is what a tidal response *should* be at this

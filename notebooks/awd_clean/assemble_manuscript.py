@@ -23,25 +23,41 @@ OUT = HERE / "MANUSCRIPT.md"
 
 # (file, start marker, end marker or None for end-of-file, heading override)
 SECTIONS = [
+    # Abstract
     ("MANUSCRIPT_ABSTRACT_CONCLUSIONS.md", "## Abstract",
      "**Candidate result sentence for the body**", None),
+    # 1 Introduction
     ("MANUSCRIPT_INTRODUCTION.md", "## 1. Introduction",
      "## Citation notes and verification status", None),
+    # 2 Experiment, then Methods 3.1-3.2
     ("MANUSCRIPT_METHODS.md", "## 2. Experiment and instrumentation",
+     "### 3.5 Source repeatability metrics", None),
+    # Methods 3.3-3.4 (Deep observable and estimator)
+    ("DEEP_DVV_METHODS_DRAFT.md",
+     "### 3.3 Deep guided-mode identification and split-sample validation",
+     "### 3.7 Blind injection–recovery: Deep", None),
+    # Methods 3.5-3.6 (repeatability, Nano calibration)
+    ("MANUSCRIPT_METHODS.md", "### 3.5 Source repeatability metrics",
      "## Remaining Methods subsections", None),
-    ("DEEP_DVV_METHODS_DRAFT.md", "### Observable and split-sample selection",
-     "## Results", "### 3.13 Deep observable, estimator and calibration"),
-    ("MANUSCRIPT_RESULTS.md", "## 4.1 Installation dependence",
-     "## Cross-references for the remaining Results sections", None),
-    ("DEEP_DVV_METHODS_DRAFT.md", "### Calibrated sensitivity",
+    # Methods 3.7-3.8 (Deep calibration, controls)
+    ("DEEP_DVV_METHODS_DRAFT.md", "### 3.7 Blind injection–recovery: Deep",
+     "## Results", None),
+    # 4.1-4.5 Results
+    ("MANUSCRIPT_RESULTS.md", "### 4.1 Installation dependence",
+     "## Cross-references for the remaining Results sections", "## 4. Results\n"),
+    # 4.6 Sensitivity results
+    ("DEEP_DVV_METHODS_DRAFT.md",
+     "#### 4.6.1 Calibrated sensitivity of all three observables",
      "## Manuscript-ready summary paragraph",
-     "## 4.6 Deep sensitivity, paired legs and the Nano comparison"),
-    ("MANUSCRIPT_DISCUSSION.md", "## 5.1 Why the two installations",
-     None, None),
+     "### 4.6 Sensitivity calibration and the Nano\u2013Deep comparison\n"),
+    # 5 Discussion
+    ("MANUSCRIPT_DISCUSSION.md", "### 5.1 Why the two installations", None,
+     "## 5. Discussion\n"),
+    # 6 Conclusions
     ("MANUSCRIPT_ABSTRACT_CONCLUSIONS.md", "## 6. Conclusions",
-     "## Interpretation limits carried into the conclusions", None),
+     "### 6.6 Interpretation limits carried into the conclusions", None),
     ("MANUSCRIPT_ABSTRACT_CONCLUSIONS.md",
-     "## Interpretation limits carried into the conclusions",
+     "### 6.6 Interpretation limits carried into the conclusions",
      "## Outstanding before submission", None),
 ]
 
@@ -82,9 +98,8 @@ def main() -> None:
     for filename, start, end, heading in SECTIONS:
         body = extract(filename, start, end)
         if heading is not None:
-            # Replace the source's own first heading with the manuscript's
-            first_newline = body.index("\n")
-            body = heading + body[first_newline:]
+            # Prepend a manuscript-level heading above the source's own
+            body = heading + "\n" + body
         parts.append(body)
         parts.append("\n\n---\n\n")
     OUT.write_text("\n".join(parts).rstrip() + "\n")

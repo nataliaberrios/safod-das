@@ -117,7 +117,7 @@ hierarchy is given in §3.5.
 
 ---
 
-## 3. Methods — Nano subsections
+## 3. Methods
 
 ### 3.1 Preprocessing and coordinate conventions
 
@@ -199,7 +199,7 @@ distinguish direct P energy from a weakly dispersive guided or coupled mode.**
 The manuscript should therefore describe the Nano observable as a coherent fast
 apparent mode and must not present its apparent speed as a formation V_P.
 
-### 3.5 Repeatability metrics
+### 3.5 Source repeatability metrics
 
 Repeatability was quantified on a fixed, phase-neutral moveout beam
 (`nano_hierarchical_repeatability.py`): 30–60 Hz, 80–440 m aperture, 2975 m s⁻¹,
@@ -242,7 +242,7 @@ into a repeatable observable.
 whereas the median *across-burst template* delay is −0.048 ms. The −0.048 ms
 figure is the across-burst quantity.
 
-### 3.6 Nano injection–recovery
+### 3.6 Blind injection–recovery: Nano
 
 Nano sensitivity was calibrated with the same three-stage blinded design later
 applied to Deep — inject, recover, summarise — with a sealed truth table read

@@ -10,7 +10,7 @@ Every number is transcribed from a generated output, named inline.
 
 ---
 
-## 4.1 Installation dependence of the observable wavefield
+### 4.1 Installation dependence of the observable wavefield
 
 The same repeated surface source, recorded on two borehole DAS installations in
 the same hole during the same nominal 24 h survey, yields two different coherent
@@ -31,7 +31,7 @@ wavefield. This is the paper's organising result: **installation controls which
 coherent mode is observable**, and — as the sensitivity results show — how useful
 that mode is for time-lapse monitoring.
 
-## 4.2 The Nano coherent fast apparent mode
+### 4.2 The Nano coherent fast apparent mode
 
 From `nano_mode_identification.py`, a burst-bootstrap signed-slowness semblance
 scan over 46 bursts and 859 common drops, with 999 resamples:
@@ -61,7 +61,7 @@ dispersive guided or coupled mode.** The Nano apparent speed is consequently
 reported as a property of a coherent fast apparent mode and not as a formation
 V_P.
 
-## 4.3 The Deep slow guided mode
+### 4.3 The Deep slow guided mode
 
 Trajectories were selected independently on each leg using only the 23
 discovery-half bursts (`deep_dvv_frozen_trajectory.json`):
@@ -87,7 +87,7 @@ curvature or dispersion along the leg. The manuscript should quote the frozen
 global values (1544.6, 1549.7 m s⁻¹) for the observable and cite the local range
 separately, rather than presenting the range as uncertainty on the global value.
 
-## 4.4 Independent validation of the Deep mode
+### 4.4 Independent validation of the Deep mode
 
 From `deep_tube_validation.py`: trajectories selected on the 23 odd-indexed
 discovery bursts, evaluated on the 23 even-indexed validation bursts, against 499
@@ -121,7 +121,7 @@ The pre-registration's leg designation cites the **rank-1** pair, 0.353 against
 0.147, a factor of 2.4. Whichever is quoted, it must be labelled, because the
 implied outbound-to-return contrast differs by nearly 50% between them.
 
-## 4.5 Source repeatability, from individual drops to burst stacks
+### 4.5 Source repeatability, from individual drops to burst stacks
 
 From `nano_hierarchical_repeatability.py`, on a fixed phase-neutral 30–60 Hz
 moveout beam. Population is 988 Nano-available drops across all 49 bursts —

@@ -253,7 +253,7 @@ hierarchy is given in §3.5.
 
 ---
 
-## 3. Methods — Nano subsections
+## 3. Methods
 
 ### 3.1 Preprocessing and coordinate conventions
 
@@ -335,7 +335,39 @@ distinguish direct P energy from a weakly dispersive guided or coupled mode.**
 The manuscript should therefore describe the Nano observable as a coherent fast
 apparent mode and must not present its apparent speed as a formation V_P.
 
-### 3.5 Repeatability metrics
+
+---
+
+
+### 3.3 Deep guided-mode identification and split-sample validation
+
+We measured fractional changes in the apparent along-fibre speed of the repeatable slow guided mode recorded by the Deep fibre during the June 2026 accelerated weight-drop survey. The recovered quantity is an observable-level apparent-speed change and is not interpreted as a formation velocity change.
+
+The Deep system recorded 3200 channels at 1000 Hz with 2.0419 m channel spacing. The fibre reverses at channel 1702, producing outbound and return legs. The return leg was re-indexed so that distance increases away from the surface end on both legs. Analysis was restricted to 200–3000 m along each leg and decimated by a factor of six, giving approximately 12.25 m spatial sampling and 229 analysed channels per leg.
+
+Of the 49 bursts in the survey, 46 contained drops common to the Nano and Deep records; the Deep fibre stopped recording after burst 45, so the final three bursts have Nano coverage only and could not have entered a Deep analysis by any route (see `MANUSCRIPT_METHODS.md` §2.3). The analysed set is 859 common drops. These bursts were divided by parity following the earlier split-sample mode validation: 23 odd-indexed bursts formed the discovery set and 23 even-indexed bursts were held out for calibration. The outbound and return legs therefore use the same 23 held-out source bursts and constitute paired observations of distinct fibre paths; they are not 46 independent measurements.
+
+For each leg and frequency band, one linear trajectory was selected using only the discovery-set stack. The search maximised semblance over the full leg for apparent speeds between 1300 and 1800 m s⁻¹ and intercepts between −0.10 and +0.40 s in 2 ms increments. The primary 15–30 Hz trajectories were then frozen at 1544.6 m s⁻¹ and +0.100 s for the outbound leg and 1549.7 m s⁻¹ and +0.346 s for the return leg. The independently selected speeds agree to 0.3%. A 3–15 Hz analysis was retained as a secondary robustness test, and 60–120 Hz, where no coherent mode had been validated, was used as a control band.
+
+### 3.4 Moveout correction, beam construction and the delay-gradient estimator
+
+A fractional speed change produces a delay that accumulates with reference travel time, whereas a source or trigger error shifts the wavefield approximately uniformly. For each burst, we therefore measured delays at multiple positions along the frozen trajectory and fitted
+
+\[
+\Delta t(s)=a-\epsilon T_0(s),
+\]
+
+where \(T_0(s)\) is the reference travel time, \(a\) is a free intercept that absorbs common-mode timing error, and \(\epsilon\) is the fractional change in apparent speed.
+
+Each leg was divided into 400 m apertures with 200 m spacing, producing twelve apertures per leg. Within each aperture, channels were aligned to the frozen trajectory and averaged into a local beam after each channel was normalised by its time-independent root-mean-square amplitude. Delays relative to a count-weighted leave-one-burst-out reference were estimated by normalised cross-correlation with parabolic sub-sample refinement. The correlation window extended from −80 to +160 ms around the predicted arrival, and the maximum allowed lag was 30 ms.
+
+Apertures were retained when correlation was at least 0.30 and the estimated delay remained within 90% of the lag bound. At least six apertures were required. The delay gradient was estimated with Huber iteratively reweighted least squares, using squared correlation as the weight, and \(\epsilon\) was taken as the negative fitted slope. The delay estimator, robust regression, injection grid, and detection definition were imported directly from the Nano analysis so that the Nano–Deep comparison could not arise from different estimator implementations.
+
+
+---
+
+
+### 3.5 Source repeatability metrics
 
 Repeatability was quantified on a fixed, phase-neutral moveout beam
 (`nano_hierarchical_repeatability.py`): 30–60 Hz, 80–440 m aperture, 2975 m s⁻¹,
@@ -378,7 +410,7 @@ into a repeatable observable.
 whereas the median *across-burst template* delay is −0.048 ms. The −0.048 ms
 figure is the across-burst quantity.
 
-### 3.6 Nano injection–recovery
+### 3.6 Blind injection–recovery: Nano
 
 Nano sensitivity was calibrated with the same three-stage blinded design later
 applied to Deep — inject, recover, summarise — with a sealed truth table read
@@ -412,31 +444,7 @@ lever arm of 1.398 s is compared.
 ---
 
 
-### 3.13 Deep observable, estimator and calibration
-
-We measured fractional changes in the apparent along-fibre speed of the repeatable slow guided mode recorded by the Deep fibre during the June 2026 accelerated weight-drop survey. The recovered quantity is an observable-level apparent-speed change and is not interpreted as a formation velocity change.
-
-The Deep system recorded 3200 channels at 1000 Hz with 2.0419 m channel spacing. The fibre reverses at channel 1702, producing outbound and return legs. The return leg was re-indexed so that distance increases away from the surface end on both legs. Analysis was restricted to 200–3000 m along each leg and decimated by a factor of six, giving approximately 12.25 m spatial sampling and 229 analysed channels per leg.
-
-Of the 49 bursts in the survey, 46 contained drops common to the Nano and Deep records; the Deep fibre stopped recording after burst 45, so the final three bursts have Nano coverage only and could not have entered a Deep analysis by any route (see `MANUSCRIPT_METHODS.md` §2.3). The analysed set is 859 common drops. These bursts were divided by parity following the earlier split-sample mode validation: 23 odd-indexed bursts formed the discovery set and 23 even-indexed bursts were held out for calibration. The outbound and return legs therefore use the same 23 held-out source bursts and constitute paired observations of distinct fibre paths; they are not 46 independent measurements.
-
-For each leg and frequency band, one linear trajectory was selected using only the discovery-set stack. The search maximised semblance over the full leg for apparent speeds between 1300 and 1800 m s⁻¹ and intercepts between −0.10 and +0.40 s in 2 ms increments. The primary 15–30 Hz trajectories were then frozen at 1544.6 m s⁻¹ and +0.100 s for the outbound leg and 1549.7 m s⁻¹ and +0.346 s for the return leg. The independently selected speeds agree to 0.3%. A 3–15 Hz analysis was retained as a secondary robustness test, and 60–120 Hz, where no coherent mode had been validated, was used as a control band.
-
-### Apparent-speed estimator
-
-A fractional speed change produces a delay that accumulates with reference travel time, whereas a source or trigger error shifts the wavefield approximately uniformly. For each burst, we therefore measured delays at multiple positions along the frozen trajectory and fitted
-
-\[
-\Delta t(s)=a-\epsilon T_0(s),
-\]
-
-where \(T_0(s)\) is the reference travel time, \(a\) is a free intercept that absorbs common-mode timing error, and \(\epsilon\) is the fractional change in apparent speed.
-
-Each leg was divided into 400 m apertures with 200 m spacing, producing twelve apertures per leg. Within each aperture, channels were aligned to the frozen trajectory and averaged into a local beam after each channel was normalised by its time-independent root-mean-square amplitude. Delays relative to a count-weighted leave-one-burst-out reference were estimated by normalised cross-correlation with parabolic sub-sample refinement. The correlation window extended from −80 to +160 ms around the predicted arrival, and the maximum allowed lag was 30 ms.
-
-Apertures were retained when correlation was at least 0.30 and the estimated delay remained within 90% of the lag bound. At least six apertures were required. The delay gradient was estimated with Huber iteratively reweighted least squares, using squared correlation as the weight, and \(\epsilon\) was taken as the negative fitted slope. The delay estimator, robust regression, injection grid, and detection definition were imported directly from the Nano analysis so that the Nano–Deep comparison could not arise from different estimator implementations.
-
-### Blind injection–recovery calibration
+### 3.7 Blind injection–recovery: Deep, blinding and reliability definitions
 
 Sensitivity was calibrated by injecting known fractional speed changes into real held-out data and recovering them through the complete processing chain. For an injected change \(\epsilon_{\mathrm{inj}}\), each channel trace was shifted by \(-\epsilon_{\mathrm{inj}}T_0(s)\) before beamforming. Fifteen levels were tested: zero and \(\pm 1\times10^{-4}\), \(\pm 2\times10^{-4}\), \(\pm 5\times10^{-4}\), \(\pm 1\times10^{-3}\), \(\pm 2\times10^{-3}\), \(\pm 5\times10^{-3}\), and \(\pm 1\times10^{-2}\). This produced 345 trials for each leg and band.
 
@@ -444,7 +452,7 @@ Injection and recovery were separated into blinded stages. The injection stage w
 
 Recovered values were centred on the zero-injection median. The empirical two-sided null threshold was defined as the 95th percentile of the absolute centred zero-injection estimates. The reliable-detection level was the smallest tested magnitude for which at least 95% of trials both exceeded that threshold and had the correct sign in both the positive and negative directions. This is the same criterion used for the Nano observable.
 
-### Controls and paired-leg estimator
+### 3.8 Controls, influence diagnostics and the paired-leg estimator
 
 The primary controls tested synthetic recovery, common-mode timing rejection, dependence on individual apertures or bursts, reference construction, aperture length, and an unvalidated frequency band. Noiseless synthetic guided modes were generated on each leg’s real geometry and perturbed both by re-synthesis at an altered speed and by the injection routine. Timing controls applied either a constant 5 ms shift to every channel or a random per-burst common shift. Influence was assessed by leave-one-aperture-out and leave-one-burst-out analyses.
 
@@ -456,7 +464,9 @@ Because the two legs observe the same source bursts, combinations were formed fr
 ---
 
 
-## 4.1 Installation dependence of the observable wavefield
+## 4. Results
+
+### 4.1 Installation dependence of the observable wavefield
 
 The same repeated surface source, recorded on two borehole DAS installations in
 the same hole during the same nominal 24 h survey, yields two different coherent
@@ -477,7 +487,7 @@ wavefield. This is the paper's organising result: **installation controls which
 coherent mode is observable**, and — as the sensitivity results show — how useful
 that mode is for time-lapse monitoring.
 
-## 4.2 The Nano coherent fast apparent mode
+### 4.2 The Nano coherent fast apparent mode
 
 From `nano_mode_identification.py`, a burst-bootstrap signed-slowness semblance
 scan over 46 bursts and 859 common drops, with 999 resamples:
@@ -507,7 +517,7 @@ dispersive guided or coupled mode.** The Nano apparent speed is consequently
 reported as a property of a coherent fast apparent mode and not as a formation
 V_P.
 
-## 4.3 The Deep slow guided mode
+### 4.3 The Deep slow guided mode
 
 Trajectories were selected independently on each leg using only the 23
 discovery-half bursts (`deep_dvv_frozen_trajectory.json`):
@@ -533,7 +543,7 @@ curvature or dispersion along the leg. The manuscript should quote the frozen
 global values (1544.6, 1549.7 m s⁻¹) for the observable and cite the local range
 separately, rather than presenting the range as uncertainty on the global value.
 
-## 4.4 Independent validation of the Deep mode
+### 4.4 Independent validation of the Deep mode
 
 From `deep_tube_validation.py`: trajectories selected on the 23 odd-indexed
 discovery bursts, evaluated on the 23 even-indexed validation bursts, against 499
@@ -567,7 +577,7 @@ The pre-registration's leg designation cites the **rank-1** pair, 0.353 against
 0.147, a factor of 2.4. Whichever is quoted, it must be labelled, because the
 implied outbound-to-return contrast differs by nearly 50% between them.
 
-## 4.5 Source repeatability, from individual drops to burst stacks
+### 4.5 Source repeatability, from individual drops to burst stacks
 
 From `nano_hierarchical_repeatability.py`, on a fixed phase-neutral 30–60 Hz
 moveout beam. Population is 988 Nano-available drops across all 49 bursts —
@@ -616,7 +626,9 @@ is +0.009 ms, whereas the median *across-burst template* delay is −0.048 ms.
 ---
 
 
-## 4.6 Deep sensitivity, paired legs and the Nano comparison
+### 4.6 Sensitivity calibration and the Nano–Deep comparison
+
+#### 4.6.1 Calibrated sensitivity of all three observables
 
 ![Blind injection–recovery calibration of the Deep guided-mode observable](deep_dvv_injection_recovery.png)
 
@@ -633,7 +645,7 @@ The preselected outbound branch reached a reliable-detection level of \(5\times1
 
 The selected outbound Deep branch therefore resolved a tested change a factor of two smaller than Nano. The return branch did not improve on Nano. The supported claim is consequently branch-specific: the selected outbound Deep observable is more sensitive than the Nano apparent-moveout observable under this acquisition and processing design, but the Deep installation as a whole is not shown to outperform Nano.
 
-### Timing rejection and robustness
+#### 4.6.2 Timing rejection and robustness
 
 The primary synthetic tests passed on both legs. The worst fractional scale errors were 0.0048 for outbound and 0.0040 for return, zero injection recovered zero, and all injected signs were recovered correctly. In contrast, the 60–120 Hz control band failed the synthetic criterion and did not reach a reliable-detection level in the real-data analysis.
 
@@ -641,17 +653,17 @@ The free intercept separated common-mode timing from propagation delay. A 5 ms c
 
 All primary trials retained at least eleven apertures. Removing one aperture changed the estimate by at most 0.55 times the outbound threshold and 0.52 times the return threshold at the 95th percentile. Removing one burst changed the inferred null threshold by at most 0.16 times the outbound threshold and 0.27 times the return threshold. The result is therefore not carried by a single aperture or burst.
 
-### Why the long Deep aperture yields only a twofold gain
+#### 4.6.3 Why the long Deep aperture yields only a twofold gain
 
 The operative regression lever arm, measured across aperture centres used in the fit, was 1.398 s for Deep outbound and 0.121 s for Nano, an 11.5-fold geometric advantage. The observed null scatter improved by only a factor of 1.55. Expressed as an equivalent per-burst timing repeatability, Nano achieved approximately 0.225 ms whereas Deep outbound achieved 1.68 ms, making Deep about 7.4 times worse in timing repeatability. Most of the geometric advantage was therefore consumed by poorer burst-to-burst timing precision, leaving an approximately twofold improvement in tested reliable sensitivity rather than an 11.5-fold improvement.
 
-### Paired-leg combination
+#### 4.6.4 Paired-leg combination
 
 The zero-injection errors of the two legs were nearly uncorrelated, with \(\rho=+0.121\), so the return leg supplied partially independent information despite sharing the same source impacts. Pairing reduced the core null scatter from \(1.20\times10^{-3}\) for outbound to \(8.12\times10^{-4}\) for the inverse-variance estimator, an improvement of about 1.4. The equal-weight and covariance-aware estimators produced comparable scatter reductions.
 
 However, every paired estimator retained the same smallest tested reliable-detection level as outbound, \(5\times10^{-3}\). The injection grid jumps from \(2\times10^{-3}\) to \(5\times10^{-3}\), so a 1.4-fold precision gain cannot produce a lower reported tested level. The appropriate conclusion is therefore: **combining the two Deep legs reduced the empirical noise floor but did not lower the smallest tested 95% reliable-detection level.**
 
-### Return-leg interpretation
+#### 4.6.5 Return-leg interpretation
 
 The return-leg calibration itself is resolved: its primary 15–30 Hz reliable-detection level is 1%, equal to Nano. What remains unresolved is why it performs more weakly than outbound. The synthetic, timing, monotonicity, aperture-yield, and influence checks pass, and its null scatter is only 10% larger than outbound despite substantially lower validation beam power.
 
@@ -659,7 +671,7 @@ The displaced-intercept and slowness-offset controls cannot identify the cause. 
 
 ---
 
-## Interpretation and claim boundary
+#### 4.6.6 Interpretation and claim boundary
 
 The recovered quantity is a fractional change in the apparent along-fibre speed of the selected slow guided mode. It has no depth resolution and is not a measurement of formation \(V_P\) or \(V_S\), fault-zone stress, pore pressure, permeability, fracture compliance, or tectonic strain. Conversion to any of these quantities would require a guided-wave forward model and independent constraints not available here.
 
@@ -673,7 +685,9 @@ The all-46-burst analysis is not used for the headline claim because the traject
 ---
 
 
-## 5.1 Why the two installations recover different modes
+## 5. Discussion
+
+### 5.1 Why the two installations recover different modes
 
 The cemented Nano fibre records a coherent mode near 2950 m s⁻¹, strongest at
 30–60 Hz. The wireline Deep fibre records a mode near 1547 m s⁻¹, strongest at
@@ -708,7 +722,7 @@ viable, and this experiment does not separate them. Reporting the Nano
 observable by its apparent speed and frequency content, without a phase name, is
 a deliberate choice to avoid deciding a question the data leave open.
 
-### Guided modes are the norm in this measurement class, not an anomaly
+#### Guided modes are the norm in this measurement class, not an anomaly
 
 It is worth noting how much company these observables keep. Ellsworth & Malin
 document fault-zone-guided waves crossing the SAFOD borehole at 2.7 km. And the
@@ -749,7 +763,7 @@ guided mode's sensitivity to strain is a property of the guiding structure as
 much as of the rock. That is precisely why this paper reports apparent
 guided-mode velocity changes and does not convert them into formation properties.
 
-## 5.2 A repeatable source is not a precision source
+### 5.2 A repeatable source is not a precision source
 
 The accelerated weight drop is unambiguously repeatable at the level of waveform
 similarity. Median within-burst drop correlation is 0.889 in the signal window
@@ -776,7 +790,7 @@ per second and stacked to one high-SNR record every ~45 min. A repeated impact
 source occupies a different regime: it is cheap and portable, its individual
 realisations are noisy, and its usable precision is bought entirely by stacking.
 
-## 5.3 A longer lever arm does not convert one-for-one
+### 5.3 A longer lever arm does not convert one-for-one
 
 This is the paper's central quantitative result and the one that generalises.
 
@@ -807,7 +821,7 @@ Stated as design guidance: for a target fractional sensitivity, an experiment
 must specify both terms. Reporting aperture or depth alone does not constrain
 monitoring performance.
 
-## 5.4 Why the return branch does not support an installation-wide claim
+### 5.4 Why the return branch does not support an installation-wide claim
 
 Sensitivity is not uniform across the wireline installation. The outbound branch
 reaches a reliable-detection level of 0.5%; the return branch reaches 1.0%,
@@ -835,7 +849,7 @@ wrong-observable controls should fail — could not be evaluated, because those
 controls proved non-diagnostic (§5.5). Rather than reinterpret a frozen criterion
 after seeing the result, the branch is reported as unclassified.
 
-## 5.5 What these measurements do and do not represent
+### 5.5 What these measurements do and do not represent
 
 The recovered quantity is a fractional change in the apparent along-fibre speed
 of a selected guided mode. It is not a formation V_P or V_S change, and it is not
@@ -863,7 +877,7 @@ whether the selected mode is uniquely responsible, and they behave identically o
 both legs. The 60–120 Hz band, where no mode was validated and no reliable
 detection level is reached, is the wrong-observable control that does work.
 
-## 5.6 Implications for repeated-source borehole DAS monitoring
+### 5.6 Implications for repeated-source borehole DAS monitoring
 
 Four points follow for anyone designing a comparable experiment.
 
@@ -887,7 +901,7 @@ of ρ = 0.121. It did not lower the smallest tested reliable-detection level,
 which remained 0.5% for every weighting. Precision gains show up continuously;
 detection levels move in discrete steps.
 
-## 5.7 Small-signal benchmark and the limits of this survey
+### 5.7 Small-signal benchmark and the limits of this survey
 
 Two distinct literature scales appear below and must not be conflated. The
 **Niu SAFOD expected-response scale** is what a tidal response *should* be at this
@@ -974,7 +988,7 @@ gains accrue continuously; detection levels move in discrete steps.
 ---
 
 
-## Interpretation limits carried into the conclusions
+### 6.6 Interpretation limits carried into the conclusions
 
 The measured quantity throughout is a fractional change in the apparent
 along-fibre speed of a selected guided mode. It is not a formation V_P or V_S

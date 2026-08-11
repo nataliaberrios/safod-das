@@ -93,7 +93,7 @@ gains accrue continuously; detection levels move in discrete steps.
 
 ---
 
-## Interpretation limits carried into the conclusions
+### 6.6 Interpretation limits carried into the conclusions
 
 The measured quantity throughout is a fractional change in the apparent
 along-fibre speed of a selected guided mode. It is not a formation V_P or V_S
