@@ -303,17 +303,23 @@ not the nominal 24 h. That slightly worsens the diurnal-versus-drift degeneracy.
 
 ## 10. Known caveats
 
-- **The "De Fazio scale" of 5×10⁻⁴ is unverified.** The 1973 scan's text layer
-  drops superscripts; the observed tidal velocity change reads as "of the order
-  of 10⁻[illegible]". Recoverable: it exceeds the laboratory prediction of
-  10⁻⁵–10⁻⁶ and the authors stress in-situ sensitivity is "much greater" than
-  laboratory values, placing it at order 10⁻⁴. Beware the trap — the paper does
-  contain "a velocity change (Δc/c) of about 5×10⁻⁵", but that is the phase-to-
-  velocity conversion (1° ↔ 5×10⁻⁵), not the tidal amplitude. This affects only
-  the multiplier: the Deep upper limit of 1.03×10⁻³ is 2.05× a 5×10⁻⁴ benchmark
-  and ~10× a 1×10⁻⁴ one, so "cannot resolve a De Fazio-scale change" holds either
-  way and holds more strongly under the smaller value. Settle from a clean copy
-  before submission.
+- **The "De Fazio scale" of 5×10⁻⁴ — resolved by rendering the page.** The text
+  layer drops superscripts, so an earlier reading of "order 10⁻⁴" was wrong. The
+  rendered page states: *"The experiment has yielded a velocity change of the
+  order of 10⁻³."* Figure 3's velocity-change scale bar is Δc/c = 2×10⁻⁴ with
+  φ = 4°, consistent with the paper's 1° ↔ 5×10⁻⁵ phase-to-velocity conversion.
+  The project's 5×10⁻⁴ is therefore a defensible peak-to-peak reading of Figure 3,
+  and the authors' "order of 10⁻³" is their own rounding of that same trace.
+  Beware the trap: the paper's "velocity change (Δc/c) of about 5×10⁻⁵" is the
+  phase conversion, not the tidal amplitude.
+  **This matters more than a factor of two.** Against 5×10⁻⁴ the Deep upper limit
+  of 1.03×10⁻³ is 2.05× the benchmark; against the text's 10⁻³ it is 1.03×, i.e.
+  sitting *at* it. Under a 10⁻³ benchmark Paper 1's Nano upper limit of 7.98×10⁻⁴
+  becomes 0.8×, which would reverse its headline. Decide which quantity the paper
+  cites — Figure 3 peak-to-peak or the authors' order-of-magnitude statement — and
+  use it consistently in both papers.
+  Incidentally, De Fazio et al. describe their observable as "a Rayleigh wave-like
+  tube wave along a tunnel", which is close prior art for the Deep guided mode.
 - **The Niu benchmark values are now verified against the source**: stress
   sensitivity 2.4×10⁻⁷ Pa⁻¹ and tidal stress varying within 240 Pa both appear
   verbatim in Niu et al. (2008). Niu et al. further state that the resulting

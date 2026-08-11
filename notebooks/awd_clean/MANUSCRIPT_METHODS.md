@@ -104,6 +104,52 @@ hierarchy is given in §3.5.
 
 ## 3. Methods — Nano subsections
 
+### 3.1 Preprocessing and coordinate conventions
+
+Preprocessing is applied inside the reader (`DASutils.readFile_protobuf` for
+Nano protobuf, `readFile_HDF` for Deep HDF5) with defaults, in a fixed order, per
+channel buffer:
+
+> detrend → Tukey taper → Butterworth bandpass → across-channel median removal →
+> scaling
+
+All AWD stacking scripts read at 1–100 Hz with reader defaults: linear detrend,
+Tukey taper (α = 0.4), 4th-order zero-phase Butterworth, and across-channel
+median removal. Analysis bands (15–30 Hz for Deep, 30–60 Hz for Nano) are applied
+afterwards as a second zero-phase Butterworth, so every reported result passes
+through a cascade of two filters.
+
+Three properties of this chain bear on interpretation and should be stated.
+
+**Median removal is a modelling choice, not a cleanup step.** Subtracting the
+across-channel median at each time sample removes laser and interrogator noise
+common to all channels — and equally removes any real arrival that reaches every
+channel simultaneously. It is applied throughout.
+
+**The taper spans the whole read, not the analysis window.** Readers are called
+one file at a time, so the Tukey window covers 300 s for Nano and 60 s for Deep,
+far longer than the 3.5 s drop windows extracted from it.
+
+**The two fibres are not in the same physical quantity.** Nano protobuf files
+store strain *rate* and are returned in microstrain s⁻¹; Deep HDF5 files store
+strain and are returned in microstrain. The stacking path does not reconcile
+them. The difference is a factor of ω — a 90° phase rotation plus a slope across
+the band — which changes waveform shape and cross-fibre amplitude but **does not
+move an F–K ridge or change a moveout velocity**. Since every quantity compared
+in this paper is an apparent velocity, a delay, or a fractional change in one,
+the mismatch does not affect the Nano–Deep comparison. It would affect any
+amplitude comparison between fibres, and none is made.
+
+For completeness: the Deep reader applies a polarity factor of −1 for the FPGA
+and firmware combination used here. That is a single global sign on all Deep
+data. It affects cross-fibre polarity and absolute Deep microstrain, not
+within-Deep relative amplitude, repeatability, moveout or F–K structure.
+
+Channel coordinate is distance along fibre throughout. The return leg is
+re-indexed so that coordinate increases away from the surface end on both legs,
+making the two Deep branches directly comparable. No coordinate-to-depth
+transform is applied and no result depends on one.
+
 ### 3.2 Nano mode identification
 
 The Nano coherent mode was characterised by a burst-bootstrap semblance scan over
@@ -218,7 +264,7 @@ unearned confidence.
 
 | Subsection | Source | Status |
 |---|---|---|
-| 3.1 Preprocessing and coordinate conventions | `PREPROCESSING.md` | not drafted |
+| 3.1 Preprocessing and coordinate conventions | `PREPROCESSING.md` | **drafted above** |
 | 3.2 Nano mode identification | `nano_mode_identification.py` | **drafted above, verified against outputs** |
 | 3.3 Deep guided-mode identification and split-sample validation | `deep_tube_validation.py`, `DEEP_DVV_METHODS_DRAFT.md` | drafted in the Deep file |
 | 3.4 Moveout correction and beam construction | `DEEP_DVV_METHODS_DRAFT.md` | drafted in the Deep file |
@@ -232,6 +278,6 @@ unearned confidence.
 | 3.12 Predefined Nano–Deep comparison | `DEEP_DVV_STATUS.md` §2, §3 | drafted in the Deep file |
 | Small-signal tidal benchmark | `deep_dvv_tidal_fit.py`, `safod_tides.ipynb` | **placement undecided** — see `DEEP_DVV_STATUS.md` §5 |
 
-Methods is now complete apart from **3.1 preprocessing** and a decision on where
-the tidal benchmark lives. Both the Nano and Deep halves are drafted and every
+Methods is now complete. The only open items are a decision on where the tidal
+benchmark lives and the `[NEEDS SOURCE]` acquisition details in §2.1. Both the Nano and Deep halves are drafted and every
 number has been checked against a generated output.

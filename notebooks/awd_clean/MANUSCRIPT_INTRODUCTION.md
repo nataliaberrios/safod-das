@@ -101,25 +101,23 @@ survey recorded simultaneously on two borehole DAS installations at SAFOD:
 | Tidal stress varies within 240 Pa | Niu et al. (2008) | **verified in text** |
 | Tidal travel-time changes ~10⁻⁷ s, predicted undetectable | Niu et al. (2008) | **verified in text** |
 | Precision finer than 1 part in 10⁴ | De Fazio et al. (1973) | **verified in text** |
-| Observed tidal velocity change order 10⁻⁴, exceeding lab prediction of 10⁻⁵–10⁻⁶ | De Fazio et al. (1973) | order verified; **exact value not recoverable from this scan** |
+| Observed tidal velocity change stated as order 10⁻³, against a lab prediction of 10⁻⁵–10⁻⁶ | De Fazio et al. (1973) | **verified by rendering p. 1321**; Fig. 3 scale bar Δc/c = 2×10⁻⁴ at φ = 4° |
 | Guided-wave channel at 2.7 km, FL/FR plus a leaky fault-core mode | Ellsworth & Malin | **verified in abstract** |
 | Downhole DAS P/S velocity estimation at SAFOD | Lellouch et al. (2019, JGR) | **verified in abstract** |
 
-**Warning on the De Fazio benchmark.** The project quotes a "De Fazio scale" of
-5 × 10⁻⁴. The 1973 scan's text layer drops superscripts, so the observed
-amplitude reads as "of the order of 10⁻[illegible]". What is recoverable is that
-the observed change exceeds the laboratory prediction of 10⁻⁵–10⁻⁶ and that the
-authors emphasise in-situ sensitivity is "much greater" than laboratory values,
-which places it at order 10⁻⁴.
+**The De Fazio benchmark, resolved.** The scan's text layer drops superscripts;
+rendering page 1321 shows the paper states *"The experiment has yielded a velocity
+change of the order of 10⁻³"*, against a laboratory prediction of 10⁻⁵–10⁻⁶.
+Figure 3's velocity-change scale bar is Δc/c = 2×10⁻⁴ at φ = 4°, consistent with
+the stated 1° ↔ 5×10⁻⁵ conversion. The project's 5×10⁻⁴ is thus a defensible
+peak-to-peak reading of Figure 3, while 10⁻³ is the authors' own rounding of the
+same trace. The paper's "about 5×10⁻⁵" is the phase conversion, not an amplitude.
 
-The specific value 5 × 10⁻⁴ is **not confirmed**. Note also the trap: the paper
-does contain "a velocity change (Δc/c) of about 5 × 10⁻⁵", but that is the
-instrument's phase-to-velocity conversion — 1° of phase corresponds to 5 × 10⁻⁵ —
-and not the tidal amplitude. Anyone re-checking the benchmark could easily take
-the wrong number.
+**Choose one and use it in both papers.** Against 5×10⁻⁴ the Deep upper limit of
+1.03×10⁻³ is 2.05×; against 10⁻³ it is 1.03×, sitting at the benchmark rather than
+above it. Under a 10⁻³ benchmark Paper 1's Nano upper limit of 7.98×10⁻⁴ becomes
+0.8×, which would reverse that paper's headline. This is a decision, not a
+rounding detail.
 
-This affects only the multiplier, not any conclusion. The measured Deep upper
-limit of 1.03 × 10⁻³ is 2.05× a 5 × 10⁻⁴ benchmark and ~10× a 1 × 10⁻⁴ benchmark;
-"cannot resolve a De Fazio-scale tidal change" holds either way, and holds more
-strongly under the smaller value. Before submission the figure should be settled
-from a clean copy of the paper or from its Figure 3.
+De Fazio et al. also describe their observable as "a Rayleigh wave-like tube wave
+along a tunnel" — close prior art for the Deep guided mode, worth citing in §5.1.
