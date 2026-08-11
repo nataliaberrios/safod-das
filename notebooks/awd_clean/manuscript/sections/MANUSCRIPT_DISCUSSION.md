@@ -232,7 +232,8 @@ site; the **De Fazio observed tidal-response scale** is the largest such respons
 anyone has reported, measured elsewhere on a different guided mode. Neither is
 "the tidal benchmark".
 
-The Niu SAFOD expected-response scale follows from Niu et al. (2008):
+The **Niu SAFOD expected-response scale** is the amplitude Model A assigns to the
+tidal template (§3.9), and follows from Niu et al. (2008):
 a barometric stress sensitivity of 2.4×10⁻⁷ Pa⁻¹ against a calculated tidal
 stress variation of ~240 Pa gives ~5.76×10⁻⁵, or 0.00576%. This is an
 order-of-magnitude benchmark for a small signal, not a prediction for the modes
@@ -245,7 +246,9 @@ upper limit of 1.03×10⁻³ sits ~18× above it; Paper 1's Nano upper limit of
 independent stacking, reaching it from the Deep single-burst null would require
 of order 1000 independent burst stacks; the survey collected 46.
 
-Fitting the tide model directly to the per-burst velocity estimates gives a 95%
+Because the regression uses Model A's own template and differs from it only in
+leaving the amplitude free, the comparison is direct: Model A predicts
+5.76×10⁻⁵, and fitting that same template to the measurements gives a 95%
 upper limit of 1.03×10⁻³ on 46 bursts, with surrogate p-values between 0.66 and
 0.76 — a clean null, and no tidal response is claimed. Notably, **the more
 sensitive observable did not produce a better tidal limit**: 1.03×10⁻³ is ~1.3×

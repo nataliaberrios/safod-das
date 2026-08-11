@@ -438,6 +438,41 @@ Because Nano regresses against propagation time across an 80–440 m aperture at
 2975 m s⁻¹, its lever arm is **0.121 s** — the quantity against which the Deep
 lever arm of 1.428 s is compared.
 
+### 3.9 Solid-Earth-tide regression
+
+The zero-injection trials constitute a per-burst velocity time series, so the
+tidal question can be asked of them directly without further waveform
+processing.
+
+The predictor is the normalised degree-2 tidal template of Model A
+(`theory/SAFOD_Model_A_first_order_tidal_dvv_guide.pdf`). The degree-2
+tide-generating potential of the Sun and Moon is evaluated at the SAFOD
+coordinates over the survey window, converted to a scalar areal-strain proxy with
+quasi-static PREM Love numbers, and normalised to unit amplitude:
+
+> τ(t) = (W(t) − W̄) / max|W(t) − W̄|
+
+Model A additionally fixes the expected *amplitude* of that template from two
+values reported by Niu et al. (2008) — a tidal stress scale of ~240 Pa and a
+velocity–stress sensitivity of 2.4×10⁻⁷ Pa⁻¹ — giving a predicted maximum of
+5.76×10⁻⁵. Both are explicit assumptions rather than measurements of the 2026
+modes: the 240 Pa scale was computed for Niu et al.'s observing interval, and
+their sensitivity was derived from barometric rather than tidal loading.
+
+The regression here uses Model A's shape but leaves its amplitude free, fitting
+
+> ε(t) = A·τ(t) + c₀ + c₁t
+
+with a constant and a linear trend, because over a ~22 h record a diurnal
+template is not orthogonal to instrumental drift. Inference is by surrogate null:
+the template is re-evaluated at 999 random time offsets and the fit repeated,
+giving an empirical p-value that assumes neither Gaussian nor independent errors.
+A leave-one-out reference inflates the per-burst estimates by N/(N−1), which is
+divided out before fitting.
+
+Model A therefore predicts the amplitude and this regression measures it; the two
+share the identical template.
+
 ---
 
 
@@ -909,7 +944,8 @@ site; the **De Fazio observed tidal-response scale** is the largest such respons
 anyone has reported, measured elsewhere on a different guided mode. Neither is
 "the tidal benchmark".
 
-The Niu SAFOD expected-response scale follows from Niu et al. (2008):
+The **Niu SAFOD expected-response scale** is the amplitude Model A assigns to the
+tidal template (§3.9), and follows from Niu et al. (2008):
 a barometric stress sensitivity of 2.4×10⁻⁷ Pa⁻¹ against a calculated tidal
 stress variation of ~240 Pa gives ~5.76×10⁻⁵, or 0.00576%. This is an
 order-of-magnitude benchmark for a small signal, not a prediction for the modes
@@ -922,7 +958,9 @@ upper limit of 1.03×10⁻³ sits ~18× above it; Paper 1's Nano upper limit of
 independent stacking, reaching it from the Deep single-burst null would require
 of order 1000 independent burst stacks; the survey collected 46.
 
-Fitting the tide model directly to the per-burst velocity estimates gives a 95%
+Because the regression uses Model A's own template and differs from it only in
+leaving the amplitude free, the comparison is direct: Model A predicts
+5.76×10⁻⁵, and fitting that same template to the measurements gives a 95%
 upper limit of 1.03×10⁻³ on 46 bursts, with surrogate p-values between 0.66 and
 0.76 — a clean null, and no tidal response is claimed. Notably, **the more
 sensitive observable did not produce a better tidal limit**: 1.03×10⁻³ is ~1.3×

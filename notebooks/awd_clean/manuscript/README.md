@@ -61,5 +61,5 @@ These are the analysis record, not the paper:
 |---|---|
 | Figure 1 — experiment geometry schematic | never made; see below |
 | Interrogator model numbers; physical depth at channel 1702; which cable is which | Ettore |
-| Tide section: Model A to main text, Model B to supplement | drafted plan, not yet written in |
+| Model B to the supplement as a model-dependence bound | not yet written in; Model A **is** integrated (§3.9, §5.7) |
 | Section numbering gaps if sections are added | re-run the assembler |
