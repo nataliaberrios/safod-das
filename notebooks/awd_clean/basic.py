@@ -32,10 +32,12 @@ from scipy.signal import hilbert
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from plain_look import (  # noqa: E402
-    DX_NANO, NANO_DIR, OUT_DIR, PRE_S, RAW_KW,
+    DX_NANO, NANO_DIR, PLAIN_LOOK_DIR, PRE_S, RAW_KW,
     bandpass, nano_time, pick_burst, read_manifest, section_around,
 )
 from DASutils import readFile_protobuf  # noqa: E402
+
+OUT_DIR = PLAIN_LOOK_DIR / "basic"
 
 HERE = Path(__file__).resolve().parent
 STACKS = HERE / "canonical_epoch_stacks_paired_deep_all.npz"

@@ -64,9 +64,12 @@ DEEP_DIR = Path(
     "/oak/stanford/groups/ettore88/data/SAFOD/ActiveJune2026/"
     "01_--_recording_2026-06-15T230629Z_--_active_source"
 )
-OUT_DIR = Path(
+# Base of the figure tree. Each script writes into its own subfolder so a rerun
+# does not scatter 40-odd PNGs back into one directory.
+PLAIN_LOOK_DIR = Path(
     "/home/groups/ettore88/nberrios/safod_das_git/notebooks/figures/awd_2026/plain_look"
 )
+OUT_DIR = PLAIN_LOOK_DIR / "diagnostic"
 
 PRE_S, POST_S = 0.5, 3.0
 DX_NANO, DX_DEEP = 1.26606202, 2.0419

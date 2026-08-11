@@ -65,7 +65,7 @@ DEEP_DIR = Path(
 )
 OUT_DIR = Path(
     "/home/groups/ettore88/nberrios/safod_das_git/notebooks/figures/awd_2026/plain_look"
-)
+) / "deep"
 
 DX = 2.0419                 # Deep channel spacing
 TURNAROUND_CH = 1702        # deep_target_scan.py:38

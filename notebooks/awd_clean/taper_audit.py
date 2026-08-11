@@ -66,7 +66,7 @@ HERE = Path(__file__).resolve().parent
 MANIFEST = HERE / "awd_manifest.csv"
 OUT_DIR = Path(
     "/home/groups/ettore88/nberrios/safod_das_git/notebooks/figures/awd_2026/plain_look"
-)
+) / "diagnostic"
 
 # True file durations, from the raw arrays themselves: Nano reads back
 # (732, 300000) and Deep (3200, 60000) at 1000 Hz, and the filename cadence is

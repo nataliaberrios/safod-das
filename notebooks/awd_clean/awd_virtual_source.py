@@ -74,7 +74,7 @@ HERE = Path(__file__).resolve().parent
 STACKS = HERE / "canonical_epoch_stacks_paired_deep_all.npz"
 OUT_DIR = Path(
     "/home/groups/ettore88/nberrios/safod_das_git/notebooks/figures/awd_2026/plain_look"
-)
+) / "virtual_source"
 
 PRE_S = 0.5                     # the stacks are cut -0.5 to +3.0 s
 BAND = (20.0, 50.0)             # the Nano working band, from fig02 of plain_look

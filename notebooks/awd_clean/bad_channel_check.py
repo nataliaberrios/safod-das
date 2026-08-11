@@ -62,7 +62,7 @@ from DASutils import readFile_protobuf  # noqa: E402
 NANO_DIR = Path("/oak/stanford/groups/ettore88/data/SAFOD/ActiveJune2026/Nano")
 OUT_DIR = Path(
     "/home/groups/ettore88/nberrios/safod_das_git/notebooks/figures/awd_2026/plain_look"
-)
+) / "diagnostic"
 
 DX = 1.26606202          # channel spacing, from the .pb acquisition_stats
 GL_M = 16.4588           # gauge length, same source

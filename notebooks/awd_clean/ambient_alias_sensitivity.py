@@ -101,6 +101,12 @@ def run(args):
         x = preprocess(x, fs, norm_seconds=5.0)
         for path in paths:
             y, fs_y, dx_y = prepare(x, fs, dx, path)
+            # Apply the signed F-K selection before correlations. The first
+            # version compared unfiltered correlations and therefore could
+            # not validate anti-aliasing for the F-K result.
+            fk = np.fft.fft2(y)
+            mask = fk_mask(y.shape[0], y.shape[1], fs_y, dx_y, "negative")
+            y = np.fft.ifft2(fk * mask).real
             targets = [int(round(50.0 * j / dx_y)) for j in range(1, 15)]
             targets = [channel for channel in targets if channel < y.shape[0]]
             lags, corr = normalized_corr_pairs(y, [(0, channel) for channel in targets], fs_y)

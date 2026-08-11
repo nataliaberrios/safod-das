@@ -1,5 +1,10 @@
 # What each plain-look figure shows, in plain language
 
+> **Note:** the figures were reorganised into subfolders. The `figNN_*` files
+> described here now live in `diagnostic/`, `deep_fig*` in `deep/`, `vs_fig*` in
+> `virtual_source/`. For the current first-look set see `basic/` and the
+> `README.md` beside it.
+
 Companion to the PNGs in this folder. Nothing here changes the figures; it just
 explains them. If you only read one section, read "How to read a record section"
 and then figures 2, 6 and 9.

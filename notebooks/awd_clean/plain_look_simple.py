@@ -36,11 +36,13 @@ from matplotlib.patches import FancyBboxPatch  # noqa: F401  (kept for caption b
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from plain_look import (  # noqa: E402
-    DX_NANO, NANO_DIR, OUT_DIR, PRE_S, RAW_KW,
+    DX_NANO, NANO_DIR, PLAIN_LOOK_DIR, PRE_S, RAW_KW,
     bandpass, ch_at, nano_time, norm_rows, pick_burst, read_manifest,
     section_around,
 )
 from DASutils import readFile_protobuf  # noqa: E402
+
+OUT_DIR = PLAIN_LOOK_DIR / "superseded"
 
 BAND = (20.0, 50.0)
 V_DIRECT = 2975.0          # measured elsewhere in this repo; drawn only as a guide
