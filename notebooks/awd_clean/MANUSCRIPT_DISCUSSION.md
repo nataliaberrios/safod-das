@@ -56,9 +56,14 @@ c ≈ 3000 m s⁻¹.
 
 A numerical coincidence here is worth defusing rather than exploiting. De Fazio's
 mode also travels at ~3000 m s⁻¹, close to the Nano apparent speed, but the two
-numbers mean different things. Franklin marble has Vp ≈ 6000–6500 m s⁻¹ and
-Vs ≈ 3200–3400 m s⁻¹, so 3000 m s⁻¹ is roughly half the P velocity of their host
-rock and sits right at its Rayleigh velocity — which is why their Rayleigh-like
+numbers mean different things. De Fazio et al. do not quote a P velocity, but
+they do give an elastic constant "of the order of 5 × 10⁵ bar" (50 GPa) for the
+Franklin marble hosting their shaft. With a marble density of ~2700 kg m⁻³ that
+implies Vp ≈ 5000–5800 m s⁻¹ depending on whether the quoted modulus is Young's
+or bulk — either way, far above 3000 m s⁻¹. Read as a bulk modulus with μ ≈ 30 GPa
+it also gives a Rayleigh velocity of ~3070 m s⁻¹, essentially their observed
+value. Their 3000 m s⁻¹ is therefore roughly half the P velocity of their own
+host rock and sits at its Rayleigh velocity, which is why their Rayleigh-like
 identification is self-consistent. At SAFOD the same figure lies inside the
 mapped shallow Vp range. Equal apparent speeds in different rock, at 500 Hz
 against 30–60 Hz, in an air-filled shaft against a cemented borehole, imply no
