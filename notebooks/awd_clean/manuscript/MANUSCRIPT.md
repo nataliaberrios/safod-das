@@ -438,6 +438,30 @@ Because Nano regresses against propagation time across an 80–440 m aperture at
 2975 m s⁻¹, its lever arm is **0.121 s** — the quantity against which the Deep
 lever arm of 1.428 s is compared.
 
+
+---
+
+
+### 3.7 Blind injection–recovery: Deep, blinding and reliability definitions
+
+Sensitivity was calibrated by injecting known fractional speed changes into real held-out data and recovering them through the complete processing chain. For an injected change \(\epsilon_{\mathrm{inj}}\), each channel trace was shifted by \(-\epsilon_{\mathrm{inj}}T_0(s)\) before beamforming. Fifteen levels were tested: zero and \(\pm 1\times10^{-4}\), \(\pm 2\times10^{-4}\), \(\pm 5\times10^{-4}\), \(\pm 1\times10^{-3}\), \(\pm 2\times10^{-3}\), \(\pm 5\times10^{-3}\), and \(\pm 1\times10^{-2}\). This produced 345 trials for each leg and band.
+
+Injection and recovery were separated into blinded stages. The injection stage wrote randomly identified perturbed gathers and a separate sealed truth table. The recovery stage had access only to the blinded gathers, and truth was joined to recovered values during summarisation.
+
+Recovered values were centred on the zero-injection median. The empirical two-sided null threshold was defined as the 95th percentile of the absolute centred zero-injection estimates. The reliable-detection level was the smallest tested magnitude for which at least 95% of trials both exceeded that threshold and had the correct sign in both the positive and negative directions. This is the same criterion used for the Nano observable.
+
+### 3.8 Controls, influence diagnostics and the paired-leg estimator
+
+The primary controls tested synthetic recovery, common-mode timing rejection, dependence on individual apertures or bursts, reference construction, aperture length, and an unvalidated frequency band. Noiseless synthetic guided modes were generated on each leg’s real geometry and perturbed both by re-synthesis at an altered speed and by the injection routine. Timing controls applied either a constant 5 ms shift to every channel or a random per-burst common shift. Influence was assessed by leave-one-aperture-out and leave-one-burst-out analyses.
+
+Because the two legs observe the same source bursts, combinations were formed from 23 paired per-burst estimates rather than by treating the legs as independent populations. Equal, inverse-variance, and covariance-aware combinations were evaluated. Variances and covariance were estimated leave-one-burst-out from the zero-injection pairs, so the weight applied to a burst did not use that burst’s own null estimate. The preselected outbound leg remained the benchmark.
+
+---
+
+
+---
+
+
 ### 3.9 Solid-Earth-tide regression
 
 The zero-injection trials constitute a per-burst velocity time series, so the
@@ -472,26 +496,6 @@ divided out before fitting.
 
 Model A therefore predicts the amplitude and this regression measures it; the two
 share the identical template.
-
----
-
-
----
-
-
-### 3.7 Blind injection–recovery: Deep, blinding and reliability definitions
-
-Sensitivity was calibrated by injecting known fractional speed changes into real held-out data and recovering them through the complete processing chain. For an injected change \(\epsilon_{\mathrm{inj}}\), each channel trace was shifted by \(-\epsilon_{\mathrm{inj}}T_0(s)\) before beamforming. Fifteen levels were tested: zero and \(\pm 1\times10^{-4}\), \(\pm 2\times10^{-4}\), \(\pm 5\times10^{-4}\), \(\pm 1\times10^{-3}\), \(\pm 2\times10^{-3}\), \(\pm 5\times10^{-3}\), and \(\pm 1\times10^{-2}\). This produced 345 trials for each leg and band.
-
-Injection and recovery were separated into blinded stages. The injection stage wrote randomly identified perturbed gathers and a separate sealed truth table. The recovery stage had access only to the blinded gathers, and truth was joined to recovered values during summarisation.
-
-Recovered values were centred on the zero-injection median. The empirical two-sided null threshold was defined as the 95th percentile of the absolute centred zero-injection estimates. The reliable-detection level was the smallest tested magnitude for which at least 95% of trials both exceeded that threshold and had the correct sign in both the positive and negative directions. This is the same criterion used for the Nano observable.
-
-### 3.8 Controls, influence diagnostics and the paired-leg estimator
-
-The primary controls tested synthetic recovery, common-mode timing rejection, dependence on individual apertures or bursts, reference construction, aperture length, and an unvalidated frequency band. Noiseless synthetic guided modes were generated on each leg’s real geometry and perturbed both by re-synthesis at an altered speed and by the injection routine. Timing controls applied either a constant 5 ms shift to every channel or a random per-burst common shift. Influence was assessed by leave-one-aperture-out and leave-one-burst-out analyses.
-
-Because the two legs observe the same source bursts, combinations were formed from 23 paired per-burst estimates rather than by treating the legs as independent populations. Equal, inverse-variance, and covariance-aware combinations were evaluated. Variances and covariance were estimated leave-one-burst-out from the zero-injection pairs, so the weight applied to a burst did not use that burst’s own null estimate. The preselected outbound leg remained the benchmark.
 
 ---
 

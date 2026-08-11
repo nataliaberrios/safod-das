@@ -39,10 +39,13 @@ SECTIONS = [
      "### 3.7 Blind injection–recovery: Deep", None),
     # Methods 3.5-3.6 (repeatability, Nano calibration)
     ("MANUSCRIPT_METHODS.md", "### 3.5 Source repeatability metrics",
-     "## Remaining Methods subsections", None),
+     "### 3.9 Solid-Earth-tide regression", None),
     # Methods 3.7-3.8 (Deep calibration, controls)
     ("DEEP_DVV_METHODS_DRAFT.md", "### 3.7 Blind injection–recovery: Deep",
      "## Results", None),
+    # Methods 3.9 (tidal regression) - must follow the Deep block
+    ("MANUSCRIPT_METHODS.md", "### 3.9 Solid-Earth-tide regression",
+     "## Remaining Methods subsections", None),
     # 4.1-4.5 Results
     ("MANUSCRIPT_RESULTS.md", "### 4.1 Installation dependence",
      "## Cross-references for the remaining Results sections", "## 4. Results\n"),
