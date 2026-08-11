@@ -108,16 +108,37 @@ def plot_aggregate(tops, lags, distance, results, weighted_files):
             interpolation="nearest",
         )
         reference_distance = np.r_[0.0, distance]
-        ax.plot(sign * reference_distance / 3200.0, reference_distance, "k--", lw=1.25)
+        peak_velocity = results[mode]["peak_velocity_m_s"]
+        ax.plot(
+            sign * reference_distance / peak_velocity,
+            reference_distance,
+            "k--",
+            lw=1.4,
+            label=f"score peak: {peak_velocity / 1000:.3f} km/s",
+        )
+        ax.plot(
+            sign * reference_distance / 3200.0,
+            reference_distance,
+            color="0.4",
+            ls=":",
+            lw=1.0,
+            label="fixed reference: 3.2 km/s",
+        )
         ax.scatter(0.0, 0.0, marker="*", s=110, color="#ffd84d", edgecolor="black",
                    linewidth=0.8, zorder=5, clip_on=False)
-        ax.annotate("virtual source (channel 0)", (0.0, 0.0), xytext=(8, 10),
-                    textcoords="offset points", fontsize=8)
-        branch = results[mode]
-        ax.set_title(
-            f"{mode.capitalize()} F-K branch: {branch['peak_velocity_m_s']/1000:.3f} km/s, "
-            f"p={branch['p_peak']:.4g}"
+        ax.annotate(
+            "virtual source (channel 0)",
+            (0.0, 0.0),
+            xytext=(8, -14),
+            textcoords="offset points",
+            fontsize=8,
+            va="top",
         )
+        physical_lag = "positive" if sign > 0 else "negative"
+        branch_symbol = "<" if mode == "negative" else ">"
+        ax.set_title(f"F K {branch_symbol} 0 evaluated at {physical_lag} lag")
+        legend_location = "lower left" if sign > 0 else "lower right"
+        ax.legend(loc=legend_location, frameon=True, framealpha=0.88, fontsize=7)
         ax.set_xlim(-0.25, 0.25)
         ax.set_ylim(700, -15)
         ax.set_xlabel("Correlation lag (s)")
@@ -160,9 +181,12 @@ def plot_aggregate(tops, lags, distance, results, weighted_files):
     fig.suptitle(
         f"Corrected seasonal signed-lag ambient F-K comparison ({weighted_files:,} files)",
         fontsize=14,
+        y=1.025,
     )
-    fig.savefig(OUT / "seasonal_signed_fk_v2_aggregate.png", dpi=350)
-    fig.savefig(OUT / "seasonal_signed_fk_v2_aggregate.pdf")
+    fig.savefig(OUT / "seasonal_signed_fk_v2_aggregate.png", dpi=350,
+                bbox_inches="tight")
+    fig.savefig(OUT / "seasonal_signed_fk_v2_aggregate.pdf", bbox_inches="tight")
+    plt.close(fig)
 
 
 def plot_days(day_products):
