@@ -21,7 +21,7 @@ apparent-moveout observable?
 | Recovery is unbiased on the primary branch | **Established** | bias ≤6×10⁻⁵ at every level, outbound |
 | Result carried by one aperture or one burst | **Refuted** | no single aperture moves it >0.55× threshold, no burst >0.27× |
 | Combining the two legs improves sensitivity | **Partial — improves the noise floor, not the detection level** | scatter 1.36–1.48× better; reliable detection unchanged at 5×10⁻³ |
-| A more sensitive observable lowers the tidal upper limit | **Refuted** | UL 1.03×10⁻³ at 46 bursts = 2.05× De Fazio, still ~1.3× worse than Paper 1's Nano 7.98×10⁻⁴ |
+| A more sensitive observable lowers the tidal upper limit | **Refuted** | UL 1.03×10⁻³ at 46 bursts, ~18× the Niu SAFOD expected-response scale; ~1.3× worse than Paper 1's Nano 7.98×10⁻⁴ |
 | Return-leg weakness is SNR-limited | **Unresolved** | 5 of 6 pre-registered criteria met; the 6th rests on a control that turned out non-diagnostic |
 | Sensitivity is attributable to the guided mode specifically | **Inherited, not shown here** | rests on the earlier permutation nulls (p = 0.002), not on this experiment |
 
@@ -113,19 +113,29 @@ cross to the next tested level.
 
 Better per-burst precision does **not** buy a better tidal limit. This was tested
 because a scatter-ratio projection suggested the Deep observable might push the
-tidal upper limit below the De Fazio et al. (1973) scale of 5×10⁻⁴, which Paper 1
-reports as out of reach at 7.98×10⁻⁴ (1.6×). It does not.
+tidal upper limit below what Paper 1 reports as out of reach at 7.98×10⁻⁴. It
+does not.
+
+**Benchmark framing.** Two literature scales are kept distinct and neither is
+called "the tidal benchmark". The **Niu SAFOD expected-response scale**,
+2.4×10⁻⁷ Pa⁻¹ × 240 Pa = 5.76×10⁻⁵, is the site-specific expectation and the
+quantity results are scored against. The **De Fazio observed tidal-response
+scale**, ~5×10⁻⁴ to 10⁻³, is historical context only: the largest reported
+guided-mode tidal response, measured on an air-filled mine shaft in marble at
+500 Hz. It is quoted as a range because the 1973 scan is ambiguous between the
+text's "order of 10⁻³" and Figure 3's ~5×10⁻⁴, and nothing depends on which end
+is taken.
 
 The zero-injection trials are already a dv/v time series, so the tide model was
 regressed directly onto them, with a constant and a linear trend, and inference by
 999-realisation surrogate null (`deep_dvv_tidal_fit.py`).
 
-| Observable | Amplitude | σ | p | 95% UL | ×De Fazio |
+| Observable | Amplitude | σ | p | 95% UL | ×Niu scale |
 |---|---|---|---|---|---|
-| Deep outbound | +3.64×10⁻⁴ | 4.58×10⁻⁴ | 0.576 | 1.26×10⁻³ | 2.52 |
-| Deep return | +6.85×10⁻⁴ | 7.23×10⁻⁴ | 0.378 | 2.10×10⁻³ | 4.20 |
-| Deep paired, inverse-variance | +4.60×10⁻⁴ | 4.02×10⁻⁴ | 0.517 | **1.25×10⁻³** | **2.50** |
-| Deep paired, covariance-aware | +4.62×10⁻⁴ | 4.08×10⁻⁴ | 0.476 | 1.26×10⁻³ | 2.52 |
+| Deep outbound | +3.64×10⁻⁴ | 4.58×10⁻⁴ | 0.576 | 1.26×10⁻³ | 21.9 |
+| Deep return | +6.85×10⁻⁴ | 7.23×10⁻⁴ | 0.378 | 2.10×10⁻³ | 36.5 |
+| Deep paired, inverse-variance | +4.60×10⁻⁴ | 4.02×10⁻⁴ | 0.517 | **1.25×10⁻³** | **21.7** |
+| Deep paired, covariance-aware | +4.62×10⁻⁴ | 4.08×10⁻⁴ | 0.476 | 1.26×10⁻³ | 21.9 |
 
 Every p-value is a clean null; no tidal signal is detected and none is claimed.
 Fitted amplitudes sit close to Paper 1's +3.4×10⁻⁴ and the p-values close to its
@@ -145,7 +155,7 @@ bursts (`--population allbursts`). That population is trajectory-contaminated fo
 a *sensitivity* claim, but legitimate here: trajectory selection is
 time-independent and cannot manufacture a tidal signal.
 
-| Observable | amplitude | σ | p | 95% UL | ×De Fazio |
+| Observable | amplitude | σ | p | 95% UL | ×Niu scale |
 |---|---|---|---|---|---|
 | Deep outbound | +5.79×10⁻⁴ | 3.59×10⁻⁴ | 0.701 | 1.28×10⁻³ | 2.57 |
 | Deep return | +2.24×10⁻⁴ | 4.82×10⁻⁴ | 0.755 | 1.17×10⁻³ | 2.34 |

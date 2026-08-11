@@ -101,10 +101,10 @@ gains accrue continuously; detection levels move in discrete steps.
 The measured quantity throughout is a fractional change in the apparent
 along-fibre speed of a selected guided mode. It is not a formation V_P or V_S
 change, not a measure of stress, pore pressure, permeability, fracture
-compliance, or tectonic strain, and it carries no depth resolution. A
-site-relevant small tidal velocity response lies roughly two orders of magnitude
-below the best demonstrated detection level, and a direct fit to the per-burst
-estimates returns a clean null with a 95% upper limit of 1.03×10⁻³.
+compliance, or tectonic strain, and it carries no depth resolution. The Niu SAFOD expected-response scale for a tidal velocity change, 5.76×10⁻⁵,
+lies roughly two orders of magnitude below the best demonstrated detection level;
+a direct fit to the per-burst estimates returns a clean null with a 95% upper
+limit of 1.03×10⁻³, some 18× above that scale.
 
 ## Outstanding before submission
 

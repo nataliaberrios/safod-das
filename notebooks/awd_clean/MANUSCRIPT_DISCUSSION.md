@@ -239,7 +239,9 @@ order-of-magnitude benchmark for a small signal, not a prediction for the modes
 measured here.
 
 That scale lies roughly 87× below the best demonstrated reliable-detection level
-of 0.5%, and ~32× below the Deep outbound null threshold. Under idealised
+of 0.5%, and ~32× below the Deep outbound null threshold. The measured Deep tidal
+upper limit of 1.03×10⁻³ sits ~18× above it; Paper 1's Nano upper limit of
+7.98×10⁻⁴ sits ~14× above it. Under idealised
 independent stacking, reaching it from the Deep single-burst null would require
 of order 1000 independent burst stacks; the survey collected 46.
 
