@@ -183,7 +183,23 @@ def build_templates():
     return T
 
 
-def beams(fn, slow, phase=None, keep=None, sos=None):
+def _phase_for(n, slow, z, cache):
+    """Phase stack for record length n, built once per length encountered.
+
+    File length is NOT constant. nSamples in the manifest takes at least twelve
+    distinct values (5476 ... 30000), and the event-triggered files are longer
+    still, so a stack precomputed for 30000 samples fails on anything else -- the
+    first smoke run died on a 97400-sample file with a broadcast error.
+    """
+    if n not in cache:
+        f = np.fft.rfftfreq(n, 1.0 / FS)
+        cache[n] = np.array(
+            [np.exp(2j * np.pi * np.outer(p * z, f)) for p in slow],
+            dtype=np.complex64)
+    return cache[n]
+
+
+def beams(fn, slow, z=None, keep=None, sos=None, pcache=None):
     """All beams for one file from ONE forward FFT. Returns (nslow, nt) or None.
 
     `phase` is the precomputed exp(2i.pi.p.z.f) stack, valid only because the
@@ -192,6 +208,14 @@ def beams(fn, slow, phase=None, keep=None, sos=None):
     from scipy.signal import butter, sosfiltfilt
     try:
         with h5py.File(fn, 'r') as h:
+            # SAMPLE RATE IS NOT CONSTANT. Event-triggered files are 5000 Hz, and
+            # the templates are 500 Hz -- correlating across rates is meaningless.
+            # Skip rather than decimate: these are a small fraction of the archive
+            # and are already catalogued events, which is not what the scan is for.
+            a = h['Acquisition'].attrs
+            fsf = float(a.get('MaximumFrequency', FS / 2)) * 2.0
+            if abs(fsf - FS) > 1:
+                return None
             g = [k for k in h['Acquisition'].keys() if 'Raw' in k][0]
             X = np.asarray(h[f'Acquisition/{g}/RawData'][:, :], dtype=np.float64)
     except Exception:
@@ -212,6 +236,7 @@ def beams(fn, slow, phase=None, keep=None, sos=None):
         return None
     A = A[ok] / rms[ok, None]
     n = A.shape[1]
+    phase = _phase_for(n, slow, z, pcache)
     F = np.fft.rfft(A, axis=-1).astype(np.complex64)   # one expensive transform
     out = np.empty((len(slow), n))
     for k in range(len(slow)):
@@ -256,23 +281,15 @@ def main():
     from scipy.signal import butter
     keep = freeze_channels(db)
     z = (np.arange(CH_LO, CH_HI)[keep] - CH_LO) * DX
-    nfft = 30000                       # nominal 60 s at 500 Hz
-    f = np.fft.rfftfreq(nfft, 1.0 / FS)
-    # complex64: the stack is 14 x 700 x 15001, which is 2.4 GB at complex128 and
-    # 1.2 GB here, and the per-file multiply is the inner loop. Max phase is
-    # p*z*f ~ 2.5e-4 * 715 * 250 = 45 cycles, and float32 carries ~7 digits, so
-    # the shift is accurate to ~1e-5 cycles -- far below the 2 ms timing target.
-    phase = np.array([np.exp(2j * np.pi * np.outer(p * z, f)) for p in slow],
-                     dtype=np.complex64)
+    pcache = {}                        # phase stacks keyed by record length
     sos = butter(4, list(BAND), btype='band', fs=FS, output='sos')
-    print(f'frozen channel set: {int(keep.sum())} of {CH_HI-CH_LO}; '
-          f'phase stack {phase.nbytes/1e9:.2f} GB', flush=True)
+    print(f'frozen channel set: {int(keep.sum())} of {CH_HI-CH_LO}', flush=True)
 
     acc = {}          # (day, tag) -> dict of running stats
     nread = 0
     t_start = _time.time()
     for c, (_, r) in enumerate(mine.iterrows()):
-        B = beams(r['fn'], slow, phase=phase, keep=keep, sos=sos)
+        B = beams(r['fn'], slow, z=z, keep=keep, sos=sos, pcache=pcache)
         if B is None:
             continue
         nread += 1
