@@ -37,7 +37,7 @@
 
 \title{SAFOD June 2026 AWD--DAS: Analysis Summary and Figure Notes}
 \author{SAFOD AWD--DAS working analysis}
-\date{5 August 2026}
+\date{10 August 2026}
 
 \begin{document}
 \maketitle
@@ -55,7 +55,7 @@ $1.4$--$1.56~\mathrm{km\,s^{-1}}$ low-frequency mode is validated on the
 wireline Deep array.  The former is not yet securely identified as direct P;
 the latter is consistent with, but not yet proven to be, a borehole tube wave.
 The document follows the current results notebook,
-\path{AWD_results_dashboard.ipynb}, version v43.  The hierarchical
+\path{AWD_results_dashboard.ipynb}, version v44.  The hierarchical
 individual-drop/burst repeatability analysis and the split-sample Deep
 time-gated branch search are now promoted into the authoritative results
 record.  A six-figure core presentation set plus an advisor-facing figure
@@ -1566,7 +1566,7 @@ Lellouch et al. organize the top-source geometry by receiver position along the 
 \subsection{Interim five-hour unfiltered versus F--K comparison}
 \figquestion{Does the F--K enhancement appear before the full seasonal stack, and is the corresponding unfiltered control independently weak?}
 
-The first selected winter day (2024-12-20) has enough completed checkpoint products for a five-hour interim stack using 300 one-minute files. The exact-resolution unfiltered path gives a normalized-correlation score of 0.0003 at 3.2~km~s$^{-1}$, below its receiver-permutation 95th-percentile maximum (p = 0.265). The negative signed F--K branch peaks at 3.075~km~s$^{-1}$, has score 0.266 at 3.2~km~s$^{-1}$, and gives p = 0.0005; the positive branch is not significant, while the two-sided branch remains enhanced.
+The first selected winter day (2024-12-20) has enough completed checkpoint products for a five-hour interim stack using 300 one-minute files. The exact-resolution unfiltered path gives a normalized-correlation score of 0.0003 at 3.2~km~s$^{-1}$, below its receiver-permutation 95th-percentile maximum (p = 0.265). The negative signed F--K branch peaks at 3.075~km~s$^{-1}$, has score 0.266 at 3.2~km~s$^{-1}$, and gives p = 0.0005; the legacy positive-mask curve was evaluated at the same positive lag and is superseded as a physical opposite-branch test, while the two-sided branch remains enhanced.
 
 All traces were detrended, filtered from 5--20~Hz, and normalized by a 5-s running absolute mean. Earthquake-containing intervals were retained. Because the F--K wedge was selected to include 2.5--4.5~km~s$^{-1}$, its null result is conditional on that selection and is not an independent velocity estimate. This is an interim one-day diagnostic; the completed seasonal aggregate is reported below.
 
@@ -1675,12 +1675,12 @@ This physical label is specific to the Nano top-source geometry and its stated c
 
 No. The legacy FFT correlation assembled its negative-lag half from a truncated padded array. The zero and positive lags were extracted correctly, so the reported negative-mask positive-lag moveout score and its receiver-permutation null remain reproducible. The negative-lag half was invalid. Consequently, the legacy positive-mask value $p=0.978$ tested leakage along the same positive-lag target moveout; it did not test whether a physical opposite-propagating branch exists at negative lag.
 
-The corrected routine now passes three deterministic regression tests: a delayed impulse returns $+0.20$~s, the reversed pair returns $-0.20$~s, and broadband waves traveling toward increasing and decreasing fiber coordinate are retained by opposite signed F--K masks and peak at opposite correlation lags. A one-file real-data smoke test shows comparable candidate branches near 3.1~km~s$^{-1}$ on opposite lag signs. That smoke result is diagnostic only. The versioned eight-day recomputation is running as SLURM array 37717572, with after-success aggregation job 37717613. No physical causal/anti-causal asymmetry is claimed until those jobs complete.
+The corrected routine passes three deterministic regression tests: delayed and reversed impulses return opposite lags, and broadband waves traveling toward increasing and decreasing fiber coordinate are retained by opposite signed F--K masks and peak at opposite correlation lags. The corrected seasonal retry is currently array 38562360, with after-success postprocess 38562403. No seasonal physical causal/anti-causal asymmetry is claimed while those products remain pending.
 
 \takeaway{Figure~39 remains valid only as a negative-mask positive-lag repeatability result. Figure~34's positive-mask curve is an opposite-mask leakage control, not a physical anti-causal branch test.}
 
 
-\subsection{Completed eight-day seasonal F--K validation and unfiltered control}
+\subsection{Superseded legacy eight-day F--K summary and unfiltered control}
 \figquestion{Does the signed F--K observable persist across independent dates, and does it remain absent from the exact-resolution unfiltered control?}
 
 The seasonal jobs processed eight selected dates independently and then formed an aggregate from 11,523 weighted one-minute files. All records were detrended, filtered from 5--20~Hz, divided by a 5-s running mean of absolute amplitude, and correlated with the channel-0 top-source geometry using the measured 1.020952-m spacing. The fixed negative signed wedge has a peak at 3.075~km~s$^{-1}$, score 0.279, and a 500-permutation receiver null probability $p=0.0002$. The legacy positive-mask score at positive lag is weak ($p=0.978$), but is now interpreted only as opposite-mask leakage along the negative branch's target moveout. It is not a test of the physical positive branch at negative lag. The two-sided positive-lag control is enhanced ($p=0.0026$), while the exact-resolution unfiltered aggregate is weak ($p=0.343$).
@@ -1690,7 +1690,7 @@ This establishes a repeatable directionally selected transfer observable across 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.98\linewidth]{ambient_transfer/fk_seasonal_day_sections.png}
-\caption{\textbf{Eight-day seasonal repeatability of the negative signed F--K correlation section.} The eight date panels show independently stacked, channel-0 top-source correlations from complete selected days; the final panel is the across-day weighted aggregate. Every panel uses the same 5--20~Hz temporal normalization, measured 1.020952-m channel spacing, fixed negative signed F--K mask, lag and receiver-position limits, and display color scale. The dashed line is a 3.2~km~s$^{-1}$ reference moveout, not a fitted velocity. Similar receiver-position--lag structure across dates and its reinforcement in the aggregate provide the visual repeatability test. The aggregate negative branch reaches a peak near 3.075~km~s$^{-1}$ with score 0.279 and receiver-permutation $p=0.0002$ across 11,523 weighted files. Because the signed wedge includes 2.5--4.5~km~s$^{-1}$ by construction, this demonstrates repeatability of a selected transfer observable, not an independent formation-velocity estimate. The older summary scatter plot is retained only as supplementary QC.}\end{figure}
+\caption{\textbf{Superseded legacy view of eight-day negative-mask positive-lag repeatability.} The eight date panels show independently stacked, channel-0 top-source correlations from complete selected days; the final panel is the across-day weighted aggregate. Every panel uses the same 5--20~Hz temporal normalization, measured 1.020952-m channel spacing, fixed negative signed F--K mask, lag and receiver-position limits, and display color scale. The dashed line is a 3.2~km~s$^{-1}$ reference moveout, not a fitted velocity. Similar receiver-position--lag structure across dates and its reinforcement in the aggregate provide the visual repeatability test. The aggregate negative branch reaches a peak near 3.075~km~s$^{-1}$ with score 0.279 and receiver-permutation $p=0.0002$ across 11,523 weighted files. Because the signed wedge includes 2.5--4.5~km~s$^{-1}$ by construction, this demonstrates repeatability of a selected transfer observable, not an independent formation-velocity estimate. The older summary scatter plot is retained only as supplementary QC.}\end{figure}
 
 \subsection{Completed frequency-band and anomaly diagnostics}
 The frequency-band scan processed four ten-file blocks per selected day in 3--8, 5--12, 8--20, and 15--30~Hz bands. The 3--8-Hz control is the most stable, with median early and late apparent velocities of approximately 3.15 and 3.12~km~s$^{-1}$ and a median descriptive breakpoint near 425~m. Higher-frequency row-maximum fits are less stable and sometimes yield nonphysical late-branch values, so they are retained as sensitivity diagnostics rather than independent geological constraints. The full anomaly postprocess contains 1,167 products across nine dates and places the descriptive transition broadly near 350--425~m, not uniquely at 500--520~m.
@@ -1707,6 +1707,101 @@ The first saved anti-alias comparison is withdrawn as an F--K validation. An imp
 \includegraphics[width=0.98\linewidth]{ambient_transfer/alias_sensitivity_2024-12-20_start0_n30.png}
 \caption{\textbf{Withdrawn anti-alias pilot figure.} This provenance figure compares direct, anti-aliased, and full-resolution paths, but the original implementation measured correlations before applying the signed F--K mask. It is therefore not a valid F--K preprocessing test and should not be used for interpretation; corrected results are pending.}\end{figure}
 
-\takeaway{v43 preserves the repeatable negative-mask positive-lag observable near 3.075~km~s$^{-1}$, withdraws any claim that the physical opposite branch is absent, and records the versioned corrected seasonal rerun. The result remains conditional on the selected F--K wedge and is not an independent formation-velocity estimate.}
+\takeaway{This legacy summary is retained for provenance but is superseded for branch physics and F--K-selection inference by the v44 ambient transfer validation below. The old positive-mask same-positive-lag result must not be interpreted as absence of the physical opposite branch.}
+
+
+\section{Ambient transfer validation}
+
+\subsection{Held-out mask sensitivity}
+\figquestion{Does the ambient transfer observable persist on dates excluded
+from development, and is its apparent velocity independent of the selected
+F--K mask?}
+
+Nano channel~0 is the virtual source.  All eight dates use a 5--20~Hz band and
+the same temporal normalization.  The development date is 2024-12-20; the
+remaining seven dates were frozen as held out before aggregation.  Under the
+documented Fourier and coordinate convention, $F K<0$ is evaluated at positive
+lag for propagation toward increasing fiber coordinate, whereas $F K>0$ is
+evaluated at negative lag for the opposite coordinate direction.
+
+On the held-out dates, the production 2.5--4.5~km~s$^{-1}$ wedge peaks at
+3.075 and
+3.075~km~s$^{-1}$ on the
+negative and positive branches.  Their equal-day scores at
+3.2~km~s$^{-1}$ are 0.270 and
+0.267, with conditional receiver-order
+probabilities $p=0.0005$ and
+$p=0.0005$.  The observable therefore
+repeats beyond the development date under the frozen production processing.
+
+The inferred velocity is not independent of the selection.  The narrow
+2.8--3.8~km~s$^{-1}$ wedge moves the negative-branch conditional peak to
+3.200~km~s$^{-1}$ and raises
+its score to 0.703.  The broad
+2.0--5.5~km~s$^{-1}$ wedge instead peaks at
+2.275 and
+1.850~km~s$^{-1}$, and its
+fixed 3.2~km~s$^{-1}$ probabilities are
+$p=0.656$ and
+$p=0.49$.  Direction-only scores
+at 3.2~km~s$^{-1}$ fall to 0.0004 and
+0.0107.  Thus the measured result is a
+repeatable, directionally and kinematically selected correlation observable;
+the approximately 3.1~km~s$^{-1}$ ridge is not an unbiased formation-velocity
+measurement.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.99\linewidth]{ambient_transfer/fk_mask_sensitivity_v2/ambient_fk_mask_sensitivity_v2.png}
+\caption{\textbf{Held-out sensitivity of the ambient transfer observable to the F--K mask.} The 2024-12-20 development date is separated from seven preselected held-out dates spanning the available seasonal archive. Each date is processed independently with Nano channel~0 as the virtual source, 5--20~Hz preprocessing, and running-absolute-mean temporal normalization; dates receive equal weight in the held-out aggregate. Columns compare the frozen production wedge (2.5--4.5~km~s$^{-1}$), a narrow wedge (2.8--3.8~km~s$^{-1}$), a broad wedge (2.0--5.5~km~s$^{-1}$), and signed-direction-only filtering without a velocity restriction. The $F K<0$ and $F K>0$ branches are evaluated on positive and negative physical lags, respectively. Receiver-order permutations quantify ordered moveout after F--K selection; they are not full-pipeline selection nulls. Persistence of the production-wedge score establishes temporal repeatability of the selected observable, whereas the large mask-dependent changes in ridge position and strength demonstrate that the approximately 3.1~km~s$^{-1}$ value is not an independent or unbiased estimate of formation velocity.}
+\end{figure}
+
+\subsection{Pre-F--K full-pipeline null tests}
+\figquestion{Does the frozen velocity wedge produce an apparently coherent
+ridge after the input wavefield's spatial or phase coherence has been
+destroyed?}
+
+The nulls are applied before F--K selection.  Channel permutation preserves
+individual trace spectra but destroys the receiver ordering.  Independent
+circular time shifts approximately preserve each trace's spectrum and
+amplitude distribution but disrupt interchannel phase alignment.  Every
+surrogate is then passed through the same 5--20~Hz processing, frozen
+2.5--4.5~km~s$^{-1}$ signed wedge, channel-0 correlation, stacking, and
+velocity scan.  The familywise statistic is the maximum across both physical
+lag branches and the scanned velocity range.
+
+For the 30-file pilot, channel permutation: negative p = 1, positive p = 1, familywise p = 1; circular time shift: negative p = 1, positive p = 1, familywise p = 1.  A large probability means
+that the observed maximum is common among the stated surrogates and therefore
+does not reject that null; it does not show that a physical signal is absent.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.99\linewidth]{ambient_transfer/fk_full_pipeline_null_v2_pilot_n30_r20/fk_full_pipeline_null_v2_aggregate_figure.png}
+\caption{\textbf{Thirty-minute pre-F--K full-pipeline null pilot.} The observed negative-branch, positive-branch, and branch-plus-velocity familywise peak median-correlation statistics are compared with 20 channel-permutation and 20 independent-circular-time-shift realizations. Each surrogate is constructed before F--K filtering and passes through the same Nano channel-0 virtual-source workflow, 5--20~Hz preprocessing, frozen 2.5--4.5~km~s$^{-1}$ signed wedge, physical-lag correlation, stack, and velocity scan as the unmodified 30-file record. Black vertical lines show observed statistics, dotted lines show surrogate 95th percentiles, and one-sided empirical probabilities use a plus-one correction. The pilot does not reject either coherence-destroying null. It therefore cannot establish that the selected ridge depends on preserved wave propagation, and it does not identify wave type or formation velocity.}
+\end{figure}
+
+The 300-file test gives channel permutation: negative p = 1, positive p = 1, familywise p = 1; circular time shift: negative p = 1, positive p = 1, familywise p = 1.  It increases stack duration
+tenfold while retaining the identical mask and test statistic, so differences
+from the pilot describe stack-length sensitivity rather than a changed
+selection rule.
+
+\textbf{Decision.} The five-hour result fails the predeclared requirement that both familywise nulls be rejected at $\alpha=0.05$.  The ambient ridge is therefore withdrawn as physical-wave evidence and retained only as a processing-sensitive diagnostic. Longer stacking of the same selected statistic is not treated as a remedy.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.99\linewidth]{ambient_transfer/fk_full_pipeline_null_v2_n300_r20/fk_full_pipeline_null_v2_aggregate_figure.png}
+\caption{\textbf{Five-hour pre-F--K full-pipeline null test.} The full null construction is repeated for 300 one-minute files with the same Nano channel-0 geometry, 5--20~Hz band, temporal normalization, 2.5--4.5~km~s$^{-1}$ signed wedge, branch-specific physical lag conventions, and maximum-across-branches-and-velocity familywise statistic used in the pilot. Channel permutations test reliance on spatial ordering; independent circular shifts test reliance on interchannel phase alignment. Both surrogate classes precede F--K filtering, so this is a direct test of whether the fixed selection can recover similar statistics from these coherence-destroyed inputs. The nulls do not span every possible spatially correlated ambient source field. The figure constrains processing-selection risk; it does not prove Green's-function convergence, identify the mode, establish causality, or convert a conditional ridge peak into formation $V_P$.}
+\end{figure}
+
+\takeaway{The production-wedge observable repeats on seven held-out dates, but it does not exceed both stated five-hour pre-F--K surrogate ensembles.  It is therefore withdrawn as physical-wave evidence.  The approximately 3.1~km~s$^{-1}$ feature must not be presented as Green's-function convergence, a propagating mode, or formation $V_P$.}
+
+
+\subsection{Corrected seasonal signed-lag status}
+The corrected eight-day causal/anti-causal aggregation remains pending under
+retry array 38562360 and after-success postprocess
+38562403.  Consequently, no seasonal branch-amplitude
+asymmetry is promoted in v44.  This status is deliberately separate from the
+completed held-out mask-sensitivity test, which used its own versioned
+products.
 
 \end{document}

@@ -1,0 +1,132 @@
+{
+  "workflow_version": "ambient_fk_full_pipeline_null_v2_aggregate",
+  "source_batches": [
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r0-0.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r1-1.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r10-10.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r11-11.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r12-12.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r13-13.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r14-14.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r15-15.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r16-16.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r17-17.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r18-18.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r19-19.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r2-2.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r3-3.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r4-4.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r5-5.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r6-6.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r7-7.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r8-8.json",
+    "fk_full_pipeline_null_v2_2024-12-20_start0_n30_r9-9.json"
+  ],
+  "date": "2024-12-20",
+  "start": 0,
+  "requested_files": 30,
+  "used_files": 30,
+  "random_seed": 20260805,
+  "null_realizations": 20,
+  "null_realization_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "null_methods": [
+    "channel_permutation",
+    "circular_time_shift"
+  ],
+  "observed": {
+    "negative": {
+      "peak_absolute_score_in_wedge": 0.2533106059860125,
+      "peak_velocity_m_s_in_wedge": 3075.0,
+      "signed_score_3200": 0.2346149121819348,
+      "absolute_score_3200": 0.2346149121819348
+    },
+    "positive": {
+      "peak_absolute_score_in_wedge": 0.2635781406165737,
+      "peak_velocity_m_s_in_wedge": 3075.0,
+      "signed_score_3200": 0.24513413569847153,
+      "absolute_score_3200": 0.24513413569847153
+    }
+  },
+  "observed_familywise_score": 0.2635781406165737,
+  "null_results": {
+    "channel_permutation": {
+      "branches": {
+        "negative": {
+          "observed_peak_absolute_score_in_wedge": 0.2533106059860125,
+          "observed_peak_velocity_m_s_in_wedge": 3075.0,
+          "null95_peak_score_in_wedge": 0.32282723032631166,
+          "p_peak_in_wedge": 1.0,
+          "null95_absolute_score_3200": 0.32243120531121505,
+          "p_absolute_score_3200": 1.0
+        },
+        "positive": {
+          "observed_peak_absolute_score_in_wedge": 0.2635781406165737,
+          "observed_peak_velocity_m_s_in_wedge": 3075.0,
+          "null95_peak_score_in_wedge": 0.3241179290134388,
+          "p_peak_in_wedge": 1.0,
+          "null95_absolute_score_3200": 0.32019011755576043,
+          "p_absolute_score_3200": 1.0
+        }
+      },
+      "familywise": {
+        "observed_maximum_across_branches_and_wedge": 0.2635781406165737,
+        "null95": 0.3244447860201564,
+        "p": 1.0
+      }
+    },
+    "circular_time_shift": {
+      "branches": {
+        "negative": {
+          "observed_peak_absolute_score_in_wedge": 0.2533106059860125,
+          "observed_peak_velocity_m_s_in_wedge": 3075.0,
+          "null95_peak_score_in_wedge": 0.30091142564973555,
+          "p_peak_in_wedge": 1.0,
+          "null95_absolute_score_3200": 0.29767131648670275,
+          "p_absolute_score_3200": 1.0
+        },
+        "positive": {
+          "observed_peak_absolute_score_in_wedge": 0.2635781406165737,
+          "observed_peak_velocity_m_s_in_wedge": 3075.0,
+          "null95_peak_score_in_wedge": 0.3041048175890351,
+          "p_peak_in_wedge": 1.0,
+          "null95_absolute_score_3200": 0.3014123098380854,
+          "p_absolute_score_3200": 1.0
+        }
+      },
+      "familywise": {
+        "observed_maximum_across_branches_and_wedge": 0.2635781406165737,
+        "null95": 0.3071160532414793,
+        "p": 1.0
+      }
+    }
+  },
+  "supported_claim": "A small empirical p value supports that the filtered/correlated ridge depends on pre-F-K spatial/phase coherence and is not produced by the fixed wedge acting on these coherence-destroyed surrogates.",
+  "limitations": [
+    "The inference is conditional on the 2.5-4.5 km/s wedge being frozen before evaluation.",
+    "These artificial surrogates do not reproduce every form of spatially correlated ambient noise.",
+    "The test does not establish Green's-function convergence, wave type, causality, or formation Vp.",
+    "Circular shifts introduce one wrap boundary per shifted trace.",
+    "The empirical p-value resolution is limited to 1/(number of nulls + 1)."
+  ]
+}

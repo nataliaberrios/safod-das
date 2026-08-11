@@ -1,0 +1,1206 @@
+{
+  "workflow_version": "ambient_fk_mask_sensitivity_v2_aggregate",
+  "development_date": "2024-12-20",
+  "heldout_dates": [
+    "2025-02-24",
+    "2024-05-11",
+    "2025-03-04",
+    "2024-06-17",
+    "2024-06-26",
+    "2024-10-28",
+    "2024-11-30"
+  ],
+  "available_heldout_dates": [
+    "2025-02-24",
+    "2024-05-11",
+    "2025-03-04",
+    "2024-06-17",
+    "2024-06-26",
+    "2024-10-28",
+    "2024-11-30"
+  ],
+  "split_is_frozen": true,
+  "manifest": "/home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean/ambient_transfer/seasonal_day_selection.json",
+  "manifest_selection_criteria": "nfiles >= 1400 and max inter-file interval <= 65 s; deterministic seed 20260803; two days per season; baseline 2025-02-20 excluded from random picks",
+  "predeclared_masks": {
+    "production_2p5_4p5": {
+      "velocity_m_s": [
+        2500.0,
+        4500.0
+      ],
+      "role": "predeclared production wedge"
+    },
+    "narrow_2p8_3p8": {
+      "velocity_m_s": [
+        2800.0,
+        3800.0
+      ],
+      "role": "narrow sensitivity wedge around the prior target"
+    },
+    "broad_2p0_5p5": {
+      "velocity_m_s": [
+        2000.0,
+        5500.0
+      ],
+      "role": "broad sensitivity wedge"
+    },
+    "direction_only": {
+      "velocity_m_s": null,
+      "role": "5--20 Hz signed-direction control with no velocity restriction"
+    }
+  },
+  "reference_velocity_m_s": 3200.0,
+  "velocity_statement": "Velocity peaks are post-filter conditional ridge diagnostics; they are not independent or unbiased estimates of formation velocity.",
+  "null_statement": "Receiver-order permutations test ordered moveout after F-K selection; they are not full-pipeline mask-selection nulls.",
+  "aggregation": "Each date is stacked internally by file count; held-out dates then receive equal weight.",
+  "permutations": 2000,
+  "partial": false,
+  "day_completeness": {
+    "2024-12-20": {
+      "found_chunks": 144,
+      "expected_chunks": 144,
+      "missing_chunks": [],
+      "used_files_by_mask": {
+        "production_2p5_4p5": 1440,
+        "narrow_2p8_3p8": 1440,
+        "broad_2p0_5p5": 1440,
+        "direction_only": 1440
+      }
+    },
+    "2025-02-24": {
+      "found_chunks": 144,
+      "expected_chunks": 144,
+      "missing_chunks": [],
+      "used_files_by_mask": {
+        "production_2p5_4p5": 1440,
+        "narrow_2p8_3p8": 1440,
+        "broad_2p0_5p5": 1440,
+        "direction_only": 1440
+      }
+    },
+    "2024-05-11": {
+      "found_chunks": 144,
+      "expected_chunks": 144,
+      "missing_chunks": [],
+      "used_files_by_mask": {
+        "production_2p5_4p5": 1440,
+        "narrow_2p8_3p8": 1440,
+        "broad_2p0_5p5": 1440,
+        "direction_only": 1440
+      }
+    },
+    "2025-03-04": {
+      "found_chunks": 145,
+      "expected_chunks": 145,
+      "missing_chunks": [],
+      "used_files_by_mask": {
+        "production_2p5_4p5": 1441,
+        "narrow_2p8_3p8": 1441,
+        "broad_2p0_5p5": 1441,
+        "direction_only": 1441
+      }
+    },
+    "2024-06-17": {
+      "found_chunks": 144,
+      "expected_chunks": 144,
+      "missing_chunks": [],
+      "used_files_by_mask": {
+        "production_2p5_4p5": 1440,
+        "narrow_2p8_3p8": 1440,
+        "broad_2p0_5p5": 1440,
+        "direction_only": 1440
+      }
+    },
+    "2024-06-26": {
+      "found_chunks": 144,
+      "expected_chunks": 144,
+      "missing_chunks": [],
+      "used_files_by_mask": {
+        "production_2p5_4p5": 1440,
+        "narrow_2p8_3p8": 1440,
+        "broad_2p0_5p5": 1440,
+        "direction_only": 1440
+      }
+    },
+    "2024-10-28": {
+      "found_chunks": 145,
+      "expected_chunks": 145,
+      "missing_chunks": [],
+      "used_files_by_mask": {
+        "production_2p5_4p5": 1441,
+        "narrow_2p8_3p8": 1441,
+        "broad_2p0_5p5": 1441,
+        "direction_only": 1441
+      }
+    },
+    "2024-11-30": {
+      "found_chunks": 145,
+      "expected_chunks": 145,
+      "missing_chunks": [],
+      "used_files_by_mask": {
+        "production_2p5_4p5": 1441,
+        "narrow_2p8_3p8": 1441,
+        "broad_2p0_5p5": 1441,
+        "direction_only": 1441
+      }
+    }
+  },
+  "group_results": {
+    "development": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.2878386701902051,
+          "conditional_peak_absolute_score": 0.2878386701902051,
+          "signed_score_3200": 0.2800047774691285,
+          "absolute_score_3200": 0.2800047774691285,
+          "conditional_null95_fixed_3200": 0.06721408745049602,
+          "conditional_p_fixed_3200": 0.0004997501249375312,
+          "conditional_null95_peak_scan": 0.14902197374047585,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.2897804698159856,
+          "conditional_peak_absolute_score": 0.2897804698159856,
+          "signed_score_3200": 0.28235050696583425,
+          "absolute_score_3200": 0.28235050696583425,
+          "conditional_null95_fixed_3200": 0.0701898184387905,
+          "conditional_p_fixed_3200": 0.0004997501249375312,
+          "conditional_null95_peak_scan": 0.15623869494041667,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7231097746849103,
+          "conditional_peak_absolute_score": 0.7231097746849103,
+          "signed_score_3200": 0.7231097746849103,
+          "absolute_score_3200": 0.7231097746849103,
+          "conditional_null95_fixed_3200": 0.11672837842246002,
+          "conditional_p_fixed_3200": 0.0004997501249375312,
+          "conditional_null95_peak_scan": 0.2576518317972211,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7240830274580985,
+          "conditional_peak_absolute_score": 0.7240830274580985,
+          "signed_score_3200": 0.7240830274580985,
+          "absolute_score_3200": 0.7240830274580985,
+          "conditional_null95_fixed_3200": 0.11333440128108486,
+          "conditional_p_fixed_3200": 0.0004997501249375312,
+          "conditional_null95_peak_scan": 0.2600668111769397,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.14440412684736487,
+          "conditional_peak_absolute_score": 0.14440412684736487,
+          "signed_score_3200": 0.013396222468469443,
+          "absolute_score_3200": 0.013396222468469443,
+          "conditional_null95_fixed_3200": 0.04699528745515281,
+          "conditional_p_fixed_3200": 0.5822088955522239,
+          "conditional_null95_peak_scan": 0.08125426908276831,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.14390948627349665,
+          "conditional_peak_absolute_score": 0.14390948627349665,
+          "signed_score_3200": 0.015162643313646425,
+          "absolute_score_3200": 0.015162643313646425,
+          "conditional_null95_fixed_3200": 0.049645979840301224,
+          "conditional_p_fixed_3200": 0.5397301349325337,
+          "conditional_null95_peak_scan": 0.08037147705077852,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 5950.0,
+          "conditional_peak_signed_score": 0.006559757510548428,
+          "conditional_peak_absolute_score": 0.006559757510548428,
+          "signed_score_3200": -0.0014004177024457343,
+          "absolute_score_3200": 0.0014004177024457343,
+          "conditional_null95_fixed_3200": 0.003941914887066255,
+          "conditional_p_fixed_3200": 0.5332333833083458,
+          "conditional_null95_peak_scan": 0.006183644402640619,
+          "conditional_p_peak_scan": 0.026486756621689155
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 5950.0,
+          "conditional_peak_signed_score": 0.0067830461543455026,
+          "conditional_peak_absolute_score": 0.0067830461543455026,
+          "signed_score_3200": -0.001983010135331728,
+          "absolute_score_3200": 0.001983010135331728,
+          "conditional_null95_fixed_3200": 0.0038455534798127553,
+          "conditional_p_fixed_3200": 0.4492753623188406,
+          "conditional_null95_peak_scan": 0.006071220890427799,
+          "conditional_p_peak_scan": 0.009995002498750625
+        }
+      }
+    },
+    "held_out": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.2778979003439662,
+          "conditional_peak_absolute_score": 0.2778979003439662,
+          "signed_score_3200": 0.26967600633858313,
+          "absolute_score_3200": 0.26967600633858313,
+          "conditional_null95_fixed_3200": 0.06778347782838602,
+          "conditional_p_fixed_3200": 0.0004997501249375312,
+          "conditional_null95_peak_scan": 0.15414579213785062,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.28743788246129304,
+          "conditional_peak_absolute_score": 0.28743788246129304,
+          "signed_score_3200": 0.2668835164750041,
+          "absolute_score_3200": 0.2668835164750041,
+          "conditional_null95_fixed_3200": 0.07686205887273673,
+          "conditional_p_fixed_3200": 0.0004997501249375312,
+          "conditional_null95_peak_scan": 0.15793261115152335,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7034885475188586,
+          "conditional_peak_absolute_score": 0.7034885475188586,
+          "signed_score_3200": 0.7034885475188586,
+          "absolute_score_3200": 0.7034885475188586,
+          "conditional_null95_fixed_3200": 0.10716280342126396,
+          "conditional_p_fixed_3200": 0.0004997501249375312,
+          "conditional_null95_peak_scan": 0.23370547484697163,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.6908919033818224,
+          "conditional_peak_absolute_score": 0.6908919033818224,
+          "signed_score_3200": 0.6908919033818224,
+          "absolute_score_3200": 0.6908919033818224,
+          "conditional_null95_fixed_3200": 0.1206829742495545,
+          "conditional_p_fixed_3200": 0.0004997501249375312,
+          "conditional_null95_peak_scan": 0.23393002273175673,
+          "conditional_p_peak_scan": 0.0004997501249375312
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.12834060225979246,
+          "conditional_peak_absolute_score": 0.12834060225979246,
+          "signed_score_3200": 0.01006194708928565,
+          "absolute_score_3200": 0.01006194708928565,
+          "conditional_null95_fixed_3200": 0.042095189127145084,
+          "conditional_p_fixed_3200": 0.6561719140429785,
+          "conditional_null95_peak_scan": 0.07336242145162049,
+          "conditional_p_peak_scan": 0.0009995002498750624
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 1850.0,
+          "conditional_peak_signed_score": -0.09971575661980589,
+          "conditional_peak_absolute_score": 0.09971575661980589,
+          "signed_score_3200": 0.015666479996320086,
+          "absolute_score_3200": 0.015666479996320086,
+          "conditional_null95_fixed_3200": 0.04653348568439587,
+          "conditional_p_fixed_3200": 0.4897551224387806,
+          "conditional_null95_peak_scan": 0.07684189560376868,
+          "conditional_p_peak_scan": 0.0069965017491254375
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2500.0,
+          "conditional_peak_signed_score": 0.009918041227967246,
+          "conditional_peak_absolute_score": 0.009918041227967246,
+          "signed_score_3200": -0.00040463463951997676,
+          "absolute_score_3200": 0.00040463463951997676,
+          "conditional_null95_fixed_3200": 0.007090483483762147,
+          "conditional_p_fixed_3200": 0.928535732133933,
+          "conditional_null95_peak_scan": 0.01066513257846561,
+          "conditional_p_peak_scan": 0.14492753623188406
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3100.0,
+          "conditional_peak_signed_score": -0.011674205710358114,
+          "conditional_peak_absolute_score": 0.011674205710358114,
+          "signed_score_3200": -0.010732430739538211,
+          "absolute_score_3200": 0.010732430739538211,
+          "conditional_null95_fixed_3200": 0.009131563458302138,
+          "conditional_p_fixed_3200": 0.018490754622688656,
+          "conditional_null95_peak_scan": 0.013513678456777645,
+          "conditional_p_peak_scan": 0.21539230384807595
+        }
+      }
+    }
+  },
+  "day_results": {
+    "2024-12-20": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.2878386701902051,
+          "conditional_peak_absolute_score": 0.2878386701902051,
+          "signed_score_3200": 0.2800047774691285,
+          "absolute_score_3200": 0.2800047774691285,
+          "conditional_null95_fixed_3200": 0.06572115004138335,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.14669908391819658,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.2897804698159856,
+          "conditional_peak_absolute_score": 0.2897804698159856,
+          "signed_score_3200": 0.28235050696583425,
+          "absolute_score_3200": 0.28235050696583425,
+          "conditional_null95_fixed_3200": 0.07584520503804994,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.149569578108877,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7231097746849103,
+          "conditional_peak_absolute_score": 0.7231097746849103,
+          "signed_score_3200": 0.7231097746849103,
+          "absolute_score_3200": 0.7231097746849103,
+          "conditional_null95_fixed_3200": 0.1093500269696631,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.26310164084831184,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7240830274580985,
+          "conditional_peak_absolute_score": 0.7240830274580985,
+          "signed_score_3200": 0.7240830274580985,
+          "absolute_score_3200": 0.7240830274580985,
+          "conditional_null95_fixed_3200": 0.12082177930450266,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.26916122362492717,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.14440412684736487,
+          "conditional_peak_absolute_score": 0.14440412684736487,
+          "signed_score_3200": 0.013396222468469443,
+          "absolute_score_3200": 0.013396222468469443,
+          "conditional_null95_fixed_3200": 0.04918185563134444,
+          "conditional_p_fixed_3200": 0.5577689243027888,
+          "conditional_null95_peak_scan": 0.07745678267156668,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.14390948627349665,
+          "conditional_peak_absolute_score": 0.14390948627349665,
+          "signed_score_3200": 0.015162643313646425,
+          "absolute_score_3200": 0.015162643313646425,
+          "conditional_null95_fixed_3200": 0.04905529880235621,
+          "conditional_p_fixed_3200": 0.5378486055776892,
+          "conditional_null95_peak_scan": 0.08456305588878073,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 5950.0,
+          "conditional_peak_signed_score": 0.006559757510548428,
+          "conditional_peak_absolute_score": 0.006559757510548428,
+          "signed_score_3200": -0.0014004177024457343,
+          "absolute_score_3200": 0.0014004177024457343,
+          "conditional_null95_fixed_3200": 0.004002885760273288,
+          "conditional_p_fixed_3200": 0.6095617529880478,
+          "conditional_null95_peak_scan": 0.005927690809632782,
+          "conditional_p_peak_scan": 0.02390438247011952
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 5950.0,
+          "conditional_peak_signed_score": 0.0067830461543455026,
+          "conditional_peak_absolute_score": 0.0067830461543455026,
+          "signed_score_3200": -0.001983010135331728,
+          "absolute_score_3200": 0.001983010135331728,
+          "conditional_null95_fixed_3200": 0.0036683411997984767,
+          "conditional_p_fixed_3200": 0.4581673306772908,
+          "conditional_null95_peak_scan": 0.0059971642949778825,
+          "conditional_p_peak_scan": 0.00796812749003984
+        }
+      }
+    },
+    "2025-02-24": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.3435583458497602,
+          "conditional_peak_absolute_score": 0.3435583458497602,
+          "signed_score_3200": 0.33203335979499593,
+          "absolute_score_3200": 0.33203335979499593,
+          "conditional_null95_fixed_3200": 0.08017346773189164,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.18064087929260425,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.3454520161970397,
+          "conditional_peak_absolute_score": 0.3454520161970397,
+          "signed_score_3200": 0.3349006343753341,
+          "absolute_score_3200": 0.3349006343753341,
+          "conditional_null95_fixed_3200": 0.08643048364987031,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.17047209611126607,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7494646551594903,
+          "conditional_peak_absolute_score": 0.7494646551594903,
+          "signed_score_3200": 0.7494646551594903,
+          "absolute_score_3200": 0.7494646551594903,
+          "conditional_null95_fixed_3200": 0.16360992123418314,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.29933934293025644,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7481334350271761,
+          "conditional_peak_absolute_score": 0.7481334350271761,
+          "signed_score_3200": 0.7481334350271761,
+          "absolute_score_3200": 0.7481334350271761,
+          "conditional_null95_fixed_3200": 0.1500689012177787,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.2820258513626712,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.13551057568754257,
+          "conditional_peak_absolute_score": 0.13551057568754257,
+          "signed_score_3200": 0.004620878566385388,
+          "absolute_score_3200": 0.004620878566385388,
+          "conditional_null95_fixed_3200": 0.05274872767601214,
+          "conditional_p_fixed_3200": 0.8565737051792829,
+          "conditional_null95_peak_scan": 0.084410169189748,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.13280013042211386,
+          "conditional_peak_absolute_score": 0.13280013042211386,
+          "signed_score_3200": 0.006346288963359396,
+          "absolute_score_3200": 0.006346288963359396,
+          "conditional_null95_fixed_3200": 0.0502332297481009,
+          "conditional_p_fixed_3200": 0.852589641434263,
+          "conditional_null95_peak_scan": 0.08411523006546304,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2700.0,
+          "conditional_peak_signed_score": -0.004374348343843204,
+          "conditional_peak_absolute_score": 0.004374348343843204,
+          "signed_score_3200": 0.00025048373703682585,
+          "absolute_score_3200": 0.00025048373703682585,
+          "conditional_null95_fixed_3200": 0.003368734375092894,
+          "conditional_p_fixed_3200": 0.8804780876494024,
+          "conditional_null95_peak_scan": 0.005603500655487055,
+          "conditional_p_peak_scan": 0.24302788844621515
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2650.0,
+          "conditional_peak_signed_score": -0.0038237277615729495,
+          "conditional_peak_absolute_score": 0.0038237277615729495,
+          "signed_score_3200": -0.001103324888304602,
+          "absolute_score_3200": 0.001103324888304602,
+          "conditional_null95_fixed_3200": 0.0029225713378253897,
+          "conditional_p_fixed_3200": 0.46613545816733065,
+          "conditional_null95_peak_scan": 0.0050206341787643475,
+          "conditional_p_peak_scan": 0.24302788844621515
+        }
+      }
+    },
+    "2024-05-11": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.2121821658641977,
+          "conditional_peak_absolute_score": 0.2121821658641977,
+          "signed_score_3200": 0.20682714690283416,
+          "absolute_score_3200": 0.20682714690283416,
+          "conditional_null95_fixed_3200": 0.05951801872768878,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.13445999841853037,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.2123647286806143,
+          "conditional_peak_absolute_score": 0.2123647286806143,
+          "signed_score_3200": 0.20720591795840007,
+          "absolute_score_3200": 0.20720591795840007,
+          "conditional_null95_fixed_3200": 0.05345696175100982,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.12915578822336451,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.6718217088155992,
+          "conditional_peak_absolute_score": 0.6718217088155992,
+          "signed_score_3200": 0.6718217088155992,
+          "absolute_score_3200": 0.6718217088155992,
+          "conditional_null95_fixed_3200": 0.09182078308918369,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.19910892103669647,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.6715100989747014,
+          "conditional_peak_absolute_score": 0.6715100989747014,
+          "signed_score_3200": 0.6715100989747014,
+          "absolute_score_3200": 0.6715100989747014,
+          "conditional_null95_fixed_3200": 0.08240500588200064,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.2101687074942661,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 4100.0,
+          "conditional_peak_signed_score": 0.09824072111310944,
+          "conditional_peak_absolute_score": 0.09824072111310944,
+          "signed_score_3200": -0.013422456147304269,
+          "absolute_score_3200": 0.013422456147304269,
+          "conditional_null95_fixed_3200": 0.035548440859818065,
+          "conditional_p_fixed_3200": 0.5099601593625498,
+          "conditional_null95_peak_scan": 0.05626222214326776,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 4100.0,
+          "conditional_peak_signed_score": 0.09872224434201321,
+          "conditional_peak_absolute_score": 0.09872224434201321,
+          "signed_score_3200": -0.01307115795322452,
+          "absolute_score_3200": 0.01307115795322452,
+          "conditional_null95_fixed_3200": 0.0367854816442329,
+          "conditional_p_fixed_3200": 0.5179282868525896,
+          "conditional_null95_peak_scan": 0.058694337068484974,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3925.0,
+          "conditional_peak_signed_score": 0.0007741341245309665,
+          "conditional_peak_absolute_score": 0.0007741341245309665,
+          "signed_score_3200": 0.00022268697069284857,
+          "absolute_score_3200": 0.00022268697069284857,
+          "conditional_null95_fixed_3200": 0.0009774598427914698,
+          "conditional_p_fixed_3200": 0.6573705179282868,
+          "conditional_null95_peak_scan": 0.0016777344179420882,
+          "conditional_p_peak_scan": 0.8326693227091634
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 1200.0,
+          "conditional_peak_signed_score": -0.0010827701861258205,
+          "conditional_peak_absolute_score": 0.0010827701861258205,
+          "signed_score_3200": 7.738316088050082e-05,
+          "absolute_score_3200": 7.738316088050082e-05,
+          "conditional_null95_fixed_3200": 0.0005368314206462806,
+          "conditional_p_fixed_3200": 0.848605577689243,
+          "conditional_null95_peak_scan": 0.0010829406979677857,
+          "conditional_p_peak_scan": 0.05976095617529881
+        }
+      }
+    },
+    "2025-03-04": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.3265933101105013,
+          "conditional_peak_absolute_score": 0.3265933101105013,
+          "signed_score_3200": 0.31837879145597137,
+          "absolute_score_3200": 0.31837879145597137,
+          "conditional_null95_fixed_3200": 0.07863278819662203,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.16114622273567872,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.3272071807312045,
+          "conditional_peak_absolute_score": 0.3272071807312045,
+          "signed_score_3200": 0.3194293637878123,
+          "absolute_score_3200": 0.3194293637878123,
+          "conditional_null95_fixed_3200": 0.08912073185136357,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.1710182933462692,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7432369867756972,
+          "conditional_peak_absolute_score": 0.7432369867756972,
+          "signed_score_3200": 0.7432369867756972,
+          "absolute_score_3200": 0.7432369867756972,
+          "conditional_null95_fixed_3200": 0.12478416221196623,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.2716814874973993,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7429392084294488,
+          "conditional_peak_absolute_score": 0.7429392084294488,
+          "signed_score_3200": 0.7429392084294488,
+          "absolute_score_3200": 0.7429392084294488,
+          "conditional_null95_fixed_3200": 0.1388721705292398,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.28354254944449603,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.13488934651639048,
+          "conditional_peak_absolute_score": 0.13488934651639048,
+          "signed_score_3200": 0.012255609873635984,
+          "absolute_score_3200": 0.012255609873635984,
+          "conditional_null95_fixed_3200": 0.05101237457641379,
+          "conditional_p_fixed_3200": 0.5657370517928287,
+          "conditional_null95_peak_scan": 0.08183103638166056,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.13147598874215494,
+          "conditional_peak_absolute_score": 0.13147598874215494,
+          "signed_score_3200": 0.015778842975567302,
+          "absolute_score_3200": 0.015778842975567302,
+          "conditional_null95_fixed_3200": 0.04431568243344847,
+          "conditional_p_fixed_3200": 0.5258964143426295,
+          "conditional_null95_peak_scan": 0.07380785336927188,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 4350.0,
+          "conditional_peak_signed_score": 0.001986156970942822,
+          "conditional_peak_absolute_score": 0.001986156970942822,
+          "signed_score_3200": 0.00042497576309574053,
+          "absolute_score_3200": 0.00042497576309574053,
+          "conditional_null95_fixed_3200": 0.0022814830637457864,
+          "conditional_p_fixed_3200": 0.7051792828685259,
+          "conditional_null95_peak_scan": 0.004067784389490284,
+          "conditional_p_peak_scan": 0.6573705179282868
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2475.0,
+          "conditional_peak_signed_score": 0.0025282732619866335,
+          "conditional_peak_absolute_score": 0.0025282732619866335,
+          "signed_score_3200": 9.805855858998185e-05,
+          "absolute_score_3200": 9.805855858998185e-05,
+          "conditional_null95_fixed_3200": 0.003112654476520313,
+          "conditional_p_fixed_3200": 0.9163346613545816,
+          "conditional_null95_peak_scan": 0.003999585003190428,
+          "conditional_p_peak_scan": 0.5617529880478087
+        }
+      }
+    },
+    "2024-06-17": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3175.0,
+          "conditional_peak_signed_score": 0.2310995542377075,
+          "conditional_peak_absolute_score": 0.2310995542377075,
+          "signed_score_3200": 0.23081495617865544,
+          "absolute_score_3200": 0.23081495617865544,
+          "conditional_null95_fixed_3200": 0.06978111457073045,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.13353198428717233,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2975.0,
+          "conditional_peak_signed_score": 0.2494944947961693,
+          "conditional_peak_absolute_score": 0.2494944947961693,
+          "signed_score_3200": 0.21510506127894194,
+          "absolute_score_3200": 0.21510506127894194,
+          "conditional_null95_fixed_3200": 0.08825079563359277,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.15658255942265392,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.6841636134502211,
+          "conditional_peak_absolute_score": 0.6841636134502211,
+          "signed_score_3200": 0.6841636134502211,
+          "absolute_score_3200": 0.6841636134502211,
+          "conditional_null95_fixed_3200": 0.1250944075664366,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.199338939209272,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3175.0,
+          "conditional_peak_signed_score": 0.6328649830074689,
+          "conditional_peak_absolute_score": 0.6328649830074689,
+          "signed_score_3200": 0.6318423903549528,
+          "absolute_score_3200": 0.6318423903549528,
+          "conditional_null95_fixed_3200": 0.11927820629583673,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.20263385499670492,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3925.0,
+          "conditional_peak_signed_score": 0.12291318325906445,
+          "conditional_peak_absolute_score": 0.12291318325906445,
+          "signed_score_3200": 0.012269125351942637,
+          "absolute_score_3200": 0.012269125351942637,
+          "conditional_null95_fixed_3200": 0.04439456272211293,
+          "conditional_p_fixed_3200": 0.6932270916334662,
+          "conditional_null95_peak_scan": 0.08357016534343782,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 4275.0,
+          "conditional_peak_signed_score": 0.10763130308086473,
+          "conditional_peak_absolute_score": 0.10763130308086473,
+          "signed_score_3200": 0.014256833813168005,
+          "absolute_score_3200": 0.014256833813168005,
+          "conditional_null95_fixed_3200": 0.06054502969343576,
+          "conditional_p_fixed_3200": 0.6374501992031872,
+          "conditional_null95_peak_scan": 0.0952283862345089,
+          "conditional_p_peak_scan": 0.01593625498007968
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2525.0,
+          "conditional_peak_signed_score": 0.014275716876908283,
+          "conditional_peak_absolute_score": 0.014275716876908283,
+          "signed_score_3200": 0.004982874877888466,
+          "absolute_score_3200": 0.004982874877888466,
+          "conditional_null95_fixed_3200": 0.008878519475337862,
+          "conditional_p_fixed_3200": 0.20318725099601595,
+          "conditional_null95_peak_scan": 0.017881143017284187,
+          "conditional_p_peak_scan": 0.27091633466135456
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2675.0,
+          "conditional_peak_signed_score": 0.024206951498480952,
+          "conditional_peak_absolute_score": 0.024206951498480952,
+          "signed_score_3200": -0.0225158283378147,
+          "absolute_score_3200": 0.0225158283378147,
+          "conditional_null95_fixed_3200": 0.01617477923780578,
+          "conditional_p_fixed_3200": 0.01593625498007968,
+          "conditional_null95_peak_scan": 0.02678457833527961,
+          "conditional_p_peak_scan": 0.1752988047808765
+        }
+      }
+    },
+    "2024-06-26": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.24040625360078383,
+          "conditional_peak_absolute_score": 0.24040625360078383,
+          "signed_score_3200": 0.22489326575224883,
+          "absolute_score_3200": 0.22489326575224883,
+          "conditional_null95_fixed_3200": 0.07289427909291278,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.1383330559381475,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2975.0,
+          "conditional_peak_signed_score": 0.3086833183860301,
+          "conditional_peak_absolute_score": 0.3086833183860301,
+          "signed_score_3200": 0.21496151838758093,
+          "absolute_score_3200": 0.21496151838758093,
+          "conditional_null95_fixed_3200": 0.12834800258106815,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.1810435459768926,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.6223924129649535,
+          "conditional_peak_absolute_score": 0.6223924129649535,
+          "signed_score_3200": 0.6223924129649535,
+          "absolute_score_3200": 0.6223924129649535,
+          "conditional_null95_fixed_3200": 0.11432802506572957,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.19922120529636475,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3100.0,
+          "conditional_peak_signed_score": 0.6263296718606232,
+          "conditional_peak_absolute_score": 0.6263296718606232,
+          "signed_score_3200": 0.5902387529569544,
+          "absolute_score_3200": 0.5902387529569544,
+          "conditional_null95_fixed_3200": 0.16040509581818965,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.22967065815658264,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3925.0,
+          "conditional_peak_signed_score": 0.1284361957794829,
+          "conditional_peak_absolute_score": 0.1284361957794829,
+          "signed_score_3200": 0.021237019108729552,
+          "absolute_score_3200": 0.021237019108729552,
+          "conditional_null95_fixed_3200": 0.05498100968174152,
+          "conditional_p_fixed_3200": 0.5697211155378487,
+          "conditional_null95_peak_scan": 0.08993937678915373,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2675.0,
+          "conditional_peak_signed_score": 0.13585727783558152,
+          "conditional_peak_absolute_score": 0.13585727783558152,
+          "signed_score_3200": 0.034889969996766794,
+          "absolute_score_3200": 0.034889969996766794,
+          "conditional_null95_fixed_3200": 0.08662027069759168,
+          "conditional_p_fixed_3200": 0.46613545816733065,
+          "conditional_null95_peak_scan": 0.13297347165314624,
+          "conditional_p_peak_scan": 0.0398406374501992
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2425.0,
+          "conditional_peak_signed_score": 0.04545227461203164,
+          "conditional_peak_absolute_score": 0.04545227461203164,
+          "signed_score_3200": -0.009998169336050735,
+          "absolute_score_3200": 0.009998169336050735,
+          "conditional_null95_fixed_3200": 0.04137824041960467,
+          "conditional_p_fixed_3200": 0.6175298804780877,
+          "conditional_null95_peak_scan": 0.056649130107728776,
+          "conditional_p_peak_scan": 0.7091633466135459
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3000.0,
+          "conditional_peak_signed_score": -0.06542915816459258,
+          "conditional_peak_absolute_score": 0.06542915816459258,
+          "signed_score_3200": -0.05586549249237873,
+          "absolute_score_3200": 0.05586549249237873,
+          "conditional_null95_fixed_3200": 0.05054604726608172,
+          "conditional_p_fixed_3200": 0.03187250996015936,
+          "conditional_null95_peak_scan": 0.07657662451634455,
+          "conditional_p_peak_scan": 0.42231075697211157
+        }
+      }
+    },
+    "2024-10-28": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.3053510451550542,
+          "conditional_peak_absolute_score": 0.3053510451550542,
+          "signed_score_3200": 0.2944499183900024,
+          "absolute_score_3200": 0.2944499183900024,
+          "conditional_null95_fixed_3200": 0.08740545496246008,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.17277444609650042,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.3059593917697116,
+          "conditional_peak_absolute_score": 0.3059593917697116,
+          "signed_score_3200": 0.2954331620576361,
+          "absolute_score_3200": 0.2954331620576361,
+          "conditional_null95_fixed_3200": 0.08140775009740786,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.17211800038090802,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7293248217101173,
+          "conditional_peak_absolute_score": 0.7293248217101173,
+          "signed_score_3200": 0.7293248217101173,
+          "absolute_score_3200": 0.7293248217101173,
+          "conditional_null95_fixed_3200": 0.15377054764576215,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.263645638811158,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7277446263767774,
+          "conditional_peak_absolute_score": 0.7277446263767774,
+          "signed_score_3200": 0.7277446263767774,
+          "absolute_score_3200": 0.7277446263767774,
+          "conditional_null95_fixed_3200": 0.15850335832054765,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.241744066058685,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.14650199860421548,
+          "conditional_peak_absolute_score": 0.14650199860421548,
+          "signed_score_3200": 0.014927050622302193,
+          "absolute_score_3200": 0.014927050622302193,
+          "conditional_null95_fixed_3200": 0.05549741099337512,
+          "conditional_p_fixed_3200": 0.5697211155378487,
+          "conditional_null95_peak_scan": 0.08467645396763776,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.14002732989010888,
+          "conditional_peak_absolute_score": 0.14002732989010888,
+          "signed_score_3200": 0.017537577368786764,
+          "absolute_score_3200": 0.017537577368786764,
+          "conditional_null95_fixed_3200": 0.051215625256114596,
+          "conditional_p_fixed_3200": 0.5219123505976095,
+          "conditional_null95_peak_scan": 0.08199083217491976,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 4825.0,
+          "conditional_peak_signed_score": 0.004492900688468367,
+          "conditional_peak_absolute_score": 0.004492900688468367,
+          "signed_score_3200": 0.0021020802535928976,
+          "absolute_score_3200": 0.0021020802535928976,
+          "conditional_null95_fixed_3200": 0.002910553903455738,
+          "conditional_p_fixed_3200": 0.2549800796812749,
+          "conditional_null95_peak_scan": 0.005243692979480961,
+          "conditional_p_peak_scan": 0.17131474103585656
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 4675.0,
+          "conditional_peak_signed_score": 0.004667326442568079,
+          "conditional_peak_absolute_score": 0.004667326442568079,
+          "signed_score_3200": 0.001628583845747704,
+          "absolute_score_3200": 0.001628583845747704,
+          "conditional_null95_fixed_3200": 0.0032554270633801392,
+          "conditional_p_fixed_3200": 0.4342629482071713,
+          "conditional_null95_peak_scan": 0.00498161812127569,
+          "conditional_p_peak_scan": 0.12749003984063745
+        }
+      }
+    },
+    "2024-11-30": {
+      "production_2p5_4p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.2891930316392629,
+          "conditional_peak_absolute_score": 0.2891930316392629,
+          "signed_score_3200": 0.2803346058953738,
+          "absolute_score_3200": 0.2803346058953738,
+          "conditional_null95_fixed_3200": 0.05940823712156075,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.15556389653185337,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3075.0,
+          "conditional_peak_signed_score": 0.2898263613368293,
+          "conditional_peak_absolute_score": 0.2898263613368293,
+          "signed_score_3200": 0.2811489574793229,
+          "absolute_score_3200": 0.2811489574793229,
+          "conditional_null95_fixed_3200": 0.06516654879292615,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.15907357070044387,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "narrow_2p8_3p8": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7240156337559315,
+          "conditional_peak_absolute_score": 0.7240156337559315,
+          "signed_score_3200": 0.7240156337559315,
+          "absolute_score_3200": 0.7240156337559315,
+          "conditional_null95_fixed_3200": 0.11196297890388214,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.26483046793225556,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 3200.0,
+          "conditional_peak_signed_score": 0.7238348115527458,
+          "conditional_peak_absolute_score": 0.7238348115527458,
+          "signed_score_3200": 0.7238348115527458,
+          "absolute_score_3200": 0.7238348115527458,
+          "conditional_null95_fixed_3200": 0.0969380533584152,
+          "conditional_p_fixed_3200": 0.00398406374501992,
+          "conditional_null95_peak_scan": 0.25023423347000184,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "broad_2p0_5p5": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.15358187579684873,
+          "conditional_peak_absolute_score": 0.15358187579684873,
+          "signed_score_3200": 0.017162433389375946,
+          "absolute_score_3200": 0.017162433389375946,
+          "conditional_null95_fixed_3200": 0.04603697966610599,
+          "conditional_p_fixed_3200": 0.4860557768924303,
+          "conditional_null95_peak_scan": 0.08098394867738108,
+          "conditional_p_peak_scan": 0.00398406374501992
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 2275.0,
+          "conditional_peak_signed_score": 0.15306776811595726,
+          "conditional_peak_absolute_score": 0.15306776811595726,
+          "signed_score_3200": 0.015976514656661715,
+          "absolute_score_3200": 0.015976514656661715,
+          "conditional_null95_fixed_3200": 0.049814824660271644,
+          "conditional_p_fixed_3200": 0.5298804780876494,
+          "conditional_null95_peak_scan": 0.07773113774213168,
+          "conditional_p_peak_scan": 0.00398406374501992
+        }
+      },
+      "direction_only": {
+        "negative": {
+          "conditional_peak_velocity_m_s": 4675.0,
+          "conditional_peak_signed_score": 0.0052311823240224304,
+          "conditional_peak_absolute_score": 0.0052311823240224304,
+          "signed_score_3200": -1.6833656024186695e-05,
+          "absolute_score_3200": 1.6833656024186695e-05,
+          "conditional_null95_fixed_3200": 0.0038585623083287088,
+          "conditional_p_fixed_3200": 0.9960159362549801,
+          "conditional_null95_peak_scan": 0.005876063374205359,
+          "conditional_p_peak_scan": 0.12749003984063745
+        },
+        "positive": {
+          "conditional_peak_velocity_m_s": 5500.0,
+          "conditional_peak_signed_score": 0.004163526811499278,
+          "conditional_peak_absolute_score": 0.004163526811499278,
+          "signed_score_3200": -0.0009344662163108862,
+          "absolute_score_3200": 0.0009344662163108862,
+          "conditional_null95_fixed_3200": 0.0037242209485071932,
+          "conditional_p_fixed_3200": 0.6812749003984063,
+          "conditional_null95_peak_scan": 0.005427973833015212,
+          "conditional_p_peak_scan": 0.2788844621513944
+        }
+      }
+    }
+  },
+  "generalization_at_3200_m_s": {
+    "production_2p5_4p5": {
+      "negative": {
+        "development_absolute_score_3200": 0.2800047774691285,
+        "heldout_equal_day_absolute_score_3200": 0.26967600633858313,
+        "heldout_day_median_absolute_score_3200": 0.2803346058953738,
+        "heldout_day_min_absolute_score_3200": 0.20682714690283416,
+        "heldout_day_max_absolute_score_3200": 0.33203335979499593,
+        "heldout_to_development_ratio_3200": 0.9631121610713084
+      },
+      "positive": {
+        "development_absolute_score_3200": 0.28235050696583425,
+        "heldout_equal_day_absolute_score_3200": 0.2668835164750041,
+        "heldout_day_median_absolute_score_3200": 0.2811489574793229,
+        "heldout_day_min_absolute_score_3200": 0.20720591795840007,
+        "heldout_day_max_absolute_score_3200": 0.3349006343753341,
+        "heldout_to_development_ratio_3200": 0.9452206030828847
+      }
+    },
+    "narrow_2p8_3p8": {
+      "negative": {
+        "development_absolute_score_3200": 0.7231097746849103,
+        "heldout_equal_day_absolute_score_3200": 0.7034885475188586,
+        "heldout_day_median_absolute_score_3200": 0.7240156337559315,
+        "heldout_day_min_absolute_score_3200": 0.6223924129649535,
+        "heldout_day_max_absolute_score_3200": 0.7494646551594903,
+        "heldout_to_development_ratio_3200": 0.9728654931063523
+      },
+      "positive": {
+        "development_absolute_score_3200": 0.7240830274580985,
+        "heldout_equal_day_absolute_score_3200": 0.6908919033818224,
+        "heldout_day_median_absolute_score_3200": 0.7238348115527458,
+        "heldout_day_min_absolute_score_3200": 0.5902387529569544,
+        "heldout_day_max_absolute_score_3200": 0.7481334350271761,
+        "heldout_to_development_ratio_3200": 0.9541611627152843
+      }
+    },
+    "broad_2p0_5p5": {
+      "negative": {
+        "development_absolute_score_3200": 0.013396222468469443,
+        "heldout_equal_day_absolute_score_3200": 0.01006194708928565,
+        "heldout_day_median_absolute_score_3200": 0.013422456147304269,
+        "heldout_day_min_absolute_score_3200": 0.004620878566385388,
+        "heldout_day_max_absolute_score_3200": 0.021237019108729552,
+        "heldout_to_development_ratio_3200": 0.7511033138609302
+      },
+      "positive": {
+        "development_absolute_score_3200": 0.015162643313646425,
+        "heldout_equal_day_absolute_score_3200": 0.015666479996320086,
+        "heldout_day_median_absolute_score_3200": 0.015778842975567302,
+        "heldout_day_min_absolute_score_3200": 0.006346288963359396,
+        "heldout_day_max_absolute_score_3200": 0.034889969996766794,
+        "heldout_to_development_ratio_3200": 1.0332288158635379
+      }
+    },
+    "direction_only": {
+      "negative": {
+        "development_absolute_score_3200": 0.0014004177024457343,
+        "heldout_equal_day_absolute_score_3200": 0.00040463463951997676,
+        "heldout_day_median_absolute_score_3200": 0.00042497576309574053,
+        "heldout_day_min_absolute_score_3200": 1.6833656024186695e-05,
+        "heldout_day_max_absolute_score_3200": 0.009998169336050735,
+        "heldout_to_development_ratio_3200": 0.2889385351337032
+      },
+      "positive": {
+        "development_absolute_score_3200": 0.001983010135331728,
+        "heldout_equal_day_absolute_score_3200": 0.010732430739538211,
+        "heldout_day_median_absolute_score_3200": 0.001103324888304602,
+        "heldout_day_min_absolute_score_3200": 7.738316088050082e-05,
+        "heldout_day_max_absolute_score_3200": 0.05586549249237873,
+        "heldout_to_development_ratio_3200": 5.412191570943653
+      }
+    }
+  }
+}
