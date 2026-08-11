@@ -55,7 +55,7 @@ $1.4$--$1.56~\mathrm{km\,s^{-1}}$ low-frequency mode is validated on the
 wireline Deep array.  The former is not yet securely identified as direct P;
 the latter is consistent with, but not yet proven to be, a borehole tube wave.
 The document follows the current results notebook,
-\path{AWD_results_dashboard.ipynb}, version v45.  The hierarchical
+\path{AWD_results_dashboard.ipynb}, version v46.  The hierarchical
 individual-drop/burst repeatability analysis and the split-sample Deep
 time-gated branch search are now promoted into the authoritative results
 record.  A six-figure core presentation set plus an advisor-facing figure
@@ -1852,12 +1852,35 @@ v44 rejection was circular, the strict unfiltered control is weak, and the
 independent pre-filter test finds no target-power enrichment. No Green's-function, mode, or
 formation-$V_P$ claim is assigned until the validation is complete.}
 
-\subsection{Corrected seasonal signed-lag status}
-The corrected eight-day causal/anti-causal aggregation remains pending under
-retry array 38562360 and after-success postprocess
-38562403.  Consequently, no seasonal branch-amplitude
-asymmetry is promoted in v45.  This status is deliberately separate from the
-completed held-out mask-sensitivity test, which used its own versioned
-products.
+\subsection{Corrected eight-day signed-lag comparison (v46)}
+\figquestion{Does corrected \(F K>0\) contain ordered moveout on its physical
+negative-lag side, and how does it compare with \(F K<0\) at positive lag?}
+
+The independently audited aggregate contains 11,523 one-minute files from
+8 frozen dates. \(F K<0\) is evaluated at positive lag for propagation
+toward increasing fiber coordinate; \(F K>0\) is evaluated at negative lag
+for the opposite coordinate direction. These are coordinate directions, not
+automatic upgoing or downgoing labels.
+
+The negative branch peaks at 3.075~km~s\( ^{-1} \),
+has absolute score 0.2710 at 3.2~km~s\( ^{-1} \),
+and receiver-permutation \(p=0.0002\). The corrected positive
+branch peaks at 3.075~km~s\( ^{-1} \), has
+absolute score 0.2688, and
+\(p=0.0002\). Their positive/negative absolute-score ratio is
+0.992, with normalized asymmetry 0.004; the branches are
+comparable in magnitude after signed F--K selection.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.99\linewidth]{ambient_transfer/signed_lag_v2/seasonal_signed_fk_v2_aggregate.png}
+\caption{\textbf{Corrected eight-day signed-lag comparison after independent completion audit.} The aggregate uses 11,523 one-minute records from 8 preselected dates, Nano channel~0 as the virtual source, increasing offset along the cemented fiber, 5--20~Hz filtering, 5-s running-absolute-mean normalization, and a frozen 2.5--4.5~km~s\( ^{-1} \) signed F--K wedge. The upper-left panel shows \(F K<0\) on positive lag; the upper-right shows \(F K>0\) on negative lag, with a common correlation scale. Dashed trajectories mark 3.2~km~s\( ^{-1} \). The lower-left shows moveout scores and receiver-permutation 95\% thresholds; the lower-right compares physical and opposite-lag leakage at 3.2~km~s\( ^{-1} \). Branches peak at 3.075 and 3.075~km~s\( ^{-1} \), with \(p=0.0002\) and \(p=0.0002\); their score ratio is 0.992. The audit reproduces scores, verifies signs, and confirms all files. Significance is conditional on F--K selection and does not independently establish Green's-function convergence, causality, propagation identity, wave type, or formation velocity.}
+\end{figure}
+
+\takeaway{Both physical lag sides have now been computed correctly and are
+comparable in magnitude. Their significance remains conditional on F--K selection. The v45
+pre-filter test and strict unfiltered controls do not independently corroborate
+the branches as ambient Green's functions, identified modes, or formation
+\(V_P\).}
 
 \end{document}

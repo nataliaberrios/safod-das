@@ -1,0 +1,44 @@
+{
+  "workflow_version": "signed_lag_v2",
+  "days": [
+    "2024-12-20",
+    "2025-02-24",
+    "2024-05-11",
+    "2025-03-04",
+    "2024-06-17",
+    "2024-06-26",
+    "2024-10-28",
+    "2024-11-30"
+  ],
+  "weighted_files": 11523,
+  "branch_lag_sign": {
+    "negative": 1.0,
+    "positive": -1.0
+  },
+  "branches": {
+    "negative": {
+      "physical_lag_sign": 1,
+      "peak_velocity_m_s": 3075.0,
+      "peak_signed_score": 0.2791477616887892,
+      "peak_absolute_score": 0.2791477616887892,
+      "score_3200": 0.2709740681062947,
+      "absolute_score_3200": 0.2709740681062947,
+      "opposite_lag_leakage_3200": 0.030484408770524163,
+      "absolute_opposite_lag_leakage_3200": 0.030484408770524163,
+      "null95": 0.1541595144952743,
+      "p_peak": 0.0001999600079984003
+    },
+    "positive": {
+      "physical_lag_sign": -1,
+      "peak_velocity_m_s": 3075.0,
+      "peak_signed_score": 0.2877358955711268,
+      "peak_absolute_score": 0.2877358955711268,
+      "score_3200": 0.26882466263924837,
+      "absolute_score_3200": 0.26882466263924837,
+      "opposite_lag_leakage_3200": 0.0334298905821464,
+      "absolute_opposite_lag_leakage_3200": 0.0334298905821464,
+      "null95": 0.16155434196902607,
+      "p_peak": 0.0001999600079984003
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "workflow_version": "signed_lag_v2_completion_audit",
+  "source_workflow_version": "signed_lag_v2",
+  "expected_and_used_files": 11523,
+  "days": [
+    "2024-12-20",
+    "2025-02-24",
+    "2024-05-11",
+    "2025-03-04",
+    "2024-06-17",
+    "2024-06-26",
+    "2024-10-28",
+    "2024-11-30"
+  ],
+  "coordinate_convention": "channel 0 is the top virtual source; F*K<0 is evaluated at positive lag and F*K>0 at negative lag",
+  "branches": {
+    "negative": {
+      "physical_lag_sign": 1.0,
+      "peak_velocity_m_s": 3075.0,
+      "peak_signed_score": 0.2791477616887892,
+      "absolute_score_3200": 0.2709740681062947,
+      "absolute_opposite_lag_leakage_3200": 0.030484408770524163,
+      "physical_to_leakage_ratio_3200": 8.888939593550642,
+      "null95": 0.1541595144952743,
+      "p_peak": 0.0001999600079984003
+    },
+    "positive": {
+      "physical_lag_sign": -1.0,
+      "peak_velocity_m_s": 3075.0,
+      "peak_signed_score": 0.2877358955711268,
+      "absolute_score_3200": 0.26882466263924837,
+      "absolute_opposite_lag_leakage_3200": 0.0334298905821464,
+      "physical_to_leakage_ratio_3200": 8.041446081873124,
+      "null95": 0.16155434196902607,
+      "p_peak": 0.0001999600079984003
+    }
+  },
+  "positive_to_negative_absolute_score_ratio_3200": 0.9920678554886544,
+  "signed_branch_asymmetry_3200": 0.003981864618461936,
+  "checks": {
+    "frozen_manifest_complete": true,
+    "branch_lag_signs_correct": true,
+    "saved_metrics_reproduced_from_sections": true,
+    "aggregate_figure_present": true
+  },
+  "interpretive_boundary": "The audit validates computation and signed-lag geometry. Statistical significance supports ordered moveout after F-K selection, but does not alone establish Green's-function convergence, mode identity, causality, or formation Vp."
+}
