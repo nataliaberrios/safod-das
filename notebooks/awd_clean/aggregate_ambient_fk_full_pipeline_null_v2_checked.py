@@ -30,6 +30,16 @@ def main() -> None:
     reference_report = None
     reference_npz = None
     observed_reference = None
+    observed_array_keys = (
+        "observed_negative_top",
+        "observed_positive_top",
+        "observed_negative_scores",
+        "observed_positive_scores",
+    )
+    # JSON report metrics can differ slightly between batches because of
+    # reduction order; this remains far tighter than the scientific signal.
+    observed_metric_rtol = 5e-5
+    observed_metric_atol = 1e-8
     ids = []
     for path in paths:
         paired = path.with_suffix(".npz")
@@ -55,12 +65,39 @@ def main() -> None:
         else:
             if identity != reference_report:
                 raise ValueError(f"incompatible batch metadata: {path}")
-            if report["observed"] != observed_reference:
-                raise ValueError(f"observed metrics differ: {path}")
-            if not np.allclose(product["lags_s"], reference_npz["lags_s"]):
+            for key in observed_array_keys:
+                if product[key].shape != reference_npz[key].shape:
+                    raise ValueError(f"observed array shape differs: {key} ({path})")
+                difference = np.asarray(product[key]) - np.asarray(reference_npz[key])
+                max_abs = float(np.max(np.abs(difference)))
+                reference_norm = float(np.linalg.norm(reference_npz[key]))
+                relative_l2 = float(
+                    np.linalg.norm(difference) / (reference_norm if reference_norm else 1.0)
+                )
+                if max_abs > 2e-5 or relative_l2 > 5e-5:
+                    raise ValueError(
+                        f"observed array differs: {key} ({path}); "
+                        f"max_abs={max_abs:.3e}, relative_l2={relative_l2:.3e}"
+                    )
+            if set(report["observed"]) != set(observed_reference):
+                raise ValueError(f"observed metric branches differ: {path}")
+            for mode in observed_reference:
+                if set(report["observed"][mode]) != set(observed_reference[mode]):
+                    raise ValueError(f"observed metric fields differ: {mode} ({path})")
+                for metric, reference_value in observed_reference[mode].items():
+                    if not np.isclose(
+                        float(report["observed"][mode][metric]), float(reference_value),
+                        rtol=observed_metric_rtol, atol=observed_metric_atol,
+                    ):
+                        raise ValueError(f"observed metric differs: {mode}.{metric} ({path})")
+            if not np.allclose(
+                product["lags_s"], reference_npz["lags_s"],
+                rtol=1e-12, atol=1e-12,
+            ):
                 raise ValueError(f"lag axis differs: {path}")
             if not np.allclose(
-                product["receiver_offsets_m"], reference_npz["receiver_offsets_m"]
+                product["receiver_offsets_m"], reference_npz["receiver_offsets_m"],
+                rtol=1e-12, atol=1e-12,
             ):
                 raise ValueError(f"receiver geometry differs: {path}")
 
