@@ -318,8 +318,21 @@ not the nominal 24 h. That slightly worsens the diurnal-versus-drift degeneracy.
   becomes 0.8×, which would reverse its headline. Decide which quantity the paper
   cites — Figure 3 peak-to-peak or the authors' order-of-magnitude statement — and
   use it consistently in both papers.
-  Incidentally, De Fazio et al. describe their observable as "a Rayleigh wave-like
-  tube wave along a tunnel", which is close prior art for the Deep guided mode.
+  **What the benchmark actually measures.** De Fazio et al.'s monitored arrival
+  was not a body wave: signal-amplitude surveys identified it as "a Rayleigh
+  wave-like tube wave along the service shaft surface", guided by a 300 m
+  inclined mine shaft at Ogdensburg, New Jersey, at 500 Hz with c ≈ 3000 m/s.
+  The canonical tidal benchmark is therefore the tidal response of a *guided mode
+  in an engineered opening*, not of bulk rock. This makes comparing it against
+  our guided-mode limits like-for-like rather than a category error — a stronger
+  justification than the arithmetic. At ~3000 m/s their mode is close to Nano
+  (~2950 m/s), not Deep (~1547 m/s), consistent with an air-filled shaft guiding
+  a wall-hosted Rayleigh-like mode while a fluid-filled borehole supports a
+  Stoneley/tube wave near fluid velocity. The authors also caution that the
+  strain-to-velocity relation for such a mode "is difficult to predict
+  quantitatively", that expected shaft-direction compression "was not observed",
+  and that local topography may matter — reinforcing that guided-mode
+  sensitivity belongs to the guiding structure as much as to the rock.
 - **The Niu benchmark values are now verified against the source**: stress
   sensitivity 2.4×10⁻⁷ Pa⁻¹ and tidal stress varying within 240 Pa both appear
   verbatim in Niu et al. (2008). Niu et al. further state that the resulting

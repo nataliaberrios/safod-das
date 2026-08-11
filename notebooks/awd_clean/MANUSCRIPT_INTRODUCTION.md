@@ -26,7 +26,12 @@ predicted to be undetectable. Earlier, De Fazio et al. (1973) had monitored
 seismic phase velocity continuously with a phase-locked shaker to a precision
 finer than one part in 10⁴, and detected periodic velocity variations they
 attributed to solid-Earth tides, of an order substantially larger than laboratory
-stress sensitivities on small rock samples would predict. Together these frame
+stress sensitivities on small rock samples would predict. Their observable is
+directly relevant here and is often overlooked: the monitored arrival was not a
+body wave but, in their words, "a Rayleigh wave-like tube wave along the service
+shaft surface" — a mode guided by a 300 m inclined mine shaft, at 500 Hz and
+c ≈ 3000 m s⁻¹. The canonical tidal velocity benchmark is therefore itself the
+tidal response *of a guided mode in an engineered opening*, not of bulk rock. Together these frame
 the small-signal regime: a tidal velocity response is real but sits near or below
 what a repeated-source experiment can resolve.
 

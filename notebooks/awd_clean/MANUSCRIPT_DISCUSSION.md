@@ -35,6 +35,38 @@ guided or coupled character, and neither apparent speed should be read as a
 formation velocity. What the installations differ in is *which* guided mode they
 present and how repeatably they present it.
 
+### Guided modes are the norm in this measurement class, not an anomaly
+
+It is worth noting how much company these observables keep. Ellsworth & Malin
+document fault-zone-guided waves crossing the SAFOD borehole at 2.7 km. And the
+canonical tidal-velocity experiment, De Fazio et al. (1973), monitored what its
+authors identify as "a Rayleigh wave-like tube wave along the service shaft
+surface" — a mode guided by a 300 m inclined mine shaft at 500 Hz, with
+c ≈ 3000 m s⁻¹.
+
+Two consequences follow.
+
+First, at ~3000 m s⁻¹ their guided mode is close in speed to the Nano observable
+(~2950 m s⁻¹) and far from the Deep one (~1547 m s⁻¹) — unsurprising, since an
+air-filled shaft guides a wall-hosted Rayleigh-like mode whereas a fluid-filled
+borehole supports a Stoneley/tube wave near fluid velocity. The two installations
+here plausibly sample opposite ends of that family.
+
+Second, and more usefully, **the comparison against the De Fazio benchmark is
+closer than it appears.** We are not comparing a guided-mode sensitivity against
+a formation-velocity prediction; we are comparing a guided-mode tidal response
+against another guided-mode tidal response, measured with a different source in a
+different opening. That is a like-for-like comparison, and it is a better
+justification for the benchmark than the arithmetic route.
+
+The same lineage carries a caution the original authors stated plainly. De Fazio
+et al. note that the effect of strain on such a mode "is difficult to predict
+quantitatively", that the compression they expected in the shaft direction "was
+not observed", and that local topography "may have to be taken into account". A
+guided mode's sensitivity to strain is a property of the guiding structure as
+much as of the rock. That is precisely why this paper reports apparent
+guided-mode velocity changes and does not convert them into formation properties.
+
 ## 5.2 A repeatable source is not a precision source
 
 The accelerated weight drop is unambiguously repeatable at the level of waveform
