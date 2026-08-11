@@ -101,7 +101,8 @@ def main():
         i, j = int(r.i), int(r.j)
         if i not in B or j not in B: continue
         a, fs, sa = B[i]; b, _, sb = B[j]
-        rows.append(dict(sep_m=r.sep_m, dM=r.dM, mmax=r.mmax, rad_m=r.rad_m,
+        rows.append(dict(i=i, j=j, tag_i=tag[i], tag_j=tag[j],
+                         sep_m=r.sep_m, dM=r.dM, mmax=r.mmax, rad_m=r.rad_m,
                          dt_days=r.dt_days, cc=cc(a, b, fs),
                          acausal=cc(a, b, fs, reverse=True),
                          sem=min(sa, sb), tag=f'{tag[i][3:11]}/{tag[j][3:11]}'))
