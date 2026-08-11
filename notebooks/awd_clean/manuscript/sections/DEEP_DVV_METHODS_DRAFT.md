@@ -75,7 +75,7 @@ All primary trials retained at least eleven apertures. Removing one aperture cha
 
 #### 4.6.3 Why the long Deep aperture yields only a twofold gain
 
-The operative regression lever arm, measured across aperture centres used in the fit, was 1.398 s for Deep outbound and 0.121 s for Nano, an 11.5-fold geometric advantage. The observed null scatter improved by only a factor of 1.55. Expressed as an equivalent per-burst timing repeatability, Nano achieved approximately 0.225 ms whereas Deep outbound achieved 1.68 ms, making Deep about 7.4 times worse in timing repeatability. Most of the geometric advantage was therefore consumed by poorer burst-to-burst timing precision, leaving an approximately twofold improvement in tested reliable sensitivity rather than an 11.5-fold improvement.
+The operative regression lever arm, measured across aperture centres used in the fit, was 1.428 s for Deep outbound and 0.121 s for Nano, an 11.8-fold geometric advantage. The observed null scatter improved by only a factor of 1.55. Expressed as an equivalent per-burst timing repeatability, Nano achieved approximately 0.225 ms whereas Deep outbound achieved 1.71 ms, making Deep about 7.6 times worse in timing repeatability. Most of the geometric advantage was therefore consumed by poorer burst-to-burst timing precision, leaving an approximately twofold improvement in tested reliable sensitivity rather than an 11.8-fold improvement.
 
 #### 4.6.4 Paired-leg combination
 
@@ -103,7 +103,7 @@ The all-46-burst analysis is not used for the headline claim because the traject
 
 ## Manuscript-ready summary paragraph
 
-Blind injection–recovery tests calibrated fractional changes in the apparent along-fibre speed of the selected Deep guided mode using 23 held-out bursts and the same estimator and injection grid applied to Nano. The preselected outbound branch reached reliable detection at \(5\times10^{-3}\) (0.5%), compared with \(1\times10^{-2}\) (1%) for both the return branch and the Nano apparent-moveout observable. Although the Deep regression lever arm was 11.5 times longer than Nano’s, its inferred per-burst timing repeatability was 7.4 times worse, so the geometric advantage produced an approximately twofold rather than an order-of-magnitude sensitivity improvement. Combining the two Deep legs reduced the null scatter by about 1.4 but did not lower the smallest tested 95% reliable-detection level. These results establish improved sensitivity for the selected outbound Deep branch only and do not imply an installation-wide advantage or a formation-velocity measurement.
+Blind injection–recovery tests calibrated fractional changes in the apparent along-fibre speed of the selected Deep guided mode using 23 held-out bursts and the same estimator and injection grid applied to Nano. The preselected outbound branch reached reliable detection at \(5\times10^{-3}\) (0.5%), compared with \(1\times10^{-2}\) (1%) for both the return branch and the Nano apparent-moveout observable. Although the Deep regression lever arm was 11.8 times longer than Nano’s, its inferred per-burst timing repeatability was 7.6 times worse, so the geometric advantage produced an approximately twofold rather than an order-of-magnitude sensitivity improvement. Combining the two Deep legs reduced the null scatter by about 1.4 but did not lower the smallest tested 95% reliable-detection level. These results establish improved sensitivity for the selected outbound Deep branch only and do not imply an installation-wide advantage or a formation-velocity measurement.
 
 ---
 

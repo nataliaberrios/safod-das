@@ -24,7 +24,7 @@ lever arm are three different quantities; only the last governs sensitivity.
 | Band where strongest | 30–60 Hz | 15–30 Hz |
 | Instrumented fibre extent | 927 m | 3475 m outbound, 3059 m return |
 | Analysis aperture used | 80–440 m | 200–3000 m per limb |
-| Regression lever arm | 0.121 s | 1.398 s (outbound) |
+| Regression lever arm | 0.121 s | 1.428 s (outbound) |
 
 The two installations are therefore not interchangeable observations of one
 wavefield. This is the paper's organising result: **installation controls which

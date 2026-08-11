@@ -38,8 +38,8 @@ against an independent reference.
 Blind injection–recovery on held-out bursts, using an identical estimator for
 both fibres, establishes smallest tested reliable-detection levels of 1.0% for
 the cemented observable, 0.5% for the outbound wireline branch, and 1.0% for the
-return branch. Although the outbound regression lever arm is 11.5 times longer
-than the cemented one, poorer burst-to-burst timing repeatability — 1.68 ms
+return branch. Although the outbound regression lever arm is 11.8 times longer
+than the cemented one, poorer burst-to-burst timing repeatability — 1.71 ms
 against 0.225 ms — limits the realised sensitivity gain to a factor of two.
 Combining the two branches lowers the empirical noise floor by roughly 1.5 times
 but does not lower the smallest tested detection level.
@@ -436,7 +436,7 @@ across the aperture.
 
 Because Nano regresses against propagation time across an 80–440 m aperture at
 2975 m s⁻¹, its lever arm is **0.121 s** — the quantity against which the Deep
-lever arm of 1.398 s is compared.
+lever arm of 1.428 s is compared.
 
 ---
 
@@ -480,7 +480,7 @@ lever arm are three different quantities; only the last governs sensitivity.
 | Band where strongest | 30–60 Hz | 15–30 Hz |
 | Instrumented fibre extent | 927 m | 3475 m outbound, 3059 m return |
 | Analysis aperture used | 80–440 m | 200–3000 m per limb |
-| Regression lever arm | 0.121 s | 1.398 s (outbound) |
+| Regression lever arm | 0.121 s | 1.428 s (outbound) |
 
 The two installations are therefore not interchangeable observations of one
 wavefield. This is the paper's organising result: **installation controls which
@@ -655,7 +655,7 @@ All primary trials retained at least eleven apertures. Removing one aperture cha
 
 #### 4.6.3 Why the long Deep aperture yields only a twofold gain
 
-The operative regression lever arm, measured across aperture centres used in the fit, was 1.398 s for Deep outbound and 0.121 s for Nano, an 11.5-fold geometric advantage. The observed null scatter improved by only a factor of 1.55. Expressed as an equivalent per-burst timing repeatability, Nano achieved approximately 0.225 ms whereas Deep outbound achieved 1.68 ms, making Deep about 7.4 times worse in timing repeatability. Most of the geometric advantage was therefore consumed by poorer burst-to-burst timing precision, leaving an approximately twofold improvement in tested reliable sensitivity rather than an 11.5-fold improvement.
+The operative regression lever arm, measured across aperture centres used in the fit, was 1.428 s for Deep outbound and 0.121 s for Nano, an 11.8-fold geometric advantage. The observed null scatter improved by only a factor of 1.55. Expressed as an equivalent per-burst timing repeatability, Nano achieved approximately 0.225 ms whereas Deep outbound achieved 1.71 ms, making Deep about 7.6 times worse in timing repeatability. Most of the geometric advantage was therefore consumed by poorer burst-to-burst timing precision, leaving an approximately twofold improvement in tested reliable sensitivity rather than an 11.8-fold improvement.
 
 #### 4.6.4 Paired-leg combination
 
@@ -774,7 +774,7 @@ The coherent mode is present in individual impacts, not manufactured by stacking
 It is not, however, precise. Individual-drop beam SNR spans 1.26 to 24.90 dB
 between the 16th and 84th percentiles — a factor of ~20 in power — and relative
 amplitude varies by roughly ±25%. Per-burst timing repeatability, inferred from
-the injection–recovery scatter, is 0.225 ms for Nano and 1.68 ms for Deep.
+the injection–recovery scatter, is 0.225 ms for Nano and 1.71 ms for Deep.
 
 Stacking is what converts the first property into the second. Independent
 within-burst substacks converge from median correlation 0.740 at one drop to
@@ -800,14 +800,14 @@ delay against reference travel time, so the precision of ε scales as
 > ε precision ≈ (per-burst timing repeatability) / (lever arm in travel time).
 
 Deep's geometry is dramatically better on the denominator. Its regression runs
-over aperture centres spanning 1.398 s of travel time, against 0.121 s for Nano —
-**11.5× longer**. Taken alone, that predicts an order-of-magnitude sensitivity
+over aperture centres spanning 1.428 s of travel time, against 0.121 s for Nano —
+**11.8× longer**. Taken alone, that predicts an order-of-magnitude sensitivity
 gain.
 
 The realised gain is about a factor of two: reliable detection improves from
 1.0% to 0.5%, and the empirical null threshold from 0.325% to 0.184%. The
 numerator explains the shortfall. Deep's per-burst timing repeatability is
-1.68 ms against Nano's 0.225 ms, **7.4× worse**, and 11.5 / 7.4 = 1.55, which is
+1.71 ms against Nano's 0.225 ms, **7.6× worse**, and 11.8 / 7.6 = 1.55, which is
 exactly the observed ratio of null scatter (1.86×10⁻³ to 1.20×10⁻³).
 
 The design lesson is not that the Deep installation is disappointing. It is that
@@ -969,8 +969,8 @@ whole is not shown to outperform the cemented one.
 **4. A longer propagation-time lever arm improves fractional sensitivity only in
 proportion to timing repeatability.** Fractional velocity sensitivity is set by
 the ratio of per-burst timing repeatability to lever arm in travel time. The
-outbound branch has 11.5 times the lever arm but 7.4 times worse timing
-repeatability, and 11.5/7.4 = 1.55 reproduces the observed ratio of null scatter
+outbound branch has 11.8 times the lever arm but 7.6 times worse timing
+repeatability, and 11.5/7.6 = 1.55 reproduces the observed ratio of null scatter
 exactly. The realised improvement in reliable detection is therefore a factor of
 two, not an order of magnitude. Experiments should specify both terms; aperture
 or depth alone does not constrain monitoring performance.

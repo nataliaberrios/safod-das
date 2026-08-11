@@ -29,8 +29,8 @@ against an independent reference.
 Blind injection–recovery on held-out bursts, using an identical estimator for
 both fibres, establishes smallest tested reliable-detection levels of 1.0% for
 the cemented observable, 0.5% for the outbound wireline branch, and 1.0% for the
-return branch. Although the outbound regression lever arm is 11.5 times longer
-than the cemented one, poorer burst-to-burst timing repeatability — 1.68 ms
+return branch. Although the outbound regression lever arm is 11.8 times longer
+than the cemented one, poorer burst-to-burst timing repeatability — 1.71 ms
 against 0.225 ms — limits the realised sensitivity gain to a factor of two.
 Combining the two branches lowers the empirical noise floor by roughly 1.5 times
 but does not lower the smallest tested detection level.
@@ -44,7 +44,7 @@ longer propagation path is branch-specific rather than installation-wide.
 > Blind injection–recovery established smallest tested two-direction
 > reliable-detection levels of 1.0% for the Nano apparent-moveout observable,
 > 0.5% for the outbound Deep guided branch, and 1.0% for the return branch.
-> Although the Deep outbound regression lever arm was 11.5 times longer than
+> Although the Deep outbound regression lever arm was 11.8 times longer than
 > Nano's, poorer burst-to-burst timing repeatability limited the demonstrated
 > sensitivity gain to a factor of two.
 
@@ -78,8 +78,8 @@ whole is not shown to outperform the cemented one.
 **4. A longer propagation-time lever arm improves fractional sensitivity only in
 proportion to timing repeatability.** Fractional velocity sensitivity is set by
 the ratio of per-burst timing repeatability to lever arm in travel time. The
-outbound branch has 11.5 times the lever arm but 7.4 times worse timing
-repeatability, and 11.5/7.4 = 1.55 reproduces the observed ratio of null scatter
+outbound branch has 11.8 times the lever arm but 7.6 times worse timing
+repeatability, and 11.5/7.6 = 1.55 reproduces the observed ratio of null scatter
 exactly. The realised improvement in reliable detection is therefore a factor of
 two, not an order of magnitude. Experiments should specify both terms; aperture
 or depth alone does not constrain monitoring performance.

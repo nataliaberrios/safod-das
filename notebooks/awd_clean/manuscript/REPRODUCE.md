@@ -123,8 +123,8 @@ scale, and the Model A / Model B comparison. Smoke-test with
 >
 > The cemented fibre resolves 1%. The deep fibre's outbound branch resolves 0.5%,
 > its return branch 1%. The interesting part is why the deep fibre isn't far
-> better: its arrival travels 11.5× longer, which should help a lot, but its
-> timing wobbles 7.4× more from burst to burst, and that cancels most of the
+> better: its arrival travels 11.8× longer, which should help a lot, but its
+> timing wobbles 7.6× more from burst to burst, and that cancels most of the
 > advantage.
 >
 > Finally we fitted an Earth-tide model to the measurements. No tidal signal, and

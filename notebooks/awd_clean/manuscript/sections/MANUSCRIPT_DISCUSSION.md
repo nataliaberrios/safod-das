@@ -97,7 +97,7 @@ The coherent mode is present in individual impacts, not manufactured by stacking
 It is not, however, precise. Individual-drop beam SNR spans 1.26 to 24.90 dB
 between the 16th and 84th percentiles — a factor of ~20 in power — and relative
 amplitude varies by roughly ±25%. Per-burst timing repeatability, inferred from
-the injection–recovery scatter, is 0.225 ms for Nano and 1.68 ms for Deep.
+the injection–recovery scatter, is 0.225 ms for Nano and 1.71 ms for Deep.
 
 Stacking is what converts the first property into the second. Independent
 within-burst substacks converge from median correlation 0.740 at one drop to
@@ -123,14 +123,14 @@ delay against reference travel time, so the precision of ε scales as
 > ε precision ≈ (per-burst timing repeatability) / (lever arm in travel time).
 
 Deep's geometry is dramatically better on the denominator. Its regression runs
-over aperture centres spanning 1.398 s of travel time, against 0.121 s for Nano —
-**11.5× longer**. Taken alone, that predicts an order-of-magnitude sensitivity
+over aperture centres spanning 1.428 s of travel time, against 0.121 s for Nano —
+**11.8× longer**. Taken alone, that predicts an order-of-magnitude sensitivity
 gain.
 
 The realised gain is about a factor of two: reliable detection improves from
 1.0% to 0.5%, and the empirical null threshold from 0.325% to 0.184%. The
 numerator explains the shortfall. Deep's per-burst timing repeatability is
-1.68 ms against Nano's 0.225 ms, **7.4× worse**, and 11.5 / 7.4 = 1.55, which is
+1.71 ms against Nano's 0.225 ms, **7.6× worse**, and 11.8 / 7.6 = 1.55, which is
 exactly the observed ratio of null scatter (1.86×10⁻³ to 1.20×10⁻³).
 
 The design lesson is not that the Deep installation is disappointing. It is that

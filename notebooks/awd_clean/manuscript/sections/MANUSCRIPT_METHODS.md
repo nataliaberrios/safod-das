@@ -268,7 +268,7 @@ across the aperture.
 
 Because Nano regresses against propagation time across an 80–440 m aperture at
 2975 m s⁻¹, its lever arm is **0.121 s** — the quantity against which the Deep
-lever arm of 1.398 s is compared.
+lever arm of 1.428 s is compared.
 
 ---
 

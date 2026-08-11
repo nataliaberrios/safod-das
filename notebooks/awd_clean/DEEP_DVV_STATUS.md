@@ -16,7 +16,7 @@ apparent-moveout observable?
 |---|---|---|
 | Deep outbound is more sensitive than Nano | **Established, restricted to the outbound branch** | reliable detection 5×10⁻³ vs Nano 1×10⁻²; null threshold 1.84×10⁻³ vs 3.25×10⁻³ |
 | The Deep *installation as a whole* beats Nano | **Not claimable** | return leg reaches 1×10⁻², equal to Nano, not below it — pre-registered Rule 2 |
-| The 11.5× lever arm buys 11.5× sensitivity | **Refuted** | it buys ~2×; per-burst timing repeatability is 7.4× worse and consumes the rest |
+| The 11.8× lever arm buys 11.8× sensitivity | **Refuted** | it buys ~2×; per-burst timing repeatability is 7.6× worse and consumes the rest |
 | Estimator separates source timing from propagation | **Established** | 5 ms constant shift → 4.87 ms into the intercept, 7×10⁻⁷ into ε |
 | Recovery is unbiased on the primary branch | **Established** | bias ≤6×10⁻⁵ at every level, outbound |
 | Result carried by one aperture or one burst | **Refuted** | no single aperture moves it >0.55× threshold, no burst >0.27× |
@@ -50,9 +50,9 @@ The central quantitative result of this analysis.
 
 | | Nano | Deep outbound |
 |---|---|---|
-| Regression lever arm | 0.121 s | 1.398 s (11.5×) |
+| Regression lever arm | 0.121 s | 1.428 s (11.8×) |
 | Null scatter | 1.86×10⁻³ | 1.20×10⁻³ (1.55×) |
-| Implied per-burst timing repeatability | 0.225 ms | 1.68 ms (7.4× **worse**) |
+| Implied per-burst timing repeatability | 0.225 ms | 1.71 ms (7.6× **worse**) |
 
 Deep's geometric advantage is real and large, but poorer burst-to-burst timing
 repeatability consumes about four fifths of it. This is consistent with the
@@ -61,7 +61,7 @@ Deep-fibre per-shot repeatability deficit already recorded in
 
 Do not quote the `lever_arm_s` field in the generated report as the lever arm:
 that field is the channel span (1.808 s). The regression runs over aperture
-centres, so the operative figure is **1.398 s**.
+centres, so the operative figure is **1.428 s**.
 
 ## 4. Paired-leg combination
 
