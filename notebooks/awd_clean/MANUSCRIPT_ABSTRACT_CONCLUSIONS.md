@@ -1,11 +1,8 @@
 # Manuscript abstract and conclusions
 
-Following the plan's §21 sequence. Introduction is deferred: Niu et al. (2008) is
-not in `/home/groups/ettore88/nberrios/planpapers/` and is the highest-value
-prior-art citation for framing.
-
-Every number below is verified against a generated output. Nothing new is
-introduced here.
+Following the plan's §21 sequence. Every number below is verified against a
+generated output; nothing new is introduced here. The Introduction is drafted in
+[`MANUSCRIPT_INTRODUCTION.md`](MANUSCRIPT_INTRODUCTION.md).
 
 ---
 
@@ -57,7 +54,7 @@ longer propagation path is branch-specific rather than installation-wide.
 
 **1. Contrasting installations in one borehole recover distinct coherent modes.**
 A cemented fibre and a wireline fibre, recording the same repeated source over
-the same 24 hours, returned a fast apparent mode near 2950 m s⁻¹ at 30–60 Hz and
+the same nominal 24 h survey, returned a fast apparent mode near 2950 m s⁻¹ at 30–60 Hz and
 a slow guided mode near 1547 m s⁻¹ at 15–30 Hz respectively. Both are dispersive;
 neither apparent speed should be read as a formation velocity. Installation is an
 experimental variable, not a deployment detail.
@@ -110,8 +107,14 @@ limit of 1.03×10⁻³, some 18× above that scale.
 
 | Item | Status |
 |---|---|
-| Introduction | blocked — Niu et al. (2008) absent from the paper collection |
-| Niu benchmark values (2.4×10⁻⁷ Pa⁻¹, 240 Pa) | **unverified against the source**; currently sourced only from `safod_tides.ipynb` markdown |
-| Methods §3.1 preprocessing | not drafted; source is `PREPROCESSING.md` |
-| Tidal benchmark placement | undecided — supplement as arithmetic only, or as a measured upper limit |
-| Acquisition details | `[NEEDS SOURCE]` in `MANUSCRIPT_METHODS.md` §2.1 |
+| Introduction | **drafted**, from papers read; citation status tabulated inline |
+| Niu benchmark values (2.4×10⁻⁷ Pa⁻¹, 240 Pa) | **verified verbatim** in Niu et al. (2008) |
+| De Fazio as a threshold | **retired**; results are scored against the Niu SAFOD expected-response scale, De Fazio kept as historical context at ~5×10⁻⁴–10⁻³ |
+| Methods §3.1 preprocessing | **drafted** from `PREPROCESSING.md` |
+| Nano gauge length / channel spacing / raw rate | **resolved** from the protobuf header: 16.459 m, 1.2661 m, 10 kHz |
+| Tidal placement | supplement to carry both the Niu arithmetic and the measured upper limit, labelled a limit rather than a search |
+| Interrogator **model numbers** | open — vendors established (Sintela, OptaSense); models need Ettore |
+| Physical depth of the Deep turnaround (channel 1702) | open — needs Ettore |
+| Which physical cable each dataset is | open — the project's own fibre-identity question |
+| Two-model tide notebook (Model A / Model B) | not yet on Sherlock; Model A intended for main text, Model B for supplement |
+| Prose vs internal-record separation | pending — these files still carry filenames, defect history and reviewer-facing asides that belong in reproducibility material, not the manuscript |
