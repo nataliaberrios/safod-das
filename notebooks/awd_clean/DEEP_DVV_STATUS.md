@@ -303,6 +303,24 @@ not the nominal 24 h. That slightly worsens the diurnal-versus-drift degeneracy.
 
 ## 10. Known caveats
 
+- **The "De Fazio scale" of 5×10⁻⁴ is unverified.** The 1973 scan's text layer
+  drops superscripts; the observed tidal velocity change reads as "of the order
+  of 10⁻[illegible]". Recoverable: it exceeds the laboratory prediction of
+  10⁻⁵–10⁻⁶ and the authors stress in-situ sensitivity is "much greater" than
+  laboratory values, placing it at order 10⁻⁴. Beware the trap — the paper does
+  contain "a velocity change (Δc/c) of about 5×10⁻⁵", but that is the phase-to-
+  velocity conversion (1° ↔ 5×10⁻⁵), not the tidal amplitude. This affects only
+  the multiplier: the Deep upper limit of 1.03×10⁻³ is 2.05× a 5×10⁻⁴ benchmark
+  and ~10× a 1×10⁻⁴ one, so "cannot resolve a De Fazio-scale change" holds either
+  way and holds more strongly under the smaller value. Settle from a clean copy
+  before submission.
+- **The Niu benchmark values are now verified against the source**: stress
+  sensitivity 2.4×10⁻⁷ Pa⁻¹ and tidal stress varying within 240 Pa both appear
+  verbatim in Niu et al. (2008). Niu et al. further state that the resulting
+  travel-time changes, of order 10⁻⁷ s, are close to their measurement error and
+  therefore predicted to be undetectable — the same conclusion this work reaches
+  by a different route at the same site.
+
 - The return 3–15 Hz trajectory intercept selected at +0.396 s against a search
   ceiling of +0.400 s — a grid-edge hit. Secondary band only; the primary 15–30 Hz
   legs sit well inside. Frozen, so reported rather than re-searched.
