@@ -13,14 +13,18 @@ Every number is transcribed from a generated output, named inline.
 ## 4.1 Installation dependence of the observable wavefield
 
 The same repeated surface source, recorded on two borehole DAS installations in
-the same hole, yields two different coherent modes.
+the same hole during the same nominal 24 h survey, yields two different coherent
+modes. Note that instrumented fibre extent, analysis aperture and regression
+lever arm are three different quantities; only the last governs sensitivity.
 
 | | Nano | Deep |
 |---|---|---|
 | Installation | cemented, shallow | wireline, reversing at channel 1702 |
 | Coherent mode apparent speed | ~2950 m s⁻¹ | ~1547 m s⁻¹ |
 | Band where strongest | 30–60 Hz | 15–30 Hz |
-| Aperture | 927 m | 3475 m outbound, 3059 m return |
+| Instrumented fibre extent | 927 m | 3475 m outbound, 3059 m return |
+| Analysis aperture used | 80–440 m | 200–3000 m per limb |
+| Regression lever arm | 0.121 s | 1.398 s (outbound) |
 
 The two installations are therefore not interchangeable observations of one
 wavefield. This is the paper's organising result: **installation controls which

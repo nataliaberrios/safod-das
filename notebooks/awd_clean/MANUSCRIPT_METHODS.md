@@ -23,22 +23,37 @@ surface source. They are not interchangeable observations of one wavefield: the
 installations differ in coupling and geometry, and each recovers a different
 coherent mode.
 
-The **Nano** fibre is cemented and shallow. It provided 732 channels at 1.266 m
-channel spacing, an aperture of 927 m. Data were written as protobuf
-(`timeseriesScaler_*.pb`).
+The **Nano** fibre is cemented and shallow, interrogated by a Sintela system
+writing protobuf. Header metadata gives 732 channels at 1.2661 m channel spacing
+— a 927 m instrumented extent — a **16.459 m gauge length**, and a 10 kHz raw
+sample rate, decimated to 1000 Hz for the stacks used here.
 
-The **Deep** fibre is wireline-deployed and reverses at channel 1702, so the
-3200 recorded channels of 2.0419 m spacing trace an outbound limb of 3475 m and a
-return limb of 3059 m along 6532 m of fibre. Acquisition parameters are recorded
-in the filenames (`SAFOD-Deep-10mGL-1000HzFs-2mChDualPulse_*.h5`): **10 m gauge
-length, 1000 Hz sample rate, 2 m channel spacing, dual-pulse interrogation.**
+The **Deep** fibre is wireline-deployed and reverses at channel 1702, so its 3200
+channels at 2.0419 m spacing trace an outbound limb of 3475 m and a return limb
+of 3059 m along 6532 m of fibre. Filename metadata records a **10 m gauge
+length**, 1000 Hz sample rate, 2 m channel spacing and dual-pulse interrogation
+(`SAFOD-Deep-10mGL-1000HzFs-2mChDualPulse_*.h5`), and the reader auto-detects the
+system as OptaSense.
 
-Both systems sampled at 1000 Hz.
+The two installations therefore differ in gauge length as well as coupling:
+16.459 m for Nano against 10 m for Deep. Neither is limiting in its analysis
+band — the gauge-length response first nulls near 179 Hz for Nano (2950 m s⁻¹ /
+16.459 m) and 155 Hz for Deep (1547 m s⁻¹ / 10 m), both far above the 30–60 and
+15–30 Hz bands used — so the difference in observed band is not a gauge-length
+artefact.
 
-**[NEEDS SOURCE]** interrogator make and model for each system; Nano gauge length
-and pulse configuration; the physical depth of the Deep turnaround; casing and
-completion details. Channel coordinate is distance along fibre throughout — the
-coordinate-to-depth mapping remains provisional and no result here depends on it.
+For context on the installation, Lellouch et al. (2019) describe the SAFOD main
+hole as carrying two optical fibres cemented between casing strings in a 0.9 mm
+steel tube, and used an OptaSense ODH3.1 interrogator at 10 m gauge length and
+1 m channel spacing in 2017.
+
+**[NEEDS SOURCE]** interrogator model numbers for the present survey (vendor is
+established — Sintela for Nano, OptaSense for Deep — but not the model); the
+physical depth corresponding to the Deep turnaround at channel 1702; and
+confirmation of which physical cable each dataset corresponds to, which the
+project records as an open question. Channel coordinate is distance along fibre
+throughout; the coordinate-to-depth mapping is provisional and no result here
+depends on it.
 
 ### 2.2 Source and survey
 

@@ -14,7 +14,7 @@ installations behave differently.
 
 The cemented Nano fibre records a coherent mode near 2950 m s⁻¹, strongest at
 30–60 Hz. The wireline Deep fibre records a mode near 1547 m s⁻¹, strongest at
-15–30 Hz. Same hole, same source, same 24 h.
+15–30 Hz. Same hole, same source, same nominal 24 h survey — though Deep coverage ends after burst 45, giving ~22.5 h of usable Deep record against Nano's full span.
 
 The most natural reading is a coupling contrast. A cemented fibre is mechanically
 tied to the formation and senses strain transmitted through it; a wireline fibre
@@ -73,8 +73,10 @@ What does carry over is the interpretive category. **The comparison against the 
 closer than it appears.** We are not comparing a guided-mode sensitivity against
 a formation-velocity prediction; we are comparing a guided-mode tidal response
 against another guided-mode tidal response, measured with a different source in a
-different opening. That is a like-for-like comparison, and it is a better
-justification for the benchmark than the arithmetic route.
+different opening. That makes it **more directly comparable in observable type
+than a bulk-rock velocity benchmark would be** — not a like-for-like match, since
+the rock, frequency, geometry, coupling and guiding structure all differ, but a
+comparison of the same kind of quantity.
 
 The same lineage carries a caution the original authors stated plainly. De Fazio
 et al. note that the effect of strain on such a mode "is difficult to predict
@@ -224,7 +226,13 @@ detection levels move in discrete steps.
 
 ## 5.7 Small-signal benchmark and the limits of this survey
 
-A site-relevant tidal velocity response can be estimated from Niu et al. (2008):
+Two distinct literature scales appear below and must not be conflated. The
+**Niu SAFOD expected-response scale** is what a tidal response *should* be at this
+site; the **De Fazio observed tidal-response scale** is the largest such response
+anyone has reported, measured elsewhere on a different guided mode. Neither is
+"the tidal benchmark".
+
+The Niu SAFOD expected-response scale follows from Niu et al. (2008):
 a barometric stress sensitivity of 2.4×10⁻⁷ Pa⁻¹ against a calculated tidal
 stress variation of ~240 Pa gives ~5.76×10⁻⁵, or 0.00576%. This is an
 order-of-magnitude benchmark for a small signal, not a prediction for the modes
