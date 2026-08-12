@@ -969,3 +969,124 @@ Two things the scan did establish:
 - **Only 369-486 of ~1440 files per day were readable.** That must be explained
   before any rate or bound is quoted from the scan; at face value it means the
   effective scanned duration is a quarter of the nominal one.
+
+---
+
+## 20. Adversarial audit, 2026-08-11: the scan was invalid and several verdicts above are withdrawn
+
+Six independent reviewers audited the scripts and status documents before the 62 TB
+scan was allowed to finish; each finding was then given to a separate agent
+instructed to refute it. 61 findings, 30 at critical or high severity. The workflow
+had a flaw of its own -- 32 verifiers died on a session limit and the harness
+defaulted those to "refuted", so the count of survivors is a floor, not a total.
+
+### 20.1 The scan was cancelled. It was measuring the wrong thing.
+
+**Aperture mismatch, `full_scan.py:154`.** `build_templates()` overrides `MT.BAND`
+and `MT.CACHE` but NOT `MT.CH_LO`/`MT.CH_HI`. `moveout_test.py:57` fixes those at
+100-800, while `full_scan.py:82` beams 23-896. Every template was therefore built on
+a 714 m aperture with its z origin at channel 100, and correlated against an 891 m
+beam with z origin at channel 23. Verified on a real file containing
+`ev_20250402T154714`: matched aperture gives causal max 0.9993, mismatched gives
+far less. **`template_scan.py` has the identical bug**, so the 14-day pilot's
+"0 detections in 139 h" is also void.
+
+Three further scan defects, any one of which would have required a rerun:
+
+- **`db['fn'].map(os.path.exists)`** costs ~148 min per task (measured: 46.5 s per
+  3000 stat calls under load) x 200 tasks = **~500 core-hours of pure stat()**,
+  more than double the entire compute budget, and it removes nothing. It also makes
+  the task->file partition non-deterministic, so one transient Lustre failure
+  silently changes which files a task scans.
+- **The acausal template is not an independent null.** A time-reversed wavelet
+  correlates with its forward version at 0.29-0.65. Measured on the real file
+  containing `ev_20250402T154714`: causal max 0.9656, acausal max 0.4884 *on the
+  same file*. A genuine detection therefore raises the very floor it is judged
+  against.
+- **A single per-cell acausal maximum has no controlled error rate.** It is one
+  draw from the null-max distribution, i.e. its own median, so P(spurious
+  candidate) = 0.5 per cell. Over ~5,572 (day, template) cells that is ~2,800
+  false candidates from noise alone.
+
+### 20.2 Verdicts in this document that are now withdrawn
+
+- **Section 18.2, "dv/v REOPENS".** WITHDRAWN. The run it cites was killed by the
+  Slurm time limit before its own pre-registered decision rule executed. Applying
+  that rule to the numbers actually printed -- control floor 0.9938 % against a
+  0.15 % reopen threshold -- returns the *opposite* verdict: "no material
+  improvement, negative result stands". Section 12 is NOT superseded.
+- **Section 19, detection threshold M ~ -0.25.** UNVERIFIED. It is produced by no
+  script in the repository, and its decisive input, "beam SNR 26.2", is ambiguous
+  between peak-to-RMS and RMS-to-RMS in a way that moves the answer by ~0.4
+  magnitude units and a factor of 2.4 in event count.
+- **d' = 25.3**, used to justify the scan. It is a FLAT-stack number, selected as
+  the maximum of 16 band x variant cells, from 3 pairs. The moveout-corrected
+  configuration the scans actually use scores 4.67 in the same table.
+- **Section 19.3's "only 369-486 of 1440 files readable".** Misdiagnosis: the
+  manifest itself holds only 369/374/486 intervals for those days. Nothing was
+  unreadable; it is a coverage gap.
+
+### 20.3 Two sign errors in the shared estimator module
+
+Both propagate into every downstream result that used them.
+
+- **`dvv_core.sub_sample_delay`** returns the delay with the sub-sample term
+  subtracted instead of added, under numpy's exp(-2i.pi.f.t) convention. Fed a pair
+  delayed by exactly +3 ms it returns **-3 ms**.
+- **`dvv_core.interval_dvv`** returns the negative of `slope_dvv` on identical
+  input. Synthesised from a known dv/v = -0.500 %: `slope_dvv` gives -0.5000 %,
+  `interval_dvv` gives +0.4998 %.
+
+### 20.4 The interval_dvv_gate gates did not test what they claim
+
+- **`MIN_COH` deletes the entire coda window.** The coherence proxy
+  exp(-var(resid)/2) is not normalised for the number of frequency bins, so over a
+  10 s window it underflows to 1e-28 and every channel is cut. That is why the coda
+  returned 0 channels for every pair -- not low coherence, an unnormalised statistic.
+- **G2's tolerance is 4.9 percentage points** against injections of at most 1 %, so
+  a completely dead estimator returning zero bias prints PASS at all three levels.
+- **G3 compares a median against a single-pair sigma**, an acceptance region
+  sqrt(n)*1.25 = 4.6x too wide. On the real output it stamped PASS on a
+  time-reversed record reporting a 46 % velocity change.
+
+### 20.5 The LF strain products are not usable as built
+
+- **`build_lf.reduce_file` orientation heuristic has already fired.** A
+  (1840, 3200) file with Dimensions=[time, locus] takes the `else` branch because
+  1840 < 3200, and averages over the 3200 LOCI instead of over time -- returning a
+  spatial average labelled as a per-channel mean. That is the origin of the
+  1840-channel output.
+- **The timestamp is the SESSION start**, identical for every file in a session.
+  `Acquisition/Raw[N]/RawData.attrs['PartStartTime']` is the per-file value. As
+  shipped the product has no usable time axis.
+- **`deep_creep_strain.load_all` mixes three fibre geometries** (2050 ch at
+  StartLocusIndex 410 dx 5.10 m; 3200 at 1800 dx 2.04; 5000 at 0 dx 2.04) and
+  truncates to the minimum width, so row k is a different fibre position in
+  different time segments. That invalidates the D1 fold and the D4 leg-agreement
+  gate -- the hairpin control does not survive it.
+- **The time axis assumes gap-free recording** against 5.9 days of gaps, one of
+  5.6 days, so every label after 2026-05-01 is days early.
+
+### 20.6 Statistical claims that need restating
+
+- **`ddrt_pair_cc.py`'s `ac = D.acausal.max()`** is a max over the same N=23 draws
+  being tested: per-comparison alpha 1/(N+1) = 0.042, family-wise error rate 0.5.
+  **~1 of the 9 "confirmed" pairs is expected from noise**, and the marginal ones
+  are where it lands.
+- **The "two independent criteria" claim is unsound.** DDRT relative locations are
+  themselves built from waveform cross-correlation differential times, so the
+  geometric screen and the DAS correlation measure the same phenomenon on
+  different instruments. Section 16's own retraction says as much.
+- **`moveout_test.MAX_LAG_S = 2.0` equals the entire WIN_P span**, so the P-window
+  lag search covers the whole window and its pure-noise floor is 0.316 against
+  0.159 for the origin window. The d' comparison between window variants was never
+  like-for-like. This is the zero-lag/oversized-lag class, for the sixth time.
+- **`stress_drop_500.py`** hard-codes the gauge-response velocity at 2500 m/s
+  against VS=3500 in the same file and ~3804 m/s measured, and normalises the noise
+  spectrum by a 4 s window against the signal's 2 s, putting the noise floor 32 %
+  too low. Either could produce the wrong-sign r(M, log fc) = +0.246 on its own,
+  so section 18.1's closure is not yet attributable to the physics.
+- **`hrsn_reloc.synthetic_resolution`** injects a hard-coded 2 ms scatter against a
+  measured residual rms of 2.4-31.5 ms (median 22 ms). The 66 m resolution floor
+  should be ~660 m, so the "relative offset < 66 m" bound in section 18 is
+  optimistic by ~10x.
