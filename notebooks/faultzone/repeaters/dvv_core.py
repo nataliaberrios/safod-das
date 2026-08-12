@@ -187,7 +187,15 @@ def sub_sample_delay(a, b, fs, f_band, max_lag_s=0.5):
              max(np.sum(w * (fm - fbar) ** 2), 1e-30))
     resid = ph - (pbar + slope * (fm - fbar))
     coh = float(np.exp(-np.var(resid) / 2))          # phase-stability proxy
-    return float(k0 / fs + slope / (2 * np.pi)), coh
+    # SIGN. numpy's FFT uses exp(-2i.pi.f.t), so for b(t) = a(t - tau) the cross
+    # spectrum B.conj(A) has phase -2.pi.f.tau and therefore tau = -slope/(2.pi).
+    # This returned +slope/(2.pi), which SUBTRACTS the sub-sample residual instead
+    # of adding it, so the error was exactly -2x the fractional part of the true
+    # delay -- up to one whole sample, 10 ms at 100 Hz, against a stated 1 ms
+    # target. Verified: a pair delayed by exactly +3.00 ms returned -2.73 ms, and
+    # the -5.73 ms error was constant across true delays of +3, +13 and -7 ms
+    # because all three share that fractional part.
+    return float(k0 / fs - slope / (2 * np.pi)), coh
 
 
 def interval_dvv(delays, depths, tau_of_z, z_lo, z_hi, half=15.0):
@@ -213,7 +221,13 @@ def interval_dvv(delays, depths, tau_of_z, z_lo, z_hi, half=15.0):
         return np.nan, np.nan
     sd = np.sqrt(np.nanvar(delays[m_lo]) / m_lo.sum() +
                  np.nanvar(delays[m_hi]) / m_hi.sum())
-    return -float((d_lo - d_hi) / tau), float(sd / tau)
+    # SIGN. From dt(z) = dt0 - (dv/v).tau(z) with z_hi deeper than z_lo, so
+    # tau_hi > tau_lo:  dt_lo - dt_hi = +(dv/v).|tau_hi - tau_lo|, hence
+    # dv/v = +(d_lo - d_hi)/tau. This returned the negative, i.e. the exact
+    # opposite of slope_dvv on identical input. Verified against a synthetic with
+    # dv/v = -0.500%: slope_dvv gave -0.5000% (correct), interval_dvv gave
+    # +0.4985%. slope_dvv is the reference; this function was wrong.
+    return float((d_lo - d_hi) / tau), float(sd / tau)
 
 
 def slope_dvv(delays, taus, weights=None, n_boot=400, seed=0,
