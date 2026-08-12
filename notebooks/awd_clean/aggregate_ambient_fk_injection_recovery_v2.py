@@ -9,12 +9,12 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ambient_fk_injection_recovery_v1 import exact_velocity_score
+from ambient_fk_injection_recovery_v2 import exact_velocity_score
 from ambient_signed_fk_v2 import BRANCH_LAG_SIGN
 
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_INPUT = ROOT / "ambient_transfer" / "fk_injection_recovery_v1_n300"
+DEFAULT_INPUT = ROOT / "ambient_transfer" / "fk_injection_recovery_v2_n300"
 DEFAULT_NULL = (
     ROOT
     / "ambient_transfer"
@@ -97,7 +97,7 @@ def scenario_paths(input_dir: Path, date: str, start: int, nfiles: int):
         for direction in DIRECTIONS:
             direction_tag = "inc" if direction == 1 else "dec"
             stem = (
-                f"fk_injection_v1_{date}_start{start}_n{nfiles}_"
+                f"fk_injection_v2_{date}_start{start}_n{nfiles}_"
                 f"v{int(velocity)}_{direction_tag}"
             )
             yield velocity, direction, input_dir / f"{stem}.json", input_dir / f"{stem}.npz"
@@ -120,45 +120,51 @@ def plot_summary(summary: dict, output: Path) -> None:
     fig, axes = plt.subplots(2, 2, figsize=(13.2, 9.2), constrained_layout=True)
     colors = {1800.0: "0.45", 2750.0: "#0072B2", 3200.0: "#D55E00", 4000.0: "#009E73"}
     styles = {1: "-", -1: "--"}
+    markers = {1: "o", -1: "^"}
     direction_labels = {1: "increasing coordinate", -1: "decreasing coordinate"}
+    amplitude_labels = None
     for scenario in summary["scenarios"]:
         velocity = float(scenario["velocity_m_s"])
         direction = int(scenario["direction"])
         points = scenario["amplitudes"]
         amplitude = np.asarray([point["amplitude_ratio"] for point in points])
+        if amplitude_labels is None:
+            amplitude_labels = [f"{value:g}" for value in amplitude]
+        x_position = np.arange(amplitude.size)
         label = f"{velocity / 1000:g} km/s, {direction_labels[direction]}"
-        color, style = colors[velocity], styles[direction]
+        color, style, marker = colors[velocity], styles[direction], markers[direction]
 
         pre = np.asarray([point["prefilter_mean_log_enrichment"] for point in points])
-        axes[0, 0].plot(amplitude, pre, style, color=color, marker="o", ms=3, label=label)
+        axes[0, 0].plot(x_position, pre, style, color=color, marker=marker, ms=4, label=label)
 
         pre_delta = np.asarray([point["prefilter_uplift"] for point in points])
         pre_low = np.asarray([point["prefilter_uplift_ci95"][0] for point in points])
         pre_high = np.asarray([point["prefilter_uplift_ci95"][1] for point in points])
-        axes[0, 1].plot(amplitude, pre_delta, style, color=color, marker="o", ms=3)
-        axes[0, 1].fill_between(amplitude, pre_low, pre_high, color=color, alpha=0.08)
+        axes[0, 1].plot(x_position, pre_delta, style, color=color, marker=marker, ms=4)
+        axes[0, 1].fill_between(x_position, pre_low, pre_high, color=color, alpha=0.08)
 
         post_delta = np.asarray([point["postfilter_score_uplift"] for point in points])
         post_low = np.asarray([point["postfilter_score_uplift_ci95"][0] for point in points])
         post_high = np.asarray([point["postfilter_score_uplift_ci95"][1] for point in points])
-        axes[1, 0].plot(amplitude, post_delta, style, color=color, marker="o", ms=3)
-        axes[1, 0].fill_between(amplitude, post_low, post_high, color=color, alpha=0.08)
+        axes[1, 0].plot(x_position, post_delta, style, color=color, marker=marker, ms=4)
+        axes[1, 0].fill_between(x_position, post_low, post_high, color=color, alpha=0.08)
 
         recovered = np.asarray([point["postfilter_peak_velocity_m_s"] / 1000 for point in points])
-        axes[1, 1].plot(amplitude, recovered, style, color=color, marker="o", ms=3)
+        axes[1, 1].plot(x_position, recovered, style, color=color, marker=marker, ms=4)
         axes[1, 1].axhline(velocity / 1000, color=color, lw=0.5, alpha=0.2)
 
-    positive_x = [
-        point["amplitude_ratio"]
-        for scenario in summary["scenarios"]
-        for point in scenario["amplitudes"]
-        if point["amplitude_ratio"] > 0
-    ]
-    xmin = min(positive_x) / 1.4
+    assert amplitude_labels is not None
     for ax in axes.flat:
-        ax.set_xscale("symlog", linthresh=xmin, linscale=0.8)
+        ax.set_xticks(np.arange(len(amplitude_labels)), amplitude_labels)
         ax.set_xlabel("Injected RMS / median real 5–20 Hz RMS")
         ax.grid(alpha=0.2)
+    null_values = list(summary["prefilter_fixed_null95"].values())
+    axes[0, 0].axhspan(
+        min(null_values), max(null_values), color="0.2", alpha=0.10,
+        label="fixed pre-filter 95% null range",
+    )
+    for value in null_values:
+        axes[0, 0].axhline(value, color="0.2", lw=0.8, ls=":")
     axes[0, 0].set_ylabel("Mean pre-filter log target/reference power")
     axes[0, 0].set_title("(a) Independent pre-filter response")
     axes[0, 0].legend(frameon=False, fontsize=7, ncol=2)
@@ -187,7 +193,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
     thresholds = null_thresholds(args.null_json)
     rng = np.random.default_rng(args.seed)
     summary: dict[str, object] = {
-        "workflow_version": "ambient_fk_injection_recovery_v1_aggregate",
+        "workflow_version": "ambient_fk_injection_recovery_v2_aggregate",
         "date": args.date,
         "start": args.start,
         "requested_files": args.nfiles,
@@ -298,7 +304,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
         summary["scenarios"].append(scenario)
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    stem = args.output_dir / "ambient_fk_injection_recovery_v1_aggregate"
+    stem = args.output_dir / "ambient_fk_injection_recovery_v2_aggregate"
     json_path = stem.with_suffix(".json")
     json_path.write_text(json.dumps(summary, indent=2))
     plot_summary(summary, stem)

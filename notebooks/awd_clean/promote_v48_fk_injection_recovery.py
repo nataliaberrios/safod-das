@@ -10,10 +10,10 @@ ROOT = Path(__file__).resolve().parent
 NOTEBOOK = ROOT / "AWD_results_dashboard.ipynb"
 TEX = ROOT / "AWD_advisor_figure_guide.tex"
 TEX_V48 = ROOT / "AWD_advisor_figure_guide_v48.tex"
-OUT = ROOT / "ambient_transfer" / "fk_injection_recovery_v1_n300"
-AGGREGATE = OUT / "ambient_fk_injection_recovery_v1_aggregate.json"
-AUDIT = OUT / "ambient_fk_injection_recovery_v1_completion_audit.json"
-FIGURE = OUT / "ambient_fk_injection_recovery_v1_aggregate.png"
+OUT = ROOT / "ambient_transfer" / "fk_injection_recovery_v2_n300"
+AGGREGATE = OUT / "ambient_fk_injection_recovery_v2_aggregate.json"
+AUDIT = OUT / "ambient_fk_injection_recovery_v2_completion_audit.json"
+FIGURE = OUT / "ambient_fk_injection_recovery_v2_aggregate.png"
 EXPECTED_AMPLITUDES = [0.0, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0]
 EXPECTED_SCENARIOS = {
     (velocity, direction)
@@ -31,7 +31,7 @@ def format_ratio(value: float | None) -> str:
 
 
 def validate(summary: dict) -> None:
-    if summary.get("workflow_version") != "ambient_fk_injection_recovery_v1_aggregate":
+    if summary.get("workflow_version") != "ambient_fk_injection_recovery_v2_aggregate":
         raise ValueError("unexpected aggregate workflow version")
     if summary.get("used_files") != 300:
         raise ValueError(f"expected 300 files, found {summary.get('used_files')}")
@@ -88,7 +88,7 @@ def main() -> None:
     summary = json.loads(AGGREGATE.read_text())
     audit = json.loads(AUDIT.read_text())
     validate(summary)
-    if audit.get("workflow_version") != "ambient_fk_injection_recovery_v1_completion_audit":
+    if audit.get("workflow_version") != "ambient_fk_injection_recovery_v2_completion_audit":
         raise ValueError("unexpected completion-audit version")
     if audit.get("all_checks_pass") is not True or not all(audit.get("checks", {}).values()):
         raise ValueError(f"completion audit did not pass: {audit.get('checks')}")
@@ -125,11 +125,20 @@ def main() -> None:
 
     summary_markdown = f"""## Real-noise plane-wave injection–recovery
 
-This calibration injects deterministic broadband 5–20 Hz plane waves into the
-original one-minute samples before detrending, bandpass filtering, 5 s temporal
-normalization, decimation, F–K selection, or correlation. Each amplitude is
-the injected RMS divided by the median real-channel 5–20 Hz RMS for that file.
-The same 300 files are paired at every amplitude.
+This calibration injects deterministic broadband 5–20 Hz plane waves through
+a precision-safe linear decomposition. Real and synthetic arrays are detrended
+and bandpassed separately, then summed in float64 before 5 s temporal
+normalization, decimation, F–K selection, or correlation. This is
+mathematically equivalent to pre-filter injection while preserving sub-count
+signals against the large raw offset. Each amplitude is the injected RMS
+divided by the median real-channel 5–20 Hz RMS for that file. The same 300
+files are paired at every amplitude.
+
+**Withdrawn predecessor.** An earlier v1 calibration added the synthetic wave
+directly to large-offset float32 raw samples. That implementation rounded away
+part of the smallest sub-count injections, so its thresholds were withdrawn
+before promotion. The v2 result shown here must not be replaced by the v1
+thresholds.
 
 The table below reports the smallest tested positive amplitude ratio satisfying
 each frozen decision. “Independent” requires the pre-filter target-energy
@@ -152,13 +161,18 @@ that the operator either recovered or manufactured the uninjected feature.
 """
     caption = f"""**Publication-style caption. Ambient F–K injection–recovery in
 real SAFOD noise.** Synthetic random broadband plane waves spanning 5–20 Hz
-were added to 300 original one-minute Nano records before all production
-preprocessing. Injected RMS was scaled independently in each record to the
+were propagated through 300 original one-minute Nano records using a
+precision-safe linear injection. Real and synthetic arrays were separately
+detrended and bandpassed and then summed in float64 before the nonlinear 5 s
+running-absolute-mean normalization; this preserves the exact zero-amplitude
+production baseline while avoiding sub-count rounding against the raw offset.
+Injected RMS was scaled independently in each record to the
 median real-channel 5–20 Hz RMS, with ratios 0, 0.003, 0.01, 0.03, 0.1, 0.3,
 and 1.0. Colors distinguish apparent velocities of 1.8, 2.75, 3.2, and
-4.0 km/s; solid and dashed curves distinguish propagation toward increasing
-and decreasing fiber coordinate. Panel (a) gives the correct-branch mean
-pre-filter log target/reference power statistic. Panel (b) subtracts the
+4.0 km/s; solid circles and dashed triangles distinguish propagation toward
+increasing and decreasing fiber coordinate. Panel (a) gives the correct-branch
+mean pre-filter log target/reference power statistic; the gray interval marks
+the two frozen branch-specific 95% null thresholds. Panel (b) subtracts the
 identical zero-injection files and shows paired 95% bootstrap intervals.
 Panel (c) gives the corresponding uplift in the physical-lag correlation score
 after the frozen signed 2.5–4.5 km/s F–K wedge. Panel (d) shows the conditional
@@ -183,10 +197,10 @@ dashboard_root = next(
 )
 if dashboard_root is None:
     raise FileNotFoundError("Run from awd_clean or its parent")
-product = dashboard_root / "ambient_transfer" / "fk_injection_recovery_v1_n300"
-aggregate_json = product / "ambient_fk_injection_recovery_v1_aggregate.json"
-audit_json = product / "ambient_fk_injection_recovery_v1_completion_audit.json"
-figure = product / "ambient_fk_injection_recovery_v1_aggregate.png"
+product = dashboard_root / "ambient_transfer" / "fk_injection_recovery_v2_n300"
+aggregate_json = product / "ambient_fk_injection_recovery_v2_aggregate.json"
+audit_json = product / "ambient_fk_injection_recovery_v2_completion_audit.json"
+figure = product / "ambient_fk_injection_recovery_v2_aggregate.png"
 for required in (aggregate_json, audit_json, figure):
     if not required.is_file():
         raise FileNotFoundError(required)
@@ -201,7 +215,7 @@ display(Image(filename=str(figure), width=1200))
         {"cell_type": "markdown", "metadata": {}, "source": lines(caption)},
     ])
     status["version"] = "v48"
-    status["last_status_sync"] = "2026-08-11"
+    status["last_status_sync"] = "2026-08-12"
     NOTEBOOK.write_text(json.dumps(notebook, indent=1) + "\n")
 
     tex = TEX.read_text()
@@ -217,12 +231,18 @@ display(Image(filename=str(figure), width=1200))
 and the production F--K correlation workflow recover known plane waves in the
 actual SAFOD noise field?}}
 
-Synthetic random broadband 5--20~Hz plane waves were added to the original
-samples before detrending, bandpass filtering, 5-s running-absolute-mean
-normalization, decimation, F--K selection, or correlation. The amplitude is
+Synthetic random broadband 5--20~Hz plane waves were injected using a
+precision-safe linear decomposition. Real and synthetic arrays were detrended
+and bandpassed separately and then summed in float64 before the nonlinear 5-s
+running-absolute-mean normalization, decimation, F--K selection, or
+correlation. This is mathematically equivalent to pre-filter injection while
+preserving sub-count signals against the large raw offset. The amplitude is
 injected RMS divided by median real-channel 5--20~Hz RMS within each file. All
 amplitudes use the same 300 one-minute files, so confidence intervals are
-paired against an exactly matched zero-injection baseline.
+paired against an exactly matched zero-injection baseline. An earlier v1 run
+was withdrawn before promotion because direct addition to large-offset
+float32 raw samples rounded away part of the smallest injections; no v1
+threshold is interpreted here.
 
 \begin{{table}}[H]
 \centering
@@ -243,8 +263,8 @@ requires positive score uplift and a conditional peak within
 
 \begin{{figure}}[H]
 \centering
-\includegraphics[width=0.99\linewidth]{{ambient_transfer/fk_injection_recovery_v1_n300/ambient_fk_injection_recovery_v1_aggregate.png}}
-\caption{{\textbf{{Ambient F--K injection--recovery in real SAFOD noise.}} Synthetic random broadband plane waves spanning 5--20~Hz were added to 300 original one-minute Nano records before all production preprocessing. Injected RMS was scaled in each record to median real-channel 5--20~Hz RMS at ratios 0, 0.003, 0.01, 0.03, 0.1, 0.3, and 1.0. Colors distinguish 1.8, 2.75, 3.2, and 4.0~km~s\( ^{{-1}} \); line style distinguishes increasing- and decreasing-coordinate propagation. (a) Correct-branch mean pre-filter log target/reference power. (b) Paired pre-filter uplift with 95\% bootstrap intervals. (c) Physical-lag score uplift after the frozen signed 2.5--4.5~km~s\( ^{{-1}} \) F--K wedge. (d) Conditional peak velocity, with horizontal injected-velocity guides. The independent decision uses the stricter branch-specific 95th percentile from the frozen channel-permutation and circular-time-shift nulls; 1.8~km~s\( ^{{-1}} \) is an off-wedge specificity control. {specificity} Post-filter recovery is meaningful only relative to the independent threshold because the selected corridor constrains output slowness. This calibration does not prove Green's-function convergence or identify the uninjected feature as a physical mode.}}
+\includegraphics[width=0.99\linewidth]{{ambient_transfer/fk_injection_recovery_v2_n300/ambient_fk_injection_recovery_v2_aggregate.png}}
+\caption{{\textbf{{Ambient F--K injection--recovery in real SAFOD noise.}} Synthetic random broadband plane waves spanning 5--20~Hz were propagated through 300 original one-minute Nano records using a precision-safe linear injection. Real and synthetic arrays were separately detrended and bandpassed and then summed in float64 before nonlinear 5-s running-absolute-mean normalization, preserving the exact zero-amplitude production baseline while avoiding sub-count rounding against the raw offset. Injected RMS was scaled in each record to median real-channel 5--20~Hz RMS at ratios 0, 0.003, 0.01, 0.03, 0.1, 0.3, and 1.0. Colors distinguish 1.8, 2.75, 3.2, and 4.0~km~s\( ^{{-1}} \); solid circles and dashed triangles distinguish increasing- and decreasing-coordinate propagation. (a) Correct-branch mean pre-filter log target/reference power; the gray interval marks the frozen branch-specific 95\% null thresholds. (b) Paired pre-filter uplift with 95\% bootstrap intervals. (c) Physical-lag score uplift after the frozen signed 2.5--4.5~km~s\( ^{{-1}} \) F--K wedge. (d) Conditional peak velocity, with horizontal injected-velocity guides. The independent decision uses the stricter branch-specific 95th percentile from the frozen channel-permutation and circular-time-shift nulls; 1.8~km~s\( ^{{-1}} \) is an off-wedge specificity control. {specificity} Post-filter recovery is meaningful only relative to the independent threshold because the selected corridor constrains output slowness. The v1 calibration was withdrawn because float32 raw-domain addition rounded sub-count injections; only this audited v2 result is interpreted. This calibration does not prove Green's-function convergence or identify the uninjected feature as a physical mode.}}
 \end{{figure}}
 
 \takeaway{{The injection experiment quantifies the gap between independent

@@ -9,12 +9,14 @@ confound in the SAFOD ambient-noise workflow:
 2. At what input amplitude does the production signed F-K plus correlation
    workflow recover the same wave?
 
-Synthetic waves are added to the original channel-by-time samples before
-bandpass filtering, running-absolute-mean temporal normalization, decimation,
-F-K selection, or correlation.  Amplitude is expressed as injected broadband
-RMS divided by the median 5--20 Hz RMS of the real channels in each file.
-Outputs are scenario-specific and resumable; aggregation is performed by a
-separate script.
+Synthetic waves are injected through a precision-safe linear decomposition:
+real data and synthetic data are detrended and bandpassed separately, then
+added in float64 before running-absolute-mean temporal normalization,
+decimation, F-K selection, or correlation. This is mathematically equivalent
+to adding before those linear operators without losing sub-count signals
+against the large raw offset. Amplitude is expressed as injected broadband RMS
+divided by the median 5--20 Hz RMS of the real channels in each file. Outputs
+are scenario-specific and resumable; aggregation is performed separately.
 """
 from __future__ import annotations
 
@@ -24,6 +26,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+from scipy.ndimage import uniform_filter1d
 from scipy.signal import butter, detrend, sosfiltfilt
 from scipy.signal.windows import tukey
 
@@ -46,7 +49,7 @@ from ambient_transfer_test import (
 
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_OUT = ROOT / "ambient_transfer" / "fk_injection_recovery_v1"
+DEFAULT_OUT = ROOT / "ambient_transfer" / "fk_injection_recovery_v2"
 PASSBAND_HZ = (5.0, 20.0)
 SPACE_DECIMATION = 2
 TIME_DECIMATION = 2
@@ -105,6 +108,38 @@ def real_band_rms(raw: np.ndarray, fs: float) -> float:
     if not np.isfinite(value) or value <= 0:
         raise ValueError("real-data band RMS is not positive and finite")
     return value
+
+
+def preprocess_injected(
+    raw: np.ndarray,
+    wave: np.ndarray,
+    amplitude_ratio: float,
+    real_band_scale: float,
+    fs: float,
+    norm_seconds: float = 5.0,
+) -> np.ndarray:
+    """Apply a pre-detrend injection without float32 raw-offset rounding.
+
+    Detrending and bandpass filtering are linear. We therefore apply both
+    operations separately to the production float32 real data and unit-RMS
+    synthetic wave, then add the two float64 filtered arrays before the
+    nonlinear running-absolute-mean normalization. This retains the exact
+    zero-injection baseline of the production preprocessing while preventing
+    sub-count injections from being rounded away against the large raw integer
+    offset.
+    """
+    if raw.shape != wave.shape:
+        raise ValueError("raw and wave shapes differ")
+    real_detrended = detrend(raw, axis=1, type="linear")
+    wave_detrended = detrend(wave, axis=1, type="linear")
+    sos = butter(4, PASSBAND_HZ, btype="bandpass", fs=fs, output="sos")
+    real_band = sosfiltfilt(sos, real_detrended, axis=1)
+    wave_band = sosfiltfilt(sos, wave_detrended, axis=1)
+    x = real_band + float(amplitude_ratio * real_band_scale) * wave_band
+    nwin = max(3, int(norm_seconds * fs))
+    running = uniform_filter1d(np.abs(x), size=nwin, axis=1, mode="nearest")
+    floor = np.percentile(running, 5, axis=1, keepdims=True) * 0.1 + 1e-12
+    return x / np.maximum(running, floor)
 
 
 def prefilter_enrichment(processed: np.ndarray, fs: float, dx: float) -> dict[str, float]:
@@ -216,8 +251,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
             stable_seed(args.seed, path, args.velocity, args.direction),
         )
         for amplitude in amplitudes:
-            injected = raw if amplitude == 0.0 else raw + amplitude * scale * wave
-            processed = preprocess(injected, fs, norm_seconds=5.0)
+            processed = preprocess_injected(raw, wave, amplitude, scale, fs)
             prefilter = prefilter_enrichment(processed, fs, dx)
             current_lags, current_distance, correlations = branch_correlations(
                 processed, fs, dx
@@ -248,7 +282,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
         "real_band_rms_per_file": np.asarray(per_file_band_rms),
     }
     report: dict[str, object] = {
-        "workflow_version": "ambient_fk_injection_recovery_v1",
+        "workflow_version": "ambient_fk_injection_recovery_v2",
         "date": args.date,
         "start": args.start,
         "requested_files": args.nfiles,
@@ -262,9 +296,20 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
             "computed separately for each one-minute file"
         ),
         "injection_point": (
-            "original samples before detrending, 5-20 Hz filtering, 5-s running-"
-            "absolute-mean normalization, decimation, F-K filtering, and correlation"
+            "mathematically before the linear detrend and 5-20 Hz bandpass; real and "
+            "synthetic arrays are detrended and bandpassed separately, then added in "
+            "float64 before 5-s normalization to avoid rounding against the large raw "
+            "integer offset, decimation, F-K filtering, and correlation"
         ),
+        "numerical_precision": {
+            "raw_load_dtype": "float32 (unchanged production loader)",
+            "linear_operator_output_dtype": "float64",
+            "injection_addition_dtype": "float64",
+            "zero_baseline": (
+                "identical production detrend, 5-20 Hz bandpass, and 5-s "
+                "running-absolute-mean normalization at amplitude zero"
+            ),
+        },
         "signal": "deterministic random broadband 5-20 Hz plane wave with 10% Tukey time taper",
         "amplitudes": {},
         "interpretive_boundary": (
@@ -312,7 +357,7 @@ def run(args: argparse.Namespace) -> tuple[Path, Path]:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     direction_tag = "inc" if args.direction == 1 else "dec"
     stem = args.stem or (
-        f"fk_injection_v1_{args.date}_start{args.start}_n{args.nfiles}_"
+        f"fk_injection_v2_{args.date}_start{args.start}_n{args.nfiles}_"
         f"v{int(round(args.velocity))}_{direction_tag}"
     )
     json_path = args.output_dir / f"{stem}.json"

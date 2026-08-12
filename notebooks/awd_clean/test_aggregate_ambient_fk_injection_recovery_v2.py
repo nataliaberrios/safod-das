@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from aggregate_ambient_fk_injection_recovery_v1 import (
+from aggregate_ambient_fk_injection_recovery_v2 import (
     paired_bootstrap_mean,
     paired_bootstrap_stack_score,
     physical_trajectory_values,

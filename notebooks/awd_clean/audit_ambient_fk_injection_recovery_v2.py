@@ -14,7 +14,7 @@ from pathlib import Path
 
 import numpy as np
 
-from aggregate_ambient_fk_injection_recovery_v1 import (
+from aggregate_ambient_fk_injection_recovery_v2 import (
     DIRECTIONS,
     VELOCITIES,
     VELOCITY_TOLERANCE_M_S,
@@ -29,7 +29,7 @@ from ambient_signed_fk_v2 import BRANCH_LAG_SIGN, velocity_scores
 
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_INPUT = ROOT / "ambient_transfer" / "fk_injection_recovery_v1_n300"
+DEFAULT_INPUT = ROOT / "ambient_transfer" / "fk_injection_recovery_v2_n300"
 DEFAULT_NULL = (
     ROOT
     / "ambient_transfer"
@@ -44,7 +44,7 @@ def close(left: float, right: float, atol: float = 1e-7) -> bool:
 
 
 def run(args: argparse.Namespace) -> Path:
-    aggregate_path = args.input_dir / "ambient_fk_injection_recovery_v1_aggregate.json"
+    aggregate_path = args.input_dir / "ambient_fk_injection_recovery_v2_aggregate.json"
     if not aggregate_path.is_file():
         raise FileNotFoundError(aggregate_path)
     aggregate = json.loads(aggregate_path.read_text())
@@ -58,6 +58,8 @@ def run(args: argparse.Namespace) -> Path:
     thresholds = null_thresholds(args.null_json)
     checks = {
         "scenario_grid_complete": set(aggregate_by_key) == expected_keys,
+        "source_workflow_versions_v2": True,
+        "precision_safe_injection_declared": True,
         "all_file_lists_identical": True,
         "all_files_unique": True,
         "all_arrays_finite": True,
@@ -78,6 +80,14 @@ def run(args: argparse.Namespace) -> Path:
         if not json_path.is_file() or not npz_path.is_file():
             raise FileNotFoundError(f"missing {json_path} or {npz_path}")
         source_report = json.loads(json_path.read_text())
+        checks["source_workflow_versions_v2"] &= (
+            source_report.get("workflow_version") == "ambient_fk_injection_recovery_v2"
+        )
+        precision = source_report.get("numerical_precision", {})
+        checks["precision_safe_injection_declared"] &= (
+            precision.get("injection_addition_dtype") == "float64"
+            and "identical production" in precision.get("zero_baseline", "")
+        )
         product = np.load(npz_path)
         files = product["used_files"].astype(str)
         checks["all_files_unique"] &= len(set(files)) == args.expected_files
@@ -211,7 +221,7 @@ def run(args: argparse.Namespace) -> Path:
         })
 
     report = {
-        "workflow_version": "ambient_fk_injection_recovery_v1_completion_audit",
+        "workflow_version": "ambient_fk_injection_recovery_v2_completion_audit",
         "source_workflow_version": aggregate.get("workflow_version"),
         "expected_files": args.expected_files,
         "fixed_prefilter_null95": thresholds,
@@ -226,7 +236,7 @@ def run(args: argparse.Namespace) -> Path:
             "or the physical identity of the uninjected filtered ridge."
         ),
     }
-    output = args.input_dir / "ambient_fk_injection_recovery_v1_completion_audit.json"
+    output = args.input_dir / "ambient_fk_injection_recovery_v2_completion_audit.json"
     output.write_text(json.dumps(report, indent=2))
     print(json.dumps(report, indent=2))
     if not report["all_checks_pass"]:

@@ -34,7 +34,7 @@ def synthetic_summary() -> dict:
                 "amplitudes": points,
             })
     return {
-        "workflow_version": "ambient_fk_injection_recovery_v1_aggregate",
+        "workflow_version": "ambient_fk_injection_recovery_v2_aggregate",
         "used_files": 300,
         "scenarios": scenarios,
     }
@@ -45,16 +45,16 @@ def test_promotion() -> None:
     notebook = temporary / "AWD_results_dashboard.ipynb"
     tex = temporary / "AWD_advisor_figure_guide.tex"
     tex_v48 = temporary / "AWD_advisor_figure_guide_v48.tex"
-    product = temporary / "fk_injection_recovery_v1_n300"
+    product = temporary / "fk_injection_recovery_v2_n300"
     product.mkdir()
     shutil.copy2(promote.NOTEBOOK, notebook)
     shutil.copy2(promote.TEX, tex)
-    aggregate = product / "ambient_fk_injection_recovery_v1_aggregate.json"
-    audit = product / "ambient_fk_injection_recovery_v1_completion_audit.json"
-    figure = product / "ambient_fk_injection_recovery_v1_aggregate.png"
+    aggregate = product / "ambient_fk_injection_recovery_v2_aggregate.json"
+    audit = product / "ambient_fk_injection_recovery_v2_completion_audit.json"
+    figure = product / "ambient_fk_injection_recovery_v2_aggregate.png"
     aggregate.write_text(json.dumps(synthetic_summary()))
     audit.write_text(json.dumps({
-        "workflow_version": "ambient_fk_injection_recovery_v1_completion_audit",
+        "workflow_version": "ambient_fk_injection_recovery_v2_completion_audit",
         "expected_files": 300,
         "all_checks_pass": True,
         "checks": {"synthetic_integration_check": True},
