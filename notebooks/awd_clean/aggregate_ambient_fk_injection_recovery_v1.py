@@ -69,11 +69,25 @@ def paired_bootstrap_stack_score(
     rng: np.random.Generator,
     nboot: int,
 ) -> tuple[float, float, float]:
-    """Bootstrap uplift of median receiver score after stacking files."""
-    difference = np.asarray(injected) - np.asarray(baseline)
-    estimate = float(np.median(np.mean(difference, axis=0)))
-    indices = rng.integers(0, difference.shape[0], size=(nboot, difference.shape[0]))
-    draws = np.median(np.mean(difference[indices], axis=1), axis=1)
+    """Bootstrap the exact difference of median-after-stacking scores.
+
+    The production score first averages files at every receiver and then takes
+    the median across receivers. Subtraction must occur after both scores are
+    formed; a median of receiver-wise differences is not generally equivalent.
+    Paired resamples use the same file indices for injected and baseline data.
+    """
+    injected = np.asarray(injected)
+    baseline = np.asarray(baseline)
+    if injected.shape != baseline.shape or injected.ndim != 2:
+        raise ValueError("injected and baseline must be equal file-by-receiver arrays")
+    estimate = float(
+        np.median(np.mean(injected, axis=0))
+        - np.median(np.mean(baseline, axis=0))
+    )
+    indices = rng.integers(0, injected.shape[0], size=(nboot, injected.shape[0]))
+    injected_draws = np.median(np.mean(injected[indices], axis=1), axis=1)
+    baseline_draws = np.median(np.mean(baseline[indices], axis=1), axis=1)
+    draws = injected_draws - baseline_draws
     low, high = np.quantile(draws, (0.025, 0.975))
     return estimate, float(low), float(high)
 

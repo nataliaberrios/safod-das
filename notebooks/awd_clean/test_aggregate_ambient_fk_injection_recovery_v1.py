@@ -38,8 +38,25 @@ def test_paired_bootstraps_detect_known_uplift() -> None:
     assert low > 0.0 and low <= estimate <= high
 
 
+def test_stack_uplift_uses_difference_of_scores() -> None:
+    """Guard against replacing score(injected)-score(baseline) by median(delta)."""
+    baseline = np.tile([0.0, 100.0, 100.0], (20, 1))
+    injected = np.tile([1.0, 0.0, 101.0], (20, 1))
+    estimate, low, high = paired_bootstrap_stack_score(
+        injected, baseline, np.random.default_rng(10), 100
+    )
+    expected = np.median(injected.mean(axis=0)) - np.median(baseline.mean(axis=0))
+    old_wrong_value = np.median((injected - baseline).mean(axis=0))
+    assert expected == -99.0 and old_wrong_value == 1.0
+    assert estimate == low == high == expected
+
+
 def main() -> None:
-    tests = (test_physical_trajectory_sampling, test_paired_bootstraps_detect_known_uplift)
+    tests = (
+        test_physical_trajectory_sampling,
+        test_paired_bootstraps_detect_known_uplift,
+        test_stack_uplift_uses_difference_of_scores,
+    )
     for test in tests:
         test()
         print(f"PASS {test.__name__}")
