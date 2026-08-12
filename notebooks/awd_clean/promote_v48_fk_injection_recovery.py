@@ -12,6 +12,7 @@ TEX = ROOT / "AWD_advisor_figure_guide.tex"
 TEX_V48 = ROOT / "AWD_advisor_figure_guide_v48.tex"
 OUT = ROOT / "ambient_transfer" / "fk_injection_recovery_v1_n300"
 AGGREGATE = OUT / "ambient_fk_injection_recovery_v1_aggregate.json"
+AUDIT = OUT / "ambient_fk_injection_recovery_v1_completion_audit.json"
 FIGURE = OUT / "ambient_fk_injection_recovery_v1_aggregate.png"
 EXPECTED_AMPLITUDES = [0.0, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0]
 EXPECTED_SCENARIOS = {
@@ -81,11 +82,18 @@ def latex_rows(summary: dict) -> str:
 
 
 def main() -> None:
-    for path in (NOTEBOOK, TEX, AGGREGATE, FIGURE):
+    for path in (NOTEBOOK, TEX, AGGREGATE, AUDIT, FIGURE):
         if not path.is_file() or path.stat().st_size == 0:
             raise FileNotFoundError(path)
     summary = json.loads(AGGREGATE.read_text())
+    audit = json.loads(AUDIT.read_text())
     validate(summary)
+    if audit.get("workflow_version") != "ambient_fk_injection_recovery_v1_completion_audit":
+        raise ValueError("unexpected completion-audit version")
+    if audit.get("all_checks_pass") is not True or not all(audit.get("checks", {}).values()):
+        raise ValueError(f"completion audit did not pass: {audit.get('checks')}")
+    if audit.get("expected_files") != summary.get("used_files"):
+        raise ValueError("aggregate and completion-audit file counts disagree")
     notebook = json.loads(NOTEBOOK.read_text())
     status = notebook.setdefault("metadata", {}).setdefault("awd_dashboard", {})
     if status.get("version") == "v48":
@@ -177,11 +185,13 @@ if dashboard_root is None:
     raise FileNotFoundError("Run from awd_clean or its parent")
 product = dashboard_root / "ambient_transfer" / "fk_injection_recovery_v1_n300"
 aggregate_json = product / "ambient_fk_injection_recovery_v1_aggregate.json"
+audit_json = product / "ambient_fk_injection_recovery_v1_completion_audit.json"
 figure = product / "ambient_fk_injection_recovery_v1_aggregate.png"
-for required in (aggregate_json, figure):
+for required in (aggregate_json, audit_json, figure):
     if not required.is_file():
         raise FileNotFoundError(required)
 print(json.dumps(json.loads(aggregate_json.read_text()), indent=2))
+print(json.dumps(json.loads(audit_json.read_text()), indent=2))
 display(Image(filename=str(figure), width=1200))
 """
     notebook["cells"].extend([

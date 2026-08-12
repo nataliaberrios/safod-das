@@ -12,3 +12,4 @@ cd /home/groups/ettore88/nberrios/safod_das_git/notebooks/awd_clean
 /home/users/nberrios/miniconda3/envs/das/bin/python test_ambient_fk_injection_recovery_v1.py
 /home/users/nberrios/miniconda3/envs/das/bin/python test_aggregate_ambient_fk_injection_recovery_v1.py
 /home/users/nberrios/miniconda3/envs/das/bin/python -u aggregate_ambient_fk_injection_recovery_v1.py
+/home/users/nberrios/miniconda3/envs/das/bin/python -u audit_ambient_fk_injection_recovery_v1.py

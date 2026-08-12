@@ -50,12 +50,19 @@ def test_promotion() -> None:
     shutil.copy2(promote.NOTEBOOK, notebook)
     shutil.copy2(promote.TEX, tex)
     aggregate = product / "ambient_fk_injection_recovery_v1_aggregate.json"
+    audit = product / "ambient_fk_injection_recovery_v1_completion_audit.json"
     figure = product / "ambient_fk_injection_recovery_v1_aggregate.png"
     aggregate.write_text(json.dumps(synthetic_summary()))
+    audit.write_text(json.dumps({
+        "workflow_version": "ambient_fk_injection_recovery_v1_completion_audit",
+        "expected_files": 300,
+        "all_checks_pass": True,
+        "checks": {"synthetic_integration_check": True},
+    }))
     figure.write_bytes(b"synthetic figure placeholder")
     original = {
         name: getattr(promote, name)
-        for name in ("NOTEBOOK", "TEX", "TEX_V48", "OUT", "AGGREGATE", "FIGURE")
+        for name in ("NOTEBOOK", "TEX", "TEX_V48", "OUT", "AGGREGATE", "AUDIT", "FIGURE")
     }
     try:
         promote.NOTEBOOK = notebook
@@ -63,6 +70,7 @@ def test_promotion() -> None:
         promote.TEX_V48 = tex_v48
         promote.OUT = product
         promote.AGGREGATE = aggregate
+        promote.AUDIT = audit
         promote.FIGURE = figure
         promote.main()
         updated = json.loads(notebook.read_text())
