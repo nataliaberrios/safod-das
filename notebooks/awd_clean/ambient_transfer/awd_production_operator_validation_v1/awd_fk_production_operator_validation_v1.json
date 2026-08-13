@@ -1,0 +1,50 @@
+{
+  "workflow_version": "awd_fk_production_operator_validation_v1",
+  "question": "Does the exact signed 2.5--4.5 km/s fan retain the known increasing-coordinate AWD arrival and reject its complementary branch?",
+  "input": "canonical_epoch_stacks_paired_deep_all.npz",
+  "ground_truth": {
+    "source": "surface accelerated weight drop",
+    "coordinate": "Nano coordinate increases from the top into the well",
+    "expected_motion": "toward increasing coordinate (downgoing)",
+    "expected_fft_sign": "F*K < 0"
+  },
+  "operator": {
+    "velocity_fan_m_s": [
+      2500.0,
+      4500.0
+    ],
+    "sampling": "full temporal and spatial sampling; no decimation",
+    "mask": "hard complementary Hermitian-complete signed fans"
+  },
+  "active_gate": {
+    "aperture_m": [
+      80.0,
+      440.0
+    ],
+    "time_relative_to_catalog_reference_s": [
+      -0.08,
+      0.45
+    ],
+    "independent_observed_velocity_m_s": 2975.0,
+    "fixed_moveout_intercept_s": 0.002000000000000071,
+    "tube_half_width_s": 0.012
+  },
+  "metrics": {
+    "5_20_hz": {
+      "expected_to_opposite_retained_fourier_power_ratio": 0.975044368188025,
+      "expected_to_opposite_energy_in_fixed_downgoing_tube_ratio": 1.1845994798829982,
+      "expected_fraction_of_two_branch_tube_energy": 0.5422501885546739
+    },
+    "25_60_hz": {
+      "expected_to_opposite_retained_fourier_power_ratio": 34.38438649570664,
+      "expected_to_opposite_energy_in_fixed_downgoing_tube_ratio": 139.28823826460388,
+      "expected_fraction_of_two_branch_tube_energy": 0.992871818675819
+    }
+  },
+  "decision": {
+    "signed_fan_selects_known_downgoing_direction_at_5_20_hz": false,
+    "signed_fan_selects_known_downgoing_direction_at_25_60_hz": true,
+    "opposite_ambient_branch_can_be_assigned_to_sign_bug": false,
+    "interpretation": "The known downgoing AWD moveout strongly calibrates the physical sign at 25--60 Hz but is nearly balanced at 5--20 Hz. The low-frequency active gather is therefore not a decisive empirical direction standard for the ambient band. Exact 5--20 Hz one-way synthetics and real-background injections remain the appropriate implementation tests; physical ambient labels must remain coordinate directions unless independently resolved."
+  }
+}

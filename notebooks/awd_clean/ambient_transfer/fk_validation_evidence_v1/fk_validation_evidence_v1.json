@@ -1,0 +1,86 @@
+{
+  "workflow_version": "fk_validation_evidence_v1",
+  "question": "Can the signed 2.5--4.5 km/s F-K operator be trusted, and what physical language is justified for its ambient branches?",
+  "literature_context": [
+    {
+      "citation": "Lellouch et al. (2019), doi:10.1029/2019JB017533",
+      "relevance": "Their ambient subsection used running-absolute-mean normalization, 30 s windows with 15 s overlap, local receiver stacking, and 3.2 km/s alignment; it did not report F-K filtering for the ambient correlation."
+    },
+    {
+      "citation": "Rao and Wang (2016), doi:10.1088/1742-2132/13/3/412",
+      "relevance": "F-K filtering is a standard VSP wavefield-separation method, but simple fans can have overlap and leakage near the wavenumber origin and at truncated events."
+    }
+  ],
+  "exact_5_20_hz_synthetic_correct_to_wrong_rms_ratio": {
+    "increasing_z": 9.860051973335459,
+    "decreasing_z": 9.951715126481396
+  },
+  "real_background_injection": {
+    "used_files": 300,
+    "amplitude_definition": "injected broadband RMS / median real-channel 5-20 Hz RMS",
+    "completion_audit_all_checks_pass": true,
+    "in_wedge_scenarios": [
+      {
+        "velocity_m_s": 2750.0,
+        "direction": 1,
+        "branch": "negative",
+        "minimum_independent_recovery_ratio": 0.03,
+        "minimum_postfilter_recovery_ratio": 0.03
+      },
+      {
+        "velocity_m_s": 2750.0,
+        "direction": -1,
+        "branch": "positive",
+        "minimum_independent_recovery_ratio": 0.03,
+        "minimum_postfilter_recovery_ratio": 0.03
+      },
+      {
+        "velocity_m_s": 3200.0,
+        "direction": 1,
+        "branch": "negative",
+        "minimum_independent_recovery_ratio": 0.03,
+        "minimum_postfilter_recovery_ratio": 0.003
+      },
+      {
+        "velocity_m_s": 3200.0,
+        "direction": -1,
+        "branch": "positive",
+        "minimum_independent_recovery_ratio": 0.03,
+        "minimum_postfilter_recovery_ratio": 0.003
+      },
+      {
+        "velocity_m_s": 4000.0,
+        "direction": 1,
+        "branch": "negative",
+        "minimum_independent_recovery_ratio": 0.03,
+        "minimum_postfilter_recovery_ratio": 0.1
+      },
+      {
+        "velocity_m_s": 4000.0,
+        "direction": -1,
+        "branch": "positive",
+        "minimum_independent_recovery_ratio": 0.1,
+        "minimum_postfilter_recovery_ratio": 0.1
+      }
+    ]
+  },
+  "awd_empirical_direction": {
+    "coordinate_label": "surface AWD propagates toward increasing Nano coordinate",
+    "expected_to_opposite_fixed_tube_energy_ratio": {
+      "5_20_hz": 1.1845994798829982,
+      "25_60_hz": 139.28823826460388
+    },
+    "decision": "strong at 25--60 Hz; not decisive at 5--20 Hz"
+  },
+  "real_ambient_direction_balance": {
+    "pre_filter_fan_power": 0.9970764655342417,
+    "post_filter_correlation_score": 1.0079955665002758
+  },
+  "decision": {
+    "operator_implementation_validated": true,
+    "both_coordinate_directions_recovered_on_real_background": true,
+    "real_ambient_input_is_nearly_direction_balanced": true,
+    "approved_language": "F*K<0 and F*K>0 are opposite propagation directions along the fiber coordinate. The observed 5--20 Hz ambient field is approximately balanced between them.",
+    "language_not_yet_justified": "Calling the ambient branches downgoing and upgoing physical body waves, or treating either fan-filtered peak as an independent formation-velocity estimate."
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "workflow_version": "awd_fk_direction_ground_truth_v1",
+  "physical_question": "Does the signed F-K convention select the known downgoing AWD arrival, and what does that imply for the strong opposite ambient branch?",
+  "coordinate_assumption": "Nano channel coordinate increases from the top of the cemented fiber into the well, following the Lellouch/main-hole convention.",
+  "expected_active_direction": {
+    "phase_beam_slowness_sign": "positive",
+    "fft_mask_sign": "F*K < 0",
+    "physical_label": "toward increasing fiber coordinate (downgoing for Nano)"
+  },
+  "active_input": "fk_dispersion.npz",
+  "active_aperture_m": [
+    80.0,
+    440.0
+  ],
+  "active_time_window_relative_to_catalog_reference_s": [
+    -0.08,
+    0.45
+  ],
+  "active_expected_to_opposite_power_ratios": {
+    "5_20_hz": {
+      "all_slowness_expected_to_opposite_power_ratio": 4.258505821228027,
+      "fan_2p5_4p5_expected_to_opposite_power_ratio": 4.868748664855957
+    },
+    "20_60_hz": {
+      "all_slowness_expected_to_opposite_power_ratio": 7.889739990234375,
+      "fan_2p5_4p5_expected_to_opposite_power_ratio": 35.58967208862305
+    },
+    "25_60_hz": {
+      "all_slowness_expected_to_opposite_power_ratio": 8.765811920166016,
+      "fan_2p5_4p5_expected_to_opposite_power_ratio": 45.529823303222656
+    }
+  },
+  "ambient_input": "ambient_transfer/fk_prefilter_energy_v1_n300_r20/fk_prefilter_energy_v1_aggregate.npz",
+  "ambient_prefilter_files": 300,
+  "ambient_fk_negative_to_positive_total_power_ratio": 0.996132774554276,
+  "ambient_fk_negative_to_positive_fan_power_ratio": 0.9970764655342417,
+  "ambient_signed_correlation_files": 11523,
+  "ambient_negative_to_positive_abs_score_ratio_3200": 1.0079955665002758,
+  "decision": {
+    "production_sign_convention_empirically_validated": true,
+    "ambient_input_is_directionally_balanced_in_target_fan": true,
+    "strong_opposite_ambient_branch_is_explained_by_sign_bug": false,
+    "interpretation": "The same sign convention strongly selects the known downgoing AWD arrival, whereas the ambient field contains comparable signed power. The opposite ambient branch is therefore a property of the recorded ambient wavefield and correlation geometry, not evidence that the signed F-K code simply mirrors one branch."
+  },
+  "interpretive_boundary": "This calibration validates coordinate direction. It does not by itself determine whether the decreasing-coordinate ambient energy is generated below the aperture, reflected, scattered, or produced by a different source distribution than in the 2017 experiment."
+}
