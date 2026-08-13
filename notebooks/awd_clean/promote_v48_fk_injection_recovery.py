@@ -153,6 +153,11 @@ Across the six in-wedge direction–velocity scenarios, independent thresholds
 are {independent_text}; post-filter thresholds are {postfilter_text}.
 {specificity}
 
+The 3.2 km/s post-filter threshold is unusually low because the uninjected
+conditional peak is already near 3.075 km/s. It therefore measures the
+incremental visibility of a perturbation aligned with an existing selected
+ridge, not a generic 0.3% recovery capability for an arbitrary wave.
+
 **Interpretive boundary.** This is a sensitivity calibration in real noise,
 not evidence that the uninjected ridge is a Green's function. If post-filter
 recovery occurs below independent pre-filter recovery, that difference
@@ -182,6 +187,8 @@ from the previously frozen channel-permutation and circular-time-shift nulls.
 The off-wedge 1.8 km/s case tests velocity specificity. {specificity} Because
 the production wedge restricts output slowness by construction, post-filter
 recovery is interpreted only relative to the independent pre-filter threshold;
+the 0.003 post-filter threshold at 3.2 km/s is conditional on the uninjected
+peak already lying near 3.075 km/s and is not a generic 0.3% detection limit;
 neither result proves Green's-function convergence or identifies the
 uninjected ambient feature as a physical mode.
 """
@@ -244,6 +251,11 @@ was withdrawn before promotion because direct addition to large-offset
 float32 raw samples rounded away part of the smallest injections; no v1
 threshold is interpreted here.
 
+The 3.2~km~s\( ^{{-1}} \) post-filter threshold is unusually low because the
+uninjected conditional peak already lies near 3.075~km~s\( ^{{-1}} \). It is
+therefore an incremental sensitivity for a perturbation aligned with an
+existing selected ridge, not a generic 0.3\% recovery capability.
+
 \begin{{table}}[H]
 \centering
 \begin{{tabular}}{{llll}}
@@ -264,7 +276,7 @@ requires positive score uplift and a conditional peak within
 \begin{{figure}}[H]
 \centering
 \includegraphics[width=0.99\linewidth]{{ambient_transfer/fk_injection_recovery_v2_n300/ambient_fk_injection_recovery_v2_aggregate.png}}
-\caption{{\textbf{{Ambient F--K injection--recovery in real SAFOD noise.}} Synthetic random broadband plane waves spanning 5--20~Hz were propagated through 300 original one-minute Nano records using a precision-safe linear injection. Real and synthetic arrays were separately detrended and bandpassed and then summed in float64 before nonlinear 5-s running-absolute-mean normalization, preserving the exact zero-amplitude production baseline while avoiding sub-count rounding against the raw offset. Injected RMS was scaled in each record to median real-channel 5--20~Hz RMS at ratios 0, 0.003, 0.01, 0.03, 0.1, 0.3, and 1.0. Colors distinguish 1.8, 2.75, 3.2, and 4.0~km~s\( ^{{-1}} \); solid circles and dashed triangles distinguish increasing- and decreasing-coordinate propagation. (a) Correct-branch mean pre-filter log target/reference power; the gray interval marks the frozen branch-specific 95\% null thresholds. (b) Paired pre-filter uplift with 95\% bootstrap intervals. (c) Physical-lag score uplift after the frozen signed 2.5--4.5~km~s\( ^{{-1}} \) F--K wedge. (d) Conditional peak velocity, with horizontal injected-velocity guides. The independent decision uses the stricter branch-specific 95th percentile from the frozen channel-permutation and circular-time-shift nulls; 1.8~km~s\( ^{{-1}} \) is an off-wedge specificity control. {specificity} Post-filter recovery is meaningful only relative to the independent threshold because the selected corridor constrains output slowness. The v1 calibration was withdrawn because float32 raw-domain addition rounded sub-count injections; only this audited v2 result is interpreted. This calibration does not prove Green's-function convergence or identify the uninjected feature as a physical mode.}}
+\caption{{\textbf{{Ambient F--K injection--recovery in real SAFOD noise.}} Synthetic random broadband plane waves spanning 5--20~Hz were propagated through 300 original one-minute Nano records using a precision-safe linear injection. Real and synthetic arrays were separately detrended and bandpassed and then summed in float64 before nonlinear 5-s running-absolute-mean normalization, preserving the exact zero-amplitude production baseline while avoiding sub-count rounding against the raw offset. Injected RMS was scaled in each record to median real-channel 5--20~Hz RMS at ratios 0, 0.003, 0.01, 0.03, 0.1, 0.3, and 1.0. Colors distinguish 1.8, 2.75, 3.2, and 4.0~km~s\( ^{{-1}} \); solid circles and dashed triangles distinguish increasing- and decreasing-coordinate propagation. (a) Correct-branch mean pre-filter log target/reference power; the gray interval marks the frozen branch-specific 95\% null thresholds. (b) Paired pre-filter uplift with 95\% bootstrap intervals. (c) Physical-lag score uplift after the frozen signed 2.5--4.5~km~s\( ^{{-1}} \) F--K wedge. (d) Conditional peak velocity, with horizontal injected-velocity guides. The independent decision uses the stricter branch-specific 95th percentile from the frozen channel-permutation and circular-time-shift nulls; 1.8~km~s\( ^{{-1}} \) is an off-wedge specificity control. {specificity} Post-filter recovery is meaningful only relative to the independent threshold because the selected corridor constrains output slowness. The 0.003 post-filter threshold at 3.2~km~s\( ^{{-1}} \) is conditional on the uninjected peak already lying near 3.075~km~s\( ^{{-1}} \) and is not a generic 0.3\% detection limit. The v1 calibration was withdrawn because float32 raw-domain addition rounded sub-count injections; only this audited v2 result is interpreted. This calibration does not prove Green's-function convergence or identify the uninjected feature as a physical mode.}}
 \end{{figure}}
 
 \takeaway{{The injection experiment quantifies the gap between independent

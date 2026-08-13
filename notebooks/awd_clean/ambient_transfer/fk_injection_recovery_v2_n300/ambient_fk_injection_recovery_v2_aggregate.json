@@ -1,0 +1,1161 @@
+{
+  "workflow_version": "ambient_fk_injection_recovery_v2_aggregate",
+  "date": "2024-12-20",
+  "start": 0,
+  "requested_files": 300,
+  "used_files": 300,
+  "amplitude_definition": "injected broadband RMS / median real-channel 5-20 Hz RMS",
+  "prefilter_fixed_null95": {
+    "negative": 0.0367006205155867,
+    "positive": 0.03768399787510327
+  },
+  "bootstrap_realizations": 1000,
+  "velocity_tolerance_m_s": 250.0,
+  "decision_rule": "Independent recovery requires the correct-branch mean pre-filter statistic to exceed the stricter original channel-permutation/time-shift 95% threshold and the paired-bootstrap pre-filter uplift lower bound to exceed zero. Post-filter recovery additionally requires positive paired score uplift and a conditional peak within 250 m/s of the injected in-wedge velocity.",
+  "scenarios": [
+    {
+      "velocity_m_s": 1800.0,
+      "direction": 1,
+      "injected_branch": "negative",
+      "inside_production_wedge": false,
+      "amplitudes": [
+        {
+          "amplitude_ratio": 0.0,
+          "prefilter_mean_log_enrichment": -0.048884856848065074,
+          "prefilter_uplift": 0.0,
+          "prefilter_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.019429175183176994,
+          "postfilter_score_uplift": 0.0,
+          "postfilter_score_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.003,
+          "prefilter_mean_log_enrichment": -0.04933519574806483,
+          "prefilter_uplift": -0.00045033889999974985,
+          "prefilter_uplift_ci95": [
+            -0.0005010169401900458,
+            -0.00039250406463567014
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.019419752061367035,
+          "postfilter_score_uplift": 9.423121809959412e-06,
+          "postfilter_score_uplift_ci95": [
+            -6.25397078692913e-06,
+            2.3365067318081852e-05
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.01,
+          "prefilter_mean_log_enrichment": -0.053757195677168884,
+          "prefilter_uplift": -0.004872338829103802,
+          "prefilter_uplift_ci95": [
+            -0.005059711107411906,
+            -0.004681505054586158
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.01941693015396595,
+          "postfilter_score_uplift": 1.2245029211044312e-05,
+          "postfilter_score_uplift_ci95": [
+            -3.6359671503305437e-05,
+            6.171613931655884e-05
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.03,
+          "prefilter_mean_log_enrichment": -0.09145647765451187,
+          "prefilter_uplift": -0.04257162080644678,
+          "prefilter_uplift_ci95": [
+            -0.04316658213730006,
+            -0.04191387622898708
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.01955627277493477,
+          "postfilter_score_uplift": -0.00012709759175777435,
+          "postfilter_score_uplift_ci95": [
+            -0.00027168611995875835,
+            0.00016878135502338383
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.1,
+          "prefilter_mean_log_enrichment": -0.4288917997965304,
+          "prefilter_uplift": -0.3800069429484653,
+          "prefilter_uplift_ci95": [
+            -0.3829666594679731,
+            -0.3769028745492033
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.021674100309610367,
+          "postfilter_score_uplift": -0.0022449251264333725,
+          "postfilter_score_uplift_ci95": [
+            -0.00262841465882957,
+            3.032060340046236e-06
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.3,
+          "prefilter_mean_log_enrichment": -1.454647635783799,
+          "prefilter_uplift": -1.4057627789357339,
+          "prefilter_uplift_ci95": [
+            -1.4115970339264619,
+            -1.3998062246733876
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.021605493500828743,
+          "postfilter_score_uplift": -0.0021763183176517487,
+          "postfilter_score_uplift_ci95": [
+            -0.0041344705503433945,
+            0.00041250176727771734
+          ],
+          "postfilter_peak_velocity_m_s": 2975.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 1.0,
+          "prefilter_mean_log_enrichment": -2.371149888741313,
+          "prefilter_uplift": -2.3222650318932474,
+          "prefilter_uplift_ci95": [
+            -2.3290860838847913,
+            -2.31526557364175
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.0360979363322258,
+          "postfilter_score_uplift": -0.016668761149048805,
+          "postfilter_score_uplift_ci95": [
+            -0.0217673743609339,
+            -0.011658217664808035
+          ],
+          "postfilter_peak_velocity_m_s": 2875.0,
+          "postfilter_recovery": false
+        }
+      ],
+      "minimum_independent_recovery_ratio": null,
+      "minimum_postfilter_recovery_ratio": null
+    },
+    {
+      "velocity_m_s": 1800.0,
+      "direction": -1,
+      "injected_branch": "positive",
+      "inside_production_wedge": false,
+      "amplitudes": [
+        {
+          "amplitude_ratio": 0.0,
+          "prefilter_mean_log_enrichment": -0.048910648874660734,
+          "prefilter_uplift": 0.0,
+          "prefilter_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.01851867511868477,
+          "postfilter_score_uplift": 0.0,
+          "postfilter_score_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.003,
+          "prefilter_mean_log_enrichment": -0.049377226506558076,
+          "prefilter_uplift": -0.0004665776318973523,
+          "prefilter_uplift_ci95": [
+            -0.0005225868181042805,
+            -0.0004132696762694243
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.01850908249616623,
+          "postfilter_score_uplift": 9.592622518539429e-06,
+          "postfilter_score_uplift_ci95": [
+            -5.84539957344532e-06,
+            2.5976635515689847e-05
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.01,
+          "prefilter_mean_log_enrichment": -0.053826534520843766,
+          "prefilter_uplift": -0.004915885646183035,
+          "prefilter_uplift_ci95": [
+            -0.005101304810580312,
+            -0.004727444537296691
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.018506040796637535,
+          "postfilter_score_uplift": 1.2634322047233582e-05,
+          "postfilter_score_uplift_ci95": [
+            -3.996421582996845e-05,
+            7.08420295268297e-05
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.03,
+          "prefilter_mean_log_enrichment": -0.09152042315768978,
+          "prefilter_uplift": -0.042609774283029055,
+          "prefilter_uplift_ci95": [
+            -0.04323531098286471,
+            -0.041917631110404203
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.018646307289600372,
+          "postfilter_score_uplift": -0.00012763217091560364,
+          "postfilter_score_uplift_ci95": [
+            -0.00027426304295659066,
+            0.00021374509669840335
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.1,
+          "prefilter_mean_log_enrichment": -0.42828240546914137,
+          "prefilter_uplift": -0.3793717565944806,
+          "prefilter_uplift_ci95": [
+            -0.3823389974886988,
+            -0.3762986990481064
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.020332571119070053,
+          "postfilter_score_uplift": -0.0018138960003852844,
+          "postfilter_score_uplift_ci95": [
+            -0.0026361843571066856,
+            0.00020088786259293492
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.3,
+          "prefilter_mean_log_enrichment": -1.453054716220664,
+          "prefilter_uplift": -1.404144067346003,
+          "prefilter_uplift_ci95": [
+            -1.4101720470344445,
+            -1.3974826957604836
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.02064216509461403,
+          "postfilter_score_uplift": -0.0021234899759292603,
+          "postfilter_score_uplift_ci95": [
+            -0.004736982053145766,
+            0.0008850771933794017
+          ],
+          "postfilter_peak_velocity_m_s": 2975.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 1.0,
+          "prefilter_mean_log_enrichment": -2.3714816266883347,
+          "prefilter_uplift": -2.3225709778136743,
+          "prefilter_uplift_ci95": [
+            -2.329322816452491,
+            -2.315540977985678
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": -0.03710164874792099,
+          "postfilter_score_uplift": -0.01858297362923622,
+          "postfilter_score_uplift_ci95": [
+            -0.023508679773658513,
+            -0.013983804639428854
+          ],
+          "postfilter_peak_velocity_m_s": 2875.0,
+          "postfilter_recovery": false
+        }
+      ],
+      "minimum_independent_recovery_ratio": null,
+      "minimum_postfilter_recovery_ratio": null
+    },
+    {
+      "velocity_m_s": 2750.0,
+      "direction": 1,
+      "injected_branch": "negative",
+      "inside_production_wedge": true,
+      "amplitudes": [
+        {
+          "amplitude_ratio": 0.0,
+          "prefilter_mean_log_enrichment": -0.048884856848065074,
+          "prefilter_uplift": 0.0,
+          "prefilter_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.1998172104358673,
+          "postfilter_score_uplift": 0.0,
+          "postfilter_score_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.003,
+          "prefilter_mean_log_enrichment": -0.04766989463748299,
+          "prefilter_uplift": 0.0012149622105820915,
+          "prefilter_uplift_ci95": [
+            0.0010884829278840998,
+            0.0013443805023077688
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.20050479471683502,
+          "postfilter_score_uplift": 0.0006875842809677124,
+          "postfilter_score_uplift_ci95": [
+            0.0005452170968055725,
+            0.0008192069828510284
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.01,
+          "prefilter_mean_log_enrichment": -0.03661762480045361,
+          "prefilter_uplift": 0.01226723204761148,
+          "prefilter_uplift_ci95": [
+            0.011773042261149757,
+            0.012746422089455816
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.2071935385465622,
+          "postfilter_score_uplift": 0.007376328110694885,
+          "postfilter_score_uplift_ci95": [
+            0.0069328021258115765,
+            0.007821768149733543
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.03,
+          "prefilter_mean_log_enrichment": 0.04988671129050001,
+          "prefilter_uplift": 0.09877156813856508,
+          "prefilter_uplift_ci95": [
+            0.09717194291048087,
+            0.10056847372845003
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.2582269310951233,
+          "postfilter_score_uplift": 0.05840972065925598,
+          "postfilter_score_uplift_ci95": [
+            0.057077792659401896,
+            0.05967680737376213
+          ],
+          "postfilter_peak_velocity_m_s": 2975.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.1,
+          "prefilter_mean_log_enrichment": 0.5285598166462354,
+          "prefilter_uplift": 0.5774446734943005,
+          "prefilter_uplift_ci95": [
+            0.5721439060034501,
+            0.582627584473414
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.48464030027389526,
+          "postfilter_score_uplift": 0.28482308983802795,
+          "postfilter_score_uplift_ci95": [
+            0.2819016009569168,
+            0.2876990281045437
+          ],
+          "postfilter_peak_velocity_m_s": 2825.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.3,
+          "prefilter_mean_log_enrichment": 1.003847244456599,
+          "prefilter_uplift": 1.0527321013046642,
+          "prefilter_uplift_ci95": [
+            1.0466015781105438,
+            1.0586855927471326
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6379060745239258,
+          "postfilter_score_uplift": 0.43808886408805847,
+          "postfilter_score_uplift_ci95": [
+            0.43430148214101794,
+            0.4416937232017517
+          ],
+          "postfilter_peak_velocity_m_s": 2775.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 1.0,
+          "prefilter_mean_log_enrichment": 1.121714427793007,
+          "prefilter_uplift": 1.170599284641072,
+          "prefilter_uplift_ci95": [
+            1.1645445145747653,
+            1.1767346384360229
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6670330762863159,
+          "postfilter_score_uplift": 0.4672158658504486,
+          "postfilter_score_uplift_ci95": [
+            0.4633977487683296,
+            0.47093257755041124
+          ],
+          "postfilter_peak_velocity_m_s": 2775.0,
+          "postfilter_recovery": true
+        }
+      ],
+      "minimum_independent_recovery_ratio": 0.03,
+      "minimum_postfilter_recovery_ratio": 0.03
+    },
+    {
+      "velocity_m_s": 2750.0,
+      "direction": -1,
+      "injected_branch": "positive",
+      "inside_production_wedge": true,
+      "amplitudes": [
+        {
+          "amplitude_ratio": 0.0,
+          "prefilter_mean_log_enrichment": -0.048910648874660734,
+          "prefilter_uplift": 0.0,
+          "prefilter_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.2031235694885254,
+          "postfilter_score_uplift": 0.0,
+          "postfilter_score_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.003,
+          "prefilter_mean_log_enrichment": -0.0477581422789775,
+          "prefilter_uplift": 0.0011525065956832384,
+          "prefilter_uplift_ci95": [
+            0.0010140358949128827,
+            0.0012877993095082596
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.20379102230072021,
+          "postfilter_score_uplift": 0.0006674528121948242,
+          "postfilter_score_uplift_ci95": [
+            0.0005299195647239685,
+            0.0007985714823007583
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.01,
+          "prefilter_mean_log_enrichment": -0.0368905919270347,
+          "prefilter_uplift": 0.012020056947626027,
+          "prefilter_uplift_ci95": [
+            0.011523438756279614,
+            0.012503352302647049
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.2103479504585266,
+          "postfilter_score_uplift": 0.007224380970001221,
+          "postfilter_score_uplift_ci95": [
+            0.006806390359997749,
+            0.007665478810667992
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.03,
+          "prefilter_mean_log_enrichment": 0.04888631501983831,
+          "prefilter_uplift": 0.09779696389449906,
+          "prefilter_uplift_ci95": [
+            0.09594495035092385,
+            0.09951211239347514
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.26052334904670715,
+          "postfilter_score_uplift": 0.05739977955818176,
+          "postfilter_score_uplift_ci95": [
+            0.05622843839228153,
+            0.058700543642044065
+          ],
+          "postfilter_peak_velocity_m_s": 2975.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.1,
+          "prefilter_mean_log_enrichment": 0.5259070538695909,
+          "prefilter_uplift": 0.5748177027442516,
+          "prefilter_uplift_ci95": [
+            0.56910085880971,
+            0.5800882121318196
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.484380304813385,
+          "postfilter_score_uplift": 0.2812567353248596,
+          "postfilter_score_uplift_ci95": [
+            0.2783092647790909,
+            0.2840914025902748
+          ],
+          "postfilter_peak_velocity_m_s": 2825.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.3,
+          "prefilter_mean_log_enrichment": 1.001890104574126,
+          "prefilter_uplift": 1.0508007534487864,
+          "prefilter_uplift_ci95": [
+            1.045014818139224,
+            1.0570618977088522
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6371902227401733,
+          "postfilter_score_uplift": 0.43406665325164795,
+          "postfilter_score_uplift_ci95": [
+            0.430165047198534,
+            0.4379828855395317
+          ],
+          "postfilter_peak_velocity_m_s": 2775.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 1.0,
+          "prefilter_mean_log_enrichment": 1.1204540542388663,
+          "prefilter_uplift": 1.1693647031135272,
+          "prefilter_uplift_ci95": [
+            1.1626496735994045,
+            1.175236037533698
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6663455367088318,
+          "postfilter_score_uplift": 0.4632219672203064,
+          "postfilter_score_uplift_ci95": [
+            0.45933793261647227,
+            0.4670434586703777
+          ],
+          "postfilter_peak_velocity_m_s": 2775.0,
+          "postfilter_recovery": true
+        }
+      ],
+      "minimum_independent_recovery_ratio": 0.03,
+      "minimum_postfilter_recovery_ratio": 0.03
+    },
+    {
+      "velocity_m_s": 3200.0,
+      "direction": 1,
+      "injected_branch": "negative",
+      "inside_production_wedge": true,
+      "amplitudes": [
+        {
+          "amplitude_ratio": 0.0,
+          "prefilter_mean_log_enrichment": -0.048884856848065074,
+          "prefilter_uplift": 0.0,
+          "prefilter_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.2661380469799042,
+          "postfilter_score_uplift": 0.0,
+          "postfilter_score_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.003,
+          "prefilter_mean_log_enrichment": -0.0477037393510161,
+          "prefilter_uplift": 0.001181117497048981,
+          "prefilter_uplift_ci95": [
+            0.0010598565548090222,
+            0.0013151981544221047
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.2664395868778229,
+          "postfilter_score_uplift": 0.00030153989791870117,
+          "postfilter_score_uplift_ci95": [
+            0.00016709119081497194,
+            0.0004541710019111632
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.01,
+          "prefilter_mean_log_enrichment": -0.03534972173685992,
+          "prefilter_uplift": 0.013535135111205163,
+          "prefilter_uplift_ci95": [
+            0.013118130817571034,
+            0.013988210586649636
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.27079713344573975,
+          "postfilter_score_uplift": 0.004659086465835571,
+          "postfilter_score_uplift_ci95": [
+            0.004225786030292511,
+            0.005112162232398986
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.03,
+          "prefilter_mean_log_enrichment": 0.06358485510627847,
+          "prefilter_uplift": 0.11246971195434355,
+          "prefilter_uplift_ci95": [
+            0.11073711580814818,
+            0.11422943417994753
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.3063428997993469,
+          "postfilter_score_uplift": 0.04020485281944275,
+          "postfilter_score_uplift_ci95": [
+            0.0386520616710186,
+            0.04156536385416985
+          ],
+          "postfilter_peak_velocity_m_s": 3100.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.1,
+          "prefilter_mean_log_enrichment": 0.598406493317208,
+          "prefilter_uplift": 0.6472913501652731,
+          "prefilter_uplift_ci95": [
+            0.6421015410790732,
+            0.652438814972606
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.4741550385951996,
+          "postfilter_score_uplift": 0.2080169916152954,
+          "postfilter_score_uplift_ci95": [
+            0.2045731119811535,
+            0.21150208860635758
+          ],
+          "postfilter_peak_velocity_m_s": 3200.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.3,
+          "prefilter_mean_log_enrichment": 1.1111115200647435,
+          "prefilter_uplift": 1.1599963769128083,
+          "prefilter_uplift_ci95": [
+            1.1539407991830133,
+            1.1659879935759203
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6049306988716125,
+          "postfilter_score_uplift": 0.3387926518917084,
+          "postfilter_score_uplift_ci95": [
+            0.33461599946022036,
+            0.3427498236298561
+          ],
+          "postfilter_peak_velocity_m_s": 3200.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 1.0,
+          "prefilter_mean_log_enrichment": 1.2374281231968438,
+          "prefilter_uplift": 1.2863129800449087,
+          "prefilter_uplift_ci95": [
+            1.2804316973233323,
+            1.2920981159367408
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6347029209136963,
+          "postfilter_score_uplift": 0.3685648739337921,
+          "postfilter_score_uplift_ci95": [
+            0.36435269117355346,
+            0.3729810379445553
+          ],
+          "postfilter_peak_velocity_m_s": 3200.0,
+          "postfilter_recovery": true
+        }
+      ],
+      "minimum_independent_recovery_ratio": 0.03,
+      "minimum_postfilter_recovery_ratio": 0.003
+    },
+    {
+      "velocity_m_s": 3200.0,
+      "direction": -1,
+      "injected_branch": "positive",
+      "inside_production_wedge": true,
+      "amplitudes": [
+        {
+          "amplitude_ratio": 0.0,
+          "prefilter_mean_log_enrichment": -0.048910648874660734,
+          "prefilter_uplift": 0.0,
+          "prefilter_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.2686873972415924,
+          "postfilter_score_uplift": 0.0,
+          "postfilter_score_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.003,
+          "prefilter_mean_log_enrichment": -0.04764618949228225,
+          "prefilter_uplift": 0.001264459382378489,
+          "prefilter_uplift_ci95": [
+            0.001133295869036124,
+            0.0013908114681184713
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.26916447281837463,
+          "postfilter_score_uplift": 0.00047707557678222656,
+          "postfilter_score_uplift_ci95": [
+            0.0003345288336277008,
+            0.000618116557598114
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.01,
+          "prefilter_mean_log_enrichment": -0.03513123582158388,
+          "prefilter_uplift": 0.013779413053076851,
+          "prefilter_uplift_ci95": [
+            0.013347524458586923,
+            0.014246406052818761
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.27385440468788147,
+          "postfilter_score_uplift": 0.0051670074462890625,
+          "postfilter_score_uplift_ci95": [
+            0.004699639230966568,
+            0.00563916489481926
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.03,
+          "prefilter_mean_log_enrichment": 0.06397957513050137,
+          "prefilter_uplift": 0.11289022400516208,
+          "prefilter_uplift_ci95": [
+            0.11114617331080487,
+            0.11457992575689928
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.30971404910087585,
+          "postfilter_score_uplift": 0.04102665185928345,
+          "postfilter_score_uplift_ci95": [
+            0.03960838839411736,
+            0.04254700616002083
+          ],
+          "postfilter_peak_velocity_m_s": 3100.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.1,
+          "prefilter_mean_log_enrichment": 0.5981799557153503,
+          "prefilter_uplift": 0.647090604590011,
+          "prefilter_uplift_ci95": [
+            0.6420280248668354,
+            0.6524172120911816
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.47567427158355713,
+          "postfilter_score_uplift": 0.20698687434196472,
+          "postfilter_score_uplift_ci95": [
+            0.2033749118447304,
+            0.21059786230325697
+          ],
+          "postfilter_peak_velocity_m_s": 3200.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.3,
+          "prefilter_mean_log_enrichment": 1.110868010946916,
+          "prefilter_uplift": 1.1597786598215771,
+          "prefilter_uplift_ci95": [
+            1.1536608775985904,
+            1.1659965381162825
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6044819355010986,
+          "postfilter_score_uplift": 0.3357945382595062,
+          "postfilter_score_uplift_ci95": [
+            0.33100779056549073,
+            0.3405048966407776
+          ],
+          "postfilter_peak_velocity_m_s": 3200.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 1.0,
+          "prefilter_mean_log_enrichment": 1.2373037351144545,
+          "prefilter_uplift": 1.2862143839891151,
+          "prefilter_uplift_ci95": [
+            1.2800795915271235,
+            1.2919638884453848
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6333511471748352,
+          "postfilter_score_uplift": 0.3646637499332428,
+          "postfilter_score_uplift_ci95": [
+            0.3600622408092022,
+            0.3693959765136242
+          ],
+          "postfilter_peak_velocity_m_s": 3200.0,
+          "postfilter_recovery": true
+        }
+      ],
+      "minimum_independent_recovery_ratio": 0.03,
+      "minimum_postfilter_recovery_ratio": 0.003
+    },
+    {
+      "velocity_m_s": 4000.0,
+      "direction": 1,
+      "injected_branch": "negative",
+      "inside_production_wedge": true,
+      "amplitudes": [
+        {
+          "amplitude_ratio": 0.0,
+          "prefilter_mean_log_enrichment": -0.048884856848065074,
+          "prefilter_uplift": 0.0,
+          "prefilter_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.07043972611427307,
+          "postfilter_score_uplift": 0.0,
+          "postfilter_score_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.003,
+          "prefilter_mean_log_enrichment": -0.047913974413574666,
+          "prefilter_uplift": 0.0009708824344904125,
+          "prefilter_uplift_ci95": [
+            0.0008485270634517072,
+            0.001084652250281215
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.07129185646772385,
+          "postfilter_score_uplift": 0.0008521303534507751,
+          "postfilter_score_uplift_ci95": [
+            0.0007230238988995552,
+            0.0009961187839508056
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.01,
+          "prefilter_mean_log_enrichment": -0.038392180484711415,
+          "prefilter_uplift": 0.010492676363353668,
+          "prefilter_uplift_ci95": [
+            0.010082158623148013,
+            0.010905037675297746
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.07922611385583878,
+          "postfilter_score_uplift": 0.008786387741565704,
+          "postfilter_score_uplift_ci95": [
+            0.00831777174025774,
+            0.009314483031630516
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.03,
+          "prefilter_mean_log_enrichment": 0.03790897494361096,
+          "prefilter_uplift": 0.08679383179167605,
+          "prefilter_uplift_ci95": [
+            0.08531082386350353,
+            0.08833428588304834
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.14049628376960754,
+          "postfilter_score_uplift": 0.07005655765533447,
+          "postfilter_score_uplift_ci95": [
+            0.06825061161071062,
+            0.07142595257610082
+          ],
+          "postfilter_peak_velocity_m_s": 3400.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.1,
+          "prefilter_mean_log_enrichment": 0.4784129437555221,
+          "prefilter_uplift": 0.5272978006035871,
+          "prefilter_uplift_ci95": [
+            0.5219706281256498,
+            0.5320415141562284
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.42152440547943115,
+          "postfilter_score_uplift": 0.3510846793651581,
+          "postfilter_score_uplift_ci95": [
+            0.3476467840373516,
+            0.35420976728200915
+          ],
+          "postfilter_peak_velocity_m_s": 3800.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.3,
+          "prefilter_mean_log_enrichment": 0.9397951028211299,
+          "prefilter_uplift": 0.9886799596691946,
+          "prefilter_uplift_ci95": [
+            0.9830506869342526,
+            0.9942105535425966
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6179666519165039,
+          "postfilter_score_uplift": 0.5475269556045532,
+          "postfilter_score_uplift_ci95": [
+            0.5437745213508606,
+            0.5515640020370484
+          ],
+          "postfilter_peak_velocity_m_s": 3800.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 1.0,
+          "prefilter_mean_log_enrichment": 1.0571591509204428,
+          "prefilter_uplift": 1.1060440077685074,
+          "prefilter_uplift_ci95": [
+            1.1000178519331485,
+            1.111328840296039
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6544232368469238,
+          "postfilter_score_uplift": 0.5839835405349731,
+          "postfilter_score_uplift_ci95": [
+            0.5800149470567704,
+            0.5875583201646805
+          ],
+          "postfilter_peak_velocity_m_s": 3800.0,
+          "postfilter_recovery": true
+        }
+      ],
+      "minimum_independent_recovery_ratio": 0.03,
+      "minimum_postfilter_recovery_ratio": 0.1
+    },
+    {
+      "velocity_m_s": 4000.0,
+      "direction": -1,
+      "injected_branch": "positive",
+      "inside_production_wedge": true,
+      "amplitudes": [
+        {
+          "amplitude_ratio": 0.0,
+          "prefilter_mean_log_enrichment": -0.048910648874660734,
+          "prefilter_uplift": 0.0,
+          "prefilter_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.06781671941280365,
+          "postfilter_score_uplift": 0.0,
+          "postfilter_score_uplift_ci95": [
+            0.0,
+            0.0
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.003,
+          "prefilter_mean_log_enrichment": -0.04795557053237606,
+          "prefilter_uplift": 0.0009550783422846668,
+          "prefilter_uplift_ci95": [
+            0.000843431889041687,
+            0.001067170249169415
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.06854605674743652,
+          "postfilter_score_uplift": 0.0007293373346328735,
+          "postfilter_score_uplift_ci95": [
+            0.0006063822656869888,
+            0.000863952375948429
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.01,
+          "prefilter_mean_log_enrichment": -0.03850659541791002,
+          "prefilter_uplift": 0.010404053456750715,
+          "prefilter_uplift_ci95": [
+            0.009987231585125914,
+            0.010827170838222575
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.07607859373092651,
+          "postfilter_score_uplift": 0.008261874318122864,
+          "postfilter_score_uplift_ci95": [
+            0.007843942940235138,
+            0.008841480128467083
+          ],
+          "postfilter_peak_velocity_m_s": 3075.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.03,
+          "prefilter_mean_log_enrichment": 0.03737482558732588,
+          "prefilter_uplift": 0.08628547446198662,
+          "prefilter_uplift_ci95": [
+            0.0847448042376381,
+            0.08774403886934104
+          ],
+          "prefilter_passes_fixed_null95": false,
+          "independent_recovery": false,
+          "postfilter_score_at_injected_velocity": 0.1364937126636505,
+          "postfilter_score_uplift": 0.06867699325084686,
+          "postfilter_score_uplift_ci95": [
+            0.0668944576755166,
+            0.07004439309239388
+          ],
+          "postfilter_peak_velocity_m_s": 3400.0,
+          "postfilter_recovery": false
+        },
+        {
+          "amplitude_ratio": 0.1,
+          "prefilter_mean_log_enrichment": 0.4763409541063072,
+          "prefilter_uplift": 0.525251602980968,
+          "prefilter_uplift_ci95": [
+            0.5202719288211091,
+            0.5299584126174808
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.41730982065200806,
+          "postfilter_score_uplift": 0.3494930863380432,
+          "postfilter_score_uplift_ci95": [
+            0.3458913967013359,
+            0.3531274676322937
+          ],
+          "postfilter_peak_velocity_m_s": 3800.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 0.3,
+          "prefilter_mean_log_enrichment": 0.9372084822970798,
+          "prefilter_uplift": 0.9861191311717404,
+          "prefilter_uplift_ci95": [
+            0.9802365763555569,
+            0.9918170801291009
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6157652139663696,
+          "postfilter_score_uplift": 0.5479484796524048,
+          "postfilter_score_uplift_ci95": [
+            0.543883065879345,
+            0.5513518840074539
+          ],
+          "postfilter_peak_velocity_m_s": 3800.0,
+          "postfilter_recovery": true
+        },
+        {
+          "amplitude_ratio": 1.0,
+          "prefilter_mean_log_enrichment": 1.0546931726489341,
+          "prefilter_uplift": 1.103603821523595,
+          "prefilter_uplift_ci95": [
+            1.097744560127021,
+            1.109469764014337
+          ],
+          "prefilter_passes_fixed_null95": true,
+          "independent_recovery": true,
+          "postfilter_score_at_injected_velocity": 0.6530696153640747,
+          "postfilter_score_uplift": 0.5852528810501099,
+          "postfilter_score_uplift_ci95": [
+            0.5813025578856468,
+            0.5888055816292763
+          ],
+          "postfilter_peak_velocity_m_s": 3800.0,
+          "postfilter_recovery": true
+        }
+      ],
+      "minimum_independent_recovery_ratio": 0.1,
+      "minimum_postfilter_recovery_ratio": 0.1
+    }
+  ]
+}

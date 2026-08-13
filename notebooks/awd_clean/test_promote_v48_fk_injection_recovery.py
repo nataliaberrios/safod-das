@@ -47,8 +47,20 @@ def test_promotion() -> None:
     tex_v48 = temporary / "AWD_advisor_figure_guide_v48.tex"
     product = temporary / "fk_injection_recovery_v2_n300"
     product.mkdir()
-    shutil.copy2(promote.NOTEBOOK, notebook)
-    shutil.copy2(promote.TEX, tex)
+    source_notebook = json.loads(promote.NOTEBOOK.read_text())
+    assert source_notebook["metadata"]["awd_dashboard"]["version"] == "v48"
+    assert "# v48" in "".join(source_notebook["cells"][-4]["source"])
+    source_notebook["cells"] = source_notebook["cells"][:-4]
+    source_notebook["metadata"]["awd_dashboard"]["version"] = "v47"
+    source_notebook["metadata"]["awd_dashboard"]["last_status_sync"] = "2026-08-11"
+    notebook.write_text(json.dumps(source_notebook, indent=1) + "\n")
+
+    source_tex = promote.TEX.read_text()
+    section = r"\section{Ambient F--K injection--recovery calibration (v48)}"
+    assert source_tex.count(section) == 1 and source_tex.count(r"\end{document}") == 1
+    source_tex = source_tex[:source_tex.index(section)] + "\\end{document}\n"
+    source_tex = source_tex.replace("version v48", "version v47", 1)
+    tex.write_text(source_tex)
     aggregate = product / "ambient_fk_injection_recovery_v2_aggregate.json"
     audit = product / "ambient_fk_injection_recovery_v2_completion_audit.json"
     figure = product / "ambient_fk_injection_recovery_v2_aggregate.png"

@@ -1,0 +1,47 @@
+{
+  "date": "2024-12-20",
+  "start": 0,
+  "requested_files": 300,
+  "used_files": 300,
+  "paths": [
+    "direct",
+    "antialiased",
+    "full_resolution"
+  ],
+  "temporal_band_hz": [
+    5.0,
+    20.0
+  ],
+  "velocity_wedge_m_s": [
+    2500.0,
+    4500.0
+  ],
+  "resampling": {
+    "direct": "x[::2, ::2]",
+    "antialiased": "scipy.signal.resample_poly down=2 along space and time",
+    "full_resolution": "no decimation"
+  },
+  "results": {
+    "direct": {
+      "peak_velocity_m_s": 3075.0,
+      "peak_score": 0.2789533247358733,
+      "score_3200": 0.26613998184281185,
+      "null95": 0.13916640186406373,
+      "p_peak": 0.001996007984031936
+    },
+    "antialiased": {
+      "peak_velocity_m_s": 3075.0,
+      "peak_score": 0.27718054386476676,
+      "score_3200": 0.2641047486041983,
+      "null95": 0.13932451407466154,
+      "p_peak": 0.001996007984031936
+    },
+    "full_resolution": {
+      "peak_velocity_m_s": 3050.0,
+      "peak_score": 0.2746743503111991,
+      "score_3200": 0.2679441465377757,
+      "null95": 0.13893565192610455,
+      "p_peak": 0.001996007984031936
+    }
+  }
+}
