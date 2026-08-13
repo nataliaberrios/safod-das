@@ -326,6 +326,12 @@ def main():
     ex = per_pair[list(per_pair)[0]]
     res = synthetic_resolution(ex, VP_REF, sigma_t)
     floor = res.get(0.0, (np.nan, np.nan))[0]
+    # PER-PAIR FLOOR. The residual rms is BIMODAL across these pairs -- 0.86 and
+    # 1.70 ms for two of them against 21-28 ms for the other three -- so a single
+    # median-scatter floor penalises exactly the pairs whose timing is good enough
+    # to say something. The floor scales linearly with timing noise, so it is
+    # computed per pair from that pair's own residual and reported alongside.
+    floor_per_ms = floor / max(1e3 * sigma_t, 1e-9)
     print(f'  {"injected m":>12}{"recovered m":>14}{"scatter m":>12}')
     for T in sorted(res):
         med, sd = res[T]
@@ -361,7 +367,10 @@ def main():
         s = rec[VP_REF]
         spread = (max(rec[v]['offset'] for v in rec) -
                   min(rec[v]['offset'] for v in rec))
-        out.append(dict(i=i, j=j, fam=bool(r0.is_cand), hrsn=r0.hrsn,
+        fl = floor_per_ms * 1e3 * s['rms_s']
+        out.append(dict(floor_m=fl,
+                        resolved=bool(s['offset'] > 2 * fl),
+                        i=i, j=j, fam=bool(r0.is_cand), hrsn=r0.hrsn,
                         das=r0.das_pub, dt_days=r0.dt_days,
                         offset=s['offset'], offset_debiased=s['offset_debiased'],
                         err=s['err'], nsta=s['nsta'],
@@ -376,11 +385,17 @@ def main():
     F = D[D.fam]
     C = D[~D.fam]
     print('FAMILY PAIRS')
-    print(f'{"events":>20}{"offset m":>10}{"err m":>8}{"rad m":>8}{"R_sep":>8}'
-          f'{"nsta":>6}{"rms ms":>8}{"HRSN CC":>9}')
-    for _, x in F.sort_values('offset').iterrows():
-        print(f'{x.tag:>20}{x.offset:10.1f}{x.err:8.1f}{x.rad:8.1f}{x.R_sep:8.2f}'
-              f'{int(x.nsta):6d}{x.rms_ms:8.2f}{x.hrsn:9.3f}')
+    print(f'{"events":>20}{"rms ms":>8}{"floor m":>9}{"offset m":>10}'
+          f'{"debias m":>10}{"rad m":>8}{"nsta":>6}   verdict')
+    for _, x in F.sort_values('rms_ms').iterrows():
+        if x.offset > 2 * x.floor_m:
+            v = 'RESOLVABLY SEPARATED' if x.offset > x.rad else 'separated, sub-rupture'
+        elif x.floor_m < 2 * x.rad:
+            v = 'consistent with co-location, floor tight enough to matter'
+        else:
+            v = 'unresolved -- floor exceeds the rupture dimension'
+        print(f'{x.tag:>20}{x.rms_ms:8.2f}{x.floor_m:9.0f}{x.offset:10.1f}'
+              f'{x.offset_debiased:10.1f}{x.rad:8.1f}{int(x.nsta):6d}   {v}')
 
     print(f'\nR2 family vs control')
     print(f'  family  n={len(F):3d}  median offset {F.offset.median():8.1f} m'
@@ -400,13 +415,13 @@ def main():
         rr = float(np.corrcoef(F.hrsn, np.log10(F.offset.clip(lower=1e-3)))[0, 1])
         print(f'  within family, r(HRSN CC, log offset) = {rr:+.3f}   (n={len(F)})')
         print(f'  DAS version of this test gave -0.826, which invalidated it.')
-        if rr < -0.6:
-            print('  -> RELOCATION IS ALSO READING WAVEFORM QUALITY. Neither')
-            print('     instrument can verify same-patch with this event set.')
-            print('     Report as an observational confirmation of Gao et al. 2021.')
-        else:
-            print('  -> relocation is NOT dominated by waveform quality. The')
-            print('     family/control separation can be read geometrically.')
+        # NO VERDICT AT THIS SAMPLE SIZE. r = -0.6 at n = 5 has p ~ 0.29; the
+        # earlier threshold-based pronouncement here was unjustified and is
+        # withdrawn. Report r with its p and say nothing more.
+        from scipy.stats import pearsonr
+        _r, _p = pearsonr(F.hrsn, np.log10(F.offset.clip(lower=1e-3)))
+        print(f'  p = {_p:.3f} at n = {len(F)} -- NOT significant. No verdict is')
+        print('  drawn either way; this test needs more pairs with usable timing.')
 
     print('\nR4 velocity sensitivity (5.0 / 5.8 / 6.5 km/s)')
     print(f'  median spread in offset across V: {D.vspread.median():.1f} m'
