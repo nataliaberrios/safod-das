@@ -80,11 +80,56 @@ OUT = os.environ.get('SCAN_OUT', '/scratch/groups/ettore88/nberrios/safod_fullsc
 os.makedirs(OUT, exist_ok=True)
 
 CH_LO, CH_HI = 23, 896
+# APERTURE, SET AT IMPORT. moveout_test fixes CH_LO/CH_HI = 100, 800 at module
+# level, so MT.prep would build templates on a 714 m aperture with z from channel
+# 100 while beams() spans 23-896 with z from channel 23 -- a mismatched matched
+# filter, which voided the 14-day pilot and the 200-task scan.
+#
+# This override MUST happen at import, not inside build_templates(): that function
+# returns early when the template cache exists, so an override placed after the
+# cache check never ran, and the cache itself had been built with the wrong
+# aperture. The cached file now records the aperture and is rejected if it differs.
+MT.CH_LO, MT.CH_HI = CH_LO, CH_HI
 DX = 1.0209523
 BAND = (5.0, 40.0)
 FS = 500.0
 TPL_WIN = (-0.5, 3.0)
 KEEP_TOP = 500          # causal peaks retained per (day, template)
+PEAKS_PER_FILE = 3      # distinct local maxima kept per file per template
+
+# THE NULL, and two wrong answers before the right one.
+#
+# A TIME-REVERSED template is not independent: a reversed wavelet correlates with
+# its forward version at 0.29-0.65 across these 16 templates, so a real detection
+# raises the very floor it is judged against. Measured on the file containing
+# ev_20250402T154714: causal 0.9656, acausal 0.4884 on the SAME file.
+#
+# A CIRCULAR TIME SHIFT is worse, 0.51-0.94, and obviously so in hindsight: corr()
+# maximises over lag, so shifting the template is largely undone by the lag search.
+#
+# PHASE RANDOMISATION is the right surrogate. It keeps the amplitude spectrum -- so
+# the noise statistics and bandwidth of the null match the template exactly -- while
+# destroying the phase structure that makes a wavelet match a real arrival, and no
+# lag search can recover it. This is the same family of surrogate the ambient F-K
+# chain uses (channel_permutation, circular_time_shift), applied to the template
+# rather than to the data. Seeded per template so the null is reproducible.
+NULL_MODE = 'phaserand'
+
+
+def make_null(w, seed=0):
+    """Amplitude-spectrum-preserving, phase-randomised surrogate of a template."""
+    if NULL_MODE != 'phaserand':
+        return w[::-1].copy()
+    rng = np.random.default_rng(seed)
+    W = np.fft.rfft(w)
+    ph = rng.uniform(-np.pi, np.pi, W.size)
+    ph[0] = 0.0                      # keep DC real
+    if w.size % 2 == 0:
+        ph[-1] = 0.0                 # and Nyquist, for a real inverse
+    v = np.fft.irfft(np.abs(W) * np.exp(1j * ph), n=w.size)
+    v -= v.mean()
+    n = np.sqrt((v ** 2).sum())
+    return v / n if n > 0 else v
 
 
 TPL_CACHE = os.path.join(HERE, 'full_scan_templates.npz')
@@ -142,8 +187,18 @@ def build_templates():
     """
     if os.path.exists(TPL_CACHE):
         d = np.load(TPL_CACHE, allow_pickle=True)
-        return [dict(tag=str(t), w=w[np.isfinite(w)], p=float(p), sem=float(s))
-                for t, w, p, s in zip(d['tag'], d['w'], d['p'], d['sem'])]
+        ap = tuple(d['aperture']) if 'aperture' in d else (None, None)
+        if ap != (CH_LO, CH_HI):
+            print(f'template cache built on aperture {ap}, need '
+                  f'{(CH_LO, CH_HI)} -- rebuilding', flush=True)
+            d = None
+    if os.path.exists(TPL_CACHE) and d is not None:
+        out = []
+        for t, w, p, sm in zip(d['tag'], d['w'], d['p'], d['sem']):
+            wv = w[np.isfinite(w)]
+            out.append(dict(tag=str(t), w=wv, p=float(p), sem=float(sm),
+                            null=make_null(wv, seed=abs(hash(str(t))) % 2**31)))
+        return out
     D = pd.read_csv(os.path.join(HERE, 'ddrt_pair_cc.csv'))
     ac = D.acausal.max()
     C = D[D.cc > ac]
@@ -170,7 +225,9 @@ def build_templates():
         w -= w.mean()
         n = np.sqrt((w ** 2).sum())
         if n > 0:
-            T.append(dict(tag=tag, w=w / n, p=p, sem=sem))
+            wn = w / n
+            T.append(dict(tag=tag, w=wn, p=p, sem=sem,
+                          null=make_null(wn, seed=abs(hash(tag)) % 2**31)))
     if T:
         L = max(len(t['w']) for t in T)
         np.savez_compressed(
@@ -179,7 +236,8 @@ def build_templates():
             w=np.array([np.pad(t['w'], (0, L - len(t['w'])),
                                constant_values=np.nan) for t in T]),
             p=np.array([t['p'] for t in T]),
-            sem=np.array([t['sem'] for t in T]))
+            sem=np.array([t['sem'] for t in T]),
+            aperture=np.array([CH_LO, CH_HI]))
     return T
 
 
@@ -274,7 +332,12 @@ def main():
               f"  sem={t['sem']:.3f}", flush=True)
 
     db = load_manifest().sort_values('t0').reset_index(drop=True)
-    db = db[db['fn'].map(os.path.exists)]
+    # NO os.path.exists SWEEP. Measured 46.5 s per 3000 stat() calls under cluster
+    # load, i.e. ~148 min for 574,301 rows, per task, x 200 tasks = ~500 core-hours
+    # of pure stat() -- more than the entire compute budget -- and it removed
+    # nothing. Worse, it made the task->file partition depend on transient Lustre
+    # results, so one stat failure silently changed which files a task scanned.
+    # Missing files are handled where they are opened: beams() returns None.
     mine = db.iloc[task::ntask]
     print(f'\ntask {task}/{ntask}: {len(mine)} files of {len(db)}', flush=True)
 
@@ -296,7 +359,7 @@ def main():
         day = pd.Timestamp(r['t0']).strftime('%Y%m%d')
         for k, t in enumerate(T):
             cc = corr(B[k], t['w'])
-            ca = corr(B[k], t['w'][::-1])
+            ca = corr(B[k], t['null'])
             if cc is None:
                 continue
             key = (day, t['tag'])
@@ -306,9 +369,21 @@ def main():
             a['s'] += float(cc.sum()); a['s2'] += float((cc ** 2).sum())
             if ca is not None:
                 a['acmax'] = max(a['acmax'], float(np.max(np.abs(ca))))
-            m = int(np.argmax(cc))
-            a['peaks'].append(float(cc[m]))
-            a['times'].append(str(r['t0']) + f'+{m/FS:.3f}')
+            # MORE THAN ONE PEAK PER FILE. Keeping only argmax means at most one
+            # event per 60 s record, which systematically loses exactly the
+            # clustered behaviour this experiment exists to test: an unrelated
+            # transient at CC 0.70 would hide a genuine repeater at 0.60 in the
+            # same minute. Retain the top few local maxima, separated by at least
+            # one template length so they are distinct arrivals.
+            sep = max(t['w'].size, 1)
+            cc_w = cc.copy()
+            for _ in range(PEAKS_PER_FILE):
+                m = int(np.argmax(cc_w))
+                if not np.isfinite(cc_w[m]):
+                    break
+                a['peaks'].append(float(cc[m]))
+                a['times'].append(str(r['t0']) + f'+{m/FS:.3f}')
+                cc_w[max(m - sep, 0):m + sep + 1] = -np.inf
         if c % 250 == 0:
             el = _time.time() - t_start
             rate = el / max(nread, 1)

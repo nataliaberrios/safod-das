@@ -239,12 +239,32 @@ def invert(rows, vp, n_boot=300, seed=0):
     boot = np.array(boot)
     off = float(np.linalg.norm(m[:3]))
     err = float(np.std(np.linalg.norm(boot, axis=1))) if len(boot) > 20 else np.nan
-    return dict(dx=m[0], dy=m[1], dz=m[2], dtau=m[3], offset=off, err=err,
+    # DEBIAS. |offset| is the norm of three noisy components, so its expectation
+    # exceeds the truth even when the truth is zero. With per-component sigma s
+    # taken from the bootstrap, subtract the expected noise power and floor at 0.
+    s_comp = float(np.mean(np.std(boot, axis=0))) if len(boot) > 20 else np.nan
+    off_db = (float(np.sqrt(max(off ** 2 - 3.0 * s_comp ** 2, 0.0)))
+              if np.isfinite(s_comp) else np.nan)
+    return dict(dx=m[0], dy=m[1], dz=m[2], dtau=m[3], offset=off,
+                offset_debiased=off_db, err=err, sigma_comp=s_comp,
                 rms_s=rms, nsta=len(rows))
 
 
-def synthetic_resolution(rows, vp, truths=(5.0, 20.0, 100.0), n=200, seed=1):
-    """R1: can this station geometry recover a known offset? Runs before the data."""
+def synthetic_resolution(rows, vp, sigma_t, truths=(5.0, 20.0, 100.0), n=200,
+                         seed=1):
+    """R1: can this station geometry recover a known offset? Runs before the data.
+
+    sigma_t is the MEASURED differential-time scatter, passed in. The first version
+    hard-coded 2 ms while the real inversion residuals were 2.4-31.5 ms (median 22),
+    so it reported a 66 m noise floor when the true floor was ~10x that. A resolution
+    test run at a tenth of the real noise is not a resolution test.
+
+    Note also that |offset| is the NORM of three noisy components, so its
+    expectation exceeds the truth even for zero true offset: for per-component
+    sigma s, E|noise| = 1.596 s. That is why injecting 5 m and 20 m both returned
+    66 m. The floor is reported explicitly rather than left to be misread as a
+    measurement.
+    """
     if len(rows) < MIN_STA:
         return {}
     G = np.array([[-r['l'][0] / vp, -r['l'][1] / vp, -r['l'][2] / vp, 1.0]
@@ -252,13 +272,13 @@ def synthetic_resolution(rows, vp, truths=(5.0, 20.0, 100.0), n=200, seed=1):
     # noise level = the measured residual scatter of the real differential times
     rng = np.random.default_rng(seed)
     out = {}
-    for T in truths:
+    for T in list(truths) + [0.0]:      # 0.0 gives the pure-noise floor
         rec = []
         for k in range(n):
             u = rng.normal(size=3)
             u /= np.linalg.norm(u)
             true = np.r_[u * T, 0.0]
-            sig = G @ true + rng.normal(0, 2e-3, len(rows))   # 2 ms scatter
+            sig = G @ true + rng.normal(0, sigma_t, len(rows))
             try:
                 m, *_ = np.linalg.lstsq(G, sig, rcond=None)
                 rec.append(np.linalg.norm(m[:3]))
@@ -294,14 +314,35 @@ def main():
 
     # ---- R1 synthetic resolution, BEFORE looking at the data ----
     print('R1 synthetic resolution with the real station geometry')
+    # measure the scatter from the data instead of assuming it
+    resid = []
+    for rows_ in per_pair.values():
+        s_ = invert(rows_, VP_REF)
+        if s_:
+            resid.append(s_['rms_s'])
+    sigma_t = float(np.median(resid)) if resid else 2e-3
+    print(f'  measured differential-time scatter: median {1e3*sigma_t:.1f} ms '
+          f'(range {1e3*min(resid):.1f}-{1e3*max(resid):.1f} ms over {len(resid)} pairs)')
     ex = per_pair[list(per_pair)[0]]
-    res = synthetic_resolution(ex, VP_REF)
+    res = synthetic_resolution(ex, VP_REF, sigma_t)
+    floor = res.get(0.0, (np.nan, np.nan))[0]
     print(f'  {"injected m":>12}{"recovered m":>14}{"scatter m":>12}')
-    for T, (med, sd) in res.items():
-        print(f'  {T:12.0f}{med:14.1f}{sd:12.1f}')
-    ok20 = 20.0 in res and abs(res[20.0][0] - 20.0) < max(2 * res[20.0][1], 10.0)
-    print(f'  -> 20 m {"RECOVERED" if ok20 else "NOT recovered"}; rupture radii'
-          f' here are 14-48 m\n', flush=True)
+    for T in sorted(res):
+        med, sd = res[T]
+        print(f'  {T:12.0f}{med:14.1f}{sd:12.1f}'
+              + ('   <- PURE-NOISE FLOOR' if T == 0.0 else ''))
+    # CORRECT CRITERION: an offset is resolvable only if it is recovered close to
+    # truth AND stands clear of the pure-noise floor. The old test compared
+    # |recovered - truth| against the recovered SCATTER, so a geometry that
+    # resolved nothing passed by being imprecise.
+    ok20 = (20.0 in res and np.isfinite(floor)
+            and abs(res[20.0][0] - 20.0) <= 0.3 * 20.0
+            and res[20.0][0] > 2.0 * floor)
+    print(f'  -> 20 m {"RESOLVED" if ok20 else "NOT resolved"}: needs recovery '
+          f'within 30% of truth AND > 2x the {floor:.0f} m noise floor')
+    print(f'     rupture radii here are 14-48 m, so a {floor:.0f} m floor '
+          f'{"permits" if floor < 14 else "PRECLUDES"} an overlap test\n',
+          flush=True)
 
     # ---- real inversions ----
     out = []
@@ -322,7 +363,8 @@ def main():
                   min(rec[v]['offset'] for v in rec))
         out.append(dict(i=i, j=j, fam=bool(r0.is_cand), hrsn=r0.hrsn,
                         das=r0.das_pub, dt_days=r0.dt_days,
-                        offset=s['offset'], err=s['err'], nsta=s['nsta'],
+                        offset=s['offset'], offset_debiased=s['offset_debiased'],
+                        err=s['err'], nsta=s['nsta'],
                         rms_ms=1e3 * s['rms_s'], rad=rad,
                         R_sep=s['offset'] / rad, vspread=spread,
                         tag=f'{ev.tag[i][3:11]}/{ev.tag[j][3:11]}'))

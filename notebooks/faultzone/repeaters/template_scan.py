@@ -71,10 +71,15 @@ from g1_coda_snr import load_manifest                            # noqa: E402
 import h5py                                                      # noqa: E402
 
 CACHE_HF = os.path.join(HERE, 'cache_hf')
-OUT = os.path.join(HERE, 'template_scan')
+OUT = os.environ.get('DAS_OUT_SCAN',
+                     '/scratch/groups/ettore88/nberrios/safod_tscan')
 os.makedirs(OUT, exist_ok=True)
 
 CH_LO, CH_HI = 23, 896
+# APERTURE, SET AT IMPORT -- see full_scan.py. moveout_test fixes 100, 800 at module
+# level, so without this the template and the beam are different apertures with
+# different z origins. This voided this script's 14-day, 139-hour pilot.
+MT.CH_LO, MT.CH_HI = CH_LO, CH_HI
 DX = 1.0209523
 BAND = (5.0, 40.0)          # detection band: wide enough for d', narrow enough
                             # that the gauge rolloff (-3 dB at 54-81 Hz) is mild
