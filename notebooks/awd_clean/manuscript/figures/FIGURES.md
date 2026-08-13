@@ -28,6 +28,9 @@ the dependency order.
 | S5 | Virtual source at 149 m: correlation vs deconvolution | `s5_vs_fig03_moveout_and_wiggles.png` (1.3 MB) | `awd_virtual_source.py` |
 | S6 | Virtual-source correlation gathers, four reference channels | `s6_vs_fig01_correlation_gathers.png` (1.4 MB) | `awd_virtual_source.py` |
 | S7 | Virtual-source deconvolution gathers, four reference channels | `s7_vs_fig02_deconvolution_gathers.png` (1.5 MB) | `awd_virtual_source.py` |
+| S8 | Deep virtual source at 900 m: correlation vs deconvolution | `s8_vs_fig03_moveout_and_wiggles_deep.png` (2.5 MB) | `awd_virtual_source.py --fiber deep` |
+| S9 | Deep virtual-source correlation gathers, four reference channels | `s9_vs_fig01_correlation_gathers_deep.png` (2.2 MB) | `awd_virtual_source.py --fiber deep` |
+| S10 | Deep virtual-source deconvolution gathers, four reference channels | `s10_vs_fig02_deconvolution_gathers_deep.png` (2.1 MB) | `awd_virtual_source.py --fiber deep` |
 
 ## Still to make
 

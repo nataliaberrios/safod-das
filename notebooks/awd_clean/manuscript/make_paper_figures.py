@@ -60,6 +60,15 @@ SUPPLEMENT = [
     ("S7", "Virtual-source deconvolution gathers, four reference channels",
      "../figures/awd_2026/plain_look/virtual_source/vs_fig02_deconvolution_gathers.png",
      "awd_virtual_source.py"),
+    ("S8", "Deep virtual source at 900 m: correlation vs deconvolution",
+     "../figures/awd_2026/plain_look/virtual_source/vs_fig03_moveout_and_wiggles_deep.png",
+     "awd_virtual_source.py --fiber deep"),
+    ("S9", "Deep virtual-source correlation gathers, four reference channels",
+     "../figures/awd_2026/plain_look/virtual_source/vs_fig01_correlation_gathers_deep.png",
+     "awd_virtual_source.py --fiber deep"),
+    ("S10", "Deep virtual-source deconvolution gathers, four reference channels",
+     "../figures/awd_2026/plain_look/virtual_source/vs_fig02_deconvolution_gathers_deep.png",
+     "awd_virtual_source.py --fiber deep"),
 ]
 
 

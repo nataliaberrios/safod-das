@@ -62,6 +62,7 @@ figures/awd_2026/plain_look/awd_virtual_source.npz
 """
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 import numpy as np
@@ -77,13 +78,42 @@ OUT_DIR = Path(
 ) / "virtual_source"
 
 PRE_S = 0.5                     # the stacks are cut -0.5 to +3.0 s
-BAND = (20.0, 50.0)             # the Nano working band, from fig02 of plain_look
-APERTURE_M = (0.0, 600.0)       # signal dies well before the 926 m fiber end
-MAX_LAG_S = 0.35
 WATER_LEVEL = 0.01              # fraction of mean |A|^2, standard spectral-division floor
 
-# Several virtual-source positions, so the result is not a channel-0 artifact.
-SOURCE_DEPTHS_M = [50.0, 150.0, 250.0, 350.0]
+# Per-fibre configuration. Deep needs a much longer lag window: over its 2.8 km
+# aperture at ~1545 m/s the differential travel time reaches ~1.8 s, so the
+# 0.35 s window that suits Nano's 600 m would truncate the gather entirely.
+#
+# Deep is restricted to the outbound leg. The fibre reverses at channel 1702, and
+# past that "distance along fibre" stops being monotonic in depth, which would
+# make a redatumed moveout meaningless. 200-3000 m is channels 98-1469, safely
+# inside the outbound limb, and is the range validated for the Deep guided mode.
+FIBERS = {
+    "nano": dict(
+        stack_key="nano_stacks", dx_key="dx_nano",
+        band=(20.0, 50.0),          # Nano working band
+        aperture_m=(0.0, 600.0),    # signal dies well before the 926 m fibre end
+        max_lag_s=0.35,
+        sources_m=[50.0, 150.0, 250.0, 350.0],
+        v_ref=2975.0,
+        label="Nano (cemented)",
+    ),
+    "deep": dict(
+        stack_key="deep_stacks", dx_key="dx_deep",
+        band=(15.0, 30.0),          # validated Deep guided-mode band
+        aperture_m=(200.0, 3000.0), # outbound leg, validated range
+        max_lag_s=2.00,
+        sources_m=[400.0, 900.0, 1600.0, 2400.0],
+        v_ref=1544.6,               # frozen outbound trajectory
+        label="Deep (wireline, outbound leg)",
+    ),
+}
+
+# Set by main() from the chosen fibre.
+BAND = FIBERS["nano"]["band"]
+APERTURE_M = FIBERS["nano"]["aperture_m"]
+MAX_LAG_S = FIBERS["nano"]["max_lag_s"]
+SOURCE_DEPTHS_M = FIBERS["nano"]["sources_m"]
 
 
 def bandpass(x, fs, band):
@@ -161,14 +191,26 @@ def draw(ax, lags, gather, z, title, v_ref=None, z_src=None):
 
 
 def main():
+    global BAND, APERTURE_M, MAX_LAG_S, SOURCE_DEPTHS_M
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--fiber", choices=tuple(FIBERS), default="nano")
+    fiber = parser.parse_args().fiber
+    cfg = FIBERS[fiber]
+    BAND = cfg["band"]
+    APERTURE_M = cfg["aperture_m"]
+    MAX_LAG_S = cfg["max_lag_s"]
+    SOURCE_DEPTHS_M = cfg["sources_m"]
+    suffix = "" if fiber == "nano" else f"_{fiber}"
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     d = np.load(STACKS)
     fs = float(d["fs"])
-    dx = float(d["dx_nano"])
+    dx = float(d[cfg["dx_key"]])
     counts = d["n_common"]
-    nano, n_drops = weighted_stack(d["nano_stacks"], counts)
-    print(f"Nano stack {nano.shape}, fs={fs}, dx={dx:.6f}, "
+    nano, n_drops = weighted_stack(d[cfg["stack_key"]], counts)
+    print(f"{cfg['label']} stack {nano.shape}, fs={fs}, dx={dx:.6f}, "
           f"{n_drops} drops over {int((counts > 0).sum())} bursts", flush=True)
+    print(f"band {BAND[0]:g}-{BAND[1]:g} Hz, max lag {MAX_LAG_S:g} s", flush=True)
 
     c0, c1 = int(APERTURE_M[0] / dx), min(int(APERTURE_M[1] / dx), nano.shape[0])
     sec = bandpass(nano[c0:c1], fs, BAND)
@@ -180,16 +222,16 @@ def main():
 
     corr, deco = {}, {}
     for c in src_ch:
-        lags, corr[c] = correlate_gather(sec, sec[c], fs)
-        _, deco[c] = deconvolve_gather(sec, sec[c], fs)
+        lags, corr[c] = correlate_gather(sec, sec[c], fs, MAX_LAG_S)
+        _, deco[c] = deconvolve_gather(sec, sec[c], fs, MAX_LAG_S)
 
     # v_ref only draws a reference moveout; it is not fitted here.
-    v_ref = 2975.0
+    v_ref = cfg["v_ref"]
 
     for name, data, fname, note in [
-        ("cross-correlation", corr, "vs_fig01_correlation_gathers.png",
+        ("cross-correlation", corr, f"vs_fig01_correlation_gathers{suffix}.png",
          "source term cancelled, source spectrum retained"),
-        ("deconvolution", deco, "vs_fig02_deconvolution_gathers.png",
+        ("deconvolution", deco, f"vs_fig02_deconvolution_gathers{suffix}.png",
          "source term and spectrum both cancelled"),
     ]:
         fig, axes = plt.subplots(1, len(src_ch), figsize=(4.2 * len(src_ch), 6.5),
@@ -200,7 +242,7 @@ def main():
                       v_ref=v_ref, z_src=z[c])
             plt.colorbar(im, ax=a, label="amplitude / trace peak")
         fig.suptitle(
-            f"AWD virtual-source gathers by {name} -- {note}\n"
+            f"{cfg[chr(39)+chr(39)] if False else cfg['label']} AWD virtual-source gathers by {name} -- {note}\n"
             f"{n_drops} drops, {BAND[0]:g}-{BAND[1]:g} Hz, traces normalised; "
             f"dashed = {v_ref:g} m/s reference moveout, green = source channel",
             fontsize=12)
@@ -234,10 +276,10 @@ def main():
     fig.suptitle(f"AWD virtual source at {z[c]:.0f} m: correlation vs deconvolution "
                  f"-- {n_drops} drops, {BAND[0]:g}-{BAND[1]:g} Hz", fontsize=12)
     fig.tight_layout()
-    fig.savefig(OUT_DIR / "vs_fig03_moveout_and_wiggles.png", dpi=140)
+    fig.savefig(OUT_DIR / f"vs_fig03_moveout_and_wiggles{suffix}.png", dpi=140)
     plt.close(fig)
 
-    np.savez(OUT_DIR / "awd_virtual_source.npz",
+    np.savez(OUT_DIR / f"awd_virtual_source{suffix}.npz",
              lags=lags, z=z, fs=fs, dx=dx, band=np.asarray(BAND),
              n_drops=n_drops, water_level=WATER_LEVEL,
              source_channels=np.asarray(src_ch),
@@ -286,7 +328,7 @@ def main():
         vals = np.array([speeds[c][0] for c in speeds])
         print(f"  across {len(vals)} virtual sources: median {np.median(vals):.0f} m/s, "
               f"spread {vals.min():.0f}-{vals.max():.0f}")
-        np.savez(OUT_DIR / "awd_virtual_source_speeds.npz",
+        np.savez(OUT_DIR / f"awd_virtual_source_speeds{suffix}.npz",
                  v_grid=v_grid,
                  source_depths=np.asarray([z[c] for c in speeds]),
                  best_v=vals,
