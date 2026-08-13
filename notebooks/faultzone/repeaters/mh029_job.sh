@@ -1,12 +1,11 @@
 #!/bin/bash
-#SBATCH -J mh029cov
-#SBATCH -p serc
-#SBATCH -t 00:25:00
-#SBATCH --mem=8G
-#SBATCH -o /home/groups/ettore88/nberrios/safod_das_git/logs/mh029cov_%j.out
-#SBATCH -e /home/groups/ettore88/nberrios/safod_das_git/logs/mh029cov_%j.err
+#SBATCH --job-name=mh029_xc
+#SBATCH --partition=serc
+#SBATCH --time=06:00:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64GB
+#SBATCH --output=logs/%x_%j.out
+#SBATCH --error=logs/%x_%j.err
 ml gcc/12.4.0
-source ~/miniconda3/etc/profile.d/conda.sh
-conda activate das
 cd /home/groups/ettore88/nberrios/safod_das_git/notebooks/faultzone/repeaters
-python -u mh029_coverage.py
+/home/users/nberrios/miniconda3/envs/das/bin/python -u mh029_das_xcorr.py
