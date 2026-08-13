@@ -60,6 +60,9 @@ def test_consolidated_fk_decision_and_frequency_boundary() -> None:
         is True
     )
     assert report["decision"]["real_ambient_input_is_nearly_direction_balanced"] is True
+    approved = report["decision"]["approved_language"]
+    assert "nominal downgoing/increasing-coordinate" in approved
+    assert "nominal upgoing/decreasing-coordinate" in approved
     active = report["awd_empirical_direction"][
         "expected_to_opposite_fixed_tube_energy_ratio"
     ]

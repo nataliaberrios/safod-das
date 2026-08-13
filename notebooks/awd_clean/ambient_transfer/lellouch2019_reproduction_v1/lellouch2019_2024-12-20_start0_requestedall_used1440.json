@@ -1,0 +1,94 @@
+{
+  "workflow_version": "ambient_lellouch2019_reproduction_v1",
+  "citation": "Lellouch et al. (2019), doi:10.1029/2019JB017533",
+  "date": "2024-12-20",
+  "start_file_index": 0,
+  "requested_files": null,
+  "used_files": 1440,
+  "used_30_s_windows": 5759,
+  "sample_rate_hz": 500.0,
+  "channel_spacing_m": 1.0209523439407349,
+  "virtual_source_channel": 0,
+  "virtual_source_coordinate_m": 0.0,
+  "target_spacing_m": 50.0,
+  "target_channels": [
+    49,
+    98,
+    147,
+    196,
+    245,
+    294,
+    343,
+    392,
+    441,
+    490,
+    539,
+    588,
+    637,
+    686,
+    735,
+    784
+  ],
+  "target_coordinates_m": [
+    50.02666485309601,
+    100.05332970619202,
+    150.07999455928802,
+    200.10665941238403,
+    250.13332426548004,
+    300.15998911857605,
+    350.18665397167206,
+    400.21331882476807,
+    450.2399836778641,
+    500.2666485309601,
+    550.2933133840561,
+    600.3199782371521,
+    650.3466430902481,
+    700.3733079433441,
+    750.3999727964401,
+    800.4266376495361
+  ],
+  "published_steps_reproduced": {
+    "time_derivative_to_strain_rate_proxy": true,
+    "running_absolute_mean_normalization": true,
+    "window_seconds": 30.0,
+    "window_overlap_seconds": 15.0,
+    "receiver_stack": "R-10 through R+10, same channel-0 source",
+    "travel_time_alignment_velocity_m_s": 3200.0,
+    "correlation_output_band_hz": [
+      5.0,
+      20.0
+    ]
+  },
+  "declared_project_choice_not_reported_by_paper": {
+    "running_absolute_mean_window_seconds": 5.0
+  },
+  "important_departures_or_boundaries": [
+    "The input is the 2024--2025 acquisition, not the June--July 2017 records used by Lellouch et al.",
+    "The 2024--2025 channel-0 origin and measured spacing are assumed to inherit the same cemented-fiber coordinate convention.",
+    "The 3.2 km/s aligned stack is a signal-enhancement operator fixed from the published average velocity, not an independent velocity estimate.",
+    "No F-K filter is applied in this reproduction because Lellouch et al. did not report F-K filtering in their ambient-interferometry subsection."
+  ],
+  "metrics": {
+    "isolated_receiver": {
+      "descriptive_causal_peak_velocity_m_s": 2025.0,
+      "descriptive_causal_peak_signed_score": 0.04982061002504705,
+      "causal_score_at_3200_m_s": 0.004831345203439702,
+      "anti_causal_score_at_3200_m_s": -0.0087714992653017,
+      "abs_causal_to_anti_causal_ratio_at_3200": 0.5508003885437851
+    },
+    "local_21_channel_simple": {
+      "descriptive_causal_peak_velocity_m_s": 2025.0,
+      "descriptive_causal_peak_signed_score": 0.04339403747774499,
+      "causal_score_at_3200_m_s": 0.006996840925330887,
+      "anti_causal_score_at_3200_m_s": -0.009387835851955573,
+      "abs_causal_to_anti_causal_ratio_at_3200": 0.7453092529172611
+    },
+    "local_21_channel_aligned_3200": {
+      "descriptive_causal_peak_velocity_m_s": 2025.0,
+      "descriptive_causal_peak_signed_score": 0.03963876566134278,
+      "causal_score_at_3200_m_s": 0.0065606665457760005,
+      "anti_causal_score_at_3200_m_s": -0.008920259707240943,
+      "abs_causal_to_anti_causal_ratio_at_3200": 0.7354793202321718
+    }
+  }
+}

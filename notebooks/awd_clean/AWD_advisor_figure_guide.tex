@@ -55,7 +55,7 @@ $1.4$--$1.56~\mathrm{km\,s^{-1}}$ low-frequency mode is validated on the
 wireline Deep array.  The former is not yet securely identified as direct P;
 the latter is consistent with, but not yet proven to be, a borehole tube wave.
 The document follows the current results notebook,
-\path{AWD_results_dashboard.ipynb}, version v49.  The hierarchical
+\path{AWD_results_dashboard.ipynb}, version v50.  The hierarchical
 individual-drop/burst repeatability analysis and the split-sample Deep
 time-gated branch search are now promoted into the authoritative results
 record.  A six-figure core presentation set plus an advisor-facing figure
@@ -1499,7 +1499,7 @@ The earlier ambient-noise analysis was an extensive five-month reproduction atte
 
 
 \subsection{Controlled Lellouch-style ambient interferometry transfer test}
-A memory-safe implementation was run on three independent 10-file chunks (30 segments, approximately 30 minutes) from the 2024--2025 archive. It used the published top-channel and 50-m source--receiver geometries, 5--20~Hz filtering, 5-s running-absolute-mean normalization, the measured 1.020952-m spacing, and pairwise RMS-normalized correlations. The combined score at 3.2~km~s$^{-1}$ was $-0.00266$; the weak maximum was $0.00388$ near 1.65~km~s$^{-1}$. A receiver-position permutation null gave $p=0.875$. This is a negative transfer pilot, not a rejection of the 2017 Lellouch result, because the archive and duration differ. The next test is a complete-day chunked stack.
+A memory-safe implementation was run on three independent 10-file chunks (30 segments, approximately 30 minutes) from the 2024--2025 archive. It used the published top-channel and 50-m source--receiver geometries, 5--20~Hz filtering, 5-s running-absolute-mean normalization, the measured 1.020952-m spacing, and pairwise RMS-normalized correlations. The combined score at 3.2~km~s$^{-1}$ was $-0.00266$; the weak maximum was $0.00388$ near 1.65~km~s$^{-1}$. A receiver-position permutation null gave $p=0.875$. This historical pilot is not a rejection of the 2017 Lellouch result; it is superseded by the completed full-day, receiver-neighborhood transfer in Figure~49.
 
 
 \subsection{Duration-matched baseline and F--K extension}
@@ -1522,7 +1522,7 @@ For this archive, one HDF5 segment contains 30,000 samples at the 500-Hz output 
 The frozen negative signed-wavenumber wedge was extended to seven independent 10-file chunks (70 segments, approximately 70~min). The aggregate peak is 3.075~km~s$^{-1}$, the score at 3.2~km~s$^{-1}$ is 0.2947, and a 5,000-permutation receiver null gives $p=0.0002$. All seven chunk scores are positive. This is a stable 70-minute F--K-selected observable, but not yet a complete-day reproduction or an independent velocity estimate because the wedge contains the target interval. The complete-day and seasonal products are now available below; held-out-day and nearby-wedge tests remain the appropriate robustness checks.
 
 
-\subsection{Seasonal robustness of the ambient F--K result (running)}
+\subsection{Seasonal robustness of the ambient F--K result (completed)}
 \figquestion{Is the approximately 3.2~km~s$^{-1}$ signed branch persistent across the 14-month archive, or is the February baseline day atypical because of season, coupling, weather, or local seismicity?}
 
 This test was initiated because a single complete-day stack cannot establish that the observed wavefield is representative of the archive. Two complete days were selected from each meteorological season using a fixed random seed. A day was admitted only if its index contained at least 1,400 one-minute files and no inter-file gap greater than 65~s. The selected dates are:
@@ -1542,17 +1542,17 @@ SON & 2024-10-28 & 2024-11-30 \\
 
 Each day is processed independently with the same 5--20~Hz bandpass, 5-s running-absolute-mean temporal normalization, and negative, positive, and two-sided signed F--K branches. Earthquake-containing intervals are retained; temporal normalization suppresses their amplitude leverage but does not remove their waveforms. Day-level products are aggregated only after the individual-day stacks and permutation nulls are complete. The comparison will report peak apparent velocity, normalized coherence at 3.2~km~s$^{-1}$, signed-branch asymmetry, and the fixed-passband response. The negative and positive branches are evaluated separately so that a seasonal change in polarity or coupling is not hidden by a two-sided stack.
 
-At the time of this guide revision, the processing is still running. The status is therefore \planned, and no seasonal persistence claim is made. The live notebook section records completion fraction and will display the day-level and across-day products once the aggregation file exists. A consistent peak velocity and branch asymmetry across seasons would support a persistent propagating wavefield; systematic seasonal changes would instead identify environmental or coupling dependence that must be included in the interpretation.
+\textbf{Status update v50: completed.} The corrected physical-lag aggregate contains 11,523 one-minute files from all eight preselected dates. The \(F K<0\) and \(F K>0\) branches both peak at 3.075~km~s\(^{-1}\), with scores 0.279 and 0.288 and receiver-order probabilities \(p=0.0002\) for each branch. These probabilities demonstrate seasonal repeatability of the fan-selected ordered observable; they remain conditional on the fixed 2.5--4.5~km~s\(^{-1}\) passband and do not independently determine velocity or physical upgoing/downgoing identity.
 
 \takeaway{Seasonal validation is a robustness test, not an additional significance claim. It determines whether the February result can be treated as an archive-wide property.}
 
 
-\subsection{Independent unfiltered verification (running)}
+\subsection{Independent unfiltered verification (completed)}
 \figquestion{Is the weak unfiltered transfer result caused by the data, or by an implementation difference?}
 
 The seasonal F--K run alone cannot distinguish a physical observability effect from a software or downsampling artifact. An independent control is therefore being run through the exact-resolution path in \code{ambient\_transfer\_test.py}. This path is separate from the F--K implementation: it reads the full-resolution traces, uses the published top-channel and 50-m source--receiver geometries, measured spatial spacing, 5--20~Hz filtering, 5-s running-absolute-mean temporal normalization, and RMS-normalized correlations. The selected days and completeness criteria are identical to the seasonal F--K test. Earthquake-containing intervals remain in the records and are not catalog-muted.
 
-The verification is intentionally resumable and produces day-level products before any across-day aggregate. Agreement between this independent full-resolution path and the F--K routine's unfiltered control would argue against an implementation bug. A strong F--K branch alongside a weak independently verified unfiltered result would instead indicate that F--K isolation materially changes observability. Until the unfiltered day-level products and permutation nulls exist, no conclusion is assigned to this branch.
+\textbf{Status update v50: completed.} The exact-resolution aggregate contains the same 11,523 weighted one-minute records. At the fixed 3.2~km~s\(^{-1}\) trajectory, the causal score is 0.002711 with receiver-order \(p=0.341\), and the anti-causal score is 0.0000929 with \(p=0.202\). This independently confirms that the broad unfiltered correlation remains weak for the selected statistic. It does not diagnose an F--K implementation bug and does not invalidate a standard passband used to isolate low-SNR coherent energy.
 
 \takeaway{The F--K result is not being used to excuse a possible unfiltered coding error; the exact-resolution unfiltered path is being rerun as an independent check.}
 
@@ -1986,11 +1986,77 @@ opposite wavefields near zero wavenumber and limitations of a simple fan mask.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.99\linewidth]{ambient_transfer/fk_directional_audit_v1/ambient_fk_directional_audit_v1.png}
-\caption{\textbf{Standard directional F--K audit of the ambient SAFOD workflow.} (a) Mean 5--20~Hz pre-filter F--K power from 300 one-minute Nano records before any signed or velocity mask; total positive- and negative-wavenumber powers have ratio 1.0039. (b,c) Held-out coordinate-direction sections after signed-quadrant selection only, with no apparent-velocity restriction; dashed trajectories mark 3.2~km~s\( ^{-1} \) solely as a fixed diagnostic. (d) Correlation between complementary branches after reflecting one lag axis, shown for the development date and seven held-out dates. The held-out mirror correlation is 0.995 for the frozen 2.5--4.5~km~s\( ^{-1} \) fan but 0.264 for direction-only selection. (e) Held-out moveout scores for the direction-only branches; fixed 3.2-km-s\( ^{-1} \) values are -0.0004 and -0.0107, providing no independent recovery of that trajectory. (f) Summary of balanced pre-filter directional power, near-mirror fan response, and non-mirrored direction-only response. One-way synthetic tests independently verify mask sign and lag conventions. The audit supports the correctness of the F--K implementation but classifies the earlier narrow-fan ambient ridge as operator-conditioned rather than as an independently demonstrated physical wave.}
+\caption{\textbf{Standard directional F--K audit of the ambient SAFOD workflow.} (a) Mean 5--20~Hz pre-filter F--K power from 300 one-minute Nano records before any signed or velocity mask; total positive- and negative-wavenumber powers have ratio 1.0039. (b,c) Held-out coordinate-direction sections after signed-quadrant selection only, with no apparent-velocity restriction; dashed trajectories mark 3.2~km~s\( ^{-1} \) solely as a fixed diagnostic. (d) Correlation between complementary branches after reflecting one lag axis, shown for the development date and seven held-out dates. The held-out mirror correlation is 0.995 for the frozen 2.5--4.5~km~s\( ^{-1} \) fan but 0.264 for direction-only selection. (e) Held-out moveout scores for the direction-only branches; fixed 3.2-km-s\( ^{-1} \) values are -0.0004 and -0.0107, providing no independent recovery of that trajectory. (f) Summary of balanced pre-filter directional power, near-mirror fan response, and non-mirrored direction-only response. One-way synthetic tests independently verify mask sign and lag conventions. The audit supports the correctness of the F--K implementation. It shows that the narrow-fan ridge is a selected, operator-conditioned observable rather than an unbiased velocity estimate; failure of the broader direction-only statistic is a sensitivity result and does not reject the standard fan filter.}
 \end{figure}
 
-\takeaway{The filtering code is correct.  The current ambient 3.1--3.2-km-s
-\( ^{-1} \) interpretation is not.  It remains a selected visualization until
-an unmasked or independently constrained method detects the same event.}
+\takeaway{The filtering implementation is correct.  The fan-assisted
+3.1--3.2-km-s\( ^{-1} \) ridge is a reproducible observable selected in an
+independently motivated apparent-velocity interval. Direction-only
+non-recovery constrains robustness but does not reject standard fan filtering.
+The fan does not independently estimate velocity or identify physical wave
+type; v50 supplies the completed validation ladder.}
+
+
+\section{Signed F--K validation ladder (v50)}
+\figquestion{Can the signed 2.5--4.5~km~s\( ^{-1} \) F--K operator be
+trusted, and what physical language is supported for the ambient branches?}
+
+F--K filtering is standard VSP wavefield separation.  Here its implementation
+and physical interpretation are evaluated separately. Exact one-way
+5--20~Hz synthetics give correct/wrong branch RMS ratios of
+9.86 and 9.95 for
+increasing- and decreasing-coordinate propagation. Known-direction broadband
+waves injected into 300 real records are independently recovered in the
+correct branch for both directions at 2.75, 3.2, and 4.0~km~s\( ^{-1} \),
+while the 1.8~km~s\( ^{-1} \) off-wedge control is rejected. The known
+surface AWD gives expected/opposite fixed-tube energy ratios of
+1.18 at 5--20~Hz and 139.3 at
+25--60~Hz, so empirical physical-sign calibration is strong only in the higher
+band. The real ambient F--K target-fan power ratio is
+0.997, and the filtered score ratio is
+1.008; the recorded low-frequency
+field is therefore nearly balanced between coordinate directions.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.99\linewidth]{ambient_transfer/fk_validation_evidence_v1/fk_validation_evidence_v1.png}
+\caption{\textbf{Validation ladder for the signed SAFOD ambient F--K operator.} (a) Exact 10-Hz, 3.2-km-s\( ^{-1} \) plane waves are propagated separately toward increasing and decreasing fiber coordinate, decimated identically to the production workflow, and passed through complementary 5--20-Hz, 2.5--4.5-km-s\( ^{-1} \) signed masks. Correct/wrong output-RMS ratios are 9.86:1 and 9.95:1, validating Fourier sign. (b) Minimum injected broadband RMS relative to median real-channel 5--20-Hz RMS required for independent pre-filter recovery after injection into 300 real one-minute records. Both directions are recovered for all in-wedge test speeds; the omitted 1.8-km-s\( ^{-1} \) off-wedge control is never recovered. (c) Full-resolution application to the known surface-AWD Nano stack over 80--440~m. Energy within a fixed \(\pm12\)-ms tube around the independently estimated 2.975-km-s\( ^{-1} \) increasing-coordinate moveout gives expected/opposite ratios 1.18 at 5--20~Hz and 139.3 at 25--60~Hz, demonstrating frequency-dependent empirical directionality. (d) The unmasked ambient target-fan power ratio is 0.997, and the independently filtered 3.2-km-s\( ^{-1} \) score ratio is 1.008. Thus the two branches are valid coordinate-direction outputs rather than a software mirror, while the physical origin of the decreasing-coordinate energy remains unresolved. The figure does not establish two body-wave Green's-function branches, wave type, or an independent formation velocity.}
+\end{figure}
+
+\takeaway{For Nano, whose coordinate increases downhole, \(F K<0\) is the
+nominal downgoing/increasing-coordinate branch and \(F K>0\) is the nominal
+upgoing/decreasing-coordinate branch.  This coordinate/sign calibration does
+not establish perfect branch purity or identify the origin of the nominal
+upgoing energy.  The standard fan is valid as an independently motivated
+passband, but cannot alone estimate velocity within that passband.}
+
+\section{Published ambient-workflow transfer test (v50)}
+\figquestion{Does the unfiltered Lellouch et al. (2019) ambient workflow
+recover the causal 3.2-km-s\( ^{-1} \) arrival in the 2024--2025 data, and
+what is gained by the previously omitted local receiver stack?}
+
+One complete UTC day (1,440 one-minute files;
+5,759 overlapping 30-s windows) is processed with
+channel~0 as the fixed top virtual source, receivers every 50~m from 50 to
+800~m, time differentiation to a strain-rate proxy, 5-s
+running-absolute-mean normalization, 15-s window overlap, and a final
+5--20-Hz correlation filter. The 5-s normalization duration is declared as a
+project choice because the paper does not report it. The spatial operator
+stacks correlations from the same source to receivers \(R-10\) through
+\(R+10\), with a second version aligned at the published 3.2~km~s\( ^{-1} \).
+No F--K filter is applied because none is reported in the paper's ambient
+subsection.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.99\linewidth]{ambient_transfer/lellouch2019_reproduction_v1/lellouch2019_2024-12-20_start0_requestedall_used1440.png}
+\caption{\textbf{Transfer of the Lellouch et al. (2019) ambient-interferometry workflow to the 2024--2025 SAFOD Nano acquisition.} A complete UTC day (1,440 contiguous one-minute files) is divided into 5,759 30-s windows with 15-s overlap. Nano channel~0 is the fixed top virtual source; target receiver positions increase down the cemented main-hole fiber at 50-m intervals from 50 to 800~m using measured 1.020952-m spacing. Phase/strain is differentiated to a strain-rate proxy and divided by a 5-s running absolute mean before correlation; the daily stack is filtered at 5--20~Hz. Black variable-area wiggles show positive correlation lag, and the red line is a fixed 3.2-km-s\( ^{-1} \) reference rather than a fit. (a) Individual receiver correlations. (b) The published local stack over receiver channels \(R-10\) through \(R+10\), retaining the same channel-0 source. (c) The same 21 correlations shifted at fixed 3.2-km-s\( ^{-1} \) travel-time differences before stacking. Fixed-trajectory causal scores are 0.0048, 0.0070, and 0.0066; the aligned absolute score is 1.36 times the isolated value. The aligned descriptive causal maximum is 2.025~km~s\( ^{-1} \), with causal/anti-causal absolute-score ratio 0.74 at 3.2~km~s\( ^{-1} \). This is a documented transfer, not a bit-for-bit reproduction of the 2017 records; acquisition epoch, interrogator/gauge settings, ambient source distribution, and channel-origin inheritance can affect the comparison.}
+\end{figure}
+
+\takeaway{The unfiltered transfer and the added F--K-assisted workflow answer
+different questions.  The former tests reproducibility of the published 2017
+processing on the 2024--2025 acquisition; the latter tests whether a
+predeclared apparent-velocity/direction passband can recover a coherent
+observable.  Neither alone provides a formation-\(V_P\) inversion.}
 
 \end{document}

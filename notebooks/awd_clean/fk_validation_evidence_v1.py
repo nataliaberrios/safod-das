@@ -151,14 +151,16 @@ def main() -> None:
                 0.8 <= ambient_ratios["pre_filter_fan_power"] <= 1.25
             ),
             "approved_language": (
-                "F*K<0 and F*K>0 are opposite propagation directions along "
-                "the fiber coordinate. The observed 5--20 Hz ambient field is "
-                "approximately balanced between them."
+                "On Nano, F*K<0 is the nominal downgoing/increasing-coordinate "
+                "branch and F*K>0 is the nominal upgoing/decreasing-coordinate "
+                "branch. The observed 5--20 Hz ambient field is approximately "
+                "balanced between them."
             ),
             "language_not_yet_justified": (
-                "Calling the ambient branches downgoing and upgoing physical "
-                "body waves, or treating either fan-filtered peak as an "
-                "independent formation-velocity estimate."
+                "Claiming that the nominal branches are clean individual body "
+                "waves, assigning the origin of the upgoing energy without a "
+                "reflection/scattering test, or treating either fan-filtered "
+                "peak as an independent formation-velocity estimate."
             ),
         },
     }
