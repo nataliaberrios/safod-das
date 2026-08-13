@@ -4,7 +4,8 @@ Five folders. **Start with `basic/`.**
 
 | folder | what it is | made by |
 |---|---|---|
-| **`basic/`** | **the standard first-look set — 12 single-purpose figures. Use these.** | `awd_clean/basic.py` |
+| **`basic/`** | **the standard first-look set for the Nano (cemented) fiber — 12 figures. Use these.** | `awd_clean/basic.py` |
+| **`basic_deep/`** | **the same set for the Deep (wireline) fiber — 11 figures** | `awd_clean/basic_deep.py` |
 | `diagnostic/` | the dense multi-panel QC set, plus the taper audit and bad-channel check, plus the CSV/NPZ products | `awd_clean/plain_look.py`, `taper_audit.py`, `bad_channel_check.py` |
 | `deep/` | the same looks for the Deep (wireline) fiber, hairpin split at channel 1702 | `awd_clean/deep_plain_look.py` |
 | `virtual_source/` | correlation and deconvolution gathers — source removed, arrival recovered at 2948 m/s | `awd_clean/awd_virtual_source.py` |
@@ -29,8 +30,12 @@ Five folders. **Start with `basic/`.**
 
 ## Numbers worth knowing before quoting any of these
 
-- **2948 m/s** apparent velocity from `basic08`, over 56–598 m. Independent of,
-  and within 1% of, the 2975 m/s established elsewhere in the project.
+- **2948 m/s** apparent velocity from `basic08` (Nano), over 56–598 m. Independent
+  of, and within 1% of, the 2975 m/s established elsewhere in the project.
+- **1576 m/s** from `basic_deep/dbasic08`, over 1013–3275 m along the outbound leg.
+  Sits just above the 1.4–1.56 km/s quoted for the Deep slow-mode candidate, from
+  a plain cross-correlation with no wedge or scan. Only 43 points cleared the
+  6 dB SNR cut and all lie beyond 1000 m, so the shallow leg is not sampled.
 - **CC 0.95 → 0.18** between 150 m and 550 m for drops within one burst: the
   source repeats very well shallow and not at all deep.
 - **SNR 28.3 dB at 460 m** in `basic07`. This is the **859-drop** stack. The
@@ -44,7 +49,10 @@ Five folders. **Start with `basic/`.**
 
 ## Caveats
 
-- Everything is the **Nano** (cemented) fiber unless it is in `deep/`.
+- `basic/` is the **Nano** (cemented) fiber; `basic_deep/` is the **Deep** (wireline)
+  fiber. They are not interchangeable: Deep is differentiated to strain rate to
+  match Nano, uses the 3-15 Hz working band rather than 20-50 Hz, and shows the
+  outbound leg only because the fiber hairpins at channel 1702.
 - All single-drop figures use burst 18, chosen mechanically as the fullest burst
   contained in one raw file, not by how it looks.
 - Record sections have ~25 instrumental bad channels interpolated over. They are
