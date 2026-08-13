@@ -38,7 +38,9 @@ def main():
             vmax=limit,
             interpolation="nearest",
         )
+        # Black dashed is the Lellouch comparison; gold is the conditional ridge.
         ax.plot(dist / 3200.0, dist, "k--", lw=1.0, alpha=0.9)
+        ax.plot(dist / 3075.0, dist, color="gold", lw=1.0, alpha=0.95)
         ax.set_title(date)
         ax.set_xlim(-0.25, 0.25)
         ax.set_ylim(700, 0)
@@ -54,11 +56,15 @@ def main():
         vmax=limit,
         interpolation="nearest",
     )
-    ax.plot(dist / 3200.0, dist, "k--", lw=1.2, alpha=0.9)
+    ax.plot(dist / 3200.0, dist, "k--", lw=1.2, alpha=0.9,
+            label="3.2 km/s reference")
+    ax.plot(dist / 3075.0, dist, color="gold", lw=1.2, alpha=0.95,
+            label="3.075 km/s conditional ridge")
     ax.set_title("Across-day weighted aggregate")
     ax.set_xlim(-0.25, 0.25)
     ax.set_ylim(700, 0)
     ax.grid(alpha=0.15, lw=0.4)
+    ax.legend(loc="lower right", fontsize=8, framealpha=0.85)
 
     for ax in axes[6:]:
         ax.set_xlabel("Correlation lag (s)")
@@ -73,7 +79,8 @@ def main():
     fig.text(
         0.5,
         0.008,
-        "Dashed line: 3.2 km/s reference moveout. Panels use identical display limits; "
+        "Black dashed: 3.2 km/s Lellouch comparison reference; gold: 3.075 km/s "
+        "conditional ridge estimate. Panels use identical display limits; "
         "the F–K wedge is fixed and includes 2.5–4.5 km/s by construction.",
         ha="center",
         fontsize=9,
@@ -86,4 +93,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
