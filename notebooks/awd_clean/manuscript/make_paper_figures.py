@@ -16,6 +16,7 @@ Figures that do not yet exist are reported rather than skipped silently.
 
 from __future__ import annotations
 
+import re
 import shutil
 from pathlib import Path
 
@@ -89,8 +90,12 @@ def collect(entries, label: str, slug: str) -> tuple[list[str], list[str]]:
 
 def main() -> None:
     OUT.mkdir(exist_ok=True)
-    for stale in OUT.glob("*.png"):   # clear prior naming before recollecting
-        stale.unlink()
+    # Remove only the files this script owns. figures/ also holds output written
+    # directly by make_lever_arm_figure.py, make_poster_figures.py and
+    # make_semblance_figure.py; a blanket wipe deleted those.
+    for stale in OUT.glob("*.png"):
+        if re.match(r"^(fig\d\d_|s\d+_)", stale.name):
+            stale.unlink()
     main_rows, main_missing = collect(FIGURES, "Fig ", "fig")
     supp_rows, supp_missing = collect(SUPPLEMENT, "", "s")
 
