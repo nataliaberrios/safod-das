@@ -37,7 +37,7 @@
 
 \title{SAFOD June 2026 AWD--DAS: Analysis Summary and Figure Notes}
 \author{SAFOD AWD--DAS working analysis}
-\date{11 August 2026}
+\date{13 August 2026}
 
 \begin{document}
 \maketitle
@@ -55,7 +55,7 @@ $1.4$--$1.56~\mathrm{km\,s^{-1}}$ low-frequency mode is validated on the
 wireline Deep array.  The former is not yet securely identified as direct P;
 the latter is consistent with, but not yet proven to be, a borehole tube wave.
 The document follows the current results notebook,
-\path{AWD_results_dashboard.ipynb}, version v48.  The hierarchical
+\path{AWD_results_dashboard.ipynb}, version v49.  The hierarchical
 individual-drop/burst repeatability analysis and the split-sample Deep
 time-gated branch search are now promoted into the authoritative results
 record.  A six-figure core presentation set plus an advisor-facing figure
@@ -1852,36 +1852,37 @@ v44 rejection was circular, the strict unfiltered control is weak, and the
 independent pre-filter test finds no target-power enrichment. No Green's-function, mode, or
 formation-$V_P$ claim is assigned until the validation is complete.}
 
-\subsection{Corrected eight-day signed-lag comparison (v47)}
-\figquestion{Does corrected \(F K>0\) contain ordered moveout on its physical
-negative-lag side, and how does it compare with \(F K<0\) at positive lag?}
+\subsection{Velocity-fan-conditioned signed-lag symmetry diagnostic (corrected v49)}
+\figquestion{What does the near-equality of the two signed, velocity-fan-filtered
+correlation panels establish?}
 
-The independently audited aggregate contains 11,523 one-minute files from
-8 frozen dates. \(F K<0\) is evaluated at positive lag for propagation
-toward increasing fiber coordinate; \(F K>0\) is evaluated at negative lag
-for the opposite coordinate direction. These are coordinate directions, not
-automatic upgoing or downgoing labels.
-
-The negative branch peaks at 3.075~km~s\( ^{-1} \),
-has absolute score 0.2710 at 3.2~km~s\( ^{-1} \),
-and receiver-permutation \(p=0.0002\). The corrected positive
-branch peaks at 3.075~km~s\( ^{-1} \), has
-absolute score 0.2688, and
-\(p=0.0002\). Their positive/negative absolute-score ratio is
-0.992, with normalized asymmetry 0.004; the branches are
-comparable in magnitude after signed F--K selection.
+The two branches were filtered and correlated independently, and one-way
+synthetics validate their sign mapping.  Nevertheless, reversing the lag axis
+of the right panel makes the two real-data sections nearly identical: their
+correlation is 0.9959, relative RMS difference is
+0.091, and norm ratio is
+1.007.  This is a property
+of the selected operator, not evidence for two independently observed waves.
+The complementary signed fans do not select Hermitian-conjugate pairs; the
+conjugate coefficients of a real gather remain within the same $F K$ sign.
+The near-mirroring is therefore an empirical property of this processed data
+set, not a mathematical requirement.  Balanced opposite-direction energy or
+shared coherent artifacts can produce similar reflected kernels when both
+fans impose the same slowness magnitude and channel-0 correlation geometry.
+The direction-only audit is needed to test whether the 3.2-km-s\(^{-1}\)
+structure persists outside that conditioning.  Receiver
+permutation after filtering tests spatial order in that conditioned output but
+does not make the selected velocity independent of the fan.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.99\linewidth]{ambient_transfer/signed_lag_v2/seasonal_signed_fk_v2_aggregate.png}
-\caption{\textbf{Corrected eight-day signed-lag comparison after independent completion audit.} The aggregate uses 11,523 one-minute records from 8 preselected dates, Nano channel~0 as the virtual source, increasing offset along the cemented fiber, 5--20~Hz filtering, 5-s running-absolute-mean normalization, and a frozen 2.5--4.5~km~s\( ^{-1} \) signed F--K wedge. The upper-left panel shows \(F K<0\) on positive lag; the upper-right shows \(F K>0\) on negative lag, with a common correlation scale. Black dashed trajectories mark each branch's conditional score peak at 3.075~km~s\( ^{-1} \); gray dotted trajectories mark the fixed 3.2~km~s\( ^{-1} \) comparison. The lower-left shows moveout scores and receiver-permutation 95\% thresholds; the lower-right compares physical and opposite-lag leakage at 3.2~km~s\( ^{-1} \). Branches peak at 3.075 and 3.075~km~s\( ^{-1} \), with \(p=0.0002\) and \(p=0.0002\); their score ratio is 0.992. The audit reproduces scores, verifies signs, and confirms all files. Significance is conditional on F--K selection and does not independently establish Green's-function convergence, causality, propagation identity, wave type, or formation velocity.}
+\caption{\textbf{Velocity-fan-conditioned signed-lag symmetry diagnostic.} The aggregate uses 11,523 one-minute records from eight preselected dates, Nano channel~0 as the virtual source, increasing receiver offset along the cemented fiber, 5--20~Hz preprocessing, 5-s running-absolute-mean temporal normalization, and complementary signed 2.5--4.5~km~s\( ^{-1} \) F--K fans. The two upper panels were reconstructed and correlated independently; they are not duplicated arrays. Black dashed trajectories mark the conditional 3.075~km~s\( ^{-1} \) score peak, and gray dotted trajectories mark 3.2~km~s\( ^{-1} \). After reversing the lag axis of the right panel, the sections have correlation 0.9959, relative RMS difference 0.091, and norm ratio 1.007. The near-mirror symmetry is an empirical property of the fan-filtered output, not a requirement of Hermitian Fourier symmetry: conjugate coefficients remain inside the same $F K$ sign. Balanced opposite-direction energy or shared coherent artifacts can produce similar reflected kernels when both fans impose the same slowness magnitude and channel-0 correlation geometry. The receiver-order probabilities below the sections are conditional on that selection. The figure validates consistent implementation of the complementary fan operators but does not demonstrate two physical ambient Green's-function branches, upgoing energy, downgoing energy, wave type, or formation velocity.}
 \end{figure}
 
-\takeaway{Both physical lag sides have now been computed correctly and are
-comparable in magnitude. Their significance remains conditional on F--K selection. The v45
-pre-filter test and strict unfiltered controls do not independently corroborate
-the branches as ambient Green's functions, identified modes, or formation
-\(V_P\).}
+\takeaway{Figure 45 is retained as an operator-symmetry and provenance
+diagnostic.  It is not evidence that both physical propagation directions are
+present.  The standard direction-only test is reported in Figure 47.}
 
 
 \section{Ambient F--K injection--recovery calibration (v48)}
@@ -1941,5 +1942,55 @@ requires positive score uplift and a conditional peak within
 input-wavefield observability and conditional visibility after the frozen F--K
 operator. It calibrates processing sensitivity, not the physical identity of
 the uninjected ambient ridge.}
+
+
+\section{Standard directional F--K audit (v49)}
+\figquestion{Is the signed F--K implementation correct, and does the held-out
+ambient wavefield retain a 3.2-km-s\( ^{-1} \) arrival without a velocity
+restriction?}
+
+F--K wavefield separation is standard VSP processing.  The evidentiary issue
+is narrower: signed-quadrant selection separates coordinate directions, while
+a velocity fan additionally imposes an allowed range of slopes.  A fan-filtered
+display is valid, but the same fan cannot supply independent evidence for a
+velocity inside its own passband.
+
+The present code passes one-way plane-wave tests in both coordinate directions:
+each synthetic is retained by the expected signed mask, rejected by the
+opposite mask by more than a factor of eight, and produces the predicted
+correlation-lag sign.  The FFT convention, channel direction, mask sign, and
+lag extraction are therefore validated.
+
+In the held-out real data, the 2.5--4.5~km~s\( ^{-1} \) production fan gives
+a reflected-branch correlation of 0.995, whereas standard
+direction-only selection gives 0.264.  Direction-only scores
+at 3.2~km~s\( ^{-1} \) are -0.0004 and
+-0.0107.  Before masking, the ratio of total positive- to
+negative-wavenumber power is 1.0039, and the frozen target-corridor
+energy statistic fails both familywise null tests.  Thus the implementation
+distinguishes directions, but the current held-out data do not retain an
+independent 3.2-km-s\( ^{-1} \) correlation after the velocity fan is removed.
+
+This distinction matches standard practice.  Lellouch et al. (2019,
+\href{https://doi.org/10.1029/2019JB017533}{doi:10.1029/2019JB017533})
+used F--K filtering on a known earthquake S-phase gather after P-moveout
+correction, passing upgoing events below 11~km~s\( ^{-1} \) and suppressing
+flattened P energy and downgoing free-surface reflections.  Their ambient
+interferometry used a top-channel virtual source, receivers at 50-m increments,
+one-day correlations, and running-absolute-mean normalization; signed F--K
+filtering of the ambient correlations was not the reported step.  Rao and Wang
+(2016, \href{https://doi.org/10.1088/1742-2132/13/3/412}{doi:10.1088/1742-2132/13/3/412})
+likewise describe F--K separation as standard while documenting overlap of
+opposite wavefields near zero wavenumber and limitations of a simple fan mask.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.99\linewidth]{ambient_transfer/fk_directional_audit_v1/ambient_fk_directional_audit_v1.png}
+\caption{\textbf{Standard directional F--K audit of the ambient SAFOD workflow.} (a) Mean 5--20~Hz pre-filter F--K power from 300 one-minute Nano records before any signed or velocity mask; total positive- and negative-wavenumber powers have ratio 1.0039. (b,c) Held-out coordinate-direction sections after signed-quadrant selection only, with no apparent-velocity restriction; dashed trajectories mark 3.2~km~s\( ^{-1} \) solely as a fixed diagnostic. (d) Correlation between complementary branches after reflecting one lag axis, shown for the development date and seven held-out dates. The held-out mirror correlation is 0.995 for the frozen 2.5--4.5~km~s\( ^{-1} \) fan but 0.264 for direction-only selection. (e) Held-out moveout scores for the direction-only branches; fixed 3.2-km-s\( ^{-1} \) values are -0.0004 and -0.0107, providing no independent recovery of that trajectory. (f) Summary of balanced pre-filter directional power, near-mirror fan response, and non-mirrored direction-only response. One-way synthetic tests independently verify mask sign and lag conventions. The audit supports the correctness of the F--K implementation but classifies the earlier narrow-fan ambient ridge as operator-conditioned rather than as an independently demonstrated physical wave.}
+\end{figure}
+
+\takeaway{The filtering code is correct.  The current ambient 3.1--3.2-km-s
+\( ^{-1} \) interpretation is not.  It remains a selected visualization until
+an unmasked or independently constrained method detects the same event.}
 
 \end{document}

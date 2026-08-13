@@ -1,0 +1,95 @@
+{
+  "workflow_version": "ambient_fk_directional_audit_v1",
+  "question": "Does standard signed-quadrant F-K separation independently retain the 3.2 km/s ambient correlation without a velocity fan?",
+  "inputs": {
+    "mask_sensitivity": "ambient_transfer/fk_mask_sensitivity_v2/ambient_fk_mask_sensitivity_v2.npz",
+    "pre_filter_energy": "ambient_transfer/fk_prefilter_energy_v1_n300_r20/fk_prefilter_energy_v1_aggregate.npz",
+    "signed_lag_aggregate": "ambient_transfer/signed_lag_v2/seasonal_signed_fk_v2_aggregate.npz"
+  },
+  "standard_operator": "5--20 Hz signed F-K quadrant selection with no apparent-velocity restriction; branches are reconstructed and correlated independently",
+  "real_pre_filter_direction_balance": {
+    "positive_to_negative_total_power_ratio": 1.003882238938935,
+    "signed_asymmetry": -0.0019373588245339165,
+    "target_enrichment_passes_both_familywise_nulls": false
+  },
+  "mask_comparisons": {
+    "development": {
+      "production_2p5_4p5": {
+        "mirror_correlation": 0.9999143768473213,
+        "mirror_relative_rms": 0.013131792407444384,
+        "mirrored_norm_ratio_positive_to_negative": 1.0010123384049365,
+        "negative_score_3200": 0.2800047774691285,
+        "positive_score_3200": 0.28235050696583425
+      },
+      "narrow_2p8_3p8": {
+        "mirror_correlation": 0.9999423356969536,
+        "mirror_relative_rms": 0.010952566630981401,
+        "mirrored_norm_ratio_positive_to_negative": 1.002094638495049,
+        "negative_score_3200": 0.7231097746849103,
+        "positive_score_3200": 0.7240830274580985
+      },
+      "broad_2p0_5p5": {
+        "mirror_correlation": 0.9998226026691651,
+        "mirror_relative_rms": 0.018913157021639766,
+        "mirrored_norm_ratio_positive_to_negative": 1.001535420054027,
+        "negative_score_3200": 0.013396222468469443,
+        "positive_score_3200": 0.015162643313646425
+      },
+      "direction_only": {
+        "mirror_correlation": 0.9950278708760695,
+        "mirror_relative_rms": 0.10091319224592696,
+        "mirrored_norm_ratio_positive_to_negative": 1.011337649128055,
+        "negative_score_3200": -0.0014004177024457343,
+        "positive_score_3200": -0.001983010135331728
+      }
+    },
+    "held_out": {
+      "production_2p5_4p5": {
+        "mirror_correlation": 0.9946076732027329,
+        "mirror_relative_rms": 0.10470768715662436,
+        "mirrored_norm_ratio_positive_to_negative": 1.0090356048364353,
+        "negative_score_3200": 0.26967600633858313,
+        "positive_score_3200": 0.2668835164750041
+      },
+      "narrow_2p8_3p8": {
+        "mirror_correlation": 0.9940255033872716,
+        "mirror_relative_rms": 0.10932192091353904,
+        "mirrored_norm_ratio_positive_to_negative": 1.000188601172618,
+        "negative_score_3200": 0.7034885475188586,
+        "positive_score_3200": 0.6908919033818224
+      },
+      "broad_2p0_5p5": {
+        "mirror_correlation": 0.9806096951675766,
+        "mirror_relative_rms": 0.1982138981724501,
+        "mirrored_norm_ratio_positive_to_negative": 1.0103437114723715,
+        "negative_score_3200": 0.01006194708928565,
+        "positive_score_3200": 0.015666479996320086
+      },
+      "direction_only": {
+        "mirror_correlation": 0.26373104725141805,
+        "mirror_relative_rms": 1.4088919074494684,
+        "mirrored_norm_ratio_positive_to_negative": 1.2906875013058672,
+        "negative_score_3200": -0.00040463463951997676,
+        "positive_score_3200": -0.010732430739538211
+      }
+    }
+  },
+  "legacy_figure45_mirror_check": {
+    "mirror_correlation": 0.9958752323241594,
+    "mirror_relative_rms": 0.09143834203940521,
+    "mirrored_norm_ratio_positive_to_negative": 1.0072101809689502
+  },
+  "decision": {
+    "signed_fk_implementation_validated_by_one_way_synthetics": true,
+    "standard_direction_only_filter_shows_independent_3p2_km_s_result": false,
+    "production_velocity_fan_result_is_operator_conditioned": true,
+    "reason": "Held-out direction-only 3.2 km/s scores are near zero, while the velocity-fan branches become almost exact lag mirrors."
+  },
+  "key_values": {
+    "held_out_production_mirror_correlation": 0.9946076732027329,
+    "held_out_direction_only_mirror_correlation": 0.26373104725141805,
+    "held_out_direction_only_negative_score_3200": -0.00040463463951997676,
+    "held_out_direction_only_positive_score_3200": -0.010732430739538211
+  },
+  "interpretive_boundary": "F-K filtering remains a valid wavefield-separation operation. The present real-data test does not independently validate a 3.2 km/s ambient arrival when the apparent-velocity fan is removed."
+}
