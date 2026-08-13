@@ -51,6 +51,15 @@ SUPPLEMENT = [
     ("S4", "Solid-Earth-tide regression, all 46 bursts",
      "deep_dvv_tidal_fit_allbursts.png",
      "deep_dvv_tidal_fit.py --population allbursts"),
+    ("S5", "Virtual source at 149 m: correlation vs deconvolution",
+     "../figures/awd_2026/plain_look/virtual_source/vs_fig03_moveout_and_wiggles.png",
+     "awd_virtual_source.py"),
+    ("S6", "Virtual-source correlation gathers, four reference channels",
+     "../figures/awd_2026/plain_look/virtual_source/vs_fig01_correlation_gathers.png",
+     "awd_virtual_source.py"),
+    ("S7", "Virtual-source deconvolution gathers, four reference channels",
+     "../figures/awd_2026/plain_look/virtual_source/vs_fig02_deconvolution_gathers.png",
+     "awd_virtual_source.py"),
 ]
 
 

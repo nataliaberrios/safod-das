@@ -25,6 +25,9 @@ the dependency order.
 | S2 | Nano repeatability, full hierarchy | `s2_nano_hierarchical_repeatability.png` (0.8 MB) | `nano_hierarchical_repeatability.py` |
 | S3 | Solid-Earth-tide regression, held-out bursts | `s3_deep_dvv_tidal_fit.png` (0.3 MB) | `deep_dvv_tidal_fit.py` |
 | S4 | Solid-Earth-tide regression, all 46 bursts | `s4_deep_dvv_tidal_fit_allbursts.png` (0.3 MB) | `deep_dvv_tidal_fit.py --population allbursts` |
+| S5 | Virtual source at 149 m: correlation vs deconvolution | `s5_vs_fig03_moveout_and_wiggles.png` (1.3 MB) | `awd_virtual_source.py` |
+| S6 | Virtual-source correlation gathers, four reference channels | `s6_vs_fig01_correlation_gathers.png` (1.4 MB) | `awd_virtual_source.py` |
+| S7 | Virtual-source deconvolution gathers, four reference channels | `s7_vs_fig02_deconvolution_gathers.png` (1.5 MB) | `awd_virtual_source.py` |
 
 ## Still to make
 
