@@ -58,7 +58,7 @@ REFERENCE_VELOCITY_M_S = 3200.0
 VELOCITY_GRID_M_S = np.arange(1500.0, 6000.1, 25.0)
 VALID_NULLS = ("ordered", "white_noise", "channel_permutation")
 VALID_SPECTRAL_MODES = ("cross_correlation", "source_power_stabilized")
-WORKFLOW_VERSION = "lellouch2019_exact_stack_v2"
+WORKFLOW_VERSION = "lellouch2019_exact_stack_v3"
 
 
 def corrected_path(value: str | Path) -> Path:
@@ -257,16 +257,20 @@ def cross_spectra_for_starts(
     local_starts: np.ndarray,
     fs: float,
     geom: dict[str, np.ndarray],
-    spectral_mode: str,
-    waterlevel: float,
-) -> tuple[np.ndarray, np.ndarray, int]:
-    """Accumulate central-receiver and published R±10 cross spectra."""
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, int]:
+    """Accumulate cross spectra and source power before any Eq. 6 ratio.
+
+    Equation 6 is a ratio of an averaged correlation to the source power.
+    Therefore source-power stabilization is applied only after window sums are
+    combined, never independently inside each 30 s window.
+    """
     window_samples = int(round(WINDOW_SECONDS * fs))
     n_fft = 1 << int(math.ceil(math.log2(2 * window_samples - 1)))
     n_frequency = n_fft // 2 + 1
     n_targets = len(geom["centers"])
     central_sum = np.zeros((n_targets, n_frequency), dtype=np.complex128)
     neighbor_sum = np.zeros_like(central_sum)
+    source_power_sum = np.zeros(n_frequency, dtype=np.float64)
     source_local = int(geom["source_local"])
     center_local = geom["center_local"]
     neighbor_local = geom["neighbor_local"]
@@ -280,16 +284,10 @@ def cross_spectra_for_starts(
         neighbor_spectrum = np.fft.rfft(neighbors, n=n_fft, axis=1)
         cross_central = np.conj(source_spectrum)[None, :] * central_spectrum
         cross_neighbors = np.conj(source_spectrum)[None, :] * neighbor_spectrum
-        if spectral_mode == "source_power_stabilized":
-            power = np.abs(source_spectrum) ** 2
-            denominator = np.maximum(
-                power, waterlevel * max(float(np.max(power)), np.finfo(float).eps)
-            )
-            cross_central /= denominator[None, :]
-            cross_neighbors /= denominator[None, :]
         central_sum += cross_central
         neighbor_sum += cross_neighbors
-    return central_sum, neighbor_sum, n_fft
+        source_power_sum += np.abs(source_spectrum) ** 2
+    return central_sum, neighbor_sum, source_power_sum, n_fft
 
 
 def chunk_tag(args: argparse.Namespace) -> str:
@@ -331,8 +329,16 @@ def run_chunk(args: argparse.Namespace) -> None:
         args.seed,
         args.realization,
     )
+    # Common-mode removal is an explicitly labelled sensitivity, not a step
+    # reported by Lellouch et al. For that test, estimate the instantaneous
+    # median from the complete acquisition rather than the sparse plotted rows.
+    if args.common_mode:
+        read_channels = np.arange(int(metadata["number_of_channels"]), dtype=int)
+    else:
+        read_channels = mapped_channels
     central_total = None
     neighbor_total = None
+    source_power_total = None
     total_windows = 0
     total_floored = 0.0
     blocks_used = 0
@@ -353,14 +359,14 @@ def run_chunk(args: argparse.Namespace) -> None:
                 raise FileNotFoundError(path)
             if args.null_method == "white_noise":
                 piece = white_noise_file(
-                    (len(mapped_channels), record_samples),
+                    (len(read_channels), record_samples),
                     args.seed,
                     args.date,
                     file_index,
                     args.realization,
                 )
             else:
-                piece = read_file_channels(path, mapped_channels)
+                piece = read_file_channels(path, read_channels)
             if piece.shape[1] != record_samples:
                 raise ValueError(f"Unexpected record shape for {path}: {piece.shape}")
             pieces.append(piece)
@@ -370,6 +376,10 @@ def run_chunk(args: argparse.Namespace) -> None:
         normalized, floored_fraction = strain_rate_and_ram_continuous(
             raw, fs, args.ram_seconds, args.common_mode
         )
+        if args.common_mode:
+            # Rows are physical channel order 0..N-1; restore the logical
+            # Figure 7c geometry after subtracting the all-channel median.
+            normalized = normalized[mapped_channels]
         core_sample_first = block_first * record_samples
         core_sample_stop = block_stop * record_samples
         global_starts = np.arange(
@@ -383,22 +393,22 @@ def run_chunk(args: argparse.Namespace) -> None:
             local_starts + window_samples > normalized.shape[1]
         ):
             raise RuntimeError("Context halo is insufficient for assigned windows")
-        central, neighbors, this_n_fft = cross_spectra_for_starts(
+        central, neighbors, source_power, this_n_fft = cross_spectra_for_starts(
             normalized,
             local_starts,
             fs,
             geom,
-            args.spectral_mode,
-            args.waterlevel,
         )
         if central_total is None:
             central_total = np.zeros_like(central)
             neighbor_total = np.zeros_like(neighbors)
+            source_power_total = np.zeros_like(source_power)
             n_fft = this_n_fft
         if this_n_fft != n_fft:
             raise RuntimeError("FFT length changed within chunk")
         central_total += central
         neighbor_total += neighbors
+        source_power_total += source_power
         total_windows += len(local_starts)
         total_floored += floored_fraction
         blocks_used += 1
@@ -412,8 +422,10 @@ def run_chunk(args: argparse.Namespace) -> None:
     output = chunk_path(args, core_first, core_stop - core_first)
     np.savez_compressed(
         output,
+        workflow_version=np.asarray(WORKFLOW_VERSION),
         central_cross_spectrum_sum=central_total,
         neighbor_cross_spectrum_sum=neighbor_total,
+        source_power_spectrum_sum=source_power_total,
         n_windows=np.asarray(total_windows),
         n_fft=np.asarray(n_fft),
         fs_hz=np.asarray(fs),
@@ -429,7 +441,11 @@ def run_chunk(args: argparse.Namespace) -> None:
         ram_samples=np.asarray(odd_ram_samples(args.ram_seconds, fs)),
         denominator_floored_fraction=np.asarray(total_floored / blocks_used),
         common_mode=np.asarray(args.common_mode),
+        common_mode_channel_count=np.asarray(
+            len(read_channels) if args.common_mode else 0
+        ),
         spectral_mode=np.asarray(args.spectral_mode),
+        source_power_waterlevel=np.asarray(args.waterlevel),
         null_method=np.asarray(args.null_method),
         realization=np.asarray(args.realization),
     )
@@ -451,6 +467,50 @@ def correlation_from_spectrum(
     )
     lags = np.arange(-maximum_lag, maximum_lag + 1, dtype=float) / fs
     return lags, correlation
+
+
+def prepare_aggregate_spectra(
+    central_sum: np.ndarray,
+    neighbor_sum: np.ndarray,
+    source_power_sum: np.ndarray | None,
+    n_windows: int,
+    n_fft: int,
+    fs: float,
+    spectral_mode: str,
+    waterlevel: float,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, float]:
+    """Average first, then optionally apply a stabilized Equation-6 ratio."""
+    central_average = central_sum / float(n_windows)
+    neighbor_average = neighbor_sum / float(n_windows)
+    if spectral_mode == "cross_correlation":
+        return (
+            central_average,
+            neighbor_average,
+            np.empty(0, dtype=float),
+            np.empty(0, dtype=float),
+            0.0,
+        )
+    if source_power_sum is None:
+        raise RuntimeError("Equation-6 mode requires summed source power")
+    source_power_average = source_power_sum / float(n_windows)
+    frequencies = np.fft.rfftfreq(n_fft, d=1.0 / fs)
+    output_band = (
+        (frequencies >= OUTPUT_BAND_HZ[0])
+        & (frequencies <= OUTPUT_BAND_HZ[1])
+    )
+    reference = max(
+        float(np.max(source_power_average[output_band])), np.finfo(float).eps
+    )
+    floor = float(waterlevel) * reference
+    denominator = np.maximum(source_power_average, floor)
+    floored_fraction = float(np.mean(source_power_average[output_band] <= floor))
+    return (
+        central_average / denominator[None, :],
+        neighbor_average / denominator[None, :],
+        source_power_average,
+        denominator,
+        floored_fraction,
+    )
 
 
 def final_bandpass(correlation: np.ndarray, fs: float) -> np.ndarray:
@@ -554,12 +614,16 @@ def aggregate(args: argparse.Namespace) -> None:
         )
     central_sum = None
     neighbor_sum = None
+    source_power_sum = None
     n_windows = 0
     core_files = 0
     metadata_reference = None
     for path in files:
         with np.load(path, allow_pickle=False) as data:
             metadata = {
+                "chunk_workflow_version": str(data["workflow_version"])
+                if "workflow_version" in data.files
+                else "lellouch2019_exact_stack_v2",
                 "fs_hz": float(data["fs_hz"]),
                 "dx_m": float(data["dx_m"]),
                 "n_fft": int(data["n_fft"]),
@@ -569,7 +633,13 @@ def aggregate(args: argparse.Namespace) -> None:
                 "ram_seconds": float(data["ram_seconds"]),
                 "ram_samples": int(data["ram_samples"]),
                 "common_mode": bool(data["common_mode"]),
+                "common_mode_channel_count": int(data["common_mode_channel_count"])
+                if "common_mode_channel_count" in data.files
+                else 0,
                 "spectral_mode": str(data["spectral_mode"]),
+                "source_power_waterlevel": float(data["source_power_waterlevel"])
+                if "source_power_waterlevel" in data.files
+                else float(args.waterlevel),
                 "null_method": str(data["null_method"]),
                 "realization": int(data["realization"]),
             }
@@ -577,17 +647,41 @@ def aggregate(args: argparse.Namespace) -> None:
                 metadata_reference = metadata
                 central_sum = np.zeros_like(data["central_cross_spectrum_sum"])
                 neighbor_sum = np.zeros_like(data["neighbor_cross_spectrum_sum"])
+                if metadata["spectral_mode"] == "source_power_stabilized":
+                    if "source_power_spectrum_sum" not in data.files:
+                        raise RuntimeError(
+                            f"Equation-6 chunk lacks source power: {path}"
+                        )
+                    source_power_sum = np.zeros_like(data["source_power_spectrum_sum"])
             elif metadata != metadata_reference:
                 raise ValueError(f"Chunk metadata mismatch at {path}")
             central_sum += data["central_cross_spectrum_sum"]
             neighbor_sum += data["neighbor_cross_spectrum_sum"]
+            if metadata["spectral_mode"] == "source_power_stabilized":
+                source_power_sum += data["source_power_spectrum_sum"]
             n_windows += int(data["n_windows"])
             core_files += int(data["used_core_files"])
     fs = metadata_reference["fs_hz"]
     n_fft = metadata_reference["n_fft"]
     offsets = np.asarray(metadata_reference["offsets_m"], dtype=float)
-    lags, central = correlation_from_spectrum(central_sum, n_windows, n_fft, fs)
-    _, neighbors = correlation_from_spectrum(neighbor_sum, n_windows, n_fft, fs)
+    (
+        central_spectrum,
+        neighbor_spectrum,
+        source_power_average,
+        source_power_denominator,
+        equation6_floored_fraction,
+    ) = prepare_aggregate_spectra(
+        central_sum,
+        neighbor_sum,
+        source_power_sum,
+        n_windows,
+        n_fft,
+        fs,
+        metadata_reference["spectral_mode"],
+        metadata_reference["source_power_waterlevel"],
+    )
+    lags, central = correlation_from_spectrum(central_spectrum, 1, n_fft, fs)
+    _, neighbors = correlation_from_spectrum(neighbor_spectrum, 1, n_fft, fs)
     central_filtered = final_bandpass(central, fs)
     neighbors_filtered = final_bandpass(neighbors, fs)
     causal_scores = moveout_scores(neighbors_filtered, lags, offsets, sign=1.0)
@@ -630,6 +724,8 @@ def aggregate(args: argparse.Namespace) -> None:
         center_channels=np.asarray(metadata_reference["center_channels"]),
         central_receiver_correlation=central_filtered,
         r_plus_minus_10_correlation=neighbors_filtered,
+        source_power_spectrum_average=source_power_average,
+        source_power_denominator=source_power_denominator,
         velocity_grid_m_s=VELOCITY_GRID_M_S,
         causal_moveout_scores=causal_scores,
         acausal_moveout_scores=acausal_scores,
@@ -639,6 +735,7 @@ def aggregate(args: argparse.Namespace) -> None:
     )
     report = {
         "workflow_version": WORKFLOW_VERSION,
+        "chunk_workflow_version": metadata_reference["chunk_workflow_version"],
         "citation": CITATION,
         "bensen_citation": BENSEN_CITATION,
         "date": args.date,
@@ -659,8 +756,22 @@ def aggregate(args: argparse.Namespace) -> None:
         ),
         "ram_samples": metadata_reference["ram_samples"],
         "common_mode_removal": args.common_mode,
+        "common_mode_channel_count": metadata_reference[
+            "common_mode_channel_count"
+        ],
         "common_mode_status": "not reported; sensitivity only",
         "spectral_mode": args.spectral_mode,
+        "source_power_waterlevel": metadata_reference[
+            "source_power_waterlevel"
+        ],
+        "equation6_denominator_floored_fraction_5_20_hz": (
+            equation6_floored_fraction
+        ),
+        "equation6_order": (
+            "average cross spectra and source power over all windows, then divide"
+            if args.spectral_mode == "source_power_stabilized"
+            else "not applied"
+        ),
         "spectral_mode_status": (
             "reported cross-correlation baseline"
             if args.spectral_mode == "cross_correlation"
@@ -749,8 +860,8 @@ def synthetic_validation(args: argparse.Namespace) -> None:
         normalized.shape[1] - int(WINDOW_SECONDS * fs) + 1,
         int(STEP_SECONDS * fs),
     )
-    central, neighbors, n_fft = cross_spectra_for_starts(
-        normalized, starts, fs, geom, "cross_correlation", 1.0e-3
+    central, neighbors, _, n_fft = cross_spectra_for_starts(
+        normalized, starts, fs, geom
     )
     lags, section = correlation_from_spectrum(neighbors, len(starts), n_fft, fs)
     expected = geom["offsets_m"] / velocity
