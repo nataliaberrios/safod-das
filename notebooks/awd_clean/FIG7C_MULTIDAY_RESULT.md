@@ -101,6 +101,48 @@ Four times the data does not move the statistic toward its threshold — it sits
 further from significance than the single best day. That is the behaviour of
 noise, not of an arrival too weak to see in 24 hours.
 
+## Day-pair survey — why a p < 0.05 here is not a reproduction
+
+Stacking the two days that individually came closest (2024-11-30 and 2024-12-20)
+returns p = 0.039. That is not a reproduction, and the reason it is not is worth
+recording because it is the exact shape of the mistake this whole thread exists
+to avoid.
+
+Those two days were chosen *because* they had the lowest p values. Running all
+ten pairs of the five usable 500 Hz days (`_fig7c_pair_survey.py`, output in
+`fig7c_pair_survey.txt`, 2,000-permutation null):
+
+| pair | peak | at (m/s) | p | causal/acausal at 3,200 |
+|---|---:|---:|---:|---:|
+| 06-17 + 06-26 | 1.643 | 5925 | 0.8251 | 0.93 |
+| 06-17 + 11-30 | 2.463 | 5775 | 0.5582 | 1.22 |
+| 06-17 + 12-20 | 2.521 | 5775 | 0.5302 | 1.23 |
+| 06-17 + 02-24 | 1.980 | 5925 | 0.7466 | 1.19 |
+| 06-26 + 11-30 | 1.618 | 4850 | 0.7851 | 0.89 |
+| 06-26 + 12-20 | 1.661 | 4800 | 0.8016 | 0.91 |
+| 06-26 + 02-24 | 1.379 | 5925 | 0.5607 | 0.86 |
+| **11-30 + 12-20** | 6.373 | 5850 | **0.0390** | 0.97 |
+| 11-30 + 02-24 | 5.735 | 5900 | 0.3188 | 1.01 |
+| **12-20 + 02-24** | 5.937 | 5850 | **0.0165** | 1.01 |
+
+Two of ten fall below 0.05 against 0.5 expected by chance — binomial P(≥2) ≈ 0.086,
+and the pairs share days so they are not independent, making the real correction
+weaker still. Selecting the best pair of ten and quoting its uncorrected p is not
+a result.
+
+**The decisive objection is not multiplicity, it is velocity.** Every pair that
+reaches p < 0.05 peaks at **5,850–5,900 m/s** with causal/acausal of 0.97–1.01. A
+peak at the top edge of the scan is a *flat-moveout* feature — energy arriving at
+every receiver essentially simultaneously across 700 m — which is the signature of
+common-mode or instrumental structure, not a propagating body wave. Figure 7c is a
+specific claim: a packet near 3,200 m/s with the causal side dominant. At 3,200 m/s
+the score is consistently about half the peak and the causal side never dominates.
+
+So this data does contain a statistically detectable coherent component, and it is
+emphatically not the arrival the paper reports. `ambient_lellouch2019_multiday_stack.py`
+now requires all three conditions — p < 0.05, peak inside the 2,500–4,000 m/s fan,
+and causal dominance — before it will call anything a reproduction.
+
 ## Conclusion
 
 Figure 7c does not reproduce on the 2024–2025 archive, on the paper's own

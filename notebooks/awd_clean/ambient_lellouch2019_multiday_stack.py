@@ -29,6 +29,7 @@ not part of that metadata, so a genuine mismatch still raises.
 Output: ambient_lellouch2019_multiday_stack.{npz,png,txt}
 """
 from __future__ import annotations
+import os
 
 import glob
 import re
@@ -50,7 +51,7 @@ from ambient_lellouch2019_exact_stack import (  # noqa: E402
     receiver_order_null,
 )
 
-STEM = HERE / "ambient_lellouch2019_multiday_stack"
+STEM = HERE / ("ambient_lellouch2019_multiday_stack" + (os.environ.get("MDS_TAG","") or ""))
 DIRS = [
     HERE / "ambient_transfer" / "lellouch2019_exact_stack",
     HERE / "ambient_transfer" / "lellouch2019_exact_stack_days",
@@ -59,6 +60,9 @@ PATTERN = "chunk_*_src23_ram0p1_cross_correlation_ordered_r0_start*_n0060.npz"
 V_REF = 3200.0
 NULL_COUNT = 10000
 SEED = 20260814
+import os
+ONLY = [d for d in os.environ.get('MDS_DATES','').split(',') if d]
+TAG = os.environ.get('MDS_TAG','')
 
 
 def collect():
@@ -86,11 +90,22 @@ def main():
     say("")
     for d in sorted(by_date):
         say("  %s : %d hourly chunks" % (d, len(by_date[d])))
-    dates = [d for d in sorted(by_date) if len(by_date[d]) == 24]
+    # A day is usable if its hourly chunks form a contiguous run starting at
+    # hour 0.  The count need not be 24: days analysed over their leading
+    # contiguous block (--continuous-prefix) legitimately have fewer, e.g.
+    # 2024-11-30 has 21 hours, and excluding them on count alone would drop the
+    # richest day in the archive.
+    dates = []
     for d in sorted(by_date):
-        if len(by_date[d]) != 24:
-            say("  skipping %s (incomplete: %d/24)" % (d, len(by_date[d])))
-            dates.remove(d) if d in dates else None
+        starts = sorted(int(re.search(r"start(\d+)", f.name).group(1)) for f in by_date[d])
+        expected = list(range(0, 60 * len(starts), 60))
+        if starts == expected:
+            dates.append(d)
+            if len(starts) != 24:
+                say("  %s : %d contiguous hours from hour 0 (partial day, accepted)"
+                    % (d, len(starts)))
+        else:
+            say("  skipping %s (hourly chunks not contiguous from hour 0)" % d)
 
     # The archive is NOT homogeneous in acquisition rate: 2024-05-11 was recorded
     # at 5000 Hz (n_fft 524288, ram_samples 501) against 500 Hz on the other days.
@@ -106,6 +121,12 @@ def main():
         mark = "STACKED" if key == dominant else "EXCLUDED, different acquisition rate"
         say("  fs %.0f Hz, n_fft %d : %s  -> %s" % (key[0], key[1], ", ".join(ds), mark))
     dates = sorted(rates[dominant])
+    if ONLY:
+        missing = [d for d in ONLY if d not in dates]
+        if missing:
+            raise SystemExit("requested dates unavailable at the dominant rate: %s" % missing)
+        dates = sorted(ONLY)
+        say("  restricted by request to: %s" % ", ".join(dates))
     if not dates:
         raise SystemExit("no complete days")
 
@@ -169,8 +190,25 @@ def main():
     say("  detectability: peak / null95 = %.2f  (must reach 1.00)"
         % (peak / max(float(np.percentile(nulls, 95)), 1e-30)))
     say("")
-    if p < 0.05:
-        say("  VERDICT: the 3200 m/s arrival IS recovered by the coherent multi-day stack.")
+    # A small p alone is NOT a reproduction. Figure 7c is a specific claim: a
+    # packet near 3200 m/s with the causal side dominating. A significant peak at
+    # the top edge of the scan is a flat-moveout feature arriving at every
+    # receiver at once -- common-mode structure, not a propagating wave. All
+    # three conditions must hold.
+    near_3200 = 2500.0 <= vpeak <= 4000.0
+    causal_dominates = (c32 / a32) > 1.0 if a32 else False
+    if p < 0.05 and near_3200 and causal_dominates:
+        say("  VERDICT: a ~3200 m/s causal arrival IS recovered (p < 0.05, peak in the"
+            " 2500-4000 m/s fan, causal side dominant).")
+    elif p < 0.05:
+        say("  VERDICT: NOT a reproduction despite p = %.4f." % p)
+        say("    peak at %.0f m/s %s the 2500-4000 m/s fan" %
+            (vpeak, "is inside" if near_3200 else "is OUTSIDE"))
+        say("    causal/acausal at 3200 m/s = %.2f %s"
+            % (c32 / a32 if a32 else float("nan"),
+               "(dominant)" if causal_dominates else "(NOT dominant, paper requires > 1)"))
+        say("    A significant flat-moveout peak is common-mode structure, not"
+            " Figure 7c.")
     else:
         say("  VERDICT: not recovered. Coherently stacking %.0f hours -- the most"
             % (core_files / 60.0))
