@@ -1,200 +1,143 @@
-# Lellouch Figure 7c on the 2024–2025 archive — status
+# Lellouch Figure 7c on the 2024–2025 archive — authoritative status
 
-> **WITHDRAWN PENDING A PAPER-FAITHFUL RERUN (2026-08-14).** The negative
-> verdict below was produced by a pipeline that (i) reset differentiation and
-> running-absolute-mean normalization at every one-minute file boundary,
-> (ii) omitted the 15-s windows spanning those boundaries (4,320 windows rather
-> than 5,759 for a contiguous day), (iii) applied an unreported linear detrend,
-> (iv) filtered each input trace before correlation, and (v) defaulted to
-> common-mode subtraction and per-trace spectral whitening, neither of which is
-> reported for ambient interferometry in section 4.1 of Lellouch et al. (2019).
-> Its figures remain provenance for a legacy attempt, but its scientific verdict
-> must not be cited. The authoritative result will be written only after the
-> corrected baseline and matched nulls complete.
+Updated 2026-08-14. This document supersedes every earlier Figure 7c verdict in
+this repository.
 
-Written 2026-08-14. Where numbers here disagree with an older notebook cell or a
-figure caption, this file wins.
+## Question and answer
 
-**Question.** Can Lellouch et al. (2019) Figure 7c — the top-source ambient
-correlation gather showing "a clear wave packet with an apparent velocity of about
-3,200 m/s" — be reproduced from the 2024–2025 continuous SAFOD main-hole archive?
+**Question.** Does the unfiltered one-day ambient-interferometry calculation
+reported for Figure 7c of Lellouch et al. (2019) recover an ordered,
+approximately 3.2 km/s packet on a complete day from the 2024–2025 SAFOD
+main-hole DAS archive?
 
----
+**Answer for 20 December 2024: no.** The corrected baseline does not contain a
+statistically significant receiver-ordered 3.2 km/s moveout. Its scan maximum is
+at 5.85 km/s, near the flat-moveout edge of the search, and is below the 95th
+percentile of a receiver-order scan-max null (score 6.13 versus 6.32;
+familywise p = 0.147). At 3.2 km/s the causal and acausal scores are comparable
+(2.75 and 2.83). Most decisively, permuting receiver channels before
+preprocessing leaves the gather almost unchanged (flattened waveform
+correlation 0.9976).
 
-## 1. Verdict
+This is a matched-day negative reproduction. It is not evidence that ambient
+interferometry fails for the full archive, and it is not evidence that F–K
+filtering is invalid.
 
-**No, and the reason is the input, not the processing. The wavefield property the
-method requires is absent from this archive: there is no net downgoing energy in
-the body-wave velocity fan on any of eight days spanning ten months.**
+## Exact input and baseline
 
-This is a data-limited negative result, not a refutation of Lellouch et al. and
-not a failure of the pipeline. Two independent lines support it, and the method
-itself is validated against the paper's own released products.
+| Quantity | Value |
+|---|---|
+| Archive index | `/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv` |
+| UTC day | 2024-12-20 |
+| Raw HDF5 files | 1,440 one-minute records |
+| HDF5 dataset | `/Acquisition/Raw[0]/RawData` |
+| Per-file shape | 30,000 time samples × 900 channels |
+| Sampling | 500 Hz; 1.020952344 m channel spacing; 16.335238 m gauge length |
+| Virtual source | channel 23, provisional G0 wellhead estimate |
+| Receiver centers | approximately 50–700 m offset in 50 m increments |
+| Nearby-receiver operator | same source correlated with R−10 through R+10; literal sum |
+| Temporal preprocessing | continuous time derivative; centered 0.1 s running absolute mean |
+| Correlation segmentation | 30 s windows every 15 s, including file-boundary starts |
+| Total windows | exactly 5,759 unique windows |
+| Figure 7c stacking | ordinary unshifted cross-spectrum average and R±10 sum |
+| Final display filter | 5–20 Hz on the full centered correlation, then crop to ±0.35 s |
+| Explicitly absent | F–K filter, detrend, input bandpass, common-mode subtraction, whitening, per-window correlation normalization, imported velocity alignment |
 
-| Claim | Status | Evidence |
-|---|---|---|
-| Figure 7c reproduces on 2024-12-20 | **No** | 1,440 files, 4,320 windows, 4 preprocessing configurations, all p ≥ 0.19 (§3) |
-| The picker and moveout machinery are correct | **Established** | reproduces the paper's Figure 9 profile from its released 7d traces, r = 0.948 (§2) |
-| The 2.5–4 km/s fan carries usable ambient energy | **No** | 3–5 % of 5–20 Hz energy; 81–99 % sits below 1,500 m/s (§4) |
-| That energy is net downgoing, as the paper requires | **No** | downgoing share never exceeds 49.9 % on any day; two summer days favour *upgoing* (§4) |
-| Failure is caused by a missing processing step | **Refuted** | four configurations spanning the three candidate steps all fail identically (§3) |
-| An F–K fan would help | **No — it manufactures the answer** | fails the pre-filter channel-scramble gate; see `Ambient_FK_QC_workflow.ipynb` |
+The 0.1 s RAM duration follows the Bensen et al. (2007) half-maximum-period
+recommendation for a 5–20 Hz band; Lellouch et al. do not report their RAM
+duration. A 5 s sensitivity is therefore retained.
 
-## 2. The method is validated before it is used
+## Full-day branch results
 
-`ambient_lellouch_fig7d_profile.py` applies the paper's picker — three adjacent
-samples with the largest correlation plus quadratic interpolation (Nakata &
-Snieder, 2012) — to Lellouch's own released Figure 7d correlograms in
-`lellouch_traces/`:
+Every branch contains 1,440 files and 5,759 windows. The p value is familywise
+over the predeclared 1.5–6.0 km/s causal velocity scan using 10,000
+receiver-order permutations.
 
-| depth | 50 m | 150 m | 250 m | 450 m | 550 m | 700 m |
-|---|---|---|---|---|---|---|
-| v (m/s) | 2416 | 2803 | 3192 | 3305 | 4061 | 4357 |
+| Branch | Best velocity (m/s) | Score at 3,200 | Acausal at 3,200 | Null 95% scan max | p | Flattened correlation to baseline |
+|---|---:|---:|---:|---:|---:|---:|
+| Paper baseline | 5,850 | 2.752 | 2.831 | 6.324 | 0.1470 | 1.0000 |
+| Source channel 0 | 5,925 | 0.959 | 1.152 | 1.858 | 0.7435 | −0.2853 |
+| RAM 5 s | 5,850 | 2.747 | 2.857 | 6.317 | 0.1083 | 0.9999 |
+| Common mode, median of all 900 channels | 3,650 | 1.000 | 1.046 | 1.115 | 0.9220 | 0.2209 |
+| Stabilized Equation 6 sensitivity | 5,850 | 1.357 | 1.371 | 1.510 | 0.3663 | 0.9723 |
+| IID broadband white noise | 4,550 | 1.025 | 0.943 | 1.377 | 0.3371 | −0.0739 |
+| Measured receivers permuted before preprocessing | 5,850 | 2.698 | 2.490 | 6.068 | 0.9010 | 0.9976 |
 
-Fit `v = 2.548·z + 2354`, r = 0.948, mean 3310 m/s. This reproduces the paper's
-Figure 9 interferometry model, including its own description of it as following
-"a somewhat linear trend", and it recovers the quoted 3,200 m/s as the *depth
-average of a gradient* rather than a single ridge velocity. So the picker works
-and the target is well posed.
+No branch clears α = 0.05. The RAM sensitivity shows that 0.1 versus 5 s does
+not control the baseline result. Common-mode subtraction removes the dominant
+shared structure but does not reveal the target. The declared Equation 6
+sensitivity divides the average cross spectrum by the average source-power
+spectrum after all windows are combined, with a 10⁻³ water level referenced to
+5–20 Hz; it also does not reveal the target.
 
-**Two geometries, two jobs.** Figure 7c (top source, receivers every 50 m) is a
-phase-identification step yielding one average velocity, which is then reused as
-the moveout-correction velocity. The velocity *model* comes from Figure 7d
-(constant 50 m offset). Figure 7c is therefore the correct target for
-"reproduce the gather", and it is shift-free: the paper applies the 3,200 m/s
-shifts only after an average velocity has been obtained by simple stacking.
+## Evaluation of the three disputed claims
 
-## 3. The reproduction attempt
+1. **Common-mode removal is not reported for ambient Figure 7c.** It must not be
+   inserted into the paper baseline. Testing it separately was useful because it
+   confirms that the uncorrected gather is dominated by a receiver-order-
+   insensitive component, but the corrected gather remains nonsignificant.
+2. **Equation 6 is present as a theoretical proportionality, but its estimator
+   is underspecified.** The post-average, water-level-stabilized implementation
+   is one declared sensitivity, not “the exact hidden step.” Its negative result
+   does not prove that every possible source-spectrum estimate is equivalent.
+3. **The R±10 sum is explicitly reported and was missing from the legacy
+   single-pair test.** It is now implemented literally. It is necessary for
+   fidelity but insufficient to recover Figure 7c on this day. Twenty-one
+   neighboring correlations imply at most an ideal amplitude-SNR gain of
+   sqrt(21) ≈ 4.6 for independent noise, not 21×.
 
-`ambient_lellouch_fig7c.py` + `.sbatch`, jobs `38943063`, `38944071`, `38944073`,
-`38944075`. Date 2024-12-20, all 1,440 one-minute files, 4,320 windows of 30 s
-with 15 s overlap, source channel 0, receivers every 50 m to 700 m, R±10
-neighbour stack (simple sum, no shifts), final 5–20 Hz band. **No F–K filter
-anywhere.**
+Thus the original opinion was partly right about the missing nearby-receiver
+sum, wrong to call common-mode subtraction a published requirement, and too
+specific about how Equation 6 must be implemented.
 
-Three steps absent from `ambient_transfer_test.py` were added and then ablated
-independently, so none is assumed:
+## Validation gates
 
-- **strain-rate conversion** — the archive stores `RawDataUnit = 'rad * 2PI/2^16'`,
-  `RawDescription = 'Diversity Processed Phase'`, i.e. phase/strain, so the paper's
-  strain→strain-rate step requires a time derivative. `ambient_transfer_test.preprocess`
-  never differentiates; the production chain has been correlating strain.
-- **R±10 neighbour stack** — the paper states it "is required to extract a clear
-  signal". The cached products correlate single pairs, ~21× less SNR.
-- **spectral normalisation** (eq. 6, `|S(ω)|²`) and **common-mode removal** (median
-  across channels, as in the legacy CC pipeline and the v19-audited notebook).
+The operator passes independent tests before measured-data interpretation:
 
-| common mode | whitening | peak \|score\| | at | score at 3200 m/s | perm. p | causal/acausal |
-|---|---|---|---|---|---|---|
-| on | on | 0.0080 | 5900 | −0.0006 | 0.20 | 0.99 |
-| off | on | 0.0011 | 4700 | −0.0005 | 0.19 | 0.88 |
-| on | off | 0.0073 | 2750 | +0.0023 | 0.34 | 0.97 |
-| off | off | 0.0007 | 5500 | −0.0001 | 0.87 | 0.83 |
+- a known 500 m/s increasing-coordinate synthetic has zero median lag error at
+  the 0.01 s synthetic sampling interval;
+- the summed-receiver and sum-of-correlations R±10 formulations agree to
+  3.28×10⁻⁸ relative error;
+- distributed window ownership yields exactly 5,759 unique full-day starts;
+- the raw white-noise control is broadband and has interchannel correlation
+  −0.00179; and
+- full-correlation filter-then-crop output agrees exactly with an independently
+  constructed reference.
 
-No configuration produces a 3,200 m/s peak, and **none reaches the paper's
-qualitative requirement that the causal side dominate the acausal side** — the
-ratio is ≤ 0.99 everywhere. The receiver-order permutation null is never cleared.
+The last gate was added after visual inspection exposed crop-boundary ringing in
+an earlier provisional white-noise figure. All seven aggregates were then rerun
+with the corrected order.
 
-## 4. Why — the input census
+## Interpretation and next test
 
-`ambient_fk_energy_census.py`, jobs `38944180`, `38945793`. Raw wavefield only:
-strain-rate proxy, 5–20 Hz, 2-D FFT in 30 s windows, energy binned by apparent
-velocity and by the sign of f·k. No correlation, no filtering, no selection.
-Twelve files spread across each day at 2 h intervals.
+The matched day fails because the dominant correlation waveform is insensitive
+to receiver ordering, not because the published nearby-receiver sum was omitted.
+The result at 5.85 km/s should not be interpreted as a high-velocity arrival: it
+lies near the flat-moveout boundary and survives receiver scrambling.
 
-| date | < 1500 m/s | 2.5–4 km/s fan | downgoing | upgoing |
-|---|---|---|---|---|
-| 2024-05-11 | 98.8 % | 0.3 % | 47.3 % | 52.7 % |
-| 2024-06-17 | 80.9 % | 4.5 % | 45.6 % | 54.4 % |
-| 2024-06-26 | 84.8 % | 3.6 % | 46.6 % | 53.4 % |
-| 2024-10-28 | 83.6 % | 4.0 % | 49.8 % | 50.2 % |
-| 2024-11-30 | 81.0 % | 4.9 % | 49.9 % | 50.1 % |
-| 2024-12-20 | 82.8 % | 4.1 % | 49.8 % | 50.2 % |
-| 2025-02-24 | 85.3 % | 3.4 % | 49.6 % | 50.4 % |
-| 2025-03-04 | 87.7 % | 2.9 % | 49.8 % | 50.2 % |
+The clean next test is to freeze this exact operator and apply it to independently
+chosen complete days, followed by a predeclared multi-day convergence sequence.
+That tests whether 20 December 2024 is unrepresentative without retuning the
+processing after seeing each result. F–K-assisted correlations remain a separate
+extension; they require their own matched white-noise and pre-filter
+channel-scramble controls and cannot be used as proof that the unfiltered Figure
+7c calculation succeeded.
 
-The paper attributes Figure 7c's causal dominance to ambient sources at the
-surface sending energy *down* the hole. In this archive that asymmetry does not
-exist on any day: the downgoing share never exceeds 49.9 %, and the two summer
-days mildly favour upgoing.
+## Provenance
 
-**Aperture-resolution check.** 900 channels × 1.0209 m = 918.9 m, so
-Δk = 0.00109 cycles/m and the 3,200 m/s fan sits only 1.4 wavenumber bins from
-k = 0 at 5 Hz. Restricting to 12–20 Hz, where the fan is 4.3–5.7 bins out and
-properly resolved, the fan share *rises slightly* to a 4.56 % mean while the
-downgoing share stays at a 49.6 % maximum. The resolution limit therefore does
-not explain the result.
+| Item | Identifier |
+|---|---|
+| Paper-faithful operator | `awd_clean/ambient_lellouch2019_exact_stack.py` |
+| Hourly full-day matrix | SLURM 38988141; 168/168 tasks completed |
+| First aggregate audit | SLURM 38988173 |
+| Final full-filter-then-crop aggregate audit | SLURM 38993456; 7/7 tasks completed |
+| Paper-operator commit | `9c70083` |
+| Sensitivity-order commit | `cc07080` |
+| Full-lag filter commit | `bb48942` |
+| Advisor notebook | `awd_clean/Ambient_FK_QC_workflow.ipynb`, v8 |
+| Result directory | `awd_clean/ambient_transfer/lellouch2019_exact_stack/` |
 
-`sanity/README.md` states the governing rule: "if there is no body-wave-velocity
-ridge in the wavefield, no CC trick will recover a body-wave Green's function."
-
-## 5. What this is not
-
-- **Not a criticism of Lellouch et al. (2019).** Figure 7c is a real result on
-  2017 data, and this project's own picker reproduces its companion Figure 9.
-- **Not a claim that ambient interferometry fails at SAFOD.** It is a claim about
-  this archive, these eight days, and the 5–20 Hz band.
-- **Not a licence to reach for the F–K fan.** The fan produces the expected
-  geometry from channel-scrambled input; that is why the QC workflow rejects it.
-
-## 5a. Quiet-window selection — tested and closed
-
-The one remaining live avenue was temporal selection: if the body-wave fraction is
-diurnal, a quiet subset might carry the arrival that the 24 h average dilutes. The
-`fig7c` chunks are 60 files each, so each chunk is exactly one UTC hour and the
-test needs no new compute.
-
-Causal/acausal ratio by UTC hour on 2024-12-20 spans **0.93 to 1.08** — scatter
-about 1.0 with no structure. Hour of day is independent of the observable, so this
-is a fair test rather than a conditioned one. Stacking the six most
-causally-dominant hours, selected on the same day, gives ratio 1.02, peak
-\|score\| 0.0082 at 5,900 m/s, score at 3,200 m/s of −0.0001; splitting those six
-into halves gives 1.02 and 1.03. **Selection buys nothing, which is what happens
-when there is nothing to select.**
-
-Note also that the scan's peak sits at ~5,900 m/s — the top of the trial range —
-in 20 of 24 hours. That is the flat-moveout end of the scan, not an arrival.
-
-## 6. What would change the answer
-
-Ordered cheapest first. None is required for the negative result to stand, and the
-cheapest one has already been tried (§5a).
-
-1. ~~**Quiet-window selection.**~~ Tested, negative — see §5a.
-2. **Higher band.** The fan is better resolved and marginally richer above 12 Hz.
-   A 12–30 Hz reproduction departs from the paper but is better matched to the
-   aperture and the 16.335 m gauge length (2017 used 10 m).
-3. **Multi-day stacking.** Eight complete days are cached. Lellouch needed one, and
-   stacking cannot create a directional asymmetry that is absent per-day, so this
-   is a completeness exercise rather than a fix.
-4. **Instrument-transfer comparison.** This acquisition is OptaSense IU,
-   16.335 m gauge, 500 Hz output; the 2017 records are a different instrument.
-   Quantifying that difference converts the negative result into a measurement.
-
-## 7. Related correction
-
-All 1,162 cached `ambient_transfer/transfer_*_start*_n*.npz` chunks were written
-2026-08-03 16:07 → 2026-08-04 18:14, **before** the negative-lag fix committed in
-`0931988` on 2026-08-05 (documented in `ambient_signed_lag_audit_v43.md`). Verified
-empirically: the old routine's autocorrelation is asymmetric by 0.025 where it must
-be 0, and its negative lags correlate with correct ones at −0.0017 while positive
-lags correlate at 1.0000. **Zero chunks were regenerated after the fix**, so any
-acausal quantity read from that cache is void; positive lags are unaffected. The
-F–K null products are *not* affected — `ambient_fk_full_pipeline_null_v2.py`
-reprocesses from raw HDF5.
-
-Separately, the aggregated `transfer_seasonal_<date>.npz` products retain only
-`top_stack`; `fixed_stack` is dropped at aggregation and so the Figure 7d
-observable was never available downstream.
-
-## 8. Provenance
-
-| Script | Product | Jobs |
-|---|---|---|
-| `ambient_lellouch_fig7c.py`, `.sbatch` | `ambient_transfer/lellouch_fig7c/` | 38943063, 38944071/73/75 |
-| `ambient_fk_energy_census.py` | `ambient_fk_energy_census_<date>.{npz,png,txt}` | 38944180, 38945793 |
-| `ambient_lellouch_fig7d_profile.py` | `ambient_lellouch_fig7d_profile.{npz,png,txt}` | run interactively |
-
-`38945793_0` (2024-05-11) was OOM-killed at 32 GB after printing its summary; its
-numbers above are recovered from `logs/fkcensall_38945793_0.out` and it has no
-`.npz`, so it is excluded from the 12–20 Hz re-analysis.
+Primary citation: Lellouch et al. (2019), *Journal of Geophysical Research:
+Solid Earth*, https://doi.org/10.1029/2019JB017533. RAM guidance: Bensen et al.
+(2007), *Geophysical Journal International*,
+https://doi.org/10.1111/j.1365-246X.2007.03374.x.
