@@ -1,0 +1,33 @@
+F-K wedge taper test -- does smoothing the mask remove the ringing?
+mask: 5-20 Hz, 2500-4500 m/s, F*K<0; grid 400 ch x 3000 samples, fs 250 Hz, dx 2.042 m
+
+--- 1. kernel compactness (no data involved) ---
+config                       E<=2       E<=8      E<=16    tail/peak
+hard (production)          0.0104     0.0593     0.1471     4.10e-03
+taper f=1 Hz, v=5%         0.0123     0.0694     0.1666     4.49e-04
+taper f=2 Hz, v=10%        0.0147     0.0817     0.1893     6.22e-05
+taper f=4 Hz, v=20%        0.0198     0.1080     0.2375     1.79e-05
+
+--- 2. white-noise floor and 3. real-data score ---
+    white noise: 8 Gaussian realizations through the complete operator
+    real data: 8 duration-matched 12 s excerpts from 2024-12-20
+
+config                  white median   white 95th   real median real/white
+hard (production)             0.1334       0.2196        0.0837       0.63
+taper f=1 Hz, v=5%            0.1050       0.1677        0.0622       0.59
+taper f=2 Hz, v=10%           0.0718       0.1315        0.0341       0.48
+taper f=4 Hz, v=20%           0.0389       0.1213        0.0212       0.54
+
+  'real/white' is the quantity that decides whether the fan adds information.
+  A taper is only useful if it raises this ratio -- i.e. suppresses the
+  manufactured floor by more than it suppresses the real score.
+
+--- interpretation ---
+  Tapering changes the manufactured white-noise score by 0.29x at best (taper f=4 Hz, v=20%).
+  real/white ratio: hard 0.63 -> best taper 0.54
+  The taper substantially suppresses the ringing floor.
+
+  Either way this does not license the F-K result. A velocity fan passes
+  only energy consistent with its own band, so its output resembles that
+  moveout whatever the edge shape. The gate is the pre-filter channel
+  scramble on real data, which the production fan fails.
