@@ -1,5 +1,17 @@
 # Lellouch Figure 7c on the 2024–2025 archive — status
 
+> **WITHDRAWN PENDING A PAPER-FAITHFUL RERUN (2026-08-14).** The negative
+> verdict below was produced by a pipeline that (i) reset differentiation and
+> running-absolute-mean normalization at every one-minute file boundary,
+> (ii) omitted the 15-s windows spanning those boundaries (4,320 windows rather
+> than 5,759 for a contiguous day), (iii) applied an unreported linear detrend,
+> (iv) filtered each input trace before correlation, and (v) defaulted to
+> common-mode subtraction and per-trace spectral whitening, neither of which is
+> reported for ambient interferometry in section 4.1 of Lellouch et al. (2019).
+> Its figures remain provenance for a legacy attempt, but its scientific verdict
+> must not be cited. The authoritative result will be written only after the
+> corrected baseline and matched nulls complete.
+
 Written 2026-08-14. Where numbers here disagree with an older notebook cell or a
 figure caption, this file wins.
 
