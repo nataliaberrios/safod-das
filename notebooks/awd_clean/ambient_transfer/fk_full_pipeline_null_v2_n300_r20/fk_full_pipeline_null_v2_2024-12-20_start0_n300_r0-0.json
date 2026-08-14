@@ -1,0 +1,118 @@
+{
+  "workflow_version": "ambient_fk_full_pipeline_null_v2",
+  "scientific_question": "Does the signed-lag velocity statistic require spatially ordered, phase-coherent data before the frozen F-K projection?",
+  "date": "2024-12-20",
+  "start": 0,
+  "requested_files": 300,
+  "used_files": 300,
+  "null_start": 0,
+  "null_realizations": 1,
+  "random_seed": 20260805,
+  "null_methods": [
+    "channel_permutation",
+    "circular_time_shift"
+  ],
+  "coordinate_assumption": "channel 0 is the top virtual source; increasing channel coordinate follows the downhole fiber direction",
+  "receiver_offsets_m": [
+    49.00571250915527,
+    100.05332970619202,
+    149.0590422153473,
+    200.10665941238403,
+    249.1123719215393,
+    300.15998911857605,
+    349.1657016277313,
+    400.21331882476807,
+    449.21903133392334,
+    500.2666485309601,
+    549.2723610401154,
+    600.3199782371521,
+    649.3256907463074,
+    700.3733079433441
+  ],
+  "preprocessing": "5-20 Hz bandpass followed by 5-s running-absolute-mean normalization",
+  "surrogate_stage": "after channel-wise preprocessing and before F-K filtering",
+  "fk_velocity_wedge_m_s": [
+    2500.0,
+    4500.0
+  ],
+  "fk_signed_branches": {
+    "negative": "F*K < 0 evaluated at positive lag",
+    "positive": "F*K > 0 evaluated at negative lag"
+  },
+  "selection_statistic": "maximum absolute median normalized correlation over 2.5-4.5 km/s; familywise maximum also spans both signed branches",
+  "observed": {
+    "negative": {
+      "peak_absolute_score_in_wedge": 0.2789533247358733,
+      "peak_velocity_m_s_in_wedge": 3075.0,
+      "signed_score_3200": 0.26613998184281185,
+      "absolute_score_3200": 0.26613998184281185
+    },
+    "positive": {
+      "peak_absolute_score_in_wedge": 0.2829407345264479,
+      "peak_velocity_m_s_in_wedge": 3075.0,
+      "signed_score_3200": 0.2686913175826657,
+      "absolute_score_3200": 0.2686913175826657
+    }
+  },
+  "observed_familywise_score": 0.2829407345264479,
+  "null_results": {
+    "channel_permutation": {
+      "branches": {
+        "negative": {
+          "observed_peak_absolute_score_in_wedge": 0.2789533247358733,
+          "observed_peak_velocity_m_s_in_wedge": 3075.0,
+          "null95_peak_score_in_wedge": 0.36293704164582363,
+          "p_peak_in_wedge": 1.0,
+          "null95_absolute_score_3200": 0.35915083243592405,
+          "p_absolute_score_3200": 1.0
+        },
+        "positive": {
+          "observed_peak_absolute_score_in_wedge": 0.2829407345264479,
+          "observed_peak_velocity_m_s_in_wedge": 3075.0,
+          "null95_peak_score_in_wedge": 0.360857938423647,
+          "p_peak_in_wedge": 1.0,
+          "null95_absolute_score_3200": 0.35694270866520605,
+          "p_absolute_score_3200": 1.0
+        }
+      },
+      "familywise": {
+        "observed_maximum_across_branches_and_wedge": 0.2829407345264479,
+        "null95": 0.36293704164582363,
+        "p": 1.0
+      }
+    },
+    "circular_time_shift": {
+      "branches": {
+        "negative": {
+          "observed_peak_absolute_score_in_wedge": 0.2789533247358733,
+          "observed_peak_velocity_m_s_in_wedge": 3075.0,
+          "null95_peak_score_in_wedge": 0.329973364541028,
+          "p_peak_in_wedge": 1.0,
+          "null95_absolute_score_3200": 0.32556204305200603,
+          "p_absolute_score_3200": 1.0
+        },
+        "positive": {
+          "observed_peak_absolute_score_in_wedge": 0.2829407345264479,
+          "observed_peak_velocity_m_s_in_wedge": 3075.0,
+          "null95_peak_score_in_wedge": 0.3285450879998038,
+          "p_peak_in_wedge": 1.0,
+          "null95_absolute_score_3200": 0.3237611844778965,
+          "p_absolute_score_3200": 1.0
+        }
+      },
+      "familywise": {
+        "observed_maximum_across_branches_and_wedge": 0.2829407345264479,
+        "null95": 0.329973364541028,
+        "p": 1.0
+      }
+    }
+  },
+  "supported_claim": "A small empirical p value supports that the filtered/correlated ridge depends on pre-F-K spatial/phase coherence and is not produced by the fixed wedge acting on these coherence-destroyed surrogates.",
+  "limitations": [
+    "The inference is conditional on the 2.5-4.5 km/s wedge being frozen before evaluation.",
+    "These artificial surrogates do not reproduce every form of spatially correlated ambient noise.",
+    "The test does not establish Green's-function convergence, wave type, causality, or formation Vp.",
+    "Circular shifts introduce one wrap boundary per shifted trace.",
+    "The empirical p-value resolution is limited to 1/(number of nulls + 1)."
+  ]
+}

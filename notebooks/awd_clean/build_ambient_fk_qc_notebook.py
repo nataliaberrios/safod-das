@@ -13,7 +13,7 @@ def markdown(text):
 def python(text):
     nb.cells.append(nbf.v4.new_code_cell(text))
 
-markdown("""# Ambient-noise F–K QC workflow — v2
+markdown("""# Ambient-noise F–K QC workflow — v3
 
 This is the single advisor-facing notebook for the ambient-noise analysis. It follows one linear chain:
 
@@ -27,7 +27,7 @@ This is the single advisor-facing notebook for the ambient-noise analysis. It fo
 The notebook is a decision document, not a gallery. A processing choice passes only if the real-data result survives the corresponding input-level null. The current 2.5–4.5 km/s fan produces an apparent ridge but fails the pre-filter channel-scramble gate, so it is not accepted as an independently recovered physical arrival.
 """)
 
-markdown("""v2""")
+markdown("""v3""")
 
 markdown("""## Frozen analysis contract
 
@@ -85,6 +85,8 @@ products = {
  'fk_grid': OUT/'fk_mask_sensitivity_v2/ambient_fk_mask_sensitivity_v2.npz',
  'fk_grid_meta': OUT/'fk_mask_sensitivity_v2/ambient_fk_mask_sensitivity_v2.json',
  'fk_nulls': OUT/'fk_full_pipeline_null_v2_n300_r20/fk_full_pipeline_null_v2_aggregate.npz',
+ 'fk_null_example': OUT/'fk_full_pipeline_null_v2_n300_r20/fk_full_pipeline_null_v2_2024-12-20_start0_n300_r0-0.npz',
+ 'fk_null_example_meta': OUT/'fk_full_pipeline_null_v2_n300_r20/fk_full_pipeline_null_v2_2024-12-20_start0_n300_r0-0.json',
  'directional_meta': OUT/'fk_directional_audit_v1/ambient_fk_directional_audit_v1.json',
  'white_noise': OUT/'fk_qc_notebook_v2/ambient_fk_white_noise_v1.npz',
  'white_noise_meta': OUT/'fk_qc_notebook_v2/ambient_fk_white_noise_v1.json',
@@ -307,38 +309,143 @@ markdown("""**Figure 7. Five-hour anti-alias and decimation sensitivity of the s
 
 markdown("""## 5. White-noise input null
 
-Ten independent white-noise ensembles, each comprising three 12-s arrays, were passed through detrending, 5–20 Hz filtering, 5-s running-absolute-mean normalization, 2× decimation, each frozen velocity/direction mask, channel-0 correlations, and the same moveout score. The question is quantitative: does the held-out real-data score exceed the 95th percentile of identically processed white noise? The synthetic duration is much shorter than the real stack and therefore gives a conservative, relatively broad finite-noise distribution rather than a duration-matched p-value. This is a project-specific surrogate-data falsification test: surrogate methods test whether a statistic exceeds what the same analysis produces after destroying the property of interest ([Theiler et al., 1992](https://doi.org/10.1016/0167-2789(92)90102-S)). Passing white noise is necessary but not sufficient because white noise does not preserve the real data's single-channel spectra or nonstationarity.
+Ten independent white-noise ensembles, each comprising three 12-s arrays, were passed through detrending, 5–20 Hz filtering, 5-s running-absolute-mean normalization, 2× decimation, each frozen velocity/direction mask, channel-0 correlations, and the same moveout score. The synthetic and measured outputs are plotted below in the **same gather coordinates and normalization**. The synthetic duration is much shorter than the real stack and therefore does not provide a duration-matched p-value. This is a project-specific surrogate-data falsification test: surrogate methods test whether a statistic exceeds what the same analysis produces after destroying the property of interest ([Theiler et al., 1992](https://doi.org/10.1016/0167-2789(92)90102-S)). Passing white noise is necessary but not sufficient because white noise does not preserve the measured data's spectra, coherent artifacts, or nonstationarity.
 """)
-python("""white=np.load(products['white_noise']); white_meta=json.loads(products['white_noise_meta'].read_text()); wi=np.argmin(abs(white['velocities_m_s']-3200))
-fig,axes=plt.subplots(2,2,figsize=(12,8),constrained_layout=True)
+python("""from ambient_transfer_test import preprocess
+from ambient_fk_transfer_test import fk_filter as production_fk_filter
+white=np.load(products['white_noise']); white_meta=json.loads(products['white_noise_meta'].read_text())
+white_fs=float(white_meta['sampling']['fs_hz']); white_dx=float(white_meta['sampling']['dx_m'])
+white_rng=np.random.default_rng(int(white_meta['seed']))
+white_raw=white_rng.standard_normal((int(white_meta['sampling']['channels']),int(white_fs*white_meta['seconds_per_record'])),dtype=np.float32)
+white_processed=preprocess(white_raw,white_fs,norm_seconds=5.0)
+white_filtered,white_filtered_fs,white_filtered_dx=production_fk_filter(white_processed,white_fs,white_dx,'negative')
+white_dec=white_processed[::2,::2]; wf=np.fft.fftfreq(white_dec.shape[1],1/white_filtered_fs); wk=np.fft.fftfreq(white_dec.shape[0],white_filtered_dx)
+wpower=np.abs(np.fft.fft2(white_dec))**2; worder=np.argsort(wk)
+fig,axes=plt.subplots(1,4,figsize=(18,4.2),constrained_layout=True)
+for ax,data,title,fs_plot,dx_plot in [
+    (axes[0],white_raw,'Gaussian white-noise input',white_fs,white_dx),
+    (axes[1],white_processed,'5–20 Hz + 5-s RAM',white_fs,white_dx),
+    (axes[3],white_filtered,'F×K<0, 2.5–4.5 km/s output',white_filtered_fs,white_filtered_dx)]:
+    limit=np.nanpercentile(np.abs(data),99)
+    ax.imshow(data,extent=[0,data.shape[1]/fs_plot,(data.shape[0]-1)*dx_plot,0],aspect='auto',cmap='RdBu_r',vmin=-limit,vmax=limit,interpolation='nearest')
+    ax.set(title=title,xlabel='Time (s)',ylabel='Fiber coordinate (m)')
+axes[2].pcolormesh(wf,wk[worder]*1000,10*np.log10(wpower[worder]/wpower.max()+1e-12),shading='auto',cmap='magma',vmin=-40,vmax=0)
+ff=np.linspace(5,20,100)
+for velocity,style in [(2500,'--'),(4500,':')]: axes[2].plot(ff,-1000*ff/velocity,color='cyan',ls=style,lw=1.2)
+axes[2].set(xlim=(0,30),ylim=(-10,10),title='Pre-filter F–K power',xlabel='Frequency (Hz)',ylabel='Wavenumber (cycles/km)')
+plt.show()
+""")
+
+markdown("""**Figure 8a. White noise before and after the production F–K operator.** A deterministic 12-s, 800-channel Gaussian realization is shown before preprocessing, after the same 5–20 Hz bandpass and 5-s running-absolute-mean normalization used by this null workflow, in the F–K domain, and after the F×K<0, 2.5–4.5 km/s mask. Cyan curves delimit the imposed velocity fan in the positive-frequency half-plane. Panel-specific amplitude limits are used because raw Gaussian samples, normalized samples, spectral power, and filtered amplitudes have different units. The final panel visibly contains sloping coherent texture even though the input contains no physical wave. That texture is the impulse response of the velocity-selective operator and is exactly why a filtered ridge cannot validate itself.""")
+
+python("""def normalize_gather(section):
+    scale=np.max(np.abs(section),axis=1,keepdims=True)
+    return section/np.maximum(scale,np.finfo(float).eps)
+w_lags=white['lags']; w_dist=white['distance']
+fig,axes=plt.subplots(4,4,figsize=(16,13),sharex=True,sharey=True,constrained_layout=True)
+columns=[('negative','Measured held-out'),('negative','White noise'),('positive','Measured held-out'),('positive','White noise')]
+for row,(mask,label) in enumerate(masks):
+    for col,(branch,source) in enumerate(columns):
+        section=(fk[f'held_out__{mask}__{branch}__top'] if source.startswith('Measured') else white[f'{mask}__{branch}__example_top'])
+        section=normalize_gather(section); sign=1 if branch=='negative' else -1
+        axes[row,col].imshow(section,extent=[w_lags[0],w_lags[-1],w_dist[-1],w_dist[0]],aspect='auto',cmap='RdBu_r',vmin=-1,vmax=1,interpolation='nearest')
+        axes[row,col].plot(sign*w_dist/3200,w_dist,'k--',lw=1)
+        axes[row,col].set_title(f'{label}; {source}; {branch}')
+        axes[row,col].set(xlabel='Correlation lag (s)',ylabel='Receiver offset (m)')
+plt.show()
+""")
+
+markdown("""**Figure 8b. Direct gather-by-gather comparison of measured data and white noise after identical signed F–K masks.** Rows apply the production 2.5–4.5 km/s fan, narrow 2.8–3.8 km/s fan, broad 2.0–5.5 km/s fan, and direction-only mask. Columns alternate the held-out measured aggregate and the first predeclared white-noise ensemble for the F×K<0 and F×K>0 branches. Every panel uses the same lag and receiver-offset axes, each trace is divided by its own maximum absolute amplitude, and all panels use the common range −1 to 1. Dashed curves mark 3.2 km/s on the branch-appropriate lag side. The velocity-bounded white-noise panels develop moveout-like ridges comparable in geometry to the measured panels, especially for the narrow fan, whereas direction-only white noise does not. This is direct visual evidence that the fan can manufacture the expected geometry from noise; differences in absolute amplitude are intentionally not assessed because the measured and synthetic stack durations differ.""")
+
+python("""fig,axes=plt.subplots(2,2,figsize=(12,8),sharex=True,constrained_layout=True)
 for ax,(mask,label) in zip(axes.flat,masks):
     for branch,color in [('negative','tab:blue'),('positive','tab:orange')]:
-        values=np.abs(white[f'{mask}__{branch}__ensemble_scores'][:,wi]); real_score=abs(fk[f'held_out__{mask}__{branch}__scores'][wi])
-        ax.hist(values,bins=7,alpha=.45,color=color,label=f'{branch} white'); ax.axvline(real_score,color=color,lw=2)
-    ax.set(title=label,xlabel='Absolute score at 3.2 km/s',ylabel='White-noise ensembles'); ax.legend(frameon=False)
+        ensemble=white[f'{mask}__{branch}__ensemble_scores']; real_curve=fk[f'held_out__{mask}__{branch}__scores']
+        lo,median,hi=np.quantile(ensemble,[.05,.5,.95],axis=0)
+        ax.fill_between(white['velocities_m_s']/1000,lo,hi,color=color,alpha=.16)
+        ax.plot(white['velocities_m_s']/1000,median,color=color,ls='--',lw=1,label=f'{branch} white median')
+        ax.plot(white['velocities_m_s']/1000,real_curve,color=color,lw=2,label=f'{branch} measured')
+    ax.axvline(3.2,color='k',ls=':'); ax.axhline(0,color='.6',lw=.8)
+    ax.set(title=label,xlabel='Trial apparent velocity (km/s)',ylabel='Signed moveout score'); ax.legend(frameon=False,fontsize=8)
 plt.show()
+wi=np.argmin(abs(white['velocities_m_s']-3200))
 for mask,label in masks:
     for branch in ['negative','positive']:
         result=white_meta['masks'][mask][branch]
         print(label,branch,'real exceeds white95:',result['real_exceeds_white_95_at_3200'])
 """)
 
-markdown("""**Figure 8. White-noise full-operator null at 3.2 km/s.** Histograms show absolute moveout scores from 10 independent Gaussian white-noise ensembles, each built from three 12-s records and passed through the production preprocessing, decimation, signed F–K mask, channel-0 correlation geometry, and scoring operator. Vertical lines show the corresponding held-out real-data score for each signed branch and mask. The production and narrow fans exceed their own white-noise 95th percentiles, whereas the broad and direction-only filters do not recover the held-out real score. The narrow fan nevertheless gives white noise a median absolute 3.2-km/s score of approximately 0.64, demonstrating that the absolute score is strongly conditioned by the imposed mask; only a comparison with the same mask is meaningful. The synthetic stacks are shorter than the real stack, so this is a conservative implementation gate rather than a duration-matched significance estimate. It shows that finite white-noise input does not routinely reproduce the real production-fan score, but it is not sufficient validation because white noise lacks the spectra, coherent artifacts, and nonstationarity of the measured data.""")
+markdown("""**Figure 8c. Measured and white-noise moveout curves for the same masks.** Solid curves are the held-out measured-data scores; dashed curves and shaded intervals are the median and 5th–95th percentile across ten identically processed white-noise ensembles. Blue and orange denote the two signed branches, and the vertical dotted line marks 3.2 km/s. The narrow fan produces large scores over its retained band even for white noise—the median absolute score at 3.2 km/s is approximately 0.64—so the magnitude and location of that peak are mask-conditioned. The production-fan measured curve exceeds this short-duration white-noise ensemble at 3.2 km/s, but the measured-data scrambling test below is the stronger control because it preserves the real spectra and nonstationarity.""")
 
-markdown("""## 6. Pre-filter channel-scramble and time-shift nulls
+markdown("""## 6. Channel-scrambling test — input and resulting gathers
 
 These are stronger than shuffling the finished correlation panel. For every real input record, channel 0 is fixed and all other preprocessed traces are reassigned to random fiber coordinates before F–K filtering. A second null independently circularly shifts each non-source trace before filtering. Both preserve important attributes of the measured traces while destroying ordered interchannel propagation. The nulls are tailored to this analysis; [Theiler et al. (1992)](https://doi.org/10.1016/0167-2789(92)90102-S) provides the general surrogate-test logic, not this exact geophysical implementation.
 
 **Scope of this null product.** It uses the same 5–20 Hz preprocessing, 5-s normalization, 2× decimation, signed fan, channel-0 virtual source, 50-m receiver spacing, and moveout statistic as the production F–K analysis. It correlates each one-minute record directly and does not reproduce the Lellouch 30-s/15-s-overlap and nearby-receiver-stack details used in Section 4. Because this product fails rather than passes, it remains a valid warning that the fan can generate the selected statistic after spatial order is destroyed; it is not presented as an exact matched-pipeline p-value.
 """)
-python("""null=np.load(products['fk_nulls']); vv=null['velocities_m_s']; i=np.argmin(abs(vv-3200)); observed=abs(float(null['observed_negative_scores'][i]))
+python("""from ambient_fk_full_pipeline_null_v2 import stable_rng, channel_permutation
+null=np.load(products['fk_nulls']); null_example=np.load(products['fk_null_example']); null_example_meta=json.loads(products['fk_null_example_meta'].read_text())
+example_path=Path(str(null_example['used_files'][0]))
+with h5py.File(example_path,'r') as handle:
+    dataset=handle['Acquisition/Raw[0]/RawData']; example_fs=float(dataset.attrs.get('OutputDataRate',500.0)); example_dx=float(handle['Acquisition'].attrs.get('SpatialSamplingInterval',1.0))
+    example_raw=np.asarray(dataset[:min(int(12*example_fs),dataset.shape[0]),:800],dtype='float32').T
+ordered_input=preprocess(example_raw,example_fs,norm_seconds=5.0)
+scramble_rng=stable_rng(int(null_example_meta['random_seed']),'channel_permutation',0,str(example_path))
+scrambled_input=channel_permutation(ordered_input,scramble_rng)
+ordered_filtered,ordered_fs,ordered_dx=production_fk_filter(ordered_input,example_fs,example_dx,'negative')
+scrambled_filtered,_,_=production_fk_filter(scrambled_input,example_fs,example_dx,'negative')
+fig,axes=plt.subplots(1,4,figsize=(18,4.2),constrained_layout=True)
+input_limit=np.nanpercentile(np.abs(np.concatenate([ordered_input.ravel(),scrambled_input.ravel()])),99)
+filtered_limit=np.nanpercentile(np.abs(np.concatenate([ordered_filtered.ravel(),scrambled_filtered.ravel()])),99)
+for ax,data,title,fs_plot,dx_plot,limit in [
+    (axes[0],ordered_input,'Measured input: ordered channels',example_fs,example_dx,input_limit),
+    (axes[1],scrambled_input,'Same input: channels scrambled',example_fs,example_dx,input_limit),
+    (axes[2],ordered_filtered,'Ordered → production fan',ordered_fs,ordered_dx,filtered_limit),
+    (axes[3],scrambled_filtered,'Scrambled → production fan',ordered_fs,ordered_dx,filtered_limit)]:
+    ax.imshow(data,extent=[0,data.shape[1]/fs_plot,(data.shape[0]-1)*dx_plot,0],aspect='auto',cmap='RdBu_r',vmin=-limit,vmax=limit,interpolation='nearest')
+    ax.set(title=title,xlabel='Time (s)',ylabel='Assigned fiber coordinate (m)')
+plt.show()
+""")
+
+markdown("""**Figure 9a. What the channel-scrambling null does before correlation.** A 12-s excerpt from the first file in null realization 0 is shown after the production 5–20 Hz and 5-s RAM preprocessing with its measured channel order, after all non-source channels are assigned to random fiber coordinates while channel 0 remains fixed, and after the same F×K<0, 2.5–4.5 km/s filter is applied to each input. The random generator is fixed by seed 20260805, method name, realization ID 0, and file path; this example was not selected by appearance. Ordered and scrambled inputs share one amplitude scale, and their filtered outputs share another. The fan imposes sloping coherent texture even after the physical channel order has been destroyed, demonstrating the mechanism tested by the 300-file correlation gathers below.""")
+
+python("""n_lags=null_example['lags_s']; n_dist=null_example['receiver_offsets_m']
+fig,axes=plt.subplots(2,3,figsize=(14,8),sharex=True,sharey=True,constrained_layout=True)
+for row,branch in enumerate(['negative','positive']):
+    sign=1 if branch=='negative' else -1
+    panels=[
+        (null_example[f'observed_{branch}_top'],'Measured, ordered'),
+        (null_example[f'null_channel_permutation_{branch}_top_first'],'Channel-scrambled, r0'),
+        (null_example[f'null_circular_time_shift_{branch}_top_first'],'Time-shifted, r0')]
+    for col,(section,title) in enumerate(panels):
+        section=normalize_gather(section)
+        axes[row,col].imshow(section,extent=[n_lags[0],n_lags[-1],n_dist[-1],n_dist[0]],aspect='auto',cmap='RdBu_r',vmin=-1,vmax=1,interpolation='nearest')
+        axes[row,col].plot(sign*n_dist/3200,n_dist,'k--',lw=1)
+        axes[row,col].set(title=f'{title}; {branch}',xlabel='Correlation lag (s)',ylabel='Receiver offset (m)')
+plt.show()
+""")
+
+markdown("""**Figure 9b. Measured and coherence-destroyed correlation gathers after the same production fan.** Rows show the F×K<0 and F×K>0 branches; columns show the ordered 300-file measured stack, fixed channel-scramble realization 0, and fixed independent-time-shift realization 0. Every panel uses the same lag and receiver-offset axes, trace-wise normalization, color limits, and branch-appropriate 3.2-km/s trajectory. Both coherence-destroying surrogates retain a fan-aligned ridge that is at least as visually prominent as the ordered-data ridge. The scrambling test is therefore not missing and it does not pass: the apparent moveout survives removal of the spatial ordering that a physical propagating arrival requires.""")
+
+python("""vv=null['velocities_m_s']; i=np.argmin(abs(vv-3200)); observed=abs(float(null['observed_negative_scores'][i]))
 cp=np.abs(null['null_channel_permutation_negative_scores'][:,i]); ts=np.abs(null['null_circular_time_shift_negative_scores'][:,i])
-fig,ax=plt.subplots(figsize=(8,4)); ax.hist(cp,bins=10,alpha=.6,label='pre-filter channel scramble'); ax.hist(ts,bins=10,alpha=.6,label='pre-filter time shifts'); ax.axvline(observed,color='k',lw=2,label=f'real={observed:.3f}'); ax.set(xlabel='Absolute 3.2 km/s score',ylabel='Realizations',title='Production-fan full-pipeline nulls'); ax.legend(frameon=False); plt.show()
+fig,axes=plt.subplots(1,2,figsize=(13,4.8),sharey=True,constrained_layout=True)
+for ax,branch in zip(axes,['negative','positive']):
+    observed_curve=null[f'observed_{branch}_scores']; cp_curves=null[f'null_channel_permutation_{branch}_scores']; ts_curves=null[f'null_circular_time_shift_{branch}_scores']
+    cp_lo,cp_hi=np.quantile(cp_curves,[.1,.9],axis=0); ts_lo,ts_hi=np.quantile(ts_curves,[.1,.9],axis=0)
+    ax.fill_between(vv/1000,cp_lo,cp_hi,color='tab:blue',alpha=.15,label='scramble 10–90%')
+    ax.fill_between(vv/1000,ts_lo,ts_hi,color='tab:orange',alpha=.15,label='time-shift 10–90%')
+    ax.plot(vv/1000,observed_curve,color='k',lw=2,label='measured ordered')
+    ax.plot(vv/1000,null_example[f'null_channel_permutation_{branch}_scores'][0],color='tab:blue',lw=1.2,label='scramble r0')
+    ax.plot(vv/1000,null_example[f'null_circular_time_shift_{branch}_scores'][0],color='tab:orange',lw=1.2,label='time-shift r0')
+    ax.axvspan(2.5,4.5,color='.8',alpha=.15); ax.axvline(3.2,color='k',ls=':'); ax.axhline(0,color='.6',lw=.8)
+    ax.set(xlim=(2,5),title=branch,xlabel='Trial apparent velocity (km/s)',ylabel='Signed moveout score'); ax.legend(frameon=False,fontsize=8)
+plt.show()
 print('Real score:',observed,'channel-scramble 95%:',np.quantile(cp,.95),'time-shift 95%:',np.quantile(ts,.95))
 print('Decision: FAIL — the real production-fan score does not exceed either input-level null.')
 """)
 
-markdown("""**Figure 9. Pre-filter spatial-order and phase-coherence surrogate tests.** The black line is the absolute 3.2-km/s score of the measured production-fan stack. Histograms show scores obtained when, before F–K filtering, non-source channels are randomly reassigned to fiber coordinates or independently circularly shifted in time while channel 0 is fixed. Both nulls preserve measured single-channel content while destroying the ordered interchannel relationship needed for physical moveout. The observed score lies below both 95th-percentile null thresholds and has an exceedance probability of 1.0 in the stored ensembles. The selected fan therefore fails this QC gate: it can produce an equal or stronger moveout statistic after the physical spatial or phase ordering is destroyed.""")
+markdown("""**Figure 9c. Trial-velocity curves for the ordered stack and all measured-data surrogate realizations.** Black curves are the ordered 300-file scores. Blue and orange curves show the fixed realization-0 channel-scramble and time-shift scores; shaded intervals span the 10th–90th percentiles of all 20 realizations. The gray band is the imposed 2.5–4.5 km/s velocity fan and the dotted line marks 3.2 km/s. At 3.2 km/s, the ordered F×K<0 absolute score is 0.266, compared with 95th-percentile values of 0.359 for channel scrambling and 0.326 for time shifting; every stored surrogate realization equals or exceeds the ordered score. Thus the filtered measured result fails both the spatial-order and phase-coherence controls. The plotted gathers in Figure 9b and the curves here make the same decision visually and quantitatively.""")
 
 markdown("""## 7. Is F–K required, and is the recovered feature defensible?
 
