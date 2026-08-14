@@ -1,0 +1,71 @@
+# Figure 7c across five complete days — paper-faithful
+
+Written 2026-08-14. Companion to `AMBIENT_FIG7C_STATUS.md`, which covers
+2024-12-20 in full. This file records the extension to four further days and is
+the basis for widening that document's claim from one day to the archive.
+
+## Why more days
+
+`AMBIENT_FIG7C_STATUS.md` tests 2024-12-20 only, matched to the paper's own
+one-day design. But the raw energy census (`ambient_fk_energy_census.py`) shows
+the 2.5–4 km/s fan share varies by day, 0.3 % to 4.9 %, so the day that had been
+tested was not the most favourable one available. If the arrival exists anywhere
+in this archive it should appear on the richest day.
+
+## What was run
+
+`ambient_lellouch2019_exact_stack.py` configuration 0 (paper baseline: wellhead
+source channel 23, RAM 0.1 s, 30 s windows at 15 s overlap over a contiguous
+day, literal R±10 sums, simple unshifted stacking, 5–20 Hz applied to the
+stacked correlations, no F–K filter), via
+`ambient_lellouch2019_exact_stack_days.sbatch`, jobs `39000540` / `39003189` /
+`39004321`, output in `ambient_transfer/lellouch2019_exact_stack_days/`.
+
+Only days whose manifest is **exactly** continuous at 60.000 s are usable — the
+operator streams across file boundaries and its guard rightly refuses to splice a
+discontinuous day. Measured over the manifest, 2024-11-30, 2024-10-28 and
+2025-03-04 each carry two timing anomalies (longest continuous runs 1,278, 1,191
+and 826 files) and were excluded rather than silently truncated. **2024-11-30 is
+the richest day in the census at 4.9 % and is among those excluded**; the richest
+usable day is 2024-06-17 at 4.5 %.
+
+## Result
+
+Each day is a complete 1,440-file, 5,759-window stack with its own 10,000-draw
+receiver-order familywise null over the declared 1.5–6.0 km/s scan.
+
+| date | census fan % | peak | at (m/s) | @3,200 causal | @3,200 acausal | null 95 % | p |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 2024-12-20 | 4.1 | 6.131 | 5850 | 2.752 | 2.831 | 6.324 | 0.1470 |
+| 2025-02-24 | 3.4 | 2.532 | 5875 | 1.806 | 1.725 | 3.400 | 0.7517 |
+| 2024-06-17 | 4.5 | 1.901 | 5925 | 1.185 | 1.054 | 2.196 | 0.7413 |
+| 2024-06-26 | 3.6 | 1.297 | 5925 | 0.948 | 1.105 | 1.531 | 0.4206 |
+| 2024-05-11 | 0.3 | 1.026 | 1675 | 1.014 | 0.994 | 1.034 | 0.3091 |
+
+**No day reaches significance; the minimum p over five days is 0.147.** Fisher's
+combination across the five independent days gives χ² = 9.08 on 10 degrees of
+freedom, **p = 0.524** — the χ² ≈ df expected from pure noise, with no residual
+signal hiding below per-day significance.
+
+Two further points against the arrival being present but weak:
+
+- **The peak is in the wrong place on four of five days**, sitting at 5,850–5,925
+  m/s, the top edge of the declared scan, i.e. near-flat moveout rather than the
+  paper's ~3,200 m/s.
+- **The census does not predict the outcome.** The richest usable day, 2024-06-17
+  at 4.5 %, scores p = 0.7413 — worse than the poorest day. Whatever occupies the
+  body-wave fan in the raw energy budget is not organised into a receiver-ordered
+  arrival, so "pick a better day" is not an available fix.
+
+## Conclusion
+
+Figure 7c does not reproduce on the 2024–2025 archive, on the paper's own
+operator, on five independent complete days spanning ten months, including the
+most energy-favourable day available. Taken with the eight-day raw census — 81–99 %
+of 5–20 Hz energy below 1,500 m/s and downgoing share never exceeding 49.9 % — the
+required downgoing body-wave energy is not present in the input, so no processing
+choice recovers it.
+
+This is a statement about this archive, this band, and these days. It is not a
+criticism of Lellouch et al. (2019), whose Figure 9 companion model this project
+reproduces from the released Figure 7d correlograms at r = 0.948.
