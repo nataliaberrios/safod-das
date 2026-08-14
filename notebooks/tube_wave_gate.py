@@ -35,14 +35,20 @@ import matplotlib.pyplot as plt
 from scipy.signal import butter, sosfiltfilt, hilbert
 
 FIG_DIR = '/home/groups/ettore88/nberrios/safod_das_git/notebooks/figures/awd_2026'
-NPZ = os.path.join(FIG_DIR, 'epoch_stacks_paired.npz')
+NPZ = os.path.join(FIG_DIR, 'epoch_stacks_paired_deep_all.npz')
 
 DX_CEM, DX_WIRE = 1.26606202, 2.0419
 FS, PRE_S = 1000.0, 0.5
-BAND = (10.0, 40.0)          # tube wave is low-frequency dominated
-V_TUBE_GRID = np.arange(800.0, 1900.0, 10.0)
+# Corrected after wireline_tube_look.py: the tube wave is unmistakable at
+# 5-20 Hz across the full 3400 m down-leg and is already fading by 20-50 Hz.
+# The original 10-40 Hz band sat on its high-frequency edge.
+BAND = (5.0, 20.0)
+V_TUBE_GRID = np.arange(900.0, 1900.0, 10.0)
 V_P = 2975.0                 # measured direct-P velocity
-Z_LO, Z_HI = 130.0, 700.0
+# And it lives DEEP. The first pass used epoch_stacks_paired.npz, which holds
+# only the top 460 wireline channels (~939 m) -- the tube wave's clearest
+# expression is beyond that. Use the full-depth file and the whole down-leg.
+Z_LO, Z_HI = 130.0, 3400.0
 WIN_S = 0.060                # analysis window following each arrival
 
 
