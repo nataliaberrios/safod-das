@@ -1,0 +1,34 @@
+Lellouch Figure 7c reproduction -- 2024-12-20
+  24 chunks, 1440 files, 4320 windows; common_mode=False whiten=False neighbours=+-10
+  NO F-K filter applied.
+
+--- moveout scan ---
+  peak |score| 0.0007 at 5500 m/s   (paper: ~3200 m/s)
+   score at 2500 m/s = -0.0001
+   score at 3000 m/s = -0.0001
+   score at 3200 m/s = -0.0001
+   score at 3500 m/s = +0.0002
+   score at 4000 m/s = -0.0001
+
+--- receiver-order permutation null (2000) ---
+  null median 0.0008 | 95th pct 0.0011 | observed 0.0007 | p = 0.8681
+
+--- causal / acausal asymmetry ---
+  mean|C| causal 0.00114 | acausal 0.00138 | ratio 0.83  (paper predicts >1)
+
+--- per-offset causal pick vs the 3200 m/s benchmark ---
+      50 m : benchmark 0.0156 s , picked 0.0080 s -> v =   6253 m/s
+     100 m : benchmark 0.0313 s , picked 0.0580 s -> v =   1725 m/s
+     150 m : benchmark 0.0469 s , picked 0.0560 s -> v =   2680 m/s
+     200 m : benchmark 0.0625 s , picked 0.1140 s -> v =   1755 m/s
+     250 m : benchmark 0.0782 s , picked 0.0580 s -> v =   4313 m/s
+     300 m : benchmark 0.0938 s , picked 0.0580 s -> v =   5175 m/s
+     350 m : benchmark 0.1094 s , picked 0.0580 s -> v =   6038 m/s
+     400 m : benchmark 0.1251 s , picked 0.0640 s -> v =   6253 m/s
+     450 m : benchmark 0.1407 s , picked 0.2420 s -> v =   1860 m/s
+     500 m : benchmark 0.1563 s , picked 0.2380 s -> v =   2102 m/s
+     550 m : benchmark 0.1720 s , picked 0.2400 s -> v =   2293 m/s
+     600 m : benchmark 0.1876 s , picked 0.2360 s -> v =   2544 m/s
+     650 m : benchmark 0.2032 s , picked 0.2400 s -> v =   2710 m/s
+     700 m : benchmark 0.2189 s , picked 0.2400 s -> v =   2918 m/s
+  fitted apparent velocity = 2535 m/s (intercept -0.0116 s)

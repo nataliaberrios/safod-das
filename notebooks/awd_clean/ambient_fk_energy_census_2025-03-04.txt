@@ -1,0 +1,36 @@
+Raw 5-20 Hz F-K energy census -- 2025-03-04
+no correlation, no F-K filter, no velocity selection
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T000007Z.h5 : 2 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T020007Z.h5 : 4 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T040007Z.h5 : 6 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T060007Z.h5 : 8 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T080007Z.h5 : 10 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T100007Z.h5 : 12 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T120007Z.h5 : 14 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T135907Z.h5 : 16 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T155907Z.h5 : 18 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T175907Z.h5 : 20 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T195907Z.h5 : 22 windows so far
+  SAFOD-Zumberge-16mGL-500HzFs_2025-03-04T215907Z.h5 : 24 windows so far
+
+--- 5-20 Hz energy by apparent velocity ---
+   velocity band        share of 5-20 Hz energy
+       0 -   500 m/s :  63.88 %   ################################
+     500 -  1000 m/s :  17.40 %   #########
+    1000 -  1500 m/s :   6.46 %   ###
+    1500 -  2000 m/s :   3.43 %   ##
+    2000 -  2500 m/s :   1.90 %   #
+    2500 -  3000 m/s :   1.27 %   #
+    3000 -  3500 m/s :   1.26 %   #
+    3500 -  4000 m/s :   0.39 %   
+    4000 -  5000 m/s :   1.08 %   #
+    5000 -  6500 m/s :   1.07 %   #
+    6500 -  9000 m/s :   0.62 %   
+    9000 +      m/s :   1.25 %   #
+
+  energy below 1500 m/s          : 87.7 %
+  energy in the 2500-4000 m/s fan : 2.9 %
+
+--- directionality inside the 2500-4000 m/s fan ---
+  F*K<0 (increasing coordinate / downgoing) : 49.8 %
+  F*K>0 (decreasing coordinate / upgoing)   : 50.2 %
