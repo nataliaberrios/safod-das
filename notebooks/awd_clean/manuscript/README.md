@@ -8,6 +8,7 @@ what goes into, or explains, the paper.
 
 | File | What it is |
 |---|---|
+| **[`AWD_reproduce_analysis.ipynb`](AWD_reproduce_analysis.ipynb)** | **The reproducibility notebook.** Every analysis step, start to finish, runnable and inspectable. Start here to follow or check the analysis. |
 | **[`MANUSCRIPT.md`](MANUSCRIPT.md)** | The whole paper, abstract → conclusions, ~9,400 words. **Read this one.** Generated — do not edit it directly. |
 | **[`REPRODUCE.md`](REPRODUCE.md)** | What code produced every number, in the order it must run. Includes a two-minute plain-language explanation of the experiment. |
 | **[`figures/FIGURES.md`](figures/FIGURES.md)** | The figure set with manuscript numbering, and which script made each one. |
@@ -18,7 +19,12 @@ what goes into, or explains, the paper.
 cd notebooks/awd_clean/manuscript
 python assemble_manuscript.py     # sections/ -> MANUSCRIPT.md
 python make_paper_figures.py      # ../*.png  -> figures/
+python build_notebook.py          # rebuild the notebook from its builder
 ```
+
+The notebook needs ~8 GB (the Deep stack array is 2.2 GB), so run it under
+`sh_dev --mem=16G` or in a job, not on a login node. Smoke-test it headless with
+`python run_nb_cells.py AWD_reproduce_analysis.ipynb`.
 
 Run the first after editing any section. It fails loudly if a heading marker has
 moved, rather than quietly emitting a truncated paper.
