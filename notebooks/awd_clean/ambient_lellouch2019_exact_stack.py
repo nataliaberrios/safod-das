@@ -110,6 +110,26 @@ def acquisition_metadata(path: Path) -> dict[str, float | int | str]:
         }
 
 
+def longest_continuous_prefix(rows: pd.DataFrame, record_seconds: float) -> pd.DataFrame:
+    """Truncate a day to its longest run of exactly-contiguous records.
+
+    Opt-in only.  Three days in this archive (2024-11-30, 2024-10-28,
+    2025-03-04) carry a pair of manifest timing anomalies that sum to one record
+    length, so the day is not spliceable end to end even though most of it is
+    contiguous.  Rather than weaken `validate_continuity`, which correctly
+    refuses to splice across a discontinuity, this returns the leading
+    contiguous block so that block can be analysed on its own terms.  The
+    truncation is reported by the caller and the guard still runs afterwards.
+    """
+    if len(rows) < 2:
+        return rows
+    differences = np.diff(rows.time.astype("int64").to_numpy()) / 1.0e9
+    bad = np.flatnonzero(np.abs(differences - record_seconds) > 0.02)
+    if not bad.size:
+        return rows
+    return rows.iloc[: int(bad[0]) + 1].reset_index(drop=True)
+
+
 def validate_continuity(rows: pd.DataFrame, record_seconds: float) -> None:
     """Require the selected day to be continuous at the manifest time precision."""
     if len(rows) < 2:
@@ -314,6 +334,15 @@ def run_chunk(args: argparse.Namespace) -> None:
     dx = float(metadata["channel_spacing_m"])
     record_samples = int(metadata["record_samples"])
     record_seconds = float(metadata["record_seconds"])
+    if getattr(args, "continuous_prefix", False):
+        full = len(rows)
+        rows = longest_continuous_prefix(rows, record_seconds)
+        if len(rows) != full:
+            print(
+                "continuous-prefix: using %d of %d manifest rows (%.1f h)"
+                % (len(rows), full, len(rows) * record_seconds / 3600.0),
+                flush=True,
+            )
     validate_continuity(rows, record_seconds)
     if args.ram_seconds > record_seconds:
         raise ValueError("RAM duration exceeds one-file context halo")
@@ -1034,6 +1063,10 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--ram-seconds", type=float, default=0.1)
     result.add_argument("--spectral-mode", choices=VALID_SPECTRAL_MODES, default="cross_correlation")
     result.add_argument("--waterlevel", type=float, default=1.0e-3)
+    result.add_argument("--continuous-prefix", action="store_true",
+                        help="analyse only the leading contiguous block of a day whose "
+                             "manifest has a timing anomaly; off by default, so default "
+                             "behaviour is unchanged and the guard still runs")
     result.add_argument("--common-mode", action="store_true")
     result.add_argument("--null-method", choices=VALID_NULLS, default="ordered")
     result.add_argument("--realization", type=int, default=0)

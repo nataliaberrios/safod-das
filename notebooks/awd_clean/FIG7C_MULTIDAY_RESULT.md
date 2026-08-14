@@ -41,8 +41,16 @@ receiver-order familywise null over the declared 1.5–6.0 km/s scan.
 | 2024-06-17 | 4.5 | 1.901 | 5925 | 1.185 | 1.054 | 2.196 | 0.7413 |
 | 2024-06-26 | 3.6 | 1.297 | 5925 | 0.948 | 1.105 | 1.531 | 0.4206 |
 | 2024-05-11 | 0.3 | 1.026 | 1675 | 1.014 | 0.994 | 1.034 | 0.3091 |
+| 2024-11-30 † | **4.9** | 6.536 | 5850 | 2.936 | 3.056 | 6.613 | 0.1345 |
 
-**No day reaches significance; the minimum p over five days is 0.147.** Fisher's
+† 21.3 h continuous block (1,278 of 1,441 rows, 5,040 windows) via the opt-in
+`--continuous-prefix` flag. **This is the richest day in the whole census** and the
+last one untestable under the strict guard; it is now tested and it is the closest
+any day comes (p = 0.1345) while still failing, still peaking at 5,850 m/s rather
+than 3,200, and still with causal/acausal below 1.
+
+**No day reaches significance; the minimum p over all six days is 0.1345, on the
+richest day in the archive.** Fisher's
 combination across the five independent days gives χ² = 9.08 on 10 degrees of
 freedom, **p = 0.524** — the χ² ≈ df expected from pure noise, with no residual
 signal hiding below per-day significance.
@@ -52,8 +60,9 @@ Two further points against the arrival being present but weak:
 - **The peak is in the wrong place on four of five days**, sitting at 5,850–5,925
   m/s, the top edge of the declared scan, i.e. near-flat moveout rather than the
   paper's ~3,200 m/s.
-- **The census does not predict the outcome.** The richest usable day, 2024-06-17
-  at 4.5 %, scores p = 0.7413 — worse than the poorest day. Whatever occupies the
+- **The census does not predict the outcome.** 2024-06-17 at 4.5 % scores
+  p = 0.7413, worse than the poorest day; 2024-11-30 at 4.9 % scores p = 0.1345,
+  no better than 2024-12-20 at 4.1 %. Whatever occupies the
   body-wave fan in the raw energy budget is not organised into a receiver-ordered
   arrival, so "pick a better day" is not an available fix.
 
