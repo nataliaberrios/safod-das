@@ -273,6 +273,47 @@ This experiment measures the sensitivity of the observable *as constructed*.
 Attribution of that sensitivity to the guided mode specifically rests on the
 prior permutation nulls in `deep_tube_validation` (p = 0.002), not on this test.
 
+## 8b. The tube-wave lineage — what became the paper, and what was dropped
+
+Recorded because the naming hides it. The Deep guided mode **is** the tube-wave
+candidate; the paper reports it phase-neutrally, so the lineage is invisible in
+the manuscript and easy to think abandoned.
+
+**The search window was chosen on tube-wave grounds.** `deep_tube_validation.py`
+scans a slowness band named `TUBE_POSITIVE = (1/1800, 1/1300)` — i.e. 1300–1800
+m/s, where a fluid-column tube wave should sit. Every Deep validation product
+carries `deep_tube_` in its name. The window is not arbitrary and the manuscript
+should say so; at present it does not, which makes a frozen choice look unmotivated.
+
+**A gate test settled whether to build the thesis on it** (`tube_wave_gate.py`,
+commit `09e5fe5`). Three claims, verdict `C1 FAIL | C2 PASS | C3 PASS`, against a
+pre-set rule of "pivot only if at least C1 and C3 pass":
+
+| | Claim | Result |
+|---|---|---|
+| C1 | Detectable on both fibers, and they differ | **FAIL** — semblance 0.088 cemented, 0.014 wireline |
+| C2 | Tube-wave amplitude images permeable structure | **PASS** — 7 wireline channels >2σ below trend, at 129, 131, 137, 696, 1280, 1295, 1609 m |
+| C3 | It improves the dv/v floor | **PASS** — wireline floor 0.591% on the tube arrival against 2.574% on direct P, a 4.36× gain |
+
+So the commit subject "negative result, do not pursue" refers to **not pivoting
+the thesis**, not to the observable. Read claim by claim:
+
+- **C3 became the paper.** That 4.36× floor improvement on the wireline is the
+  early, rough version of this analysis's central result, and the gate's 0.591%
+  estimate anticipates the final 0.5% reliable-detection level closely.
+- **C1's failure is consistent with the finished result.** The two installations
+  see different coherent modes rather than the same one at different strengths.
+- **C2 passed and was never followed up.** Seven candidate depths where
+  tube-wave amplitude drops sharply — the classic hydrophone-VSP permeable-fracture
+  indicator. This is the genuinely dropped thread. Banerjee & Chatterjee (2021),
+  in the paper collection and currently uncited, is the method reference for it.
+
+**Two consequences.** The manuscript should state that the 1300–1800 m/s window
+was motivated by the tube-wave hypothesis, since that is honest provenance for a
+frozen selection region. And C2 is a live, unclaimed result sitting in a log
+file — worth either following up or explicitly retiring, but not leaving where
+it is.
+
 ## 9. Acquisition inventory, and why 46 and not 48
 
 The burst count is easy to get wrong by a fencepost, and the drop count has four
