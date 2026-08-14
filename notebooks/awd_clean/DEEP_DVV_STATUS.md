@@ -292,7 +292,7 @@ pre-set rule of "pivot only if at least C1 and C3 pass":
 | | Claim | Result |
 |---|---|---|
 | C1 | Detectable on both fibers, and they differ | **FAIL** — semblance 0.088 cemented, 0.014 wireline |
-| C2 | Tube-wave amplitude images permeable structure | **PASS** — 7 wireline channels >2σ below trend, at 129, 131, 137, 696, 1280, 1295, 1609 m |
+| C2 | Tube-wave amplitude images permeable structure | ~~PASS~~ **RETIRED 2026-08-13** — the pass criterion was not a test; see below |
 | C3 | It improves the dv/v floor | **PASS** — wireline floor 0.591% on the tube arrival against 2.574% on direct P, a 4.36× gain |
 
 So the commit subject "negative result, do not pursue" refers to **not pivoting
@@ -303,16 +303,53 @@ the thesis**, not to the observable. Read claim by claim:
   estimate anticipates the final 0.5% reliable-detection level closely.
 - **C1's failure is consistent with the finished result.** The two installations
   see different coherent modes rather than the same one at different strengths.
-- **C2 passed and was never followed up.** Seven candidate depths where
-  tube-wave amplitude drops sharply — the classic hydrophone-VSP permeable-fracture
-  indicator. This is the genuinely dropped thread. Banerjee & Chatterjee (2021),
-  in the paper collection and currently uncited, is the method reference for it.
+- **C2 is retired as of 2026-08-13.** Followed up in
+  `C2_PERMEABILITY_FOLLOWUP.md` (plan) and `C2_PHASE0_RESULTS.md` (results).
+  Banerjee & Chatterjee (2021), in the paper collection and still uncited, is the
+  method reference.
 
-**Two consequences.** The manuscript should state that the 1300–1800 m/s window
-was motivated by the tube-wave hypothesis, since that is honest provenance for a
-frozen selection region. And C2 is a live, unclaimed result sitting in a log
-file — worth either following up or explicitly retiring, but not leaving where
-it is.
+### Why C2 is retired, and what survives it
+
+The gate's pass criterion was `any(F['drops'].size >= 3 ...)` — at least three
+channels below −2σ of a linear log-amplitude trend. That is not a statistical
+test. With 1603 wireline channels, chance gives ~36 such channels; the gate found
+**seven**, a deficit rather than an excess (binomial P(≤7) = 2.3×10⁻⁹).
+
+Four findings, each sufficient on its own:
+
+1. **σ is not a scatter.** 71 % of the wireline residual variance lies at
+   wavelengths > 200 m, so σ measures structure the linear trend failed to
+   absorb.
+2. **The list is an artefact of the estimator.** Robust MAD instead of the
+   standard deviation turns 7 candidates into 42.
+3. **Nothing survives a proper null.** Phase-randomised surrogates preserving the
+   residual autocorrelation give p = 0.37 (count), 0.73 (depth), 0.29 (step).
+4. **Wrong shape, and often wrong sign.** A permeable fracture makes amplitude
+   *stay lower below* it. Only 2 of the 7 point that way, none above 0.6σ. Seven
+   channels are also only four features at the measured 51 m correlation length.
+
+**The decisive point is that the measurement had no power.** Planted features of
+known size are detected at most 34 % of the time even for a 95 % amplitude loss,
+so C2 PASS and C2 FAIL were equally uninformative. C2 is *untestable as run*, not
+refuted.
+
+**What survives is a quantified prospect.** The factor-3.3 channel-to-channel
+scatter is reproducible between burst halves (ρ = 0.922), so it is static
+per-channel response, not noise: σ_static = 1.177 against σ_noise = 0.241, i.e.
+**96 % of the variance is removable, 5.0× of headroom**. With the static response
+divided out, a step would be detectable at an **18 % amplitude loss (1.7 dB)** —
+a useful permeable-fracture threshold. That single calibration step, not the four
+Phase 1 items, is what decides whether C2 can exist.
+
+**Do not cite the seven depths.** They are a threshold artefact. The cemented
+fiber's apparently significant step (p = 0.007) is separately an edge artefact —
+it stays pinned to the first allowed breakpoint and reaches p = 0.648 once the
+shallowest 300 m are dropped, because log-amplitude is not linear in depth near
+the source.
+
+**Unchanged consequence.** The manuscript should still state that the 1300–1800
+m/s window was motivated by the tube-wave hypothesis, since that is honest
+provenance for a frozen selection region.
 
 ## 9. Acquisition inventory, and why 46 and not 48
 

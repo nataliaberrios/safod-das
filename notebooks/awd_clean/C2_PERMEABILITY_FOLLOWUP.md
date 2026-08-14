@@ -1,5 +1,22 @@
 # C2 follow-up — does tube-wave amplitude image permeable structure?
 
+> **Phase 0 ran on 2026-08-13. Results in `C2_PHASE0_RESULTS.md`.**
+>
+> The seven candidates are **retired** — the count was a *deficit* against chance
+> (7 observed, 36 expected), the list flips to 42 candidates under a robust σ, and
+> nothing survives an autocorrelation-preserving surrogate null.
+>
+> But Phase 0 also showed the measurement had **no power at all** — a planted 95 %
+> amplitude loss is detected at most 34 % of the time — so C2 was never tested
+> rather than tested and failed. And 96 % of the fatal scatter is *static*
+> per-channel response (ρ = 0.922 between burst halves), hence removable, worth
+> **5.0×**: with it divided out a step would be detectable at an **18 % amplitude
+> loss**.
+>
+> **So Phase 1 gained one mandatory first item — calibrate the static per-channel
+> amplitude response — and that item alone decides whether C2 can exist.** The rest
+> of the plan below stands as written.
+
 **Status: unclaimed result, not yet a finding.** Written 2026-08-13.
 
 The gate test `tube_wave_gate.py` returned C2 PASS: seven wireline channels more
@@ -60,6 +77,17 @@ outcome and cheaper than the alternative.
 Only if Phase 0 survives. The gate measurement was quick and has known
 weaknesses; redo it properly.
 
+- [ ] **FIRST, AND DECISIVE — divide out the static per-channel amplitude
+      response.** Phase 0 measured 96 % of the wireline log-amplitude scatter as
+      static (ρ = 0.922 between burst halves), σ_static = 1.177 against
+      σ_noise = 0.241. Until this is removed no threshold on the profile can
+      work; once it is, a step is detectable at an 18 % amplitude loss. Estimate
+      the gain from an **independent** window — a different frequency band, a
+      pre-arrival time window, or ambient RMS — so the calibration does not come
+      from the samples being tested. Then re-run `c2_phase0_significance.py` and
+      check σ falls from 1.20 toward 0.24. **If it does not, the static term is
+      not a simple gain and C2 should be retired for good.** Everything else in
+      this phase is wasted effort before this works.
 - [ ] **Use the frozen trajectory.** The gate test fitted its own tube velocity
       per fiber (1330 / 1440 m/s). The analysis now has a properly frozen
       outbound trajectory — 1544.6 m/s at t₀ = +0.100 s, selected on the
@@ -146,11 +174,14 @@ measured by a different instrument.
 | 3 — corroboration | blocked on logs | yes |
 | 4 — write-up | 1–2 days | — |
 
-**My expectation: Phase 0 retires it.** Seven candidates out of ~1372 channels is
-fewer than Gaussian chance would give, the features cluster into ~4 once channel
-correlation is accounted for, and the test looked for dips where the physics
-predicts steps. That is not a promising starting point.
+**My expectation was that Phase 0 would retire it**, because seven candidates out
+of 1603 channels is fewer than Gaussian chance gives, the features cluster into
+four once channel correlation is accounted for, and the test looked for dips where
+the physics predicts steps.
 
-Which is worth knowing in half a day rather than after two weeks. And if it does
-survive Phase 0 — a genuine step, reproducible on both legs, at a depth a log can
-confirm — then it is a real result and worth the rest.
+**Half right.** All three held, and the candidate list is gone. But the same run
+found the measurement never had the power to detect a permeable fracture at all,
+and that 96 % of what destroyed it is static and removable — so the honest verdict
+is *untestable as run*, with 5.0× of headroom and an 18 % detection threshold
+waiting behind one calibration step. Phase 1's new first item is now the whole
+decision, and it is a day of work rather than three.
