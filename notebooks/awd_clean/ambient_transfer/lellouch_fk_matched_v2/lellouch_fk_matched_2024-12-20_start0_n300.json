@@ -1,0 +1,98 @@
+{
+  "workflow_version": "ambient_lellouch_fk_matched_v2",
+  "date": "2024-12-20",
+  "start": 0,
+  "requested_files": 300,
+  "used_files": 300,
+  "fs_hz": 500.0,
+  "dx_m": 1.0209523439407349,
+  "modes": {
+    "unfiltered": {
+      "windows": 900,
+      "simple_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 2025.0,
+        "descriptive_causal_peak_signed_score": 0.03935939235082637,
+        "causal_score_at_3200_m_s": 0.014729241758379124,
+        "anti_causal_score_at_3200_m_s": 0.005535784680321175,
+        "abs_causal_to_anti_causal_ratio_at_3200": 2.66073241806879
+      },
+      "aligned_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 2025.0,
+        "descriptive_causal_peak_signed_score": 0.03590856512469331,
+        "causal_score_at_3200_m_s": 0.014959606091049085,
+        "anti_causal_score_at_3200_m_s": 0.005281165312354178,
+        "abs_causal_to_anti_causal_ratio_at_3200": 2.832633558365277
+      }
+    },
+    "downgoing_2p5_4p5": {
+      "windows": 900,
+      "simple_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 2675.0,
+        "descriptive_causal_peak_signed_score": 0.5041731376348567,
+        "causal_score_at_3200_m_s": 0.20655968815769266,
+        "anti_causal_score_at_3200_m_s": -0.019729668485352455,
+        "abs_causal_to_anti_causal_ratio_at_3200": 10.469496145413952
+      },
+      "aligned_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 2675.0,
+        "descriptive_causal_peak_signed_score": 0.510383760802353,
+        "causal_score_at_3200_m_s": 0.20835145870075333,
+        "anti_causal_score_at_3200_m_s": -0.019887614380295814,
+        "abs_causal_to_anti_causal_ratio_at_3200": 10.476443012047897
+      }
+    },
+    "upgoing_2p5_4p5": {
+      "windows": 900,
+      "simple_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 3100.0,
+        "descriptive_causal_peak_signed_score": -0.225874064928775,
+        "causal_score_at_3200_m_s": -0.024100469378869508,
+        "anti_causal_score_at_3200_m_s": 0.20156635805538506,
+        "abs_causal_to_anti_causal_ratio_at_3200": 0.1195659315938394
+      },
+      "aligned_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 3100.0,
+        "descriptive_causal_peak_signed_score": -0.22675138849729676,
+        "causal_score_at_3200_m_s": -0.025697845423402952,
+        "anti_causal_score_at_3200_m_s": 0.2108227447468053,
+        "abs_causal_to_anti_causal_ratio_at_3200": 0.12189313564940846
+      }
+    },
+    "downgoing_direction_only": {
+      "windows": 900,
+      "simple_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 4050.0,
+        "descriptive_causal_peak_signed_score": 0.24943822059474408,
+        "causal_score_at_3200_m_s": -0.04059430592715284,
+        "anti_causal_score_at_3200_m_s": 0.0462940751061674,
+        "abs_causal_to_anti_causal_ratio_at_3200": 0.8768790786738231
+      },
+      "aligned_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 4050.0,
+        "descriptive_causal_peak_signed_score": 0.2516141950608002,
+        "causal_score_at_3200_m_s": -0.040009145452023484,
+        "anti_causal_score_at_3200_m_s": 0.04457202896191029,
+        "abs_causal_to_anti_causal_ratio_at_3200": 0.8976289925283392
+      }
+    },
+    "upgoing_direction_only": {
+      "windows": 900,
+      "simple_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 3850.0,
+        "descriptive_causal_peak_signed_score": 0.1242848077663955,
+        "causal_score_at_3200_m_s": 0.03888361938705733,
+        "anti_causal_score_at_3200_m_s": -0.04563508659358144,
+        "abs_causal_to_anti_causal_ratio_at_3200": 0.8520553435857028
+      },
+      "aligned_metrics": {
+        "descriptive_causal_peak_velocity_m_s": 3850.0,
+        "descriptive_causal_peak_signed_score": 0.12111279858319002,
+        "causal_score_at_3200_m_s": 0.038078604827023355,
+        "anti_causal_score_at_3200_m_s": -0.04417751210269591,
+        "abs_causal_to_anti_causal_ratio_at_3200": 0.8619454336519694
+      }
+    }
+  },
+  "fixed_processing": "strain-rate proxy; 5-s RAM normalization; 30-s windows; 15-s overlap; channel-0 source; 50-m receivers; R+/-10 stack; final 5-20 Hz correlation filter",
+  "direction_mapping": "channel coordinate increases downhole; synthetic and AWD checks map F*K<0 at positive lag to downgoing/increasing-coordinate and F*K>0 at negative lag to upgoing/decreasing-coordinate"
+}

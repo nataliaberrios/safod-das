@@ -1,0 +1,88 @@
+{
+  "workflow_version": "ambient_fk_white_noise_v1",
+  "seed": 20260813,
+  "ensembles": 10,
+  "records_per_ensemble": 3,
+  "seconds_per_record": 12.0,
+  "sampling": {
+    "fs_hz": 500.0,
+    "dx_m": 1.0209523439407349,
+    "channels": 800
+  },
+  "preprocessing": "Gaussian samples -> detrend -> 5-20 Hz bandpass -> 5-s running-absolute-mean normalization -> 2x time/space decimation -> frozen signed F-K mask -> channel-0 correlations",
+  "masks": {
+    "production_2p5_4p5": {
+      "negative": {
+        "real_signed_score_3200": 0.26967600633858313,
+        "white_abs_score_3200_median": 0.14510874635166113,
+        "white_abs_score_3200_95": 0.1722464268477706,
+        "white_peak_abs_score_median": 0.17979809678716266,
+        "white_peak_abs_score_95": 0.1885261701426379,
+        "real_exceeds_white_95_at_3200": true
+      },
+      "positive": {
+        "real_signed_score_3200": 0.2668835164750041,
+        "white_abs_score_3200_median": 0.12836497460446045,
+        "white_abs_score_3200_95": 0.1953013245669314,
+        "white_peak_abs_score_median": 0.17122452450962744,
+        "white_peak_abs_score_95": 0.20833469616504158,
+        "real_exceeds_white_95_at_3200": true
+      }
+    },
+    "narrow_2p8_3p8": {
+      "negative": {
+        "real_signed_score_3200": 0.7034885475188586,
+        "white_abs_score_3200_median": 0.6444278281517601,
+        "white_abs_score_3200_95": 0.660830220313265,
+        "white_peak_abs_score_median": 0.6444278281517601,
+        "white_peak_abs_score_95": 0.660830220313265,
+        "real_exceeds_white_95_at_3200": true
+      },
+      "positive": {
+        "real_signed_score_3200": 0.6908919033818224,
+        "white_abs_score_3200_median": 0.6339694051567307,
+        "white_abs_score_3200_95": 0.6610206887917642,
+        "white_peak_abs_score_median": 0.6339694051567307,
+        "white_peak_abs_score_95": 0.6610206887917642,
+        "real_exceeds_white_95_at_3200": true
+      }
+    },
+    "broad_2p0_5p5": {
+      "negative": {
+        "real_signed_score_3200": 0.01006194708928565,
+        "white_abs_score_3200_median": 0.012429006941756717,
+        "white_abs_score_3200_95": 0.03446911036273292,
+        "white_peak_abs_score_median": 0.10353645623745748,
+        "white_peak_abs_score_95": 0.13281995503348637,
+        "real_exceeds_white_95_at_3200": false
+      },
+      "positive": {
+        "real_signed_score_3200": 0.015666479996320086,
+        "white_abs_score_3200_median": 0.007619068497173783,
+        "white_abs_score_3200_95": 0.02896874327432242,
+        "white_peak_abs_score_median": 0.09459512926847058,
+        "white_peak_abs_score_95": 0.129811479675937,
+        "real_exceeds_white_95_at_3200": false
+      }
+    },
+    "direction_only": {
+      "negative": {
+        "real_signed_score_3200": -0.00040463463951997676,
+        "white_abs_score_3200_median": 0.00807386989035748,
+        "white_abs_score_3200_95": 0.02619250031989136,
+        "white_peak_abs_score_median": 0.02384415443891414,
+        "white_peak_abs_score_95": 0.03202489183173611,
+        "real_exceeds_white_95_at_3200": false
+      },
+      "positive": {
+        "real_signed_score_3200": -0.010732430739538211,
+        "white_abs_score_3200_median": 0.0067552085599122715,
+        "white_abs_score_3200_95": 0.016125339764866905,
+        "white_peak_abs_score_median": 0.02329402083283143,
+        "white_peak_abs_score_95": 0.03157183752235335,
+        "real_exceeds_white_95_at_3200": false
+      }
+    }
+  },
+  "decision": "A mask passes this synthetic gate only when the held-out real-data absolute 3.2 km/s score exceeds the 95th percentile of identically processed white-noise ensembles. This gate is necessary but not sufficient; the raw-channel permutation gate is evaluated separately."
+}

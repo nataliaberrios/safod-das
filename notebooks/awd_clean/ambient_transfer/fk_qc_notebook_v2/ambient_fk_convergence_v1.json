@@ -1,0 +1,23 @@
+{
+  "workflow_version": "ambient_fk_convergence_v1",
+  "dates": [
+    "2024-05-11",
+    "2024-06-17",
+    "2024-06-26",
+    "2024-10-28",
+    "2024-11-30",
+    "2024-12-20",
+    "2025-02-24",
+    "2025-03-04"
+  ],
+  "five_hour": {
+    "unfiltered_section_correlation": -0.036876538906433526,
+    "filtered_section_correlation": 0.810219221545252,
+    "unfiltered_score_3200": 0.0002536731254821798,
+    "filtered_score_3200": 0.26611168530219453
+  },
+  "descriptive_rule": "first n for which the 10th percentile section correlation with the final eight-day stack is >=0.90 and remains so",
+  "unfiltered_first_stable_days": 7,
+  "production_fan_first_stable_days": 1,
+  "decision": "The production-fan section is descriptively stable much sooner than the unfiltered section, but this is not physical signal convergence because the same fan fails pre-filter surrogate nulls. The unfiltered 3.2 km/s observable is not independently recovered by the eight-day aggregate."
+}

@@ -1,11 +1,35 @@
 # SAFOD AWD clean analysis
 
-## Single active notebook
+## Authoritative notebooks by workflow
 
-`AWD_results_dashboard.ipynb` is the only authoritative analysis notebook.
-Its internal Markdown version cell is the version record; the current version
-is **v25**. Automated jobs may write status and proposed-update Markdown files,
-but they must not create or modify another notebook. The v15 dashboard promotes the hierarchical Nano repeatability analysis, the completed Deep localized validation/negative conversion-depth search, the conditional Deep coordinate-registration/forward consistency test, the source-history/tidal-timescale delay regression, and exploratory/physical-phase CCA controls with serial-dependence-aware nulls.
+`AWD_results_dashboard.ipynb` is the authoritative AWD analysis notebook. Its
+internal Markdown version cell is the version record; the current version is
+**v25**. Automated AWD jobs may write status and proposed-update Markdown
+files, but they must not create or modify another AWD notebook. The v15
+dashboard promotes the hierarchical Nano repeatability analysis, the completed
+Deep localized validation/negative conversion-depth search, the conditional
+Deep coordinate-registration/forward consistency test, the
+source-history/tidal-timescale delay regression, and exploratory/physical-phase
+CCA controls with serial-dependence-aware nulls.
+
+`Ambient_FK_QC_workflow.ipynb` is the single authoritative ambient-noise F--K
+quality-control notebook. It is generated reproducibly by
+`build_ambient_fk_qc_notebook.py`, documents the Lellouch et al. (2019)
+reproduction attempt and all project-specific extensions, and supersedes the
+earlier `Ambient_FK_QC_workflow_v1.ipynb` draft.
+
+Rebuild and execute that notebook from the repository's `notebooks/` directory:
+
+```bash
+python3 awd_clean/build_ambient_fk_qc_notebook.py
+jupyter nbconvert --to notebook --execute --inplace \
+  awd_clean/Ambient_FK_QC_workflow.ipynb \
+  --ExecutePreprocessor.kernel_name=das \
+  --ExecutePreprocessor.timeout=900
+```
+
+The system Python builds the notebook because it provides `nbformat`; the
+registered `das` kernel executes the scientific cells.
 
 This directory is an AWD-only replacement workflow. It does not use
 `SAFOD_ActiveSrc_ShotLocs&Times_20260617.csv`; those shots are a separate
