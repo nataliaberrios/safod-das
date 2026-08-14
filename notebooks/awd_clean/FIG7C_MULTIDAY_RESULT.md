@@ -57,11 +57,47 @@ Two further points against the arrival being present but weak:
   body-wave fan in the raw energy budget is not organised into a receiver-ordered
   arrival, so "pick a better day" is not an available fix.
 
+## The coherent stack — the most sensitive test available
+
+Combining five p values with Fisher's method is not the same experiment as
+stacking the data. A weak coherent arrival grows with the number of stacked
+windows while incoherent noise averages down, so one long stack is strictly more
+sensitive than several short tests however their p values are pooled.
+`ambient_lellouch2019_multiday_stack.py` therefore sums the chunk cross spectra —
+exactly additive, so the result is identical to having processed one continuous
+record — and imports the scoring, bandpass and null from the single-day operator
+so the arithmetic is bit-identical.
+
+**The archive is not homogeneous in acquisition rate.** 2024-05-11 was recorded at
+**5000 Hz** (`n_fft` 524288, `ram_samples` 501) against 500 Hz on every other day.
+Its cross spectra live on a different frequency grid and cannot be coherently
+pooled, so it is excluded from the stack; its one-day result above still stands.
+This also explains why that day was consistently slow and memory-hungry. Any
+future analysis pooling across this archive must group by acquisition rate.
+
+Stacking the four 500 Hz days — 5,760 files, **23,036 windows, 96.0 hours**:
+
+| quantity | value | requirement |
+|---|---:|---|
+| peak causal score | 1.912 | — |
+| at velocity | 5,925 m/s | paper: ~3,200 m/s |
+| score at 3,200 m/s, causal | 1.143 | — |
+| score at 3,200 m/s, acausal | 1.156 | causal must dominate |
+| causal / acausal at 3,200 m/s | **0.99** | **> 1** |
+| receiver-order familywise null 95 % | 2.649 | — |
+| **p** | **0.9184** | < 0.05 |
+| detectability, peak / null 95 % | **0.72** | must reach 1.00 |
+
+Four times the data does not move the statistic toward its threshold — it sits
+further from significance than the single best day. That is the behaviour of
+noise, not of an arrival too weak to see in 24 hours.
+
 ## Conclusion
 
 Figure 7c does not reproduce on the 2024–2025 archive, on the paper's own
 operator, on five independent complete days spanning ten months, including the
-most energy-favourable day available. Taken with the eight-day raw census — 81–99 %
+most energy-favourable day available, nor on a coherent 96-hour stack of the four
+days that share an acquisition rate. Taken with the eight-day raw census — 81–99 %
 of 5–20 Hz energy below 1,500 m/s and downgoing share never exceeding 49.9 % — the
 required downgoing body-wave energy is not present in the input, so no processing
 choice recovers it.
