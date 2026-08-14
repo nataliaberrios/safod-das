@@ -26,6 +26,29 @@ The notebook needs ~8 GB (the Deep stack array is 2.2 GB), so run it under
 `sh_dev --mem=16G` or in a job, not on a login node. Smoke-test it headless with
 `python run_nb_cells.py AWD_reproduce_analysis.ipynb`.
 
+### The notebook is committed WITH its outputs — deliberately
+
+This is the one exception to the repo rule about clearing notebook outputs. The
+notebook exists so a reader can follow the analysis without running it, and a
+version with no figures does not do that. It is 5.0 MB with 7 embedded figures,
+which is reviewable; the 44 MB dashboard is the case the rule is protecting
+against.
+
+Regenerate it with `sbatch rebuild_exec_job.sh`, which runs `build_notebook.py`
+and then `execute_notebook.py`. The latter exists because the `das` env has no
+nbconvert, nbclient, or nbformat — it drives the `das` kernel over
+`jupyter_client` and writes nbformat-v4 outputs itself.
+
+**Why `run_nb_cells.py` is not sufficient on its own:** it `exec`s the code cells
+and proves they run, but writes nothing back, so it cannot tell you the notebook
+renders. It passed for weeks on a notebook that produced *zero* figures, because
+`fk_dispersion` and `deep_dvv_injection_recovery` both call
+`matplotlib.use("Agg")` at import time so they can run headless under Slurm. That
+silently turns `plt.show()` into a no-op — interactively too, not just headless.
+The first code cell now restores the inline backend and prints the backend in use,
+and `execute_notebook.py` exits non-zero if any cell that draws a figure captured
+none.
+
 Run the first after editing any section. It fails loudly if a heading marker has
 moved, rather than quietly emitting a truncated paper.
 
