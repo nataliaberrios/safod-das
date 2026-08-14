@@ -1,4 +1,4 @@
-"""Build the audited advisor-facing ambient F-K QC notebook."""
+"""Build the audited advisor-facing Figure 7c reproduction and F-K QC notebook."""
 from pathlib import Path
 import nbformat as nbf
 
@@ -15,41 +15,40 @@ def markdown(text):
 def python(text):
     nb.cells.append(nbf.v4.new_code_cell(text))
 
-markdown(f"""# Ambient-noise F–K QC workflow — {NOTEBOOK_VERSION}
+markdown(f"""# Ambient-noise Figure 7c reproduction and F–K QC — {NOTEBOOK_VERSION}
 
 This is the single advisor-facing notebook for the ambient-noise analysis. It follows one linear chain:
 
-1. reproduce the Lellouch-style unfiltered calculation;
-2. show the raw → normalized → correlation → F–K progression;
-3. compare velocity bands and both signed coordinate-direction branches;
-4. run white-noise and pre-filter channel-scramble nulls through the same operator;
-5. show full-pipeline null statistics; and
-6. place the available 5-hour, one-day, and multi-day products on a stack-duration axis.
+1. reproduce the unfiltered Lellouch et al. (2019) Figure 7c calculation from raw 2024 data;
+2. test the measured gather against receiver-order, broadband-white-noise, and channel-scramble controls;
+3. show the raw → normalized → correlation → F–K progression as a separate project extension;
+4. compare velocity bands and signed coordinate-direction branches; and
+5. place the available 5-hour, one-day, and multi-day products on a stack-duration axis.
 
-The notebook is a decision document, not a gallery. A processing choice passes only if the real-data result survives a null that uses the **same correlation segmentation, the same nearby-pair stack, and the same two-pass alignment sequence** as the measured result.
+The notebook is a decision document, not a gallery. A processing choice passes only if the measured result survives controls using the same segmentation, receiver stack, display band, and velocity-selection rule.
 
-**v7 correction.** Every earlier scientific verdict in this notebook is withdrawn pending the exact rerun. The legacy pipelines reset preprocessing at one-minute boundaries, omitted boundary-spanning 15-s starts, applied an unreported detrend, and in some branches added common-mode removal, input bandpass, whitening, or per-window correlation normalization. The corrected baseline uses continuous differentiation and RAM, all 5,759 windows, the literal R±10 sum, and only a final 5–20 Hz filter. Jobs 38988141 and 38988173 produce and aggregate the new evidence automatically. Superseded jobs 38986655 and 38986699 failed before Python opened any data because the first launcher expanded an empty optional-argument array under Bash nounset; commit aa5dcfa fixes and dry-runs that launcher.
+**v8 result.** The paper-faithful one-day rerun is complete. It uses all 1,440 files and 5,759 continuous 30-s windows, the literal unshifted R±10 sum, and no F–K filter. The measured baseline peaks at 5.85 km s⁻¹ rather than 3.2 km s⁻¹ and does not exceed the receiver-order scan-max null (p = 0.147). Its gather remains almost unchanged after receiver channels are scrambled before preprocessing (flattened correlation 0.9976), so the dominant structure is not ordered moveout. This rejects a Figure 7c reproduction for the matched 20 December 2024 day; it does not invalidate F–K filtering as a standard directional tool or rule out other dates and longer stacks.
 """)
 
 markdown(f"""{NOTEBOOK_VERSION}""")
 
 markdown("""## Current exact-reproduction status
 
-**Authoritative status: running; no scientific acceptance or rejection yet.** The paper-faithful operator is `ambient_lellouch2019_exact_stack.py` at Git commit `9c70083`. Sherlock array `38988141` processes seven predeclared branches, and dependency-gated array `38988173` aggregates them only after every hourly chunk succeeds.
+**Authoritative status: completed for the matched one-day test; Figure 7c is not reproduced.** The raw-to-chunk operator is `ambient_lellouch2019_exact_stack.py`; the relevant audited commits are `9c70083` (paper operator), `cc07080` (all-channel common-mode and post-average Equation 6 sensitivities), and `bb48942` (filter the complete correlation before lag cropping). Chunk array `38988141` and final v4 aggregate array `38993456` completed with zero exit codes.
 
-The exact baseline is fixed before looking at its result: source channel 23 (the provisional G0 wellhead estimate), receiver centers at 50–700 m offsets, the same source paired with receivers R−10 through R+10, time differentiation, centered running-absolute-mean normalization, continuous 30-s windows every 15 s, raw cross-correlation averaging, a simple unshifted R±10 sum, and a final 5–20 Hz bandpass. A complete day must contain exactly **5,759 unique windows**. There is no F–K filter, linear detrend, common-mode subtraction, input bandpass, spectral whitening, per-window correlation normalization, or imported 3.2-km/s alignment in this Figure 7c baseline.
+The baseline was fixed before its result was examined: provisional wellhead channel 23; receiver centers at 50–700 m offsets; the same source paired with R−10 through R+10; time differentiation; centered running-absolute-mean normalization; continuous 30-s windows every 15 s; ordinary cross-spectrum averaging; an unshifted R±10 sum; full-correlation 5–20 Hz filtering followed by lag cropping; and exactly 5,759 unique windows. There is no F–K filter, linear detrend, common-mode subtraction, input bandpass, spectral whitening, per-window correlation normalization, or imported 3.2-km-s⁻¹ alignment in this baseline.
 
 | Branch | Why it exists | Status relative to the paper |
 |---|---|---|
 | source 23, RAM 0.1 s, ordinary correlation | primary Figure 7c reproduction | baseline; RAM duration remains an explicit ambiguity |
 | source 0 | tests the current channel-origin assumption | coordinate sensitivity |
-| RAM 5 s | tests the previously used project value | preprocessing sensitivity |
-| median common-mode subtraction | evaluates the quoted opinion and zero-lag concern | unreported sensitivity |
-| stabilized source-power division | evaluates one operational interpretation of Equation 6 | underspecified sensitivity |
-| iid broadband white noise | verifies that the complete operator does not invent ordered moveout | full-pipeline null |
-| measured data with receiver channels permuted before preprocessing | destroys spatial ordering while retaining real temporal content | full-pipeline null |
+| RAM 5 s | tests the former project value | preprocessing sensitivity |
+| 900-channel median common-mode subtraction | evaluates the quoted opinion and zero-lag concern | unreported sensitivity |
+| post-average stabilized source-power division | evaluates one operational interpretation of Equation 6 | underspecified sensitivity |
+| iid broadband white noise | verifies that the complete operator does not create significant ordered moveout | full-pipeline null |
+| receiver channels permuted before preprocessing | destroys spatial ordering while retaining measured temporal content | full-pipeline null |
 
-Everything below the explicit **legacy/withdrawn** banners is retained to show how the project arrived here. Those figures do not determine the final Figure 7c answer.
+Every branch contains 1,440 files and 5,759 windows. None clears the familywise receiver-order test at α = 0.05. The baseline and channel-scramble gathers are 0.9976 correlated, while all-channel common-mode subtraction removes the dominant structure but does not reveal a significant 3.2-km-s⁻¹ ridge. Everything below an explicit **legacy/withdrawn** banner is retained only as audit history and does not determine this conclusion.
 """)
 
 python("""from pathlib import Path
@@ -65,7 +64,7 @@ display(Image(filename=str(validation_png), width=1100))
 print(json.dumps(json.loads(validation_json.read_text()), indent=2))
 """)
 
-markdown("""**Figure QC-1. Independent validation of the exact Figure 7c operator before measured-data interpretation.** (a) Power spectral density of two deterministic-seed, independent Gaussian raw-input channels spans the complete 0–50 Hz Nyquist interval of this reduced synthetic test; the nearly zero fitted log-power slope demonstrates that the control is broadband rather than pre-shaped into the 5–20 Hz analysis band. (b) Their normalized cross-correlation remains near zero over ±1 s, and the zero-lag Pearson coefficient is −0.00179, demonstrating that the chosen noise channels do not already share a coherent waveform. (c) A plane wave with known 500 m s⁻¹ apparent velocity is propagated toward increasing channel coordinate and passed through the same differentiation, centered RAM, 30-s/15-s segmentation, cross-spectrum accumulation, R±10 summation, and lag reconstruction. The recovered median lag error is exactly 0 at the 0.01-s synthetic sampling interval. Additional machine-checked gates show that the distributed hourly ownership produces 5,759 unique full-day windows and that correlating the source with a summed 21-receiver trace is algebraically equivalent to summing the 21 separate correlations to 3.3×10⁻⁸ relative error. These controls validate implementation sign, segmentation, input-noise construction, and R±10 linearity; they do not assert that the measured archive contains the published P-wave arrival.""")
+markdown("""**Figure QC-1. Independent validation of the exact Figure 7c operator before measured-data interpretation.** (a) Power spectral density of two deterministic-seed, independent Gaussian raw-input channels spans the complete 0–50 Hz Nyquist interval of this reduced synthetic test; the nearly zero fitted log-power slope demonstrates that the control is broadband rather than pre-shaped into the 5–20 Hz analysis band. (b) Their normalized cross-correlation remains near zero over ±1 s, and the zero-lag Pearson coefficient is −0.00179, demonstrating that the chosen noise channels do not already share a coherent waveform. (c) A plane wave with known 500 m s⁻¹ apparent velocity is propagated toward increasing channel coordinate and passed through differentiation, centered RAM, 30-s/15-s segmentation, cross-spectrum accumulation, R±10 summation, full-correlation bandpass filtering, and lag cropping. The recovered median lag error is exactly 0 at the 0.01-s sampling interval. Machine-checked gates additionally recover 5,759 unique full-day windows, verify source-versus-summed-receiver equivalence to 3.3×10⁻⁸ relative error, and reproduce an independently constructed full-filter-then-crop reference with zero relative error. These tests validate implementation sign, segmentation, input-noise construction, R±10 linearity, and filter order; they do not assert that the measured archive contains the published P-wave arrival.""")
 
 markdown("""## Read this first: exactly which data are used
 
@@ -135,7 +134,7 @@ markdown("""### Audit of the three disputed preprocessing claims
 
 2. **Equation 6 source-spectrum division — theoretically present but operationally underspecified.** The paper writes the Green-function proportionality with division by the ambient-field power spectrum. It does not state how that spectrum was estimated, averaged, water-level stabilized, or applied window by window. The baseline therefore preserves the explicitly described cross-correlation stack; a separately labelled stabilized source-power branch tests whether this ambiguity controls the result.
 
-3. **R±10 nearby-receiver stack — genuinely required and previously missing from the legacy null path.** The paper explicitly sums 21 correlations for each output receiver and states that this smoothing is required to extract the signal. The corrected operator performs the literal sum for both geometries before the shifted restack. Twenty-one traces do not imply a 21-fold SNR increase: under independent-noise assumptions the ideal amplitude-SNR gain is at most the square root of 21, approximately 4.6, and is smaller for correlated neighboring noise.
+3. **R±10 nearby-receiver stack — genuinely required and previously missing from the legacy null path.** The paper explicitly sums 21 correlations for each output receiver and states that this smoothing is required to extract the signal. The corrected operator performs that literal sum in the fixed-top Figure 7c geometry without travel-time shifts. Twenty-one traces do not imply a 21-fold SNR increase: under independent-noise assumptions the ideal amplitude-SNR gain is at most the square root of 21, approximately 4.6, and is smaller for correlated neighboring noise.
 
 Thus the quoted opinion was partly correct: item 3 identified a decisive omission in the old single-pair test; item 1 incorrectly promoted a legacy project choice to a published requirement; and item 2 identified a real fidelity ambiguity but overstated how completely the paper specifies its implementation.
 """)
@@ -742,62 +741,88 @@ plt.show(); print(conv_meta)
 
 markdown("""**Figure 10. Stack-duration stability relative to the eight-day reference.** For each stack length from one to eight complete selected days, every available day combination is averaged and compared with the final eight-day section. Square symbols show the separately processed five-hour checkpoint. Lines show medians and shaded intervals show the 10th–90th percentiles across day combinations. The left panel measures full-section waveform correlation with the eight-day reference; the red dashed line marks the predeclared descriptive threshold of 0.9. The right panel shows the 3.2-km/s moveout score. Because each partial day stack contributes to the eight-day reference, these correlations are positively dependent and cannot be read as independent prediction accuracy. The fan-filtered section crosses the internal threshold after approximately one day, whereas the unfiltered section does so only at seven days. Because the fan fails the input-level surrogate tests in Figure 9, its fast stability is interpreted as convergence of the selected operator output, not convergence of a physical Green's function. A defensible physical-signal minimum is not established between five hours and the tested eight days.""")
 
-markdown("""## 9. Current decision gate
+markdown("""## 9. Decision and scope
 
-The exact Figure 7c question is **not yet decided**. All earlier numerical accept/reject statements in Figures 1–10 were generated by legacy operators and are retained only as audit history. They may motivate controls, but they cannot prove that the published stack succeeds or fails.
+The corrected one-day Figure 7c test is complete. All required gates passed operationally: 1,440 files; 5,759 unique windows; the fixed-top unshifted R±10 gather; no F–K filter; a complete velocity scan; receiver-order, white-noise, and pre-correlation channel-scramble controls; source-coordinate and RAM sensitivities; and separately labelled common-mode and Equation-6 sensitivities.
 
-Completion now requires all of the following evidence from the same corrected operator:
+The scientific outcome is negative for **20 December 2024**:
 
-1. all 1,440 measured files and exactly 5,759 continuous 30-s windows;
-2. the fixed-top, unshifted R±10 Figure 7c gather with no F–K filter;
-3. the complete velocity scan and receiver-order familywise null;
-4. full-pipeline broadband-white-noise and data-level channel-permutation gathers;
-5. source-channel 23 versus channel 0 sensitivity;
-6. 0.1-s versus 5-s RAM sensitivity;
-7. common-mode and stabilized Equation-6 sensitivities kept separate from the baseline; and
-8. matching metadata showing no detrend, input bandpass, per-window correlation normalization, imported velocity alignment, or F–K selection in the baseline.
+- the measured scan maximum occurs at 5.85 km s⁻¹, near the flat-moveout edge of the 1.5–6.0 km s⁻¹ search, rather than at the published approximately 3.2 km s⁻¹;
+- the measured scan maximum is below the receiver-order 95th percentile (6.13 versus 6.32; familywise p = 0.147);
+- the causal and acausal scores at 3.2 km s⁻¹ are comparable (2.75 and 2.83), not a clear causal-dominant packet;
+- the baseline and pre-correlation channel-scramble gathers have flattened correlation 0.9976, showing that the dominant waveform is insensitive to receiver order; and
+- neither 900-channel common-mode subtraction nor the declared post-average Equation-6 stabilization reveals a significant 3.2 km s⁻¹ mode.
 
-Array `38988141` computes these products. Dependency-gated array `38988173` refuses to aggregate if any hourly chunk fails and independently asserts the 5,759-window total. The final decision will be promoted here only after those gates pass.
+Therefore the exact published one-day operator does **not** reproduce Figure 7c on this matched 2024 day. This conclusion is narrower than “ambient interferometry fails” and narrower than “F–K filtering is invalid.” The next clean scientific question is whether the same exact operator converges on independently chosen days or a predeclared multi-day stack; any F–K-assisted result remains a separately labelled extension whose evidence must include matched input-level controls.
 """)
 
 if EXACT_SUMMARY.is_file():
     markdown("""## 10. Paper-faithful Figure 7c result — v8
 
-The dependency-gated full-day aggregation completed. The table and figures below are loaded from the corrected v2 operator, not from the withdrawn legacy checkpoints.""")
-    python("""exact_dir = ROOT/'ambient_transfer'/'lellouch2019_exact_stack'
+The dependency-gated full-day calculation and v4 aggregation completed. The table and figures below are generated from the corrected operator and matched controls, not from the withdrawn legacy checkpoints. Hourly baseline spectra retain v2 provenance because the v3 sensitivity and v4 lag-filter corrections leave their cross spectra unchanged; v4 reconstructs, filters, tests, and plots every aggregate.""")
+    python("""import json
+import numpy as np
+import pandas as pd
+from IPython.display import display, Image
+
+exact_dir = ROOT/'ambient_transfer'/'lellouch2019_exact_stack'
 branch_stems = {
     'paper baseline': 'aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0',
     'source channel 0': 'aggregate_2024-12-20_src0_ram0p1_cross_correlation_ordered_r0',
     'RAM 5 s': 'aggregate_2024-12-20_src23_ram5_cross_correlation_ordered_r0',
-    'common mode': 'aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0_cm',
+    'common mode (900 ch)': 'aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0_cm',
     'Equation 6 stabilized': 'aggregate_2024-12-20_src23_ram0p1_source_power_stabilized_ordered_r0',
     'white noise': 'aggregate_2024-12-20_src23_ram0p1_cross_correlation_white_noise_r0',
     'channel permutation': 'aggregate_2024-12-20_src23_ram0p1_cross_correlation_channel_permutation_r0',
 }
-records=[]
+branch_json = {}
+branch_npz = {}
 for label, stem in branch_stems.items():
-    path=exact_dir/(stem+'.json')
-    assert path.is_file(), path
-    item=json.loads(path.read_text())
-    records.append([
-        label,item['files'],item['windows_30_s_15_s_step'],
-        item['best_causal_velocity_m_s'],item['causal_score_at_3200'],
-        item['acausal_score_at_3200'],item['receiver_order_scan_max_null_p'],
-        item['common_mode_removal'],item['spectral_mode'],item['fk_filter'],
-    ])
-display(pd.DataFrame(records,columns=[
-    'branch','files','windows','best causal v (m/s)','causal score at 3200',
-    'acausal score at 3200','receiver-order max-scan p','common mode',
-    'spectral mode','F-K filter',
-]))
-for label in ('paper baseline','white noise','channel permutation'):
-    display(Image(filename=str(exact_dir/(branch_stems[label]+'.png')),width=1100))
+    json_path = exact_dir/(stem+'.json')
+    npz_path = exact_dir/(stem+'.npz')
+    assert json_path.is_file() and npz_path.is_file(), (json_path, npz_path)
+    item = json.loads(json_path.read_text())
+    data = np.load(npz_path, allow_pickle=False)
+    assert item['workflow_version'] == 'lellouch2019_exact_stack_v4'
+    assert item['files'] == 1440 and item['windows_30_s_15_s_step'] == 5759
+    assert item['fk_filter'] is False
+    assert item['bandpass_order_relative_to_lag_crop'] == 'full correlation first; crop second'
+    branch_json[label], branch_npz[label] = item, data
+
+baseline = branch_npz['paper baseline']['r_plus_minus_10_correlation']
+def gather_similarity(test):
+    row_correlation = [np.corrcoef(reference, candidate)[0, 1]
+                       for reference, candidate in zip(baseline, test)]
+    return float(np.median(row_correlation)), float(np.corrcoef(
+        baseline.ravel(), test.ravel())[0, 1])
+
+records = []
+for label in branch_stems:
+    item, data = branch_json[label], branch_npz[label]
+    median_row, flattened = gather_similarity(data['r_plus_minus_10_correlation'])
+    records.append({
+        'branch': label,
+        'best v (m/s)': item['best_causal_velocity_m_s'],
+        'best score': item['best_causal_score'],
+        'score at 3200': item['causal_score_at_3200'],
+        'acausal at 3200': item['acausal_score_at_3200'],
+        'null 95% scan max': float(np.percentile(
+            data['receiver_order_null_maxima'], 95)),
+        'familywise p': item['receiver_order_scan_max_null_p'],
+        'median trace corr. to baseline': median_row,
+        'flattened corr. to baseline': flattened,
+    })
+display(pd.DataFrame(records).round(4))
+
+for label in ('paper baseline', 'common mode (900 ch)',
+              'white noise', 'channel permutation'):
+    display(Image(filename=str(exact_dir/(branch_stems[label]+'.png')), width=1100))
 """)
-    markdown("""**Figure 11. Paper-faithful full-day Figure 7c reproduction and matched falsification controls.** The first three-panel figure is the measured-data baseline: individual center-receiver correlations, the literal unshifted R−10:R+10 sum, and a causal/acausal apparent-velocity scan whose receiver-order null repeats the complete velocity selection. The second and third figures apply the same differentiation, centered RAM, 30-s/15-s continuous segmentation, R±10 sum, final 5–20 Hz filter, display normalization, and velocity scan to iid broadband white noise and to measured receiver channels permuted before preprocessing. Every branch must report 1,440 files and 5,759 windows. The red 3.2-km-s⁻¹ trajectory is a comparison line, not a fitted or imposed filter. The table exposes source-coordinate, RAM, common-mode, and Equation-6 sensitivities; only the first row is the primary reproduction. Scientific acceptance requires an ordered measured ridge that is visually coherent, stable to reasonable preprocessing ambiguity, and stronger than the full-selection nulls. The printed empirical p value is familywise over the declared 1.5–6.0 km-s⁻¹ scan rather than a post hoc test at the most favorable velocity.""")
+    markdown("""**Figure 11. Paper-faithful full-day Figure 7c test and matched falsification controls.** The first three-panel figure is the measured-data baseline: (a) individual center-receiver correlations, (b) the literal unshifted R−10:R+10 sum reported for Figure 7c, and (c) causal and acausal apparent-velocity scans. The dotted horizontal line in panel (c) is the 95th percentile of 10,000 receiver-order null scan maxima; the vertical 3.2 km s⁻¹ line and red moveout trajectory are comparison references, not fitted or imposed filters. The baseline maximum occurs at 5.85 km s⁻¹ with score 6.13, below the null threshold 6.32 (familywise p = 0.147), while the causal and acausal scores at 3.2 km s⁻¹ are 2.75 and 2.83. The second figure subtracts the instantaneous median estimated from all 900 acquisition channels before RAM; it removes the dominant shared waveform but does not expose significant ordered moveout (p = 0.922). The third figure passes deterministic-seed iid broadband Gaussian input through the complete operator and remains nonsignificant (p = 0.337). The fourth permutes measured receiver channels before differentiation and RAM, preserving temporal content while destroying spatial order; it is also nonsignificant (p = 0.901) yet remains nearly identical to the measured baseline (flattened gather correlation 0.9976). Every branch uses 1,440 files, 5,759 windows, full-correlation 5–20 Hz filtering before lag cropping, and no F–K filter. Together these results show that the exact one-day 2024 calculation does not recover the ordered approximately 3.2 km s⁻¹ packet shown by Lellouch et al. (2019). They do not test whether a separately controlled F–K extension or a longer, independently selected stack can recover a physical signal.""")
 else:
     markdown("""## 10. Paper-faithful Figure 7c result — pending
 
-The authoritative implementation is `ambient_lellouch2019_exact_stack.py` at commit `9c70083`. Full-day matrix job `38988141` is queued/running on Sherlock. Dependency-gated aggregation job `38988173` will continue automatically only after all 168 hourly branch tasks succeed. No user notification is required. Until the aggregate JSON appears, all legacy Figure 7c and F–K verdicts remain withdrawn.""")
+The authoritative implementation is `ambient_lellouch2019_exact_stack.py` at commit `bb48942`. Full-day matrix job `38988141` is queued/running on Sherlock. Dependency-gated aggregation job `38988173` will continue automatically only after all 168 hourly branch tasks succeed. No user notification is required. Until the aggregate JSON appears, all legacy Figure 7c and F–K verdicts remain withdrawn.""")
 markdown("""## References
 
 - Bensen, G. D., et al. (2007), Processing seismic ambient noise data to obtain reliable broad-band surface wave dispersion measurements, *Geophysical Journal International*, 169, 1239–1260. [https://doi.org/10.1111/j.1365-246X.2007.03374.x](https://doi.org/10.1111/j.1365-246X.2007.03374.x)
