@@ -18,10 +18,11 @@ def corrected_path(p):
 
 def load_segment(path):
     with h5py.File(path, "r") as h:
-        d = h["Acquisition/Raw[0]/RawData"][:].astype(np.float32)
-        attrs = h["Acquisition/Raw[0]/RawData"].attrs
+        raw_group = h["Acquisition/Raw[0]"]
+        dataset = raw_group["RawData"]
+        d = dataset[:].astype(np.float32)
         a = h["Acquisition"].attrs
-        fs = float(attrs.get("OutputDataRate", 500.0))
+        fs = float(raw_group.attrs.get("OutputDataRate", dataset.attrs.get("OutputDataRate", 500.0)))
         dx = float(a.get("SpatialSamplingInterval", 1.0))
     return d.T, fs, dx
 

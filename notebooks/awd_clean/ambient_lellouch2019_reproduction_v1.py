@@ -74,10 +74,10 @@ def day_rows(date: str, start: int, nfiles: int | None) -> pd.DataFrame:
 def acquisition_metadata(path: Path) -> tuple[float, float, int, float]:
     """Return sample rate, channel spacing, channel count, and duration."""
     with h5py.File(path, "r") as handle:
-        data = handle["Acquisition/Raw[0]/RawData"]
-        raw_attributes = data.attrs
+        raw_group = handle["Acquisition/Raw[0]"]
+        data = raw_group["RawData"]
         acquisition_attributes = handle["Acquisition"].attrs
-        fs = float(raw_attributes.get("OutputDataRate", 500.0))
+        fs = float(raw_group.attrs.get("OutputDataRate", data.attrs.get("OutputDataRate", 500.0)))
         dx = float(acquisition_attributes.get("SpatialSamplingInterval", 1.0))
         duration = data.shape[0] / fs
         return fs, dx, int(data.shape[1]), float(duration)
@@ -110,8 +110,9 @@ def geometry(dx: float, n_channels: int) -> tuple[np.ndarray, np.ndarray]:
 def load_required_channels(path: Path, channels: np.ndarray) -> tuple[np.ndarray, float]:
     """Read selected channels as channel x time float32 phase records."""
     with h5py.File(path, "r") as handle:
-        data = handle["Acquisition/Raw[0]/RawData"]
-        fs = float(data.attrs.get("OutputDataRate", 500.0))
+        raw_group = handle["Acquisition/Raw[0]"]
+        data = raw_group["RawData"]
+        fs = float(raw_group.attrs.get("OutputDataRate", data.attrs.get("OutputDataRate", 500.0)))
         selected = np.asarray(data[:, channels], dtype=np.float32).T
     return selected, fs
 

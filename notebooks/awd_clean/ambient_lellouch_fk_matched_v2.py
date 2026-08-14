@@ -47,8 +47,9 @@ MODE_SPECS = {
 
 def load_contiguous(path: Path, stop_channel: int) -> tuple[np.ndarray, float]:
     with h5py.File(path, "r") as handle:
-        dataset = handle["Acquisition/Raw[0]/RawData"]
-        fs = float(dataset.attrs.get("OutputDataRate", 500.0))
+        raw_group = handle["Acquisition/Raw[0]"]
+        dataset = raw_group["RawData"]
+        fs = float(raw_group.attrs.get("OutputDataRate", dataset.attrs.get("OutputDataRate", 500.0)))
         return np.asarray(dataset[:, :stop_channel], dtype=np.float32).T, fs
 
 

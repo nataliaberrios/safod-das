@@ -13,7 +13,7 @@ def markdown(text):
 def python(text):
     nb.cells.append(nbf.v4.new_code_cell(text))
 
-markdown("""# Ambient-noise F–K QC workflow — v3
+markdown("""# Ambient-noise F–K QC workflow — v4
 
 This is the single advisor-facing notebook for the ambient-noise analysis. It follows one linear chain:
 
@@ -27,7 +27,26 @@ This is the single advisor-facing notebook for the ambient-noise analysis. It fo
 The notebook is a decision document, not a gallery. A processing choice passes only if the real-data result survives the corresponding input-level null. The current 2.5–4.5 km/s fan produces an apparent ridge but fails the pre-filter channel-scramble gate, so it is not accepted as an independently recovered physical arrival.
 """)
 
-markdown("""v3""")
+markdown("""v4""")
+
+markdown("""## Read this first: exactly which data are used
+
+**This notebook does not load the June 2026 AWD files from `ActiveJune2026/Nano/`.** It analyzes the separate 2024–2025 continuous recording from the cemented fiber in the SAFOD main hole. AWD enters only once, in Figure 5, as an independent propagation-direction check; it is not included in any ambient-noise correlation stack.
+
+The measured-data loading chain is
+
+`SAFOD_2024_2025.csv` → corrected mounted HDF5 path → `Acquisition/Raw[0]/RawData` → channel × time array → preprocessing/correlation → frozen NPZ product → notebook figure.
+
+The archive index is
+
+`/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv`.
+
+Rows in that transferred index contain the older prefix `/oak/stanford/groups/ettore88/data/SAFODAS1-harddrive-transfer/`. The loader inserts the missing `/SAFOD/` directory component and checks that the resulting HDF5 file exists. This is a path correction only; it does not alter timestamps or data values.
+
+The primary development day is **20 December 2024 UTC**. It contains 1,440 one-minute files from 00:00:06 to 23:59:06 UTC. The five-hour matched and surrogate tests use the first 300 files, from 00:00:06 through 04:59:06 UTC. Seven other complete days are held out for seasonal validation. Exact file names, header values, dates, figure inputs, and derived-product paths are printed in Section 0 below.
+
+**Raw versus derived inputs.** HDF5 files are the measured DAS data. NPZ and JSON files under `ambient_transfer/` are frozen intermediate results computed from those HDF5 files by the named scripts. They are loaded here so an advisor can inspect the full QC argument without recomputing eight complete days and 20 surrogate realizations during notebook execution.
+""")
 
 markdown("""## Frozen analysis contract
 
@@ -105,6 +124,162 @@ for name, path in products.items(): print(f'{name:16s}', 'OK' if path.exists() e
 assert all(path.exists() for path in products.values())
 """)
 
+markdown("""## 0. Data provenance, raw-file audit, and checkpoint map
+
+This notebook uses three input classes that must not be conflated:
+
+1. **Measured ambient DAS:** one-minute HDF5 records from the 2024–2025 continuous archive on the cemented SAFOD main-hole fiber.
+2. **Reproducible checkpoints:** NPZ arrays plus JSON metadata written by the named analysis scripts after reading those HDF5 records. They prevent a two-week stack from being recomputed during every notebook review.
+3. **Controls:** deterministic Gaussian white noise, exact analytic plane waves, and a separate June 2026 AWD product used only for the propagation-direction check.
+
+The cell below opens the exact raw file used in the five-hour analysis, reads its acquisition header, and prints a figure-by-figure ledger. `RawData` is stored on disk as **time sample × channel/locus** and each loader transposes it to **channel × time**. Distance is along-fiber coordinate, not independently surveyed true vertical or measured depth. Channel 0 is treated as the top coordinate under the shared-fiber convention inherited from the 2017 deployment; that is an explicit registration assumption.
+
+The expensive checkpoints are not unaudited black boxes. The notebook prints their producing script/command, dates, duration, and geometry. Section 0a then recomputes a small raw subset end to end so that the path from HDF5 samples to a correlation gather can be inspected without waiting for all long-duration jobs.
+""")
+
+python("""import sys, h5py, pandas as pd
+from IPython.display import display
+sys.path.insert(0, str(ROOT))
+from ambient_transfer_test import CSV, corrected_path
+
+archive_index = pd.read_csv(CSV, sep=r'\\s+')
+archive_index = archive_index[archive_index.nSamples > 0].copy()
+archive_index['time_utc'] = pd.to_datetime(archive_index.startTime, utc=True, errors='coerce')
+development_rows = archive_index[archive_index.time_utc.dt.strftime('%Y-%m-%d') == '2024-12-20'].sort_values('time_utc').reset_index(drop=True)
+null_example_manifest = np.load(products['fk_null_example'])
+raw_example_path = Path(str(null_example_manifest['used_files'][0]))
+
+def decoded(value):
+    return value.decode() if isinstance(value, (bytes, np.bytes_)) else value
+
+with h5py.File(raw_example_path, 'r') as handle:
+    acquisition = handle['Acquisition']
+    raw_group = handle['Acquisition/Raw[0]']
+    raw_dataset = raw_group['RawData']
+    sample_rate = float(raw_group.attrs['OutputDataRate'])
+    header = {
+        'HDF5 dataset key': raw_dataset.name,
+        'On-disk array order': 'time sample × channel/locus',
+        'On-disk shape': str(tuple(raw_dataset.shape)),
+        'Stored dtype': str(raw_dataset.dtype),
+        'Sample rate': f'{sample_rate:.1f} Hz',
+        'Samples and duration per file': f'{raw_dataset.shape[0]:,}; {raw_dataset.shape[0] / sample_rate:.1f} s',
+        'Number of loci/channels': f"{int(acquisition.attrs['NumberOfLoci'])}",
+        'Along-fiber spacing': f"{float(acquisition.attrs['SpatialSamplingInterval']):.9f} m",
+        'Gauge length': f"{float(acquisition.attrs['GaugeLength']):.6f} m",
+        'Raw unit in header': str(decoded(raw_group.attrs.get('RawDataUnit', 'not recorded'))),
+        'StartLocusIndex': f"{int(acquisition.attrs.get('StartLocusIndex', 0))}",
+    }
+
+display(pd.DataFrame({'Acquisition quantity': list(header), 'Value read from exact HDF5 header': list(header.values())}))
+print('Archive index:', CSV)
+print('Exact measured example:', raw_example_path)
+print('December 20 usable one-minute files:', len(development_rows))
+print('Full-day first UTC/file:', development_rows.iloc[0].time_utc, corrected_path(development_rows.iloc[0].file))
+print('Five-hour last UTC/file:', development_rows.iloc[299].time_utc, corrected_path(development_rows.iloc[299].file))
+print('Full-day last UTC/file:', development_rows.iloc[-1].time_utc, corrected_path(development_rows.iloc[-1].file))
+
+figure_inputs = pd.DataFrame([
+    ['1', 'measured HDF5 → checkpoint', '2024-12-20; all 1,440 one-minute files', 'ch 0; targets ch 49–784 with R±10', 'ambient_lellouch2019_reproduction_v1.py --date 2024-12-20 --nfiles all', products['lellouch']],
+    ['2', 'measured raw HDF5', 'first 12 s of exact 2024-12-20 00:00:06 file printed above', 'ch 0–799', 'opened directly with h5py', raw_example_path],
+    ['3–4', 'measured HDF5 → checkpoints', 'seven held-out complete days in 2024–2025', 'channel-0 geometry; equal day weights', 'ambient_fk_mask_sensitivity_v2.py + aggregate_ambient_fk_mask_sensitivity_v2.py', products['fk_grid']],
+    ['5', 'controls only', 'analytic waves + separate June 2026 AWD product', 'no ambient stack contribution', 'sign-test scripts', products['awd_sign_figure']],
+    ['6', 'measured HDF5 → checkpoint', '2024-12-20; first 300 files = 5 h', 'same geometry for every branch', 'ambient_lellouch_fk_matched_v2.py --date 2024-12-20 --start 0 --nfiles 300', products['matched']],
+    ['7', 'measured HDF5 → checkpoint', 'same first 300 files', 'resampling method alone changes', 'ambient_alias_sensitivity.py --date 2024-12-20 --start 0 --nfiles 300', products['alias']],
+    ['8a–d', 'generated control + measured checkpoints', 'seed 20260813; 800 ch; 500 Hz; 12 s records', 'independent N(0,1) samples before preprocessing', 'ambient_fk_white_noise_v1.py and in-notebook raw audit', products['white_noise']],
+    ['9a–c', 'measured HDF5 + surrogates', 'first 300 December 20 files; 20 realizations', 'pre-F–K channel permutation and time shifts', 'ambient_fk_full_pipeline_null_v2.py --date 2024-12-20 --nfiles 300 --nulls 20', products['fk_nulls']],
+    ['10', 'measured HDF5 → daily checkpoints', 'eight complete dates spanning 2024-05-11 to 2025-03-04', 'all combinations of daily stacks', 'ambient_fk_convergence_v1.py', products['convergence']],
+], columns=['Figure', 'Input class', 'Dates/files/duration', 'Geometry/control', 'Producing code or command', 'Checkpoint loaded here'])
+display(figure_inputs)
+
+selection_path = OUT/'seasonal_day_selection.json'
+selection = json.loads(selection_path.read_text())
+seasonal_rows=[]
+for item in selection['days']:
+    chosen = archive_index[archive_index.time_utc.dt.strftime('%Y-%m-%d') == item['date']].sort_values('time_utc').reset_index(drop=True)
+    assert len(chosen) == int(item['nfiles']), (item['date'],len(chosen),item['nfiles'])
+    seasonal_rows.append([
+        item['date'],item['season'],len(chosen),chosen.iloc[0].time_utc,chosen.iloc[-1].time_utc,
+        corrected_path(chosen.iloc[0].file),corrected_path(chosen.iloc[-1].file),
+    ])
+print('Frozen seasonal selection:',selection_path)
+print('Selection rule:',selection['criteria'])
+display(pd.DataFrame(seasonal_rows,columns=['UTC date','season','raw HDF5 count','first record UTC','last record UTC','first raw HDF5','last raw HDF5']))
+
+lellouch_check=json.loads(products['lellouch_meta'].read_text())
+matched_check=json.loads(products['matched_meta'].read_text())
+alias_check=json.loads(products['alias_meta'].read_text())
+fk_grid_check=json.loads(products['fk_grid_meta'].read_text())
+null_check=json.loads(products['fk_nulls'].with_suffix('.json').read_text())
+convergence_check=json.loads(products['convergence_meta'].read_text())
+checkpoint_checks=pd.DataFrame([
+    ['Figure 1 full day',1440,lellouch_check['used_files'],lellouch_check['date']=='2024-12-20'],
+    ['Figure 6 matched five hours',300,matched_check['used_files'],matched_check['date']=='2024-12-20' and matched_check['start']==0],
+    ['Figure 7 alias test',300,alias_check['used_files'],alias_check['date']=='2024-12-20' and alias_check['start']==0],
+    ['Figures 3–4 seasonal masks',sum(item['nfiles'] for item in selection['days']),sum(v['used_files_by_mask']['production_2p5_4p5'] for v in fk_grid_check['day_completeness'].values()),all(not v['missing_chunks'] for v in fk_grid_check['day_completeness'].values())],
+    ['Figures 9b–9c measured nulls',300,null_check['used_files'],null_check['date']=='2024-12-20' and null_check['start']==0 and null_check['null_realizations']==20],
+    ['Figure 10 daily convergence',8,len(convergence_check['dates']),set(convergence_check['dates'])==set(item['date'] for item in selection['days'])],
+],columns=['Checkpoint','Expected raw files or days','Recorded files or days','Metadata/date/complete check'])
+checkpoint_checks['PASS']=checkpoint_checks['Expected raw files or days'].eq(checkpoint_checks['Recorded files or days']) & checkpoint_checks['Metadata/date/complete check']
+display(checkpoint_checks)
+assert bool(checkpoint_checks.PASS.all()), checkpoint_checks
+print('June 2026 AWD files included in an ambient correlation stack: NO')
+""")
+
+markdown("""**Data-provenance reading guide.** The header table is read from the exact first HDF5 record used by the five-hour matched and measured-surrogate analyses, rather than copied from a generic instrument specification. The ledger identifies whether each panel comes from raw measured data, a reproducible checkpoint, or a synthetic/independent control. The June 2026 AWD record appears only in Figure 5 and cannot create an ambient-noise correlation ridge elsewhere in this notebook.""")
+
+markdown("""### 0a. Small end-to-end rebuild from raw HDF5
+
+The complete seasonal/two-week products remain checkpoints because rebuilding them interactively is impractical. This audit performs the same raw loading, strain-rate conversion, temporal normalization, 30-s/15-s-overlap correlation, and receiver stacking on a deliberately small contiguous subset. Its purpose is provenance and code inspection, not replacing the long-duration scientific stack. Changing `RAW_AUDIT_FILES` increases the amount recomputed directly in the notebook.
+""")
+
+python("""from ambient_lellouch2019_reproduction_v1 import (
+    acquisition_metadata, geometry, load_required_channels,
+    strain_rate_and_ram, correlation_window, align_and_stack, final_bandpass,
+    MAX_LAG_SECONDS, WINDOW_SECONDS, STEP_SECONDS,
+)
+RAW_AUDIT_FILES = 2
+audit_paths = [corrected_path(path) for path in development_rows.file.iloc[:RAW_AUDIT_FILES]]
+audit_fs, audit_dx, audit_n_channels, _ = acquisition_metadata(audit_paths[0])
+audit_targets, audit_required = geometry(audit_dx, audit_n_channels)
+audit_source_index = int(np.flatnonzero(audit_required == 0)[0])
+audit_sum = None; audit_windows = 0; audit_lags = None
+for audit_path in audit_paths:
+    audit_raw, current_fs = load_required_channels(audit_path, audit_required)
+    assert current_fs == audit_fs
+    audit_processed = strain_rate_and_ram(audit_raw, audit_fs)
+    window_samples = int(round(WINDOW_SECONDS * audit_fs))
+    step_samples = int(round(STEP_SECONDS * audit_fs))
+    for start_sample in range(0, audit_processed.shape[1] - window_samples + 1, step_samples):
+        current_lags, current_corr = correlation_window(
+            audit_processed[:, start_sample:start_sample + window_samples],
+            audit_source_index, audit_fs, MAX_LAG_SECONDS,
+        )
+        audit_sum = current_corr if audit_sum is None else audit_sum + current_corr
+        audit_lags = current_lags
+        audit_windows += 1
+audit_mean = audit_sum / audit_windows
+_, audit_simple, audit_aligned = align_and_stack(
+    audit_mean, audit_lags, audit_required, audit_targets, audit_dx,
+)
+audit_distances = audit_targets.astype(float) * audit_dx
+audit_simple = final_bandpass(audit_simple, audit_fs)
+audit_aligned = final_bandpass(audit_aligned, audit_fs)
+fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharex=True, sharey=True, constrained_layout=True)
+audit_limit = np.nanpercentile(np.abs(np.concatenate([audit_simple.ravel(), audit_aligned.ravel()])), 98.5)
+for ax, section, title in zip(axes, [audit_simple, audit_aligned], ['Raw audit: simple R±10 stack', 'Raw audit: locally aligned at 3.2 km/s']):
+    ax.imshow(section, extent=[audit_lags[0], audit_lags[-1], audit_distances[-1], audit_distances[0]], aspect='auto', cmap='RdBu_r', vmin=-audit_limit, vmax=audit_limit)
+    ax.plot(audit_distances/3200, audit_distances, 'k--', lw=1)
+    ax.set(title=title, xlabel='Correlation lag (s)', ylabel='Receiver offset from channel 0 (m)')
+plt.show()
+print('Raw audit files:')
+for item in audit_paths: print(' ', item)
+print('Raw audit 30-s windows:', audit_windows)
+print('This cell read HDF5 and recomputed these sections; it did not load an NPZ stack.')
+""")
+
+markdown("""**Raw-audit figure. End-to-end HDF5-to-correlation reconstruction on two contiguous one-minute records.** The left panel is the simple R±10 receiver stack and the right panel applies the separately declared 3.2-km/s local alignment. Both are rebuilt in this notebook from the exact raw files printed beneath the figure, using the same strain-rate proxy, 5-s running-absolute-mean normalization, 30-s windows with 15-s overlap, channel-0 virtual source, receiver geometry, and final 5–20 Hz bandpass as Figure 1. Two minutes are intentionally insufficient for a scientific ambient-noise conclusion; this is a transparent executable provenance check showing that the cached long-duration workflow starts from the stated HDF5 dataset and produces the expected array shapes and coordinates.""")
+
 markdown("""## 1. Lellouch-style reproduction — no F–K filter
 
 This is the required baseline and control. The F–K filter is not applied here. The dashed lines are comparison trajectories; they are not fitted velocities. The geometry, windowing, nearby-receiver stack, final 5–20 Hz filter, and post-stack 3.2 km/s alignment follow the ambient-interferometry description of [Lellouch et al. (2019)](https://doi.org/10.1029/2019JB017533). The data epoch and interrogator are different, and the present channel-0 registration is assumed to correspond to the same top coordinate on the same cemented main-hole fiber; those are experiment-specific caveats, not facts supplied by the 2019 paper.
@@ -135,13 +310,11 @@ python("""try:
     sys.path.insert(0, str(ROOT))
     from scipy.ndimage import uniform_filter1d
     from scipy.signal import detrend
-    from ambient_transfer_test import CSV, corrected_path
-    db = pd.read_csv(CSV, sep=r'\\s+'); db = db[db.nSamples > 0]
-    path = next((corrected_path(p) for p in db.file if corrected_path(p).exists()), None)
-    if path is None: raise FileNotFoundError('No shared HDF5 record mounted')
+    path = raw_example_path
+    if not path.exists(): raise FileNotFoundError(f'Exact shared HDF5 record not mounted: {path}')
     with h5py.File(path,'r') as handle:
-        dataset=handle['Acquisition/Raw[0]/RawData']
-        fs=float(dataset.attrs.get('OutputDataRate',500.0)); dx=float(handle['Acquisition'].attrs.get('SpatialSamplingInterval',1.0))
+        raw_group=handle['Acquisition/Raw[0]']; dataset=raw_group['RawData']
+        fs=float(raw_group.attrs.get('OutputDataRate',dataset.attrs.get('OutputDataRate',500.0))); dx=float(handle['Acquisition'].attrs.get('SpatialSamplingInterval',1.0))
         excerpt_samples=min(int(12*fs),dataset.shape[0])
         raw=np.asarray(dataset[:excerpt_samples,:800],dtype='float32').T
     strain = detrend(raw, axis=1, type='linear').astype('float32')
@@ -310,6 +483,8 @@ markdown("""**Figure 7. Five-hour anti-alias and decimation sensitivity of the s
 markdown("""## 5. White-noise input null
 
 Ten independent white-noise ensembles, each comprising three 12-s arrays, were passed through detrending, 5–20 Hz filtering, 5-s running-absolute-mean normalization, 2× decimation, each frozen velocity/direction mask, channel-0 correlations, and the same moveout score. The synthetic and measured outputs are plotted below in the **same gather coordinates and normalization**. The synthetic duration is much shorter than the real stack and therefore does not provide a duration-matched p-value. This is a project-specific surrogate-data falsification test: surrogate methods test whether a statistic exceeds what the same analysis produces after destroying the property of interest ([Theiler et al., 1992](https://doi.org/10.1016/0167-2789(92)90102-S)). Passing white noise is necessary but not sufficient because white noise does not preserve the measured data's spectra, coherent artifacts, or nonstationarity.
+
+The first realization is audited **before any filter**. Its samples must be independent in channel and time, its power must span the entire 0–250 Hz Nyquist band rather than only the target band, and cross-correlations between distinct channels must fluctuate around zero at the finite-record scale.
 """)
 python("""from ambient_transfer_test import preprocess
 from ambient_fk_transfer_test import fk_filter as production_fk_filter
@@ -317,6 +492,39 @@ white=np.load(products['white_noise']); white_meta=json.loads(products['white_no
 white_fs=float(white_meta['sampling']['fs_hz']); white_dx=float(white_meta['sampling']['dx_m'])
 white_rng=np.random.default_rng(int(white_meta['seed']))
 white_raw=white_rng.standard_normal((int(white_meta['sampling']['channels']),int(white_fs*white_meta['seconds_per_record'])),dtype=np.float32)
+from scipy.signal import welch, correlate, correlation_lags
+validation_channels=[0,49,196,392,784]
+psd_frequency,psd_each=welch(white_raw[validation_channels],fs=white_fs,nperseg=1024,axis=1)
+psd_relative=psd_each.mean(axis=0)/np.median(psd_each.mean(axis=0))
+pair_a,pair_b=0,784
+a=white_raw[pair_a]-white_raw[pair_a].mean(); b=white_raw[pair_b]-white_raw[pair_b].mean()
+cross=correlate(a,b,mode='full',method='fft')/np.sqrt(np.sum(a*a)*np.sum(b*b))
+cross_lag_samples=correlation_lags(a.size,b.size,mode='full'); cross_lags=cross_lag_samples/white_fs
+lag_keep=np.abs(cross_lags)<=1.0; overlap=np.maximum(1,a.size-np.abs(cross_lag_samples)); cross_95=1.96/np.sqrt(overlap)
+zero_lag_against_ch0=np.corrcoef(white_raw)[0,1:]
+fig,axes=plt.subplots(1,3,figsize=(16,4.2),constrained_layout=True)
+axes[0].plot(np.arange(1000)/white_fs,white_raw[pair_a,:1000],lw=.7,label=f'ch {pair_a}')
+axes[0].plot(np.arange(1000)/white_fs,white_raw[pair_b,:1000],lw=.7,alpha=.75,label=f'ch {pair_b}')
+axes[0].set(xlabel='Time (s)',ylabel='Generated amplitude',title='Independent input samples'); axes[0].legend(frameon=False)
+axes[1].plot(psd_frequency,psd_relative,color='k',lw=1); axes[1].axvspan(5,20,color='tab:green',alpha=.15,label='later analysis band')
+axes[1].axhline(1,color='.5',ls=':'); axes[1].set(xlim=(0,white_fs/2),xlabel='Frequency (Hz)',ylabel='PSD / median PSD',title='Broadband pre-filter spectrum'); axes[1].legend(frameon=False)
+axes[2].plot(cross_lags[lag_keep],cross[lag_keep],color='k',lw=.8)
+axes[2].fill_between(cross_lags[lag_keep],-cross_95[lag_keep],cross_95[lag_keep],color='tab:blue',alpha=.15,label='pointwise Gaussian 95% scale')
+axes[2].axvline(0,color='.5',ls=':'); axes[2].set(xlabel='Lag (s)',ylabel='Normalized cross-correlation',title=f'Independent channels {pair_a} and {pair_b}'); axes[2].legend(frameon=False)
+plt.show()
+zero_index=np.flatnonzero(cross_lag_samples==0)[0]; outside_fraction=float(np.mean(np.abs(cross[lag_keep])>cross_95[lag_keep]))
+print('Generator: numpy.random.default_rng(seed).standard_normal; seed =',white_meta['seed'])
+print('Shape:',white_raw.shape,'sample rate:',white_fs,'Hz; Nyquist:',white_fs/2,'Hz; duration:',white_raw.shape[1]/white_fs,'s')
+print('All-sample mean/std:',float(white_raw.mean()),float(white_raw.std()))
+print('Mean normalized PSD below/inside/above 5–20 Hz:',float(psd_relative[psd_frequency<5].mean()),float(psd_relative[(psd_frequency>=5)&(psd_frequency<=20)].mean()),float(psd_relative[psd_frequency>20].mean()))
+print('ch0–ch784 zero-lag correlation:',float(cross[zero_index]))
+print('ch0 versus all 799 other channels: mean/std/max |zero-lag r|:',float(zero_lag_against_ch0.mean()),float(zero_lag_against_ch0.std()),float(np.max(np.abs(zero_lag_against_ch0))))
+print('Fraction of |lag|≤1 s points outside pointwise 95% scale:',outside_fraction,'(about 0.05 is expected)')
+""")
+
+markdown("""**Figure 8a. Direct validation of the generated white-noise input before any filter.** The left panel overlays the first 2 s from channel 0 and channel 784, the farthest target receiver in the Lellouch-style geometry. The center panel is the mean Welch power spectral density of five widely separated channels, normalized by its median. Power spans the complete 0–250 Hz Nyquist band before preprocessing; the shaded 5–20 Hz interval only marks the band applied later. The right panel cross-correlates channels 0 and 784 over ±1 s and compares the result with the lag-dependent pointwise 95% scale expected for independent Gaussian samples with finite overlap. Printed diagnostics give the exact generator and seed, dimensions, mean and standard deviation, spectral power below/within/above 5–20 Hz, the selected pair's zero-lag correlation, channel 0's zero-lag correlations with all 799 other channels, and the fraction of lag samples outside the pointwise envelope. This validates that the input is broadband and mutually uncorrelated before the processing operator is applied.""")
+
+python("""
 white_processed=preprocess(white_raw,white_fs,norm_seconds=5.0)
 white_filtered,white_filtered_fs,white_filtered_dx=production_fk_filter(white_processed,white_fs,white_dx,'negative')
 white_dec=white_processed[::2,::2]; wf=np.fft.fftfreq(white_dec.shape[1],1/white_filtered_fs); wk=np.fft.fftfreq(white_dec.shape[0],white_filtered_dx)
@@ -336,7 +544,7 @@ axes[2].set(xlim=(0,30),ylim=(-10,10),title='Pre-filter F–K power',xlabel='Fre
 plt.show()
 """)
 
-markdown("""**Figure 8a. White noise before and after the production F–K operator.** A deterministic 12-s, 800-channel Gaussian realization is shown before preprocessing, after the same 5–20 Hz bandpass and 5-s running-absolute-mean normalization used by this null workflow, in the F–K domain, and after the F×K<0, 2.5–4.5 km/s mask. Cyan curves delimit the imposed velocity fan in the positive-frequency half-plane. Panel-specific amplitude limits are used because raw Gaussian samples, normalized samples, spectral power, and filtered amplitudes have different units. The final panel visibly contains sloping coherent texture even though the input contains no physical wave. That texture is the impulse response of the velocity-selective operator and is exactly why a filtered ridge cannot validate itself.""")
+markdown("""**Figure 8b. Validated white noise before and after the production F–K operator.** The broadband, independent 12-s, 800-channel Gaussian realization validated in Figure 8a is shown before preprocessing, after the same 5–20 Hz bandpass and 5-s running-absolute-mean normalization used by this null workflow, in the F–K domain, and after the F×K<0, 2.5–4.5 km/s mask. Cyan curves delimit the imposed velocity fan in the positive-frequency half-plane. Panel-specific amplitude limits are used because raw Gaussian samples, normalized samples, spectral power, and filtered amplitudes have different units. The final panel visibly contains sloping coherent texture even though the input contains no physical wave. That texture is the impulse response of the velocity-selective operator and is exactly why a filtered ridge cannot validate itself.""")
 
 python("""def normalize_gather(section):
     scale=np.max(np.abs(section),axis=1,keepdims=True)
@@ -355,7 +563,7 @@ for row,(mask,label) in enumerate(masks):
 plt.show()
 """)
 
-markdown("""**Figure 8b. Direct gather-by-gather comparison of measured data and white noise after identical signed F–K masks.** Rows apply the production 2.5–4.5 km/s fan, narrow 2.8–3.8 km/s fan, broad 2.0–5.5 km/s fan, and direction-only mask. Columns alternate the held-out measured aggregate and the first predeclared white-noise ensemble for the F×K<0 and F×K>0 branches. Every panel uses the same lag and receiver-offset axes, each trace is divided by its own maximum absolute amplitude, and all panels use the common range −1 to 1. Dashed curves mark 3.2 km/s on the branch-appropriate lag side. The velocity-bounded white-noise panels develop moveout-like ridges comparable in geometry to the measured panels, especially for the narrow fan, whereas direction-only white noise does not. This is direct visual evidence that the fan can manufacture the expected geometry from noise; differences in absolute amplitude are intentionally not assessed because the measured and synthetic stack durations differ.""")
+markdown("""**Figure 8c. Direct gather-by-gather comparison of measured data and white noise after identical signed F–K masks.** Rows apply the production 2.5–4.5 km/s fan, narrow 2.8–3.8 km/s fan, broad 2.0–5.5 km/s fan, and direction-only mask. Columns alternate the held-out measured aggregate and the first predeclared white-noise ensemble for the F×K<0 and F×K>0 branches. Every panel uses the same lag and receiver-offset axes, each trace is divided by its own maximum absolute amplitude, and all panels use the common range −1 to 1. Dashed curves mark 3.2 km/s on the branch-appropriate lag side. The velocity-bounded white-noise panels develop moveout-like ridges comparable in geometry to the measured panels, especially for the narrow fan, whereas direction-only white noise does not. This is direct visual evidence that the fan can manufacture the expected geometry from noise; differences in absolute amplitude are intentionally not assessed because the measured and synthetic stack durations differ.""")
 
 python("""fig,axes=plt.subplots(2,2,figsize=(12,8),sharex=True,constrained_layout=True)
 for ax,(mask,label) in zip(axes.flat,masks):
@@ -375,7 +583,7 @@ for mask,label in masks:
         print(label,branch,'real exceeds white95:',result['real_exceeds_white_95_at_3200'])
 """)
 
-markdown("""**Figure 8c. Measured and white-noise moveout curves for the same masks.** Solid curves are the held-out measured-data scores; dashed curves and shaded intervals are the median and 5th–95th percentile across ten identically processed white-noise ensembles. Blue and orange denote the two signed branches, and the vertical dotted line marks 3.2 km/s. The narrow fan produces large scores over its retained band even for white noise—the median absolute score at 3.2 km/s is approximately 0.64—so the magnitude and location of that peak are mask-conditioned. The production-fan measured curve exceeds this short-duration white-noise ensemble at 3.2 km/s, but the measured-data scrambling test below is the stronger control because it preserves the real spectra and nonstationarity.""")
+markdown("""**Figure 8d. Measured and white-noise moveout curves for the same masks.** Solid curves are the held-out measured-data scores; dashed curves and shaded intervals are the median and 5th–95th percentile across ten identically processed white-noise ensembles. Blue and orange denote the two signed branches, and the vertical dotted line marks 3.2 km/s. The narrow fan produces large scores over its retained band even for white noise—the median absolute score at 3.2 km/s is approximately 0.64—so the magnitude and location of that peak are mask-conditioned. The production-fan measured curve exceeds this short-duration white-noise ensemble at 3.2 km/s, but the measured-data scrambling test below is the stronger control because it preserves the real spectra and nonstationarity.""")
 
 markdown("""## 6. Channel-scrambling test — input and resulting gathers
 
@@ -387,7 +595,7 @@ python("""from ambient_fk_full_pipeline_null_v2 import stable_rng, channel_permu
 null=np.load(products['fk_nulls']); null_example=np.load(products['fk_null_example']); null_example_meta=json.loads(products['fk_null_example_meta'].read_text())
 example_path=Path(str(null_example['used_files'][0]))
 with h5py.File(example_path,'r') as handle:
-    dataset=handle['Acquisition/Raw[0]/RawData']; example_fs=float(dataset.attrs.get('OutputDataRate',500.0)); example_dx=float(handle['Acquisition'].attrs.get('SpatialSamplingInterval',1.0))
+    raw_group=handle['Acquisition/Raw[0]']; dataset=raw_group['RawData']; example_fs=float(raw_group.attrs.get('OutputDataRate',dataset.attrs.get('OutputDataRate',500.0))); example_dx=float(handle['Acquisition'].attrs.get('SpatialSamplingInterval',1.0))
     example_raw=np.asarray(dataset[:min(int(12*example_fs),dataset.shape[0]),:800],dtype='float32').T
 ordered_input=preprocess(example_raw,example_fs,norm_seconds=5.0)
 scramble_rng=stable_rng(int(null_example_meta['random_seed']),'channel_permutation',0,str(example_path))
