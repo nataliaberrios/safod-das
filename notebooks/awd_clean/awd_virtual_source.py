@@ -80,19 +80,19 @@ OUT_DIR = Path(
 PRE_S = 0.5                     # the stacks are cut -0.5 to +3.0 s
 WATER_LEVEL = 0.01              # fraction of mean |A|^2, standard spectral-division floor
 
-# Per-fibre configuration. Deep needs a much longer lag window: over its 2.8 km
+# Per-fiber configuration. Deep needs a much longer lag window: over its 2.8 km
 # aperture at ~1545 m/s the differential travel time reaches ~1.8 s, so the
 # 0.35 s window that suits Nano's 600 m would truncate the gather entirely.
 #
-# Deep is restricted to the outbound leg. The fibre reverses at channel 1702, and
-# past that "distance along fibre" stops being monotonic in depth, which would
+# Deep is restricted to the outbound leg. The fiber reverses at channel 1702, and
+# past that "distance along fiber" stops being monotonic in depth, which would
 # make a redatumed moveout meaningless. 200-3000 m is channels 98-1469, safely
 # inside the outbound limb, and is the range validated for the Deep guided mode.
 FIBERS = {
     "nano": dict(
         stack_key="nano_stacks", dx_key="dx_nano",
         band=(20.0, 50.0),          # Nano working band
-        aperture_m=(0.0, 600.0),    # signal dies well before the 926 m fibre end
+        aperture_m=(0.0, 600.0),    # signal dies well before the 926 m fiber end
         max_lag_s=0.35,
         sources_m=[50.0, 150.0, 250.0, 350.0],
         v_ref=2975.0,
@@ -109,7 +109,7 @@ FIBERS = {
     ),
 }
 
-# Set by main() from the chosen fibre.
+# Set by main() from the chosen fiber.
 BAND = FIBERS["nano"]["band"]
 APERTURE_M = FIBERS["nano"]["aperture_m"]
 MAX_LAG_S = FIBERS["nano"]["max_lag_s"]

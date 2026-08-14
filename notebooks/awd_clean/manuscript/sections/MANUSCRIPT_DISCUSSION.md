@@ -12,12 +12,12 @@ installations behave differently.
 
 ### 5.1 Why the two installations recover different modes
 
-The cemented Nano fibre records a coherent mode near 2950 m s⁻¹, strongest at
-30–60 Hz. The wireline Deep fibre records a mode near 1547 m s⁻¹, strongest at
+The cemented Nano fiber records a coherent mode near 2950 m s⁻¹, strongest at
+30–60 Hz. The wireline Deep fiber records a mode near 1547 m s⁻¹, strongest at
 15–30 Hz. Same hole, same source, same nominal 24 h survey — though Deep coverage ends after burst 45, giving ~22.5 h of usable Deep record against Nano's full span.
 
-The most natural reading is a coupling contrast. A cemented fibre is mechanically
-tied to the formation and senses strain transmitted through it; a wireline fibre
+The most natural reading is a coupling contrast. A cemented fiber is mechanically
+tied to the formation and senses strain transmitted through it; a wireline fiber
 hangs in borehole fluid and couples preferentially to energy guided by the fluid
 column and its walls. The Deep apparent speed of ~1547 m s⁻¹ sits just above
 typical borehole-fluid velocity, which is consistent with a tube-wave-like guided
@@ -174,13 +174,13 @@ after seeing the result, the branch is reported as unclassified.
 
 ### 5.5 What these measurements do and do not represent
 
-The recovered quantity is a fractional change in the apparent along-fibre speed
+The recovered quantity is a fractional change in the apparent along-fiber speed
 of a selected guided mode. It is not a formation V_P or V_S change, and it is not
 a measure of stress, pore pressure, permeability, fracture compliance, or
 tectonic strain. Converting it into any of those would require guided-wave
 physics and forward modelling not attempted here.
 
-It carries no depth resolution. Channel coordinate is distance along fibre; the
+It carries no depth resolution. Channel coordinate is distance along fiber; the
 coordinate-to-depth mapping remains provisional, and no result depends on it.
 
 The injection–recovery experiment measures the sensitivity of the observable *as
@@ -204,7 +204,7 @@ detection level is reached, is the wrong-observable control that does work.
 
 Four points follow for anyone designing a comparable experiment.
 
-**Installation is an experimental variable, not a deployment detail.** Two fibres
+**Installation is an experimental variable, not a deployment detail.** Two fibers
 in one hole, recording one source, returned different coherent modes with
 different frequency content, different apparent speeds and a factor of two
 difference in monitoring sensitivity. Installation should be specified and
@@ -256,7 +256,7 @@ worse than the Nano upper limit obtained from the same survey, despite Deep's
 better per-burst precision. Two effects account for this. Amplitude uncertainty
 is inflated ~1.5× beyond what per-burst scatter predicts, because over a 22 h
 record the diurnal tidal shape is not orthogonal to instrumental drift; and the
-record is truncated at one end, the Deep fibre having stopped after burst 45.
+record is truncated at one end, the Deep fiber having stopped after burst 45.
 
 The binding constraint on a tidal search with this design is therefore **survey
 duration and its drift degeneracy, not the choice of observable**. A longer

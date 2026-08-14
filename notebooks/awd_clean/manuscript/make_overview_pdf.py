@@ -88,15 +88,15 @@ def flow_page(pdf: PdfPages):
     fig.patch.set_facecolor("white")
     fig.text(0.5, 0.94, "SAFOD repeated-source borehole DAS", fontsize=12.5,
              color=OUTB, weight="bold", ha="center")
-    fig.text(0.5, 0.885, "From raw fibre data to a sensitivity number",
+    fig.text(0.5, 0.885, "From raw fiber data to a sensitivity number",
              fontsize=27, color=INK, weight="bold", ha="center", va="top")
-    fig.text(0.5, 0.818, "Two fibres in one borehole, one repeated source, 24 hours",
+    fig.text(0.5, 0.818, "Two fibers in one borehole, one repeated source, 24 hours",
              fontsize=15, color=MUTED, ha="center", va="top")
 
     ax = fig.add_axes([0.03, 0.30, 0.94, 0.44])
     ax.set_xlim(0, 10); ax.set_ylim(0, 4); ax.axis("off")
     steps = [
-        ("1  Raw data", "989 GPS drop times\n2 fibres, 24 h", "#e8e8e4"),
+        ("1  Raw data", "989 GPS drop times\n2 fibers, 24 h", "#e8e8e4"),
         ("2  Stack", "859 drops on both\n46 bursts", "#e8e8e4"),
         ("3  Find arrival", "semblance scan,\nhalf the bursts", "#ffe2d3"),
         ("4  Measure", "delay vs travel time,\nslope = change", "#ffe2d3"),
@@ -118,15 +118,15 @@ def flow_page(pdf: PdfPages):
 
     fig.text(0.28, 0.235, "Nano   cemented, shallow", fontsize=13.5, color=NANO,
              weight="bold", ha="center")
-    fig.text(0.28, 0.196, "927 m of fibre · 30–60 Hz · ~2950 m/s", fontsize=11.5,
+    fig.text(0.28, 0.196, "927 m of fiber · 30–60 Hz · ~2950 m/s", fontsize=11.5,
              color=MUTED, ha="center")
     fig.text(0.72, 0.235, "Deep   wireline, reversing", fontsize=13.5, color=OUTB,
              weight="bold", ha="center")
-    fig.text(0.72, 0.196, "6532 m of fibre, two legs · 15–30 Hz · ~1547 m/s",
+    fig.text(0.72, 0.196, "6532 m of fiber, two legs · 15–30 Hz · ~1547 m/s",
              fontsize=11.5, color=MUTED, ha="center")
 
     fig.add_artist(plt.Line2D([0.15, 0.85], [0.145, 0.145], color=RULE, lw=1.2))
-    fig.text(0.5, 0.095, "The cemented fibre resolves a 1% velocity change; "
+    fig.text(0.5, 0.095, "The cemented fiber resolves a 1% velocity change; "
              "the wireline outbound branch resolves 0.5%",
              fontsize=14, color=INK, ha="center", weight="bold")
     fig.text(0.5, 0.052, "The wireline arrival travels 11.8× longer, but its timing "
@@ -142,7 +142,7 @@ def main() -> None:
 
         page(pdf, kicker="STEP 1–2", title="Raw data to burst stacks",
              body=[
-                 "**In: raw fibre recordings, plus 989",
+                 "**In: raw fiber recordings, plus 989",
                  "**GPS times of the weight drops.**",
                  "",
                  "For each drop a 3.5 s window is cut",
@@ -157,18 +157,18 @@ def main() -> None:
                  "power, so they are averaged in groups.",
                  "Drops >60 s apart are separate bursts.",
                  "",
-                 "The Deep fibre stopped after burst 45,",
+                 "The Deep fiber stopped after burst 45,",
                  "so the last three bursts are Nano-only.",
                  "That is why 49 bursts becomes 46 — not",
                  "any quality cut.",
              ],
-             numbers=[("bursts analysed", "46"), ("drops, both fibres", "859"),
+             numbers=[("bursts analysed", "46"), ("drops, both fibers", "859"),
                       ("survey duration", "23.96 h"), ("burst cadence", "30 min")],
              image="fig05_fig12_repeatability_publication.png")
 
         page(pdf, kicker="STEP 3", title="Finding the arrival",
              body=[
-                 "**An arrival moving along the fibre is a",
+                 "**An arrival moving along the fiber is a",
                  "**straight line in distance vs time.**",
                  "",
                  "Describing it takes two numbers: a start",
@@ -196,7 +196,7 @@ def main() -> None:
                  "**of all the others.**",
                  "",
                  "Measure the delay at several positions",
-                 "along the fibre — per channel for Nano,",
+                 "along the fiber — per channel for Nano,",
                  "per 400 m aperture beam for Deep, which",
                  "needs the extra stacking at 3 km.",
                  "",
@@ -241,7 +241,7 @@ def main() -> None:
 
         page(pdf, kicker="RESULT", title="What each installation resolves",
              body=[
-                 "**Cemented fibre: 1%.**",
+                 "**Cemented fiber: 1%.**",
                  "**Wireline outbound branch: 0.5%.**",
                  "**Wireline return branch: 1%.**",
                  "",
@@ -299,11 +299,11 @@ def main() -> None:
              body=[
                  "**Not a formation velocity.** The measured",
                  "quantity is the apparent speed of a guided",
-                 "mode along the fibre. Both observables are",
+                 "mode along the fiber. Both observables are",
                  "dispersive; neither is a clean body wave.",
                  "",
                  "**No depth resolution.** Position is",
-                 "distance along fibre. The depth mapping is",
+                 "distance along fiber. The depth mapping is",
                  "provisional and no result depends on it.",
                  "",
                  "**No tidal detection.** Fitting a solid-",

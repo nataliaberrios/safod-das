@@ -6,7 +6,7 @@ What is the smallest fractional change in the apparent speed of the repeatable
 Deep guided mode that can be recovered reliably from the 2026 SAFOD AWD survey,
 and is it smaller than the corresponding Nano limit?
 
-The recovered quantity is a fractional change in the *apparent along-fibre speed
+The recovered quantity is a fractional change in the *apparent along-fiber speed
 of the selected Deep guided mode*.  It is not a formation Vp or Vs change, not a
 stress or pore-pressure change, and not a depth profile.  Guided-mode physics and
 forward modelling would be required to convert it into any of those.
@@ -1211,7 +1211,7 @@ def _report(groups: dict, frozen: dict, nano, control_rows: list[dict]) -> None:
         "",
         "Interpretation limits",
         "-" * 56,
-        "  The recovered quantity is a fractional change in the apparent along-fibre",
+        "  The recovered quantity is a fractional change in the apparent along-fiber",
         "  speed of the selected Deep guided mode. It is not formation Vp or Vs, not",
         "  fault-zone stress, pore pressure, permeability, fracture compliance, or",
         "  tectonic strain, and it carries no depth resolution. Converting it into any",

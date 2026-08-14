@@ -23,7 +23,7 @@ Nothing below needs a GPU. Anything heavy has an `.sbatch` beside it; submit wit
 Stages 1–2 build the data. Stage 3 is the Nano analysis, stage 4 the Deep. They
 are independent of each other once stage 2 exists.
 
-### 1. Manifest — which drops exist, on which fibre
+### 1. Manifest — which drops exist, on which fiber
 
 ```bash
 python build_manifest.py
@@ -48,7 +48,7 @@ sbatch rebuild_stacks.sbatch      # runs ../paired_stack_job_deep_all.py
 | Writes | **`canonical_epoch_stacks_paired_deep_all.npz`** (2.7 GB) |
 | Contents | `nano_stacks` (49, 732, 3500), `deep_stacks` (49, 3200, 3500), `n_common`, `begtimes_str`, `fs`, `dx_nano`, `dx_deep` |
 | Key line | `paired_stack_job_deep_all.py:239` — a drop is kept only if its full 0.5 s / 3.0 s window fits inside the file. This is the 988→970 Nano and 926→875 Deep attrition |
-| Gives the paper | 859 drops common to both fibres, across 46 bursts |
+| Gives the paper | 859 drops common to both fibers, across 46 bursts |
 
 **Everything downstream reads this one file.** If it is rebuilt, every result
 below must be rerun.
@@ -109,20 +109,20 @@ scale, and the Model A / Model B comparison. Smoke-test with
 
 ## If you had to explain this to someone in two minutes
 
-> We dropped a weight repeatedly for 24 hours and recorded it on two fibres in
+> We dropped a weight repeatedly for 24 hours and recorded it on two fibers in
 > the same borehole — one cemented, one on wireline. We first worked out what
-> coherent arrival each fibre sees, and showed each arrival is real by splitting
+> coherent arrival each fiber sees, and showed each arrival is real by splitting
 > the bursts in half, picking the arrival on one half, and confirming it on the
 > other against randomised controls.
 >
-> Then we asked how small a velocity change each fibre could detect. Rather than
+> Then we asked how small a velocity change each fiber could detect. Rather than
 > estimate that from theory, we took the real data, injected velocity changes of
 > known size into it, and tried to recover them blind — the recovery code never
-> saw the true answer. The smallest change recovered reliably is that fibre's
+> saw the true answer. The smallest change recovered reliably is that fiber's
 > sensitivity.
 >
-> The cemented fibre resolves 1%. The deep fibre's outbound branch resolves 0.5%,
-> its return branch 1%. The interesting part is why the deep fibre isn't far
+> The cemented fiber resolves 1%. The deep fiber's outbound branch resolves 0.5%,
+> its return branch 1%. The interesting part is why the deep fiber isn't far
 > better: its arrival travels 11.8× longer, which should help a lot, but its
 > timing wobbles 7.6× more from burst to burst, and that cancels most of the
 > advantage.
@@ -147,5 +147,5 @@ scale, and the Model A / Model B comparison. Smoke-test with
 - **`cc_tools.py` defines several functions twice.** The second definition wins.
   Not used by this paper, but it is in the tree.
 - **Numbers that look wrong but aren't:** 49 bursts vs 46 analysed (Deep stopped
-  after burst 45); 988 vs 970 vs 859 drops (window truncation, then common-fibre);
+  after burst 45); 988 vs 970 vs 859 drops (window truncation, then common-fiber);
   988 drops / 49 bursts in the Nano repeatability only.

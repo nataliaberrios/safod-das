@@ -110,7 +110,7 @@ def figure_p2() -> None:
                 float(r["reliable_level_detection"]) * 100)
 
     entries = [
-        ("Nano\ncemented fibre", *pair(nano), NANO),
+        ("Nano\ncemented fiber", *pair(nano), NANO),
         ("Deep outbound\nwireline", *pair(row("Deep", "outbound")), OUTB),
         ("Deep return\nwireline", *pair(row("Deep", "return")), RETN),
     ]

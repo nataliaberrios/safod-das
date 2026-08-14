@@ -99,7 +99,7 @@ Also: does it have coverage during the June 2026 AWD window, or only during the
 
 `LITERATURE.md:120` already has **Atterholt et al. 2024, JGR 129** —
 `04_methods_das/atterholt_2024_jgr_garlock-fault-zone-with-fiber.pdf`, Garlock
-fault-zone structure from a DAS array. That is fault-zone imaging with fibre, and
+fault-zone structure from a DAS array. That is fault-zone imaging with fiber, and
 is the most likely paper meant, but it is not obviously a DAS-plus-seismometer
 methods paper. Worth reading the methods section to see which of the two asks it
 actually speaks to before assuming.

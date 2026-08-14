@@ -56,7 +56,7 @@ The central quantitative result of this analysis.
 
 Deep's geometric advantage is real and large, but poorer burst-to-burst timing
 repeatability consumes about four fifths of it. This is consistent with the
-Deep-fibre per-shot repeatability deficit already recorded in
+Deep-fiber per-shot repeatability deficit already recorded in
 `docs/paper1/STATUS.md` (per-shot CC 0.054).
 
 Do not quote the `lever_arm_s` field in the generated report as the lever arm:
@@ -264,7 +264,7 @@ and has been deleted.** Any figure or number matching thresholds 1.53×10⁻³
 
 ## 8. Interpretation ceiling
 
-The recovered quantity is a fractional change in the apparent along-fibre speed
+The recovered quantity is a fractional change in the apparent along-fiber speed
 of the selected Deep guided mode. It is not formation Vp or Vs, not fault-zone
 stress, pore pressure, permeability, fracture compliance, or tectonic strain, and
 it carries no depth resolution.
@@ -289,12 +289,12 @@ different legitimate values. Full chain, verified against `awd_manifest.csv`,
 **49 bursts**, median cadence 30.0 min (range 27.6–31.2), spanning 23.96 h.
 24 h at half-hour cadence gives 48 *intervals* and therefore 49 *bursts*.
 
-**The Deep fibre stopped recording after burst 45 (22:16:23 UTC).** Bursts 46, 47
+**The Deep fiber stopped recording after burst 45 (22:16:23 UTC).** Bursts 46, 47
 and 48 — 22:46, 23:16 and 23:44 UTC on 2026-06-17 — have full Nano coverage and
 zero Deep coverage. That is the entire reason the analysis has 46 bursts and not
 49. Nothing was discarded for quality.
 
-**Requiring drops on both fibres therefore costs the Deep analysis nothing.** A
+**Requiring drops on both fibers therefore costs the Deep analysis nothing.** A
 Deep-only analysis could not have used those three bursts either; the 46-burst
 count is set by Deep's own coverage, not by the pairing requirement.
 

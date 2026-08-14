@@ -196,7 +196,7 @@ outcome occurs.
 
 ## Interpretation ceiling, unchanged
 
-The recovered quantity is a fractional change in the apparent along-fibre speed
+The recovered quantity is a fractional change in the apparent along-fiber speed
 of the selected Deep guided mode. It is not formation Vp or Vs, not fault-zone
 stress, pore pressure, permeability, fracture compliance, or tectonic strain,
 and it carries no depth resolution.

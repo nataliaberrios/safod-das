@@ -14,7 +14,7 @@ Every number is transcribed from a generated output, named inline.
 
 The same repeated surface source, recorded on two borehole DAS installations in
 the same hole during the same nominal 24 h survey, yields two different coherent
-modes. Note that instrumented fibre extent, analysis aperture and regression
+modes. Note that instrumented fiber extent, analysis aperture and regression
 lever arm are three different quantities; only the last governs sensitivity.
 
 | | Nano | Deep |
@@ -22,7 +22,7 @@ lever arm are three different quantities; only the last governs sensitivity.
 | Installation | cemented, shallow | wireline, reversing at channel 1702 |
 | Coherent mode apparent speed | ~2950 m s⁻¹ | ~1547 m s⁻¹ |
 | Band where strongest | 30–60 Hz | 15–30 Hz |
-| Instrumented fibre extent | 927 m | 3475 m outbound, 3059 m return |
+| Instrumented fiber extent | 927 m | 3475 m outbound, 3059 m return |
 | Analysis aperture used | 80–440 m | 200–3000 m per limb |
 | Regression lever arm | 0.121 s | 1.428 s (outbound) |
 
@@ -72,7 +72,7 @@ discovery-half bursts (`deep_dvv_frozen_trajectory.json`):
 | Return | 1549.7 | +0.346 | 0.252 |
 
 **The two legs agree to 0.3% in apparent speed.** They are separate propagation
-branches of one fibre selected by independent semblance searches, so the
+branches of one fiber selected by independent semblance searches, so the
 agreement is a non-trivial consistency check on the mode rather than a fitted
 constraint.
 

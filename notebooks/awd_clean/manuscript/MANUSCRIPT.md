@@ -21,12 +21,12 @@ Borehole distributed acoustic sensing is increasingly used for time-lapse
 velocity monitoring, but the consequences of installation and coupling for
 monitoring sensitivity have not been quantified against a controlled repeated
 source. We recorded a 24-hour repeated accelerated weight-drop survey on two
-borehole DAS installations in the same hole at SAFOD: a shallow cemented fibre
-and a deeper wireline fibre that reverses, giving outbound and return branches.
+borehole DAS installations in the same hole at SAFOD: a shallow cemented fiber
+and a deeper wireline fiber that reverses, giving outbound and return branches.
 
-The two installations recover different coherent modes. The cemented fibre
+The two installations recover different coherent modes. The cemented fiber
 records a fast apparent mode near 2950 m s⁻¹, strongest at 30–60 Hz, with
-resolved frequency-dependent slowness. The wireline fibre records a slow
+resolved frequency-dependent slowness. The wireline fiber records a slow
 borehole-guided mode near 1547 m s⁻¹, strongest at 15–30 Hz, whose trajectory is
 selected independently on each branch to within 0.3% and which survives
 channel-order permutation testing at the resolution floor of 499 permutations.
@@ -36,7 +36,7 @@ yields highly repeatable observables, with burst-stack correlation of 0.976
 against an independent reference.
 
 Blind injection–recovery on held-out bursts, using an identical estimator for
-both fibres, establishes smallest tested reliable-detection levels of 1.0% for
+both fibers, establishes smallest tested reliable-detection levels of 1.0% for
 the cemented observable, 0.5% for the outbound wireline branch, and 1.0% for the
 return branch. Although the outbound regression lever arm is 11.8 times longer
 than the cemented one, poorer burst-to-burst timing repeatability — 1.71 ms
@@ -57,9 +57,9 @@ longer propagation path is branch-specific rather than installation-wide.
 Repeated active-source seismic monitoring can resolve small changes in crustal
 velocity, and borehole deployment removes much of the near-surface noise and
 weather sensitivity that limits surface experiments. Distributed acoustic sensing
-(DAS) makes such deployments dense and cheap: a single fibre returns thousands of
+(DAS) makes such deployments dense and cheap: a single fiber returns thousands of
 channels along the borehole, where a conventional array returns a handful. What
-DAS does not do is remove the question of how the fibre is coupled to the rock,
+DAS does not do is remove the question of how the fiber is coupled to the rock,
 and that question turns out to control what the instrument can measure.
 
 At Parkfield, both halves of this problem have prior art at the same site. Niu
@@ -91,12 +91,12 @@ though neither can it be assumed to be guided, since the shallow section carries
 strong vertical velocity gradient (1.5–3.5 km s⁻¹ above the Salinian basement top
 at 0.77 km; Hole et al. 2006) that produces dispersion in refracted arrivals too. Lellouch et al. (2019) subsequently recorded the same site with
 downhole DAS and estimated P- and S-wave velocities from passive records,
-demonstrating that fibre in this hole resolves structure but also that the
+demonstrating that fiber in this hole resolves structure but also that the
 relationship between a DAS observable and a formation property requires care.
 
 What has not been established is how the *installation* — cemented against
 wireline, shallow against deep — changes the answer, and what that costs or buys
-for time-lapse monitoring. Two fibres in the same borehole, recording the same
+for time-lapse monitoring. Two fibers in the same borehole, recording the same
 source, provide a controlled test of exactly this. If they return the same
 observable with the same sensitivity, installation is a logistical choice. If
 they do not, installation belongs in the experimental design alongside source and
@@ -105,7 +105,7 @@ geometry.
 A second question follows from the geometry. The natural estimator for a
 fractional velocity change measures the rate at which delay accumulates with
 propagation time, so its precision improves as the observed propagation path
-lengthens. A fibre reaching further into the borehole, or a slower mode occupying
+lengthens. A fiber reaching further into the borehole, or a slower mode occupying
 more travel time over the same distance, should therefore be more sensitive. That
 argument treats timing precision as fixed. It need not be: the same deployment
 choices that extend the path may also degrade coupling, waveform repeatability
@@ -152,21 +152,21 @@ survey recorded simultaneously on two borehole DAS installations at SAFOD:
 
 ## 2. Experiment and instrumentation
 
-### 2.1 Site and fibres
+### 2.1 Site and fibers
 
 Two distinct borehole DAS installations at SAFOD recorded the same repeated
 surface source. They are not interchangeable observations of one wavefield: the
 installations differ in coupling and geometry, and each recovers a different
 coherent mode.
 
-The **Nano** fibre is cemented and shallow, interrogated by a Sintela system
+The **Nano** fiber is cemented and shallow, interrogated by a Sintela system
 writing protobuf. Header metadata gives 732 channels at 1.2661 m channel spacing
 — a 927 m instrumented extent — a **16.459 m gauge length**, and a 10 kHz raw
 sample rate, decimated to 1000 Hz for the stacks used here.
 
-The **Deep** fibre is wireline-deployed and reverses at channel 1702, so its 3200
+The **Deep** fiber is wireline-deployed and reverses at channel 1702, so its 3200
 channels at 2.0419 m spacing trace an outbound limb of 3475 m and a return limb
-of 3059 m along 6532 m of fibre. Filename metadata records a **10 m gauge
+of 3059 m along 6532 m of fiber. Filename metadata records a **10 m gauge
 length**, 1000 Hz sample rate, 2 m channel spacing and dual-pulse interrogation
 (`SAFOD-Deep-10mGL-1000HzFs-2mChDualPulse_*.h5`), and the reader auto-detects the
 system as OptaSense.
@@ -179,7 +179,7 @@ band — the gauge-length response first nulls near 179 Hz for Nano (2950 m s⁻
 artefact.
 
 For context on the installation, Lellouch et al. (2019) describe the SAFOD main
-hole as carrying two optical fibres cemented between casing strings in a 0.9 mm
+hole as carrying two optical fibers cemented between casing strings in a 0.9 mm
 steel tube, and used an OptaSense ODH3.1 interrogator at 10 m gauge length and
 1 m channel spacing in 2017.
 
@@ -187,7 +187,7 @@ steel tube, and used an OptaSense ODH3.1 interrogator at 10 m gauge length and
 established — Sintela for Nano, OptaSense for Deep — but not the model); the
 physical depth corresponding to the Deep turnaround at channel 1702; and
 confirmation of which physical cable each dataset corresponds to, which the
-project records as an open question. Channel coordinate is distance along fibre
+project records as an open question. Channel coordinate is distance along fiber
 throughout; the coordinate-to-depth mapping is provisional and no result here
 depends on it.
 
@@ -217,14 +217,14 @@ be used interchangeably:
 | Full 0.5/3.0 s window fits inside the data file | 970 | 875 | — |
 | **Used by the burst stacks** | 970 | 875 | **859 common** |
 
-The **analysed dataset is 859 drops common to both fibres, across 46 bursts.**
+The **analysed dataset is 859 drops common to both fibers, across 46 bursts.**
 
 Two attritions account for the difference, neither of them quality rejection.
 
-**The Deep fibre stopped recording after burst 45 (22:16:23 UTC).** Bursts 46, 47
+**The Deep fiber stopped recording after burst 45 (22:16:23 UTC).** Bursts 46, 47
 and 48 — at 22:46, 23:16 and 23:44 UTC on 2026-06-17 — carry full Nano coverage
 and zero Deep coverage. This alone is why the analysis uses 46 bursts and not 49.
-Consequently, **restricting the analysis to drops recorded on both fibres costs
+Consequently, **restricting the analysis to drops recorded on both fibers costs
 the Deep analysis nothing**: a Deep-only analysis could not have used those three
 bursts either. The 46-burst count is set by Deep's own coverage, not by the
 pairing requirement.
@@ -281,22 +281,22 @@ channel simultaneously. It is applied throughout.
 one file at a time, so the Tukey window covers 300 s for Nano and 60 s for Deep,
 far longer than the 3.5 s drop windows extracted from it.
 
-**The two fibres are not in the same physical quantity.** Nano protobuf files
+**The two fibers are not in the same physical quantity.** Nano protobuf files
 store strain *rate* and are returned in microstrain s⁻¹; Deep HDF5 files store
 strain and are returned in microstrain. The stacking path does not reconcile
 them. The difference is a factor of ω — a 90° phase rotation plus a slope across
-the band — which changes waveform shape and cross-fibre amplitude but **does not
+the band — which changes waveform shape and cross-fiber amplitude but **does not
 move an F–K ridge or change a moveout velocity**. Since every quantity compared
 in this paper is an apparent velocity, a delay, or a fractional change in one,
 the mismatch does not affect the Nano–Deep comparison. It would affect any
-amplitude comparison between fibres, and none is made.
+amplitude comparison between fibers, and none is made.
 
 For completeness: the Deep reader applies a polarity factor of −1 for the FPGA
 and firmware combination used here. That is a single global sign on all Deep
-data. It affects cross-fibre polarity and absolute Deep microstrain, not
+data. It affects cross-fiber polarity and absolute Deep microstrain, not
 within-Deep relative amplitude, repeatability, moveout or F–K structure.
 
-Channel coordinate is distance along fibre throughout. The return leg is
+Channel coordinate is distance along fiber throughout. The return leg is
 re-indexed so that coordinate increases away from the surface end on both legs,
 making the two Deep branches directly comparable. No coordinate-to-depth
 transform is applied and no result depends on one.
@@ -341,11 +341,11 @@ apparent mode and must not present its apparent speed as a formation V_P.
 
 ### 3.3 Deep guided-mode identification and split-sample validation
 
-We measured fractional changes in the apparent along-fibre speed of the repeatable slow guided mode recorded by the Deep fibre during the June 2026 accelerated weight-drop survey. The recovered quantity is an observable-level apparent-speed change and is not interpreted as a formation velocity change.
+We measured fractional changes in the apparent along-fiber speed of the repeatable slow guided mode recorded by the Deep fiber during the June 2026 accelerated weight-drop survey. The recovered quantity is an observable-level apparent-speed change and is not interpreted as a formation velocity change.
 
-The Deep system recorded 3200 channels at 1000 Hz with 2.0419 m channel spacing. The fibre reverses at channel 1702, producing outbound and return legs. The return leg was re-indexed so that distance increases away from the surface end on both legs. Analysis was restricted to 200–3000 m along each leg and decimated by a factor of six, giving approximately 12.25 m spatial sampling and 229 analysed channels per leg.
+The Deep system recorded 3200 channels at 1000 Hz with 2.0419 m channel spacing. The fiber reverses at channel 1702, producing outbound and return legs. The return leg was re-indexed so that distance increases away from the surface end on both legs. Analysis was restricted to 200–3000 m along each leg and decimated by a factor of six, giving approximately 12.25 m spatial sampling and 229 analysed channels per leg.
 
-Of the 49 bursts in the survey, 46 contained drops common to the Nano and Deep records; the Deep fibre stopped recording after burst 45, so the final three bursts have Nano coverage only and could not have entered a Deep analysis by any route (see `MANUSCRIPT_METHODS.md` §2.3). The analysed set is 859 common drops. These bursts were divided by parity following the earlier split-sample mode validation: 23 odd-indexed bursts formed the discovery set and 23 even-indexed bursts were held out for calibration. The outbound and return legs therefore use the same 23 held-out source bursts and constitute paired observations of distinct fibre paths; they are not 46 independent measurements.
+Of the 49 bursts in the survey, 46 contained drops common to the Nano and Deep records; the Deep fiber stopped recording after burst 45, so the final three bursts have Nano coverage only and could not have entered a Deep analysis by any route (see `MANUSCRIPT_METHODS.md` §2.3). The analysed set is 859 common drops. These bursts were divided by parity following the earlier split-sample mode validation: 23 odd-indexed bursts formed the discovery set and 23 even-indexed bursts were held out for calibration. The outbound and return legs therefore use the same 23 held-out source bursts and constitute paired observations of distinct fiber paths; they are not 46 independent measurements.
 
 For each leg and frequency band, one linear trajectory was selected using only the discovery-set stack. The search maximised semblance over the full leg for apparent speeds between 1300 and 1800 m s⁻¹ and intercepts between −0.10 and +0.40 s in 2 ms increments. The primary 15–30 Hz trajectories were then frozen at 1544.6 m s⁻¹ and +0.100 s for the outbound leg and 1549.7 m s⁻¹ and +0.346 s for the return leg. The independently selected speeds agree to 0.3%. A 3–15 Hz analysis was retained as a secondary robustness test, and 60–120 Hz, where no coherent mode had been validated, was used as a control band.
 
@@ -509,7 +509,7 @@ share the identical template.
 
 The same repeated surface source, recorded on two borehole DAS installations in
 the same hole during the same nominal 24 h survey, yields two different coherent
-modes. Note that instrumented fibre extent, analysis aperture and regression
+modes. Note that instrumented fiber extent, analysis aperture and regression
 lever arm are three different quantities; only the last governs sensitivity.
 
 | | Nano | Deep |
@@ -517,7 +517,7 @@ lever arm are three different quantities; only the last governs sensitivity.
 | Installation | cemented, shallow | wireline, reversing at channel 1702 |
 | Coherent mode apparent speed | ~2950 m s⁻¹ | ~1547 m s⁻¹ |
 | Band where strongest | 30–60 Hz | 15–30 Hz |
-| Instrumented fibre extent | 927 m | 3475 m outbound, 3059 m return |
+| Instrumented fiber extent | 927 m | 3475 m outbound, 3059 m return |
 | Analysis aperture used | 80–440 m | 200–3000 m per limb |
 | Regression lever arm | 0.121 s | 1.428 s (outbound) |
 
@@ -567,7 +567,7 @@ discovery-half bursts (`deep_dvv_frozen_trajectory.json`):
 | Return | 1549.7 | +0.346 | 0.252 |
 
 **The two legs agree to 0.3% in apparent speed.** They are separate propagation
-branches of one fibre selected by independent semblance searches, so the
+branches of one fiber selected by independent semblance searches, so the
 agreement is a non-trivial consistency check on the mode rather than a fitted
 constraint.
 
@@ -712,7 +712,7 @@ The displaced-intercept and slowness-offset controls cannot identify the cause. 
 
 #### 4.6.6 Interpretation and claim boundary
 
-The recovered quantity is a fractional change in the apparent along-fibre speed of the selected slow guided mode. It has no depth resolution and is not a measurement of formation \(V_P\) or \(V_S\), fault-zone stress, pore pressure, permeability, fracture compliance, or tectonic strain. Conversion to any of these quantities would require a guided-wave forward model and independent constraints not available here.
+The recovered quantity is a fractional change in the apparent along-fiber speed of the selected slow guided mode. It has no depth resolution and is not a measurement of formation \(V_P\) or \(V_S\), fault-zone stress, pore pressure, permeability, fracture compliance, or tectonic strain. Conversion to any of these quantities would require a guided-wave forward model and independent constraints not available here.
 
 The injection–recovery analysis calibrates the sensitivity of the observable as constructed. Attribution of the observable to a real spatially ordered guided mode relies on the earlier split-sample validation and channel-order permutation tests, in which the unpermuted held-out result exceeded all 499 permutations in each of four leg-and-band tests (\(p=0.002\)). The present analysis does not independently establish the physical phase identity or generation depth of that mode.
 
@@ -728,12 +728,12 @@ The all-46-burst analysis is not used for the headline claim because the traject
 
 ### 5.1 Why the two installations recover different modes
 
-The cemented Nano fibre records a coherent mode near 2950 m s⁻¹, strongest at
-30–60 Hz. The wireline Deep fibre records a mode near 1547 m s⁻¹, strongest at
+The cemented Nano fiber records a coherent mode near 2950 m s⁻¹, strongest at
+30–60 Hz. The wireline Deep fiber records a mode near 1547 m s⁻¹, strongest at
 15–30 Hz. Same hole, same source, same nominal 24 h survey — though Deep coverage ends after burst 45, giving ~22.5 h of usable Deep record against Nano's full span.
 
-The most natural reading is a coupling contrast. A cemented fibre is mechanically
-tied to the formation and senses strain transmitted through it; a wireline fibre
+The most natural reading is a coupling contrast. A cemented fiber is mechanically
+tied to the formation and senses strain transmitted through it; a wireline fiber
 hangs in borehole fluid and couples preferentially to energy guided by the fluid
 column and its walls. The Deep apparent speed of ~1547 m s⁻¹ sits just above
 typical borehole-fluid velocity, which is consistent with a tube-wave-like guided
@@ -890,13 +890,13 @@ after seeing the result, the branch is reported as unclassified.
 
 ### 5.5 What these measurements do and do not represent
 
-The recovered quantity is a fractional change in the apparent along-fibre speed
+The recovered quantity is a fractional change in the apparent along-fiber speed
 of a selected guided mode. It is not a formation V_P or V_S change, and it is not
 a measure of stress, pore pressure, permeability, fracture compliance, or
 tectonic strain. Converting it into any of those would require guided-wave
 physics and forward modelling not attempted here.
 
-It carries no depth resolution. Channel coordinate is distance along fibre; the
+It carries no depth resolution. Channel coordinate is distance along fiber; the
 coordinate-to-depth mapping remains provisional, and no result depends on it.
 
 The injection–recovery experiment measures the sensitivity of the observable *as
@@ -920,7 +920,7 @@ detection level is reached, is the wrong-observable control that does work.
 
 Four points follow for anyone designing a comparable experiment.
 
-**Installation is an experimental variable, not a deployment detail.** Two fibres
+**Installation is an experimental variable, not a deployment detail.** Two fibers
 in one hole, recording one source, returned different coherent modes with
 different frequency content, different apparent speeds and a factor of two
 difference in monitoring sensitivity. Installation should be specified and
@@ -972,7 +972,7 @@ worse than the Nano upper limit obtained from the same survey, despite Deep's
 better per-burst precision. Two effects account for this. Amplitude uncertainty
 is inflated ~1.5× beyond what per-burst scatter predicts, because over a 22 h
 record the diurnal tidal shape is not orthogonal to instrumental drift; and the
-record is truncated at one end, the Deep fibre having stopped after burst 45.
+record is truncated at one end, the Deep fiber having stopped after burst 45.
 
 The binding constraint on a tidal search with this design is therefore **survey
 duration and its drift degeneracy, not the choice of observable**. A longer
@@ -986,7 +986,7 @@ sensitive mode.
 ## 6. Conclusions
 
 **1. Contrasting installations in one borehole recover distinct coherent modes.**
-A cemented fibre and a wireline fibre, recording the same repeated source over
+A cemented fiber and a wireline fiber, recording the same repeated source over
 the same nominal 24 h survey, returned a fast apparent mode near 2950 m s⁻¹ at 30–60 Hz and
 a slow guided mode near 1547 m s⁻¹ at 15–30 Hz respectively. Both are dispersive;
 neither apparent speed should be read as a formation velocity. Installation is an
@@ -1033,7 +1033,7 @@ gains accrue continuously; detection levels move in discrete steps.
 ### 6.6 Interpretation limits carried into the conclusions
 
 The measured quantity throughout is a fractional change in the apparent
-along-fibre speed of a selected guided mode. It is not a formation V_P or V_S
+along-fiber speed of a selected guided mode. It is not a formation V_P or V_S
 change, not a measure of stress, pore pressure, permeability, fracture
 compliance, or tectonic strain, and it carries no depth resolution. The Niu SAFOD expected-response scale for a tidal velocity change, 5.76×10⁻⁵,
 lies roughly two orders of magnitude below the best demonstrated detection level;

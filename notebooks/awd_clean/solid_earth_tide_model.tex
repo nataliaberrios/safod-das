@@ -1,0 +1,430 @@
+% Simple methods note for the SAFOD active-source DAS tide experiment.
+% Compile with: pdflatex solid_earth_tide_model.tex
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\dvv}{\delta v/v}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\Rearth}{R_{\oplus}}
+\newcommand{\Mbody}{\mathcal{M}}
+
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+
+\title{\textbf{A Simple Solid--Earth Tide Forward Model for SAFOD}}
+\author{Methods note --- SAFOD active-source borehole DAS experiment}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This note explains a first-pass model of the solid-Earth tide at the San
+Andreas Fault Observatory at Depth (SAFOD).  The model calculates the changing
+gravitational forcing from the Moon and Sun, converts that forcing into a
+scalar Earth-deformation proxy using degree-2 Love numbers, and uses the
+resulting time series as a template for testing an apparent seismic velocity
+change.  The model predicts the astronomical forcing; it does not by itself
+predict how strongly SAFOD rock, fractures, fluids, or the DAS measurement
+should respond.  That response is represented by an unknown strain sensitivity.
+\end{abstract}
+
+\tableofcontents
+
+% ---------------------------------------------------------------------------
+\section{The physical question}
+% ---------------------------------------------------------------------------
+
+The Moon and Sun exert a time-varying gravitational force on the solid Earth.
+Because the force is not exactly the same at every point on Earth, it produces
+a differential deformation: the solid-Earth tide.  The deformation is small,
+but it repeats on a predictable astronomical schedule.
+
+The SAFOD experiment measures an apparent fractional seismic velocity change,
+written
+\begin{equation}
+  y(t) \equiv \left(\frac{\delta v}{v}\right)_{\!\mathrm{app}}(t).
+\end{equation}
+
+The simplest physical coupling model is
+\begin{equation}
+  \left(\frac{\delta v}{v}\right)_{\!\mathrm{app}}(t)
+  = S\,\eps_{\mathrm{tide}}(t) + \text{drift}(t) + \text{noise}(t),
+  \label{eq:coupling}
+\end{equation}
+where $\eps_{\mathrm{tide}}$ is the predicted tidal strain and $S$ is an
+unknown rock sensitivity.  The coefficient $S$ absorbs the response of the
+formation and the sensitivity of the particular seismic observable.  It is
+not assumed to be one.
+
+The forward model therefore answers:
+
+\begin{quote}
+What tidal deformation should be present at SAFOD at each time?
+\end{quote}
+
+The matched-filter analysis then asks whether the measured $y(t)$ contains
+that predicted shape.
+
+% ---------------------------------------------------------------------------
+\section{What the first-pass model is and is not}
+% ---------------------------------------------------------------------------
+
+The model below is a useful scalar forcing model.  It is not yet a complete
+downhole tidal-strain calculation.  In particular, it does not calculate the
+full depth-dependent strain tensor projected onto the actual DAS fiber.  The
+scalar result should therefore be described as an \emph{areal-strain proxy} or
+\emph{tidal forcing template}, not as a direct measurement of the strain in
+the SAFOD formation.
+
+This distinction matters because DAS measures strain or strain rate along a
+fiber direction.  A more complete model would calculate the strain tensor
+$\eps_{ij}$ and project it onto the local fiber unit vector $n$:
+\begin{equation}
+  \eps_{\mathrm{fiber}}(t) = n_i\,\eps_{ij}(t)\,n_j.
+  \label{eq:fiber_projection}
+\end{equation}
+
+The scalar model is nevertheless a sensible starting point because the
+astronomical time dependence is the main object being tested first.
+
+% ---------------------------------------------------------------------------
+\section{Step 1: define the site and times}
+% ---------------------------------------------------------------------------
+
+Use the SAFOD site coordinates
+\begin{align}
+  \phi &= 35.9746^\circ, &
+  \lambda &= -120.5516^\circ,
+\end{align}
+where $\phi$ is latitude and $\lambda$ is longitude.
+
+For each UTC epoch time, calculate the Julian Date (JD) and define the time
+relative to J2000.0 as
+\begin{equation}
+  d = \mathrm{JD} - 2451545.0.
+  \label{eq:j2000}
+\end{equation}
+
+The time convention must be explicit.  The Sun and Moon positions are
+time-dependent, so an incorrect timezone or an incorrect UTC conversion
+shifts the phase of the predicted template.
+
+% ---------------------------------------------------------------------------
+\section{Step 2: calculate the Sun and Moon geometry}
+% ---------------------------------------------------------------------------
+
+At every epoch, the model needs the right ascension $\alpha$, declination
+$\delta$, and geocentric distance $D$ of each body.  A low-precision ephemeris
+can be used for a short, first-pass experiment.  The Sun can be calculated
+from its mean longitude and mean anomaly; the Moon can be calculated from a
+truncated orbital solution.  For higher-accuracy work, replace these formulas
+with a tested ephemeris or a standard solid-Earth-tide package.
+
+The local hour angle of a body is
+\begin{equation}
+  H = \mathrm{LST} - \alpha,
+  \label{eq:hour_angle}
+\end{equation}
+where LST is local sidereal time.  The angle $\theta$ between the body and the
+local upward direction at SAFOD follows from the spherical triangle:
+\begin{equation}
+  \cos\theta
+  = \sin\phi\,\sin\delta
+    + \cos\phi\,\cos\delta\,\cos H.
+  \label{eq:zenith_angle}
+\end{equation}
+
+The angle changes as the Earth rotates.  The Sun and Moon also have different
+declinations and distances, so their contributions are not identical.
+
+% ---------------------------------------------------------------------------
+\section{Step 3: calculate the degree-2 tidal potential}
+% ---------------------------------------------------------------------------
+
+The dominant body-tide forcing is the degree-2 part of the tidal potential.
+For one body $b$ (the Moon or Sun), the simplified potential at the Earth’s
+surface is
+\begin{equation}
+  W_b(t) =
+  \frac{G\,\Mbody_b}{D_b(t)^3}\,\Rearth^2\,
+  P_2\!\left(\cos\theta_b(t)\right),
+  \label{eq:potential}
+\end{equation}
+where
+\begin{equation}
+  P_2(x) = \frac{3x^2-1}{2}
+  \label{eq:legendre}
+\end{equation}
+is the second Legendre polynomial.
+
+The total forcing is the sum of the lunar and solar terms:
+\begin{equation}
+  W(t) = W_{\mathrm{Moon}}(t) + W_{\mathrm{Sun}}(t).
+  \label{eq:total_potential}
+\end{equation}
+
+The factor $D^{-3}$ is important: tidal forcing depends on the spatial
+gradient of the gravitational field, not merely on the gravitational force.
+The nearby Moon can therefore make a large tidal contribution despite its
+smaller mass.
+
+Because $P_2(\cos\theta)$ is quadratic in the geometry, the result is not
+generally a single sinusoid.  The combined signal usually contains diurnal
+and semidiurnal components with unequal peak heights.
+
+% ---------------------------------------------------------------------------
+\section{Step 4: convert potential into a strain proxy}
+% ---------------------------------------------------------------------------
+
+The quantity
+\begin{equation}
+  \frac{W(t)}{g\Rearth}
+  \label{eq:dimensionless_forcing}
+\end{equation}
+is dimensionless.  It represents the scale of the tidal displacement relative
+to the Earth’s radius.
+
+Love numbers describe the elastic response of the Earth to the forcing.  In
+the scalar model, $h_2$ is the degree-2 radial-displacement Love number and
+$l_2$ is the degree-2 horizontal, or Shida, number.  The first-pass areal
+strain is
+\begin{equation}
+  \boxed{
+  \eps_{\mathrm{tide}}(t)
+  = \left(2h_2-6l_2\right)\frac{W(t)}{g\Rearth}}
+  \label{eq:areal_strain}
+\end{equation}
+
+The constants used in the current SAFOD model are:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Quantity & Meaning & Value \\
+\midrule
+$R_{\oplus}$ & Earth radius & $6.371\times10^6$ m \\
+$g$ & surface gravity & $9.81$ m s$^{-2}$ \\
+$h_2$ & radial Love number & $0.6032$ \\
+$l_2$ & horizontal Love number & $0.0839$ \\
+$G$ & gravitational constant & $6.674\times10^{-11}$ m$^3$ kg$^{-1}$ s$^{-2}$ \\
+$\mathcal{M}_{\mathrm{Moon}}$ & lunar mass & $7.342\times10^{22}$ kg \\
+$\mathcal{M}_{\mathrm{Sun}}$ & solar mass & $1.989\times10^{30}$ kg \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For these Love numbers,
+\begin{equation}
+  2h_2-6l_2 = 0.703.
+\end{equation}
+
+Evaluated over the current 24-hour experiment window, this model gives
+approximately
+\begin{align}
+  \eps_{\mathrm{tide}}^{\mathrm{pk-pk}} &\approx 9.09\times10^{-8},\\
+  \eps_{\mathrm{tide}}^{\mathrm{amp}} &\approx 4.54\times10^{-8}.
+\end{align}
+
+These values describe the predicted forcing scale, not the predicted
+$\dvv$.  The conversion from tidal strain to seismic velocity change requires
+the unknown sensitivity $S$ in Eq.~\eqref{eq:coupling}.
+
+% ---------------------------------------------------------------------------
+\section{Step 5: connect the tide to the measured $\dvv$}
+% ---------------------------------------------------------------------------
+
+The measured epoch series is obtained from travel-time changes.  For a fixed
+wave path and a small velocity perturbation,
+\begin{equation}
+  \frac{\delta t}{t} = -\frac{\delta v}{v}.
+  \label{eq:travel_time}
+\end{equation}
+
+The minus sign means that a faster medium produces an earlier arrival.  In
+practice, the measured quantity is called \emph{apparent} $\dvv$ because it
+can also contain clock drift, source-wavelet variation, coupling changes, and
+processing artifacts.
+
+Let $y_k$ be the apparent $\dvv$ at epoch time $t_k$.  The forward-model curve
+is normalized to make a unit-amplitude template:
+\begin{equation}
+  \tau_k =
+  \frac{\eps_{\mathrm{tide}}(t_k)-\overline{\eps_{\mathrm{tide}}}}
+       {\max_j\left|\eps_{\mathrm{tide}}(t_j)-\overline{\eps_{\mathrm{tide}}}\right|}.
+  \label{eq:template}
+\end{equation}
+
+The simplest fit is
+\begin{equation}
+  y_k = A\tau_k + c_0+c_1t_k+c_2t_k^2+r_k,
+  \label{eq:fit_model}
+\end{equation}
+where $A$ is the fitted apparent-velocity response, the $c$ terms represent
+slow drift, and $r_k$ is the remaining residual.
+
+The three useful trend choices are:
+\begin{itemize}[nosep]
+  \item flat: $c_1=c_2=0$;
+  \item linear: $c_2=0$;
+  \item quadratic: all three trend coefficients are fitted.
+\end{itemize}
+
+The null hypothesis is the trend-only model, $A=0$.  The tide is the one
+additional, physically predicted shape being tested.
+
+If the template is scaled using the physical tidal amplitude rather than the
+unit normalization in Eq.~\eqref{eq:template}, the strain sensitivity is
+\begin{equation}
+  S = \frac{A}{\eps_{\mathrm{tide}}^{\mathrm{amp}}}.
+  \label{eq:sensitivity}
+\end{equation}
+
+For example, a detection floor of $8\times10^{-4}$ in apparent $\dvv$ would
+correspond to
+\begin{equation}
+  S_{\mathrm{floor}}
+  = \frac{8\times10^{-4}}{4.54\times10^{-8}}
+  \approx 1.8\times10^4.
+\end{equation}
+
+This means the rock and measurement system would need an effective sensitivity
+of roughly $1.8\times10^4$ for the predicted tidal forcing to reach that
+detection floor.
+
+% ---------------------------------------------------------------------------
+\section{A compact implementation recipe}
+% ---------------------------------------------------------------------------
+
+The forward model can be implemented in the following order:
+
+\begin{enumerate}
+  \item Convert every UTC epoch time to Julian Date.
+  \item Calculate the Sun’s and Moon’s $\alpha$, $\delta$, and $D$.
+  \item Calculate local sidereal time and each body’s hour angle.
+  \item Calculate $\cos\theta$ using Eq.~\eqref{eq:zenith_angle}.
+  \item Evaluate the degree-2 potential in Eq.~\eqref{eq:potential}.
+  \item Sum the solar and lunar potentials.
+  \item Convert potential to the scalar strain proxy using Eq.~\eqref{eq:areal_strain}.
+  \item Interpolate the model to the measured epoch times.
+  \item Fit the normalized template plus flat, linear, or quadratic trend.
+  \item Estimate uncertainty using a time-respecting bootstrap or another
+        method appropriate for serially correlated epochs.
+\end{enumerate}
+
+In pseudocode:
+
+\begin{verbatim}
+for t in epoch_times:
+    jd = utc_to_julian_date(t)
+    sun  = solar_position(jd)
+    moon = lunar_position(jd)
+    W = 0
+    for body in (sun, moon):
+        cos_theta = site_body_geometry(body, SAFOD_lat, SAFOD_lon, t)
+        W += G * body.mass / body.distance**3 \\
+             * R_earth**2 * P2(cos_theta)
+    tide_strain[t] = (2*h2 - 6*l2) * W / (g * R_earth)
+
+template = normalize_zero_mean(tide_strain)
+fit measured_dvv = A*template + trend + residual
+\end{verbatim}
+
+% ---------------------------------------------------------------------------
+\section{Limitations and next refinements}
+% ---------------------------------------------------------------------------
+
+\begin{enumerate}
+  \item \textbf{Ephemeris accuracy.} A low-precision Sun/Moon calculation is
+        adequate for understanding the template over one day, but a precise
+        study should use a tested ephemeris and a standard body-tide package.
+
+  \item \textbf{Scalar versus tensor strain.} Equation~\eqref{eq:areal_strain}
+        is a scalar areal-strain proxy.  A downhole DAS measurement is better
+        represented by the strain tensor projected onto the actual fiber
+        direction, Eq.~\eqref{eq:fiber_projection}.
+
+  \item \textbf{Surface versus downhole response.} The Love-number expression
+        is written as a surface degree-2 response.  The deformation field at
+        depth and the response of a deviated borehole may differ from this
+        scalar surface approximation.
+
+  \item \textbf{Other loadings.} Ocean tides, atmospheric pressure, hydrology,
+        and local poroelastic effects can contribute to deformation.  They are
+        separate from the direct Sun--Moon body-tide term.
+
+  \item \textbf{Rock physics.} The astronomical model predicts the forcing,
+        not the value of $S$.  A non-detection constrains the product of rock
+        sensitivity and measurement quality; it does not prove that the rock
+        has zero tidal response.
+\end{enumerate}
+
+The first scientifically clean claim is therefore:
+
+\begin{quote}
+The Sun--Moon body tide provides a known, small, non-sinusoidal forcing
+template at SAFOD.  The active-source DAS experiment tests whether the
+measured apparent velocity-change series contains a response with that shape
+above its drift and noise floor.
+\end{quote}
+
+% ---------------------------------------------------------------------------
+\section{References}
+% ---------------------------------------------------------------------------
+
+\begin{thebibliography}{99}
+
+\bibitem{Agnew2007}
+D.~C. Agnew (2007), ``Earth tides,'' in T.~A. Herring (ed.),
+\emph{Treatise on Geophysics}, vol.~3, pp.~163--195, Elsevier.
+\href{https://doi.org/10.1016/B978-044452748-6.00056-0}{doi:10.1016/B978-044452748-6.00056-0}.
+
+\bibitem{MetivierConrad2008}
+L.~M\'etivier and C.~P. Conrad (2008), ``Body tides of a convecting,
+laterally heterogeneous, and aspherical Earth,'' \emph{Journal of Geophysical
+Research: Solid Earth}, 113, B11405.
+\href{https://doi.org/10.1029/2007JB005448}{doi:10.1029/2007JB005448}.
+
+\bibitem{Farrell1972}
+W.~E. Farrell (1972), ``Deformation of the Earth by surface loads,''
+\emph{Reviews of Geophysics}, 10(3), 761--797.
+\href{https://doi.org/10.1029/RG010i003p00761}{doi:10.1029/RG010i003p00761}.
+
+\bibitem{Poupinet1984}
+G.~Poupinet, W.~L. Ellsworth, and J. Fr\'echet (1984), ``Monitoring velocity
+variations in the crust using earthquake doublets: An application to the
+Calaveras Fault, California,'' \emph{Journal of Geophysical Research}, 89(B7),
+5719--5731.
+\href{https://doi.org/10.1029/JB089iB07p05719}{doi:10.1029/JB089iB07p05719}.
+
+\bibitem{Takano2014}
+T.~Takano, T.~Nishimura, H.~Nakahara, Y.~Ohta, and S.~Tanaka (2014),
+``Seismic velocity changes caused by the Earth tide: Ambient noise correlation
+analyses of small-array data,'' \emph{Geophysical Research Letters}, 41(17),
+6131--6136.
+\href{https://doi.org/10.1002/2014GL060690}{doi:10.1002/2014GL060690}.
+
+\bibitem{Lellouch2019}
+A.~Lellouch, S.~Yuan, Z.~Spica, B.~Biondi, and W.~L. Ellsworth (2019),
+``Seismic velocity estimation using passive downhole distributed acoustic
+sensing records: Examples from the San Andreas Fault Observatory at Depth,''
+\emph{Journal of Geophysical Research: Solid Earth}, 124, 6931--6948.
+\href{https://doi.org/10.1029/2019JB017533}{doi:10.1029/2019JB017533}.
+
+\bibitem{RojstaczerAgnew1989}
+S.~Rojstaczer and D.~C. Agnew (1989), ``The influence of formation material
+properties on the response of water levels in wells to Earth tides and
+atmospheric loading,'' \emph{Journal of Geophysical Research}, 94(B9),
+12403--12411.
+\href{https://doi.org/10.1029/JB094iB09p12403}{doi:10.1029/JB094iB09p12403}.
+
+\end{thebibliography}
+
+\end{document}

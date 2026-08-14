@@ -12,12 +12,12 @@ Borehole distributed acoustic sensing is increasingly used for time-lapse
 velocity monitoring, but the consequences of installation and coupling for
 monitoring sensitivity have not been quantified against a controlled repeated
 source. We recorded a 24-hour repeated accelerated weight-drop survey on two
-borehole DAS installations in the same hole at SAFOD: a shallow cemented fibre
-and a deeper wireline fibre that reverses, giving outbound and return branches.
+borehole DAS installations in the same hole at SAFOD: a shallow cemented fiber
+and a deeper wireline fiber that reverses, giving outbound and return branches.
 
-The two installations recover different coherent modes. The cemented fibre
+The two installations recover different coherent modes. The cemented fiber
 records a fast apparent mode near 2950 m s⁻¹, strongest at 30–60 Hz, with
-resolved frequency-dependent slowness. The wireline fibre records a slow
+resolved frequency-dependent slowness. The wireline fiber records a slow
 borehole-guided mode near 1547 m s⁻¹, strongest at 15–30 Hz, whose trajectory is
 selected independently on each branch to within 0.3% and which survives
 channel-order permutation testing at the resolution floor of 499 permutations.
@@ -27,7 +27,7 @@ yields highly repeatable observables, with burst-stack correlation of 0.976
 against an independent reference.
 
 Blind injection–recovery on held-out bursts, using an identical estimator for
-both fibres, establishes smallest tested reliable-detection levels of 1.0% for
+both fibers, establishes smallest tested reliable-detection levels of 1.0% for
 the cemented observable, 0.5% for the outbound wireline branch, and 1.0% for the
 return branch. Although the outbound regression lever arm is 11.8 times longer
 than the cemented one, poorer burst-to-burst timing repeatability — 1.71 ms
@@ -53,7 +53,7 @@ longer propagation path is branch-specific rather than installation-wide.
 ## 6. Conclusions
 
 **1. Contrasting installations in one borehole recover distinct coherent modes.**
-A cemented fibre and a wireline fibre, recording the same repeated source over
+A cemented fiber and a wireline fiber, recording the same repeated source over
 the same nominal 24 h survey, returned a fast apparent mode near 2950 m s⁻¹ at 30–60 Hz and
 a slow guided mode near 1547 m s⁻¹ at 15–30 Hz respectively. Both are dispersive;
 neither apparent speed should be read as a formation velocity. Installation is an
@@ -96,7 +96,7 @@ gains accrue continuously; detection levels move in discrete steps.
 ### 6.6 Interpretation limits carried into the conclusions
 
 The measured quantity throughout is a fractional change in the apparent
-along-fibre speed of a selected guided mode. It is not a formation V_P or V_S
+along-fiber speed of a selected guided mode. It is not a formation V_P or V_S
 change, not a measure of stress, pore pressure, permeability, fracture
 compliance, or tectonic strain, and it carries no depth resolution. The Niu SAFOD expected-response scale for a tidal velocity change, 5.76×10⁻⁵,
 lies roughly two orders of magnitude below the best demonstrated detection level;
@@ -115,6 +115,6 @@ limit of 1.03×10⁻³, some 18× above that scale.
 | Tidal placement | supplement to carry both the Niu arithmetic and the measured upper limit, labelled a limit rather than a search |
 | Interrogator **model numbers** | open — vendors established (Sintela, OptaSense); models need Ettore |
 | Physical depth of the Deep turnaround (channel 1702) | open — needs Ettore |
-| Which physical cable each dataset is | open — the project's own fibre-identity question |
+| Which physical cable each dataset is | open — the project's own fiber-identity question |
 | Two-model tide notebook (Model A / Model B) | not yet on Sherlock; Model A intended for main text, Model B for supplement |
 | Prose vs internal-record separation | pending — these files still carry filenames, defect history and reviewer-facing asides that belong in reproducibility material, not the manuscript |

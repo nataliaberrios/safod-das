@@ -11,9 +11,9 @@ from memory. Extraction: `ml system poppler/0.47.0` then `pdftotext`.
 Repeated active-source seismic monitoring can resolve small changes in crustal
 velocity, and borehole deployment removes much of the near-surface noise and
 weather sensitivity that limits surface experiments. Distributed acoustic sensing
-(DAS) makes such deployments dense and cheap: a single fibre returns thousands of
+(DAS) makes such deployments dense and cheap: a single fiber returns thousands of
 channels along the borehole, where a conventional array returns a handful. What
-DAS does not do is remove the question of how the fibre is coupled to the rock,
+DAS does not do is remove the question of how the fiber is coupled to the rock,
 and that question turns out to control what the instrument can measure.
 
 At Parkfield, both halves of this problem have prior art at the same site. Niu
@@ -45,12 +45,12 @@ though neither can it be assumed to be guided, since the shallow section carries
 strong vertical velocity gradient (1.5–3.5 km s⁻¹ above the Salinian basement top
 at 0.77 km; Hole et al. 2006) that produces dispersion in refracted arrivals too. Lellouch et al. (2019) subsequently recorded the same site with
 downhole DAS and estimated P- and S-wave velocities from passive records,
-demonstrating that fibre in this hole resolves structure but also that the
+demonstrating that fiber in this hole resolves structure but also that the
 relationship between a DAS observable and a formation property requires care.
 
 What has not been established is how the *installation* — cemented against
 wireline, shallow against deep — changes the answer, and what that costs or buys
-for time-lapse monitoring. Two fibres in the same borehole, recording the same
+for time-lapse monitoring. Two fibers in the same borehole, recording the same
 source, provide a controlled test of exactly this. If they return the same
 observable with the same sensitivity, installation is a logistical choice. If
 they do not, installation belongs in the experimental design alongside source and
@@ -59,7 +59,7 @@ geometry.
 A second question follows from the geometry. The natural estimator for a
 fractional velocity change measures the rate at which delay accumulates with
 propagation time, so its precision improves as the observed propagation path
-lengthens. A fibre reaching further into the borehole, or a slower mode occupying
+lengthens. A fiber reaching further into the borehole, or a slower mode occupying
 more travel time over the same distance, should therefore be more sensitive. That
 argument treats timing precision as fixed. It need not be: the same deployment
 choices that extend the path may also degrade coupling, waveform repeatability

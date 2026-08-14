@@ -86,7 +86,7 @@ def main() -> None:
                     arrowprops=dict(arrowstyle="<->", color=colour, lw=1.8))
         ax.text(x + 70, 0.5 * (lo + hi), text, color=colour, va="center", fontsize=10)
 
-    ax.set(xlabel="distance along fibre (m)",
+    ax.set(xlabel="distance along fiber (m)",
            ylabel="reference travel time $T_0$ (s)",
            xlim=(0, 3600), ylim=(-0.15, 2.15))
     ax.set_title(

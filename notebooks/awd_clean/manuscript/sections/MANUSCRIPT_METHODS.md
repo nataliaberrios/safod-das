@@ -16,21 +16,21 @@ listed at the end.
 
 ## 2. Experiment and instrumentation
 
-### 2.1 Site and fibres
+### 2.1 Site and fibers
 
 Two distinct borehole DAS installations at SAFOD recorded the same repeated
 surface source. They are not interchangeable observations of one wavefield: the
 installations differ in coupling and geometry, and each recovers a different
 coherent mode.
 
-The **Nano** fibre is cemented and shallow, interrogated by a Sintela system
+The **Nano** fiber is cemented and shallow, interrogated by a Sintela system
 writing protobuf. Header metadata gives 732 channels at 1.2661 m channel spacing
 — a 927 m instrumented extent — a **16.459 m gauge length**, and a 10 kHz raw
 sample rate, decimated to 1000 Hz for the stacks used here.
 
-The **Deep** fibre is wireline-deployed and reverses at channel 1702, so its 3200
+The **Deep** fiber is wireline-deployed and reverses at channel 1702, so its 3200
 channels at 2.0419 m spacing trace an outbound limb of 3475 m and a return limb
-of 3059 m along 6532 m of fibre. Filename metadata records a **10 m gauge
+of 3059 m along 6532 m of fiber. Filename metadata records a **10 m gauge
 length**, 1000 Hz sample rate, 2 m channel spacing and dual-pulse interrogation
 (`SAFOD-Deep-10mGL-1000HzFs-2mChDualPulse_*.h5`), and the reader auto-detects the
 system as OptaSense.
@@ -43,7 +43,7 @@ band — the gauge-length response first nulls near 179 Hz for Nano (2950 m s⁻
 artefact.
 
 For context on the installation, Lellouch et al. (2019) describe the SAFOD main
-hole as carrying two optical fibres cemented between casing strings in a 0.9 mm
+hole as carrying two optical fibers cemented between casing strings in a 0.9 mm
 steel tube, and used an OptaSense ODH3.1 interrogator at 10 m gauge length and
 1 m channel spacing in 2017.
 
@@ -51,7 +51,7 @@ steel tube, and used an OptaSense ODH3.1 interrogator at 10 m gauge length and
 established — Sintela for Nano, OptaSense for Deep — but not the model); the
 physical depth corresponding to the Deep turnaround at channel 1702; and
 confirmation of which physical cable each dataset corresponds to, which the
-project records as an open question. Channel coordinate is distance along fibre
+project records as an open question. Channel coordinate is distance along fiber
 throughout; the coordinate-to-depth mapping is provisional and no result here
 depends on it.
 
@@ -81,14 +81,14 @@ be used interchangeably:
 | Full 0.5/3.0 s window fits inside the data file | 970 | 875 | — |
 | **Used by the burst stacks** | 970 | 875 | **859 common** |
 
-The **analysed dataset is 859 drops common to both fibres, across 46 bursts.**
+The **analysed dataset is 859 drops common to both fibers, across 46 bursts.**
 
 Two attritions account for the difference, neither of them quality rejection.
 
-**The Deep fibre stopped recording after burst 45 (22:16:23 UTC).** Bursts 46, 47
+**The Deep fiber stopped recording after burst 45 (22:16:23 UTC).** Bursts 46, 47
 and 48 — at 22:46, 23:16 and 23:44 UTC on 2026-06-17 — carry full Nano coverage
 and zero Deep coverage. This alone is why the analysis uses 46 bursts and not 49.
-Consequently, **restricting the analysis to drops recorded on both fibres costs
+Consequently, **restricting the analysis to drops recorded on both fibers costs
 the Deep analysis nothing**: a Deep-only analysis could not have used those three
 bursts either. The 46-burst count is set by Deep's own coverage, not by the
 pairing requirement.
@@ -145,22 +145,22 @@ channel simultaneously. It is applied throughout.
 one file at a time, so the Tukey window covers 300 s for Nano and 60 s for Deep,
 far longer than the 3.5 s drop windows extracted from it.
 
-**The two fibres are not in the same physical quantity.** Nano protobuf files
+**The two fibers are not in the same physical quantity.** Nano protobuf files
 store strain *rate* and are returned in microstrain s⁻¹; Deep HDF5 files store
 strain and are returned in microstrain. The stacking path does not reconcile
 them. The difference is a factor of ω — a 90° phase rotation plus a slope across
-the band — which changes waveform shape and cross-fibre amplitude but **does not
+the band — which changes waveform shape and cross-fiber amplitude but **does not
 move an F–K ridge or change a moveout velocity**. Since every quantity compared
 in this paper is an apparent velocity, a delay, or a fractional change in one,
 the mismatch does not affect the Nano–Deep comparison. It would affect any
-amplitude comparison between fibres, and none is made.
+amplitude comparison between fibers, and none is made.
 
 For completeness: the Deep reader applies a polarity factor of −1 for the FPGA
 and firmware combination used here. That is a single global sign on all Deep
-data. It affects cross-fibre polarity and absolute Deep microstrain, not
+data. It affects cross-fiber polarity and absolute Deep microstrain, not
 within-Deep relative amplitude, repeatability, moveout or F–K structure.
 
-Channel coordinate is distance along fibre throughout. The return leg is
+Channel coordinate is distance along fiber throughout. The return leg is
 re-indexed so that coordinate increases away from the surface end on both legs,
 making the two Deep branches directly comparable. No coordinate-to-depth
 transform is applied and no result depends on one.
