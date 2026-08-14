@@ -32,13 +32,13 @@ RAM=0.1
 SPECTRAL=cross_correlation
 NULL_METHOD=ordered
 REALIZATION=0
-EXTRA=()
+COMMON_MODE=0
 
 case "$CONFIG" in
   0) LABEL=paper_baseline ;;
   1) LABEL=source_ch0; SOURCE=0 ;;
   2) LABEL=ram_5s; RAM=5.0 ;;
-  3) LABEL=common_mode; EXTRA=(--common-mode) ;;
+  3) LABEL=common_mode; COMMON_MODE=1 ;;
   4) LABEL=equation6_stabilized; SPECTRAL=source_power_stabilized ;;
   5) LABEL=white_noise; NULL_METHOD=white_noise ;;
   6) LABEL=channel_permutation; NULL_METHOD=channel_permutation; REALIZATION=0 ;;
@@ -46,16 +46,21 @@ case "$CONFIG" in
 esac
 
 echo "config=$CONFIG label=$LABEL hour=$HOUR start=$START source=$SOURCE ram=$RAM spectral=$SPECTRAL null=$NULL_METHOD"
-srun "$PY" -u ambient_lellouch2019_exact_stack.py \
-  --action chunk \
-  --date 2024-12-20 \
-  --start "$START" \
-  --nfiles 60 \
-  --block-files 10 \
-  --source-channel "$SOURCE" \
-  --ram-seconds "$RAM" \
-  --spectral-mode "$SPECTRAL" \
-  --null-method "$NULL_METHOD" \
-  --realization "$REALIZATION" \
-  --output-dir "$OUT" \
-  "${EXTRA[@]}"
+ARGS=(
+  -u ambient_lellouch2019_exact_stack.py
+  --action chunk
+  --date 2024-12-20
+  --start "$START"
+  --nfiles 60
+  --block-files 10
+  --source-channel "$SOURCE"
+  --ram-seconds "$RAM"
+  --spectral-mode "$SPECTRAL"
+  --null-method "$NULL_METHOD"
+  --realization "$REALIZATION"
+  --output-dir "$OUT"
+)
+if [[ "$COMMON_MODE" -eq 1 ]]; then
+  ARGS+=(--common-mode)
+fi
+srun "$PY" "${ARGS[@]}"
