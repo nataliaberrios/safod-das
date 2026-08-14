@@ -5,7 +5,7 @@ import nbformat as nbf
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "Ambient_FK_QC_workflow.ipynb"
 EXACT_SUMMARY = HERE / "ambient_transfer" / "lellouch2019_exact_stack" / "aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0.json"
-NOTEBOOK_VERSION = "v8" if EXACT_SUMMARY.is_file() else "v7"
+NOTEBOOK_VERSION = "v9" if EXACT_SUMMARY.is_file() else "v7"
 nb = nbf.v4.new_notebook()
 nb.metadata = {"kernelspec": {"display_name": "Python [conda env:das]", "language": "python", "name": "das"}}
 
@@ -823,6 +823,103 @@ else:
     markdown("""## 10. Paper-faithful Figure 7c result — pending
 
 The authoritative implementation is `ambient_lellouch2019_exact_stack.py` at commit `bb48942`. Full-day matrix job `38988141` is queued/running on Sherlock. Dependency-gated aggregation job `38988173` will continue automatically only after all 168 hourly branch tasks succeed. No user notification is required. Until the aggregate JSON appears, all legacy Figure 7c and F–K verdicts remain withdrawn.""")
+markdown("""## 11. Beyond one day — five more days, a coherent stack, and why a small p is still not a reproduction — v9
+
+Section 10 tests 20 December 2024 alone, matched to the paper's own one-day design.
+Three questions remained: whether another day does better, whether stacking more
+data recovers the arrival, and what to conclude if some subset does return a small
+p value. All three are now answered.
+
+**Every complete day, not just the tested one.** The raw energy census shows the
+2.5–4 km/s fan share varies from 0.3 % to 4.9 % across days, so 20 December was not
+the most favourable day available. Configuration 0 was therefore run on every other
+complete day. Days whose manifest is not exactly continuous at 60.000 s cannot be
+streamed end to end; 2024-11-30, 2024-10-28 and 2025-03-04 each carry two timing
+anomalies, and 2024-11-30 — the richest day in the census — was analysed over its
+leading 21.3-hour contiguous block rather than excluded.
+
+| date | census fan % | peak | at (m/s) | causal/acausal at 3,200 | p |
+|---|---:|---:|---:|---:|---:|
+| 2024-11-30 (21.3 h) | 4.9 | 6.536 | 5850 | 0.96 | 0.1345 |
+| 2024-12-20 | 4.1 | 6.131 | 5850 | 0.97 | 0.1470 |
+| 2024-06-17 | 4.5 | 1.901 | 5925 | 1.12 | 0.7413 |
+| 2024-06-26 | 3.6 | 1.297 | 5925 | 0.86 | 0.4206 |
+| 2025-02-24 | 3.4 | 2.532 | 5875 | 1.05 | 0.7517 |
+| 2024-05-11 | 0.3 | 1.026 | 1675 | 1.02 | 0.3091 |
+
+No day reaches significance; the minimum over six days is 0.1345, on the richest
+day. Fisher's combination across the independent days gives χ² = 9.08 on 10 degrees
+of freedom, p = 0.524 — the χ² ≈ df expected from noise. The census does not predict
+the outcome: 4.5 % scores p = 0.7413, worse than the 0.3 % day.
+
+**A coherent stack, not a pooled p value.** Combining p values is not the same
+experiment as stacking data: a coherent arrival grows with stacked windows while
+noise averages down. Because chunk files store summed cross spectra, days are
+exactly additive. Stacking the four full days that share an acquisition rate —
+5,760 files, 23,036 windows, 96.0 hours — gives peak 1.912 at 5,925 m/s against a
+null 95th percentile of 2.649, p = 0.9184, and causal/acausal of 0.99 at 3,200 m/s.
+Four times the data leaves the statistic further from threshold than the single best
+day.
+
+**The archive is not homogeneous in acquisition rate.** 2024-05-11 was recorded at
+5000 Hz against 500 Hz on every other day, so its cross spectra lie on a different
+frequency grid and cannot be coherently pooled. Any future analysis combining days
+must group by rate.
+
+**Why a p below 0.05 here would still not be a reproduction.** Stacking the two
+best-scoring days returns p = 0.039, and the two days were selected precisely
+because they scored lowest. Running all ten pairs of the five usable 500 Hz days
+gives two below 0.05 against 0.5 expected by chance; binomial P(≥2) ≈ 0.086, and the
+pairs share days so are not independent. The decisive objection, however, is not
+multiplicity but velocity: **every pair reaching p < 0.05 peaks at 5,850–5,900 m/s
+with causal/acausal of 0.97–1.01.** A maximum at the top edge of the declared scan
+is flat moveout — energy arriving at all receivers within a few milliseconds across
+700 m — which is the signature of common-mode or instrumental structure, not a
+propagating body wave. Figure 7c is a specific claim: a packet near 3,200 m/s with
+the causal side dominant. At 3,200 m/s the score is consistently about half the peak
+and the causal side never dominates.
+
+This archive therefore does contain a statistically detectable coherent component,
+and it is not the arrival Lellouch et al. (2019) report. Accepting it on its p value
+alone would repeat, in a new form, the error that Sections 5–7 document for the F–K
+fan. The multi-day tool now requires three conditions jointly — p < 0.05, a peak
+inside the 2,500–4,000 m/s fan, and causal dominance — before it will report a
+recovery.
+""")
+
+python("""from pathlib import Path
+import numpy as np
+from IPython.display import Image, display
+
+base = ROOT if 'ROOT' in globals() else Path.cwd()
+days_dir = base/'ambient_transfer'/'lellouch2019_exact_stack_days'
+auth = base/'ambient_transfer'/'lellouch2019_exact_stack'/'_authoritative_38993456'
+
+rows = []
+for f in sorted(days_dir.glob('aggregate_*_src23_ram0p1_cross_correlation_ordered_r0.npz')) + \
+         sorted(auth.glob('aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0.npz')):
+    z = np.load(f, allow_pickle=True)
+    vg = z['velocity_grid_m_s']; cs = z['causal_moveout_scores']; ac = z['acausal_moveout_scores']
+    nl = z['receiver_order_null_maxima']; k = int(np.nanargmax(cs))
+    rows.append((f.name.split('_')[1], int(z['n_windows']), float(cs[k]), float(vg[k]),
+                 float(np.interp(3200, vg, cs)/np.interp(3200, vg, ac)),
+                 float((np.sum(nl >= cs[k])+1)/(len(nl)+1))))
+rows.sort(key=lambda r: r[5])
+print(f"{'date':<12}{'windows':>9}{'peak':>9}{'at m/s':>9}{'c/a@3200':>10}{'p':>9}")
+for r in rows:
+    print(f"{r[0]:<12}{r[1]:>9}{r[2]:>9.3f}{r[3]:>9.0f}{r[4]:>10.2f}{r[5]:>9.4f}")
+print()
+print('No day clears alpha = 0.05. Every peak but one sits at the top edge of the scan,')
+print('i.e. flat moveout, rather than at the ~3200 m/s the paper reports.')
+
+for png in (base/'ambient_lellouch2019_multiday_stack.png',
+            base/'ambient_lellouch2019_multiday_stack_best2.png'):
+    if png.is_file():
+        display(Image(filename=str(png), width=1100))
+""")
+
+markdown("""**Figure 12. Coherent multi-day stacks.** The first panel pair is the 96.0-hour stack of the four full days sharing a 500 Hz acquisition rate; the second is the two best-scoring days only. Left panels show the R−10:R+10 gather with the 3.2 km s⁻¹ trajectory overlaid as a reference, not a fit; right panels show the causal velocity scan against the 95th percentile of the receiver-order null. Neither stack places its maximum near 3.2 km s⁻¹. The 96-hour stack is nonsignificant (p = 0.918); the hand-picked two-day stack reaches p = 0.039 but peaks at 5,850 m s⁻¹ with causal/acausal 0.97, which is flat moveout rather than a propagating arrival, and was selected as the best of ten pairs. Neither is a reproduction of Figure 7c.""")
+
 markdown("""## References
 
 - Bensen, G. D., et al. (2007), Processing seismic ambient noise data to obtain reliable broad-band surface wave dispersion measurements, *Geophysical Journal International*, 169, 1239–1260. [https://doi.org/10.1111/j.1365-246X.2007.03374.x](https://doi.org/10.1111/j.1365-246X.2007.03374.x)
