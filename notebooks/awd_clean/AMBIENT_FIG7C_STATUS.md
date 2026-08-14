@@ -125,13 +125,30 @@ ridge in the wavefield, no CC trick will recover a body-wave Green's function."
 - **Not a licence to reach for the F–K fan.** The fan produces the expected
   geometry from channel-scrambled input; that is why the QC workflow rejects it.
 
+## 5a. Quiet-window selection — tested and closed
+
+The one remaining live avenue was temporal selection: if the body-wave fraction is
+diurnal, a quiet subset might carry the arrival that the 24 h average dilutes. The
+`fig7c` chunks are 60 files each, so each chunk is exactly one UTC hour and the
+test needs no new compute.
+
+Causal/acausal ratio by UTC hour on 2024-12-20 spans **0.93 to 1.08** — scatter
+about 1.0 with no structure. Hour of day is independent of the observable, so this
+is a fair test rather than a conditioned one. Stacking the six most
+causally-dominant hours, selected on the same day, gives ratio 1.02, peak
+\|score\| 0.0082 at 5,900 m/s, score at 3,200 m/s of −0.0001; splitting those six
+into halves gives 1.02 and 1.03. **Selection buys nothing, which is what happens
+when there is nothing to select.**
+
+Note also that the scan's peak sits at ~5,900 m/s — the top of the trial range —
+in 20 of 24 hours. That is the flat-moveout end of the scan, not an arrival.
+
 ## 6. What would change the answer
 
-Ordered cheapest first. None is required for the negative result to stand.
+Ordered cheapest first. None is required for the negative result to stand, and the
+cheapest one has already been tried (§5a).
 
-1. **Quiet-window selection.** The census samples every 2 h; the body-wave fraction
-   may be strongly diurnal. Select windows by the census statistic itself, then
-   restack. This is the only item that could plausibly recover 7c from this archive.
+1. ~~**Quiet-window selection.**~~ Tested, negative — see §5a.
 2. **Higher band.** The fan is better resolved and marginally richer above 12 Hz.
    A 12–30 Hz reproduction departs from the paper but is better matched to the
    aperture and the 16.335 m gauge length (2017 used 10 m).
