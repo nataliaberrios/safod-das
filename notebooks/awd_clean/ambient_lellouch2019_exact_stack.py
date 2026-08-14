@@ -58,7 +58,7 @@ REFERENCE_VELOCITY_M_S = 3200.0
 VELOCITY_GRID_M_S = np.arange(1500.0, 6000.1, 25.0)
 VALID_NULLS = ("ordered", "white_noise", "channel_permutation")
 VALID_SPECTRAL_MODES = ("cross_correlation", "source_power_stabilized")
-WORKFLOW_VERSION = "lellouch2019_exact_stack_v3"
+WORKFLOW_VERSION = "lellouch2019_exact_stack_v4"
 
 
 def corrected_path(value: str | Path) -> Path:
@@ -458,13 +458,18 @@ def correlation_from_spectrum(
     n_windows: int,
     n_fft: int,
     fs: float,
+    apply_bandpass: bool = False,
 ) -> tuple[np.ndarray, np.ndarray]:
+    """Reconstruct the full linear correlation, filter, then crop in lag."""
     average = cross_spectrum / float(n_windows)
     circular = np.fft.irfft(average, n=n_fft, axis=1)
+    centered = np.fft.fftshift(circular, axes=1)
+    if apply_bandpass:
+        centered = final_bandpass(centered, fs)
     maximum_lag = int(round(MAX_LAG_SECONDS * fs))
-    correlation = np.concatenate(
-        (circular[:, -maximum_lag:], circular[:, : maximum_lag + 1]), axis=1
-    )
+    midpoint = n_fft // 2
+    lag_slice = slice(midpoint - maximum_lag, midpoint + maximum_lag + 1)
+    correlation = centered[:, lag_slice]
     lags = np.arange(-maximum_lag, maximum_lag + 1, dtype=float) / fs
     return lags, correlation
 
@@ -680,10 +685,12 @@ def aggregate(args: argparse.Namespace) -> None:
         metadata_reference["spectral_mode"],
         metadata_reference["source_power_waterlevel"],
     )
-    lags, central = correlation_from_spectrum(central_spectrum, 1, n_fft, fs)
-    _, neighbors = correlation_from_spectrum(neighbor_spectrum, 1, n_fft, fs)
-    central_filtered = final_bandpass(central, fs)
-    neighbors_filtered = final_bandpass(neighbors, fs)
+    lags, central_filtered = correlation_from_spectrum(
+        central_spectrum, 1, n_fft, fs, apply_bandpass=True
+    )
+    _, neighbors_filtered = correlation_from_spectrum(
+        neighbor_spectrum, 1, n_fft, fs, apply_bandpass=True
+    )
     causal_scores = moveout_scores(neighbors_filtered, lags, offsets, sign=1.0)
     acausal_scores = moveout_scores(neighbors_filtered, lags, offsets, sign=-1.0)
     peak_index = int(np.argmax(causal_scores))
@@ -783,6 +790,7 @@ def aggregate(args: argparse.Namespace) -> None:
         "per_window_correlation_normalization": False,
         "published_neighbor_stack": "sum of receiver correlations R-10 through R+10",
         "final_output_band_hz": list(OUTPUT_BAND_HZ),
+        "bandpass_order_relative_to_lag_crop": "full correlation first; crop second",
         "best_causal_velocity_m_s": float(VELOCITY_GRID_M_S[peak_index]),
         "best_causal_score": observed_peak,
         "causal_score_at_3200": float(causal_scores[reference_index]),
@@ -863,7 +871,9 @@ def synthetic_validation(args: argparse.Namespace) -> None:
     central, neighbors, _, n_fft = cross_spectra_for_starts(
         normalized, starts, fs, geom
     )
-    lags, section = correlation_from_spectrum(neighbors, len(starts), n_fft, fs)
+    lags, section = correlation_from_spectrum(
+        neighbors, len(starts), n_fft, fs, apply_bandpass=True
+    )
     expected = geom["offsets_m"] / velocity
     picked = []
     for trace, target in zip(section, expected):
@@ -928,6 +938,33 @@ def synthetic_validation(args: argparse.Namespace) -> None:
     white_cross /= math.sqrt(float(np.sum(white[0] ** 2) * np.sum(white[1] ** 2)))
     white_lags = np.arange(-white_max_lag, white_max_lag + 1) / fs
 
+    # Independently construct the declared order: center and filter the full
+    # linear correlation, then extract the displayed lag interval.
+    filter_rng = np.random.default_rng(8417)
+    filter_test_spectrum = (
+        filter_rng.standard_normal(n_fft // 2 + 1)
+        + 1j * filter_rng.standard_normal(n_fft // 2 + 1)
+    )[None, :]
+    filter_test_spectrum[:, [0, -1]] = filter_test_spectrum[:, [0, -1]].real
+    _, filter_observed = correlation_from_spectrum(
+        filter_test_spectrum, 1, n_fft, fs, apply_bandpass=True
+    )
+    filter_full = np.fft.fftshift(
+        np.fft.irfft(filter_test_spectrum, n=n_fft, axis=1), axes=1
+    )
+    filter_full = final_bandpass(filter_full, fs)
+    filter_midpoint = n_fft // 2
+    filter_half_width = int(round(MAX_LAG_SECONDS * fs))
+    filter_reference = filter_full[
+        :,
+        filter_midpoint - filter_half_width:
+        filter_midpoint + filter_half_width + 1,
+    ]
+    filter_order_error = float(
+        np.linalg.norm(filter_observed - filter_reference)
+        / max(np.linalg.norm(filter_reference), np.finfo(float).eps)
+    )
+
     report = {
         "synthetic_velocity_m_s": velocity,
         "median_absolute_lag_error_s": lag_error,
@@ -939,6 +976,8 @@ def synthetic_validation(args: argparse.Namespace) -> None:
         "window_ownership_pass": bool(len(assigned) == 5759),
         "white_noise_raw_cross_correlation": white_corr,
         "white_noise_independence_pass": bool(abs(white_corr) < 0.03),
+        "full_lag_filter_reference_relative_error": filter_order_error,
+        "full_lag_filter_before_crop_pass": bool(filter_order_error < 1.0e-12),
         "white_noise_log_psd_slope_per_hz": log_power_slope,
         "white_noise_broadband_pass": bool(abs(log_power_slope) < 0.02),
     }
@@ -948,6 +987,7 @@ def synthetic_validation(args: argparse.Namespace) -> None:
         "window_ownership_pass",
         "white_noise_independence_pass",
         "white_noise_broadband_pass",
+        "full_lag_filter_before_crop_pass",
     ]
     if not all(report[name] for name in required_passes):
         raise AssertionError(report)
