@@ -5,7 +5,7 @@ import nbformat as nbf
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "Ambient_FK_QC_workflow.ipynb"
 EXACT_SUMMARY = HERE / "ambient_transfer" / "lellouch2019_exact_stack" / "aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0.json"
-NOTEBOOK_VERSION = "v7" if EXACT_SUMMARY.is_file() else "v6"
+NOTEBOOK_VERSION = "v8" if EXACT_SUMMARY.is_file() else "v7"
 nb = nbf.v4.new_notebook()
 nb.metadata = {"kernelspec": {"display_name": "Python [conda env:das]", "language": "python", "name": "das"}}
 
@@ -28,14 +28,14 @@ This is the single advisor-facing notebook for the ambient-noise analysis. It fo
 
 The notebook is a decision document, not a gallery. A processing choice passes only if the real-data result survives a null that uses the **same correlation segmentation, the same nearby-pair stack, and the same two-pass alignment sequence** as the measured result.
 
-**v6 correction.** Every earlier scientific verdict in this notebook is withdrawn pending the exact rerun. The legacy pipelines reset preprocessing at one-minute boundaries, omitted boundary-spanning 15-s starts, applied an unreported detrend, and in some branches added common-mode removal, input bandpass, whitening, or per-window correlation normalization. The corrected baseline uses continuous differentiation and RAM, all 5,759 windows, the literal R±10 sum, and only a final 5–20 Hz filter. Jobs 38986655 and 38986699 produce and aggregate the new evidence automatically.
+**v7 correction.** Every earlier scientific verdict in this notebook is withdrawn pending the exact rerun. The legacy pipelines reset preprocessing at one-minute boundaries, omitted boundary-spanning 15-s starts, applied an unreported detrend, and in some branches added common-mode removal, input bandpass, whitening, or per-window correlation normalization. The corrected baseline uses continuous differentiation and RAM, all 5,759 windows, the literal R±10 sum, and only a final 5–20 Hz filter. Jobs 38988141 and 38988173 produce and aggregate the new evidence automatically. Superseded jobs 38986655 and 38986699 failed before Python opened any data because the first launcher expanded an empty optional-argument array under Bash nounset; commit aa5dcfa fixes and dry-runs that launcher.
 """)
 
 markdown(f"""{NOTEBOOK_VERSION}""")
 
 markdown("""## Current exact-reproduction status
 
-**Authoritative status: running; no scientific acceptance or rejection yet.** The paper-faithful operator is `ambient_lellouch2019_exact_stack.py` at Git commit `9c70083`. Sherlock array `38986655` processes seven predeclared branches, and dependency-gated array `38986699` aggregates them only after every hourly chunk succeeds.
+**Authoritative status: running; no scientific acceptance or rejection yet.** The paper-faithful operator is `ambient_lellouch2019_exact_stack.py` at Git commit `9c70083`. Sherlock array `38988141` processes seven predeclared branches, and dependency-gated array `38988173` aggregates them only after every hourly chunk succeeds.
 
 The exact baseline is fixed before looking at its result: source channel 23 (the provisional G0 wellhead estimate), receiver centers at 50–700 m offsets, the same source paired with receivers R−10 through R+10, time differentiation, centered running-absolute-mean normalization, continuous 30-s windows every 15 s, raw cross-correlation averaging, a simple unshifted R±10 sum, and a final 5–20 Hz bandpass. A complete day must contain exactly **5,759 unique windows**. There is no F–K filter, linear detrend, common-mode subtraction, input bandpass, spectral whitening, per-window correlation normalization, or imported 3.2-km/s alignment in this Figure 7c baseline.
 
@@ -757,11 +757,11 @@ Completion now requires all of the following evidence from the same corrected op
 7. common-mode and stabilized Equation-6 sensitivities kept separate from the baseline; and
 8. matching metadata showing no detrend, input bandpass, per-window correlation normalization, imported velocity alignment, or F–K selection in the baseline.
 
-Array `38986655` computes these products. Dependency-gated array `38986699` refuses to aggregate if any hourly chunk fails and independently asserts the 5,759-window total. The final decision will be promoted here only after those gates pass.
+Array `38988141` computes these products. Dependency-gated array `38988173` refuses to aggregate if any hourly chunk fails and independently asserts the 5,759-window total. The final decision will be promoted here only after those gates pass.
 """)
 
 if EXACT_SUMMARY.is_file():
-    markdown("""## 10. Paper-faithful Figure 7c result — v7
+    markdown("""## 10. Paper-faithful Figure 7c result — v8
 
 The dependency-gated full-day aggregation completed. The table and figures below are loaded from the corrected v2 operator, not from the withdrawn legacy checkpoints.""")
     python("""exact_dir = ROOT/'ambient_transfer'/'lellouch2019_exact_stack'
@@ -797,7 +797,7 @@ for label in ('paper baseline','white noise','channel permutation'):
 else:
     markdown("""## 10. Paper-faithful Figure 7c result — pending
 
-The authoritative implementation is `ambient_lellouch2019_exact_stack.py` at commit `9c70083`. Full-day matrix job `38986655` is queued/running on Sherlock. Dependency-gated aggregation job `38986699` will continue automatically only after all 168 hourly branch tasks succeed. No user notification is required. Until the aggregate JSON appears, all legacy Figure 7c and F–K verdicts remain withdrawn.""")
+The authoritative implementation is `ambient_lellouch2019_exact_stack.py` at commit `9c70083`. Full-day matrix job `38988141` is queued/running on Sherlock. Dependency-gated aggregation job `38988173` will continue automatically only after all 168 hourly branch tasks succeed. No user notification is required. Until the aggregate JSON appears, all legacy Figure 7c and F–K verdicts remain withdrawn.""")
 markdown("""## References
 
 - Bensen, G. D., et al. (2007), Processing seismic ambient noise data to obtain reliable broad-band surface wave dispersion measurements, *Geophysical Journal International*, 169, 1239–1260. [https://doi.org/10.1111/j.1365-246X.2007.03374.x](https://doi.org/10.1111/j.1365-246X.2007.03374.x)
