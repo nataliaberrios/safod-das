@@ -1,0 +1,37 @@
+Cross-epoch array response: 2017 (Lellouch) vs 2024-25, identical operator
+band 5-20 Hz, resampled to 100 Hz, depth 0-700 m below wellhead, 60 m windows
+
+--- 2017, Lellouch released records (800 ch, 1.0 m, 250 Hz) ---
+      trace edit: kept 763 of 800 channels (dropped 37)
+  2017 M1p33                   arrival t=3.27 s of 5.00 s, 22 windows, median semblance 0.723, median SNR 2.5
+      trace edit: kept 777 of 800 channels (dropped 23)
+  2017 M2p46                   arrival t=2.99 s of 5.00 s, 22 windows, median semblance 0.715, median SNR 2.5
+
+--- 2024-25, matched deep events (900 ch, 1.0210 m) ---
+      trace edit: kept 875 of 900 channels (dropped 25)
+  2024-25 20240703T025446 (M1.03, 10.8 km) arrival t=8.55 s of 25.00 s, 22 windows, median semblance 0.727, median SNR 1.7
+      trace edit: kept 878 of 900 channels (dropped 22)
+  2024-25 20241020T232837 (M1.05, 10.4 km) arrival t=8.49 s of 25.00 s, 22 windows, median semblance 0.639, median SNR 1.5
+      WARNING: SNR < 1.5 -- no arrival detected; this record's semblance is not interpretable
+      trace edit: kept 865 of 900 channels (dropped 35)
+  2024-25 20250630T041215 (M1.08, 10.9 km) arrival t=8.14 s of 25.00 s, 22 windows, median semblance 0.383, median SNR 1.6
+      trace edit: kept 876 of 900 channels (dropped 24)
+  2024-25 20250208T205342 (M1.19, 10.4 km) arrival t=10.58 s of 25.00 s, 22 windows, median semblance 0.441, median SNR 1.6
+      trace edit: kept 886 of 900 channels (dropped 14)
+  2024-25 20240705T080457 (M1.20, 11.2 km) arrival t=8.46 s of 25.00 s, 22 windows, median semblance 0.689, median SNR 2.3
+      trace edit: kept 888 of 900 channels (dropped 12)
+  2024-25 20240831T060450 (M1.29, 11.6 km) arrival t=8.19 s of 25.00 s, 22 windows, median semblance 0.725, median SNR 2.3
+
+  selected on depth 9-13 km and M 1.0-2.0 only, never on result
+
+--- comparison ---
+  median semblance   2017 0.719   2024-25 0.664   ratio 0.92
+  median SNR         2017 2.5   2024-25 1.7
+
+  READS AS EXPLANATION A: the 2024-25 array records coherent earthquake
+  wavefronts about as well as the 2017 array. The sensing is intact, so
+  the Figure 7c failure points to the ambient source field, not the
+  instrument.
+
+  CAVEAT: semblance rises with SNR, so this is not fully source-independent.
+  Read the semblance-vs-SNR panel before concluding.
