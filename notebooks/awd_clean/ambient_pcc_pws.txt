@@ -1,0 +1,19 @@
+Phase cross-correlation + phase-weighted stacking -- 2024-12-20
+  24 chunks, 1440 files, 5759 windows; PCC nu=2 (unit-modulus analytic), PWS nu=2
+  no RAM normalisation (PCC is amplitude-blind); no F-K filter
+  mean inter-window phase coherence: 0.3146
+
+--- PCC linear stack ---
+  corr(velocity, score) +0.977   [pedestal indicator; config 0 is +0.976, config 3 -0.381]
+  peak 7.5961 at 5975 m/s | at 3200: causal 2.8553 acausal 2.8974 ratio 0.99
+  null95 7.6507 | p = 0.0838 (n=500)
+  preconditions: pedestal False | in fan False | not edge True | causal False | p<0.05 False
+  not recovered
+
+--- PCC + PWS ---
+  corr(velocity, score) +0.893   [pedestal indicator; config 0 is +0.976, config 3 -0.381]
+  peak 170.6049 at 5975 m/s | at 3200: causal 23.0481 acausal 23.2762 ratio 0.99
+  null95 194.2101 | p = 0.3593 (n=500)
+  preconditions: pedestal False | in fan False | not edge True | causal False | p<0.05 False
+  not recovered
+

@@ -1,0 +1,29 @@
+Linear Radon (tau-p) analysis of the Figure 7c gather
+  source   : aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0_cm.npz
+  branch   : median-removed (config 3)
+  gather   : 14 offsets 50-700 m, 351 lags -0.350..0.350 s
+  p mute   : |p| < 1.667e-04 s/m  (faster than 6000 m/s)
+  target   : p = 3.125e-04 s/m (3200 m/s)
+
+--- precondition (a): pedestal suppression ---
+  corr(apparent velocity, energy) before mute : +0.740
+  corr(apparent velocity, energy) after  mute : +0.940
+  pedestal suppressed (|corr| < 0.5): False
+
+--- observation ---
+  peak causal energy 6.31755 at 6000 m/s
+  at 3200 m/s: causal 4.52932, acausal 5.17820, ratio 0.87
+
+--- receiver-order permutation null (10000) ---
+  null 95th 8.27001 | observed 6.31755 | p = 0.5978
+
+--- preconditions ---
+  (a) pedestal suppressed        : False
+  (b) peak in 2500-4000 m/s fan   : False (peak 6000 m/s)
+      peak not at a scan edge    : False
+  (c) causal dominates at 3200    : False (0.87)
+  (d) familywise p < 0.05        : False (0.5978)
+
+  NOT RECOVERED. Failing preconditions are listed above; a p-value
+  alone is not sufficient and is not reported as a result when the
+  pedestal or fan conditions fail.

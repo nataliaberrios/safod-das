@@ -238,11 +238,61 @@ def odd_ram_samples(ram_seconds: float, fs: float) -> int:
     return samples if samples % 2 else samples + 1
 
 
+def remove_coherent_subspace(rate: np.ndarray, rank: int, seed: int = 0,
+                             window_samples: int = 0) -> np.ndarray:
+    """Project out the leading `rank` left singular vectors, in place-ish.
+
+    WHY THIS EXISTS.  `common_mode=True` subtracts the instantaneous median across
+    channels, which removes a common mode only if every channel carries it at the
+    SAME gain.  A DAS common mode is generally a_i * c(t) with channel-dependent
+    a_i, and median subtraction leaves (a_i - median(a)) * c(t) -- still perfectly
+    coherent at zero lag, and therefore still a pedestal under the moveout scan.
+
+    Measured consequence, 2026-08-14: on one day the median-removed velocity curve
+    is flat, corr(trial velocity, score) = -0.381.  Coherently stacked over four
+    days it is +0.951 -- the residual is coherent across windows and days, so
+    stacking averages down the incoherent noise and lets the residual re-emerge.
+    Median removal therefore gets WORSE with more data, not better.
+
+    Removing the leading left singular subspace handles any gain pattern.  Uses a
+    randomised range finder: for rank k with p oversampling, one pass of
+    X @ Omega then a QR gives an orthonormal basis Q for the dominant column
+    space, and X - Q (Q^T X) is the projection onto its complement.
+
+    MEASURED 2026-08-14: applied to a whole 60 s block this does NOT suppress the
+    pedestal -- corr(trial velocity, score) stays at +0.96 to +0.98 for ranks
+    1/2/4/8, no better than the untreated baseline's +0.976, while the per-sample
+    median reaches -0.381. The reason is that a global truncation over the block
+    captures the dominant TIME-AVERAGED spatiotemporal modes, whereas the pedestal
+    comes from the instantaneous common level, which the median removes at every
+    sample. Hence `window_samples`: projecting within short windows approximates
+    the instantaneous removal while still handling channel-dependent gain, which
+    the median cannot.
+    """
+    if rank <= 0:
+        return rate
+    rng = np.random.default_rng(stable_seed(seed, "coherent-subspace"))
+    n = rate.shape[1]
+    step = n if window_samples <= 0 else min(int(window_samples), n)
+    for lo in range(0, n, step):
+        hi = min(lo + step, n)
+        if hi - lo < rank + 4:
+            continue
+        block = rate[:, lo:hi]
+        sketch = rng.standard_normal((block.shape[1], rank + 4)).astype(np.float32)
+        basis, _ = np.linalg.qr(block @ sketch)
+        block -= basis @ (basis.T @ block)
+    return rate
+
+
 def strain_rate_and_ram_continuous(
     raw: np.ndarray,
     fs: float,
     ram_seconds: float,
     common_mode: bool,
+    svd_rank: int = 0,
+    seed: int = 0,
+    svd_window_samples: int = 0,
 ) -> tuple[np.ndarray, float]:
     """Differentiate and apply centered Bensen running-absolute-mean weights.
 
@@ -255,8 +305,15 @@ def strain_rate_and_ram_continuous(
     np.subtract(raw[:, 1:], raw[:, :-1], out=rate[:, 1:])
     rate *= np.float32(fs)
     del raw
+    # Median FIRST, then the subspace projection on the residual. The two are
+    # complementary, not alternatives: the median removes the instantaneous common
+    # level (uniform gain only) and the projection removes what is left of a
+    # channel-dependent-gain common mode. Applying svd_rank alone was measured on
+    # 2026-08-14 to leave the pedestal untouched.
     if common_mode:
         rate -= np.median(rate, axis=0, keepdims=True).astype(np.float32)
+    if svd_rank > 0:
+        rate = remove_coherent_subspace(rate, svd_rank, seed, svd_window_samples)
     absolute = np.abs(rate)
     weights = uniform_filter1d(
         absolute,
@@ -316,6 +373,8 @@ def chunk_tag(args: argparse.Namespace) -> str:
         f"{args.date}_src{args.source_channel}_ram{ram}_"
         f"{args.spectral_mode}_{args.null_method}_r{args.realization}"
         f"{'_cm' if args.common_mode else ''}"
+        f"{('_svd%d' % args.svd_rank) if getattr(args, 'svd_rank', 0) else ''}"
+        f"{('w%.6g' % args.svd_window_s).replace('.', 'p') if getattr(args, 'svd_window_s', 0) else ''}"
     )
 
 
@@ -403,7 +462,9 @@ def run_chunk(args: argparse.Namespace) -> None:
         raw = np.concatenate(pieces, axis=1)
         del pieces
         normalized, floored_fraction = strain_rate_and_ram_continuous(
-            raw, fs, args.ram_seconds, args.common_mode
+            raw, fs, args.ram_seconds, args.common_mode,
+            svd_rank=getattr(args, "svd_rank", 0), seed=args.seed,
+            svd_window_samples=int(round(getattr(args, "svd_window_s", 0.0) * fs)),
         )
         if args.common_mode:
             # Rows are physical channel order 0..N-1; restore the logical
@@ -470,6 +531,7 @@ def run_chunk(args: argparse.Namespace) -> None:
         ram_samples=np.asarray(odd_ram_samples(args.ram_seconds, fs)),
         denominator_floored_fraction=np.asarray(total_floored / blocks_used),
         common_mode=np.asarray(args.common_mode),
+        svd_rank=np.asarray(int(getattr(args, "svd_rank", 0))),
         common_mode_channel_count=np.asarray(
             len(read_channels) if args.common_mode else 0
         ),
@@ -1068,6 +1130,19 @@ def parser() -> argparse.ArgumentParser:
                              "manifest has a timing anomaly; off by default, so default "
                              "behaviour is unchanged and the guard still runs")
     result.add_argument("--common-mode", action="store_true")
+    result.add_argument(
+        "--svd-rank", type=int, default=0,
+        help="project out the leading k left singular vectors instead of the "
+             "median common mode. Median removes only a UNIFORM-gain common "
+             "mode and leaves (a_i - median(a))*c(t), which is coherent at zero "
+             "lag and accumulates under stacking; rank-k handles any gain "
+             "pattern. 0 (default) keeps the existing median behaviour. Applied "
+             "AFTER the median when --common-mode is also given.")
+    result.add_argument(
+        "--svd-window-s", type=float, default=0.0,
+        help="apply the subspace projection within windows of this length rather "
+             "than over the whole block. 0 (default) = whole block, which was "
+             "measured not to suppress the pedestal.")
     result.add_argument("--null-method", choices=VALID_NULLS, default="ordered")
     result.add_argument("--realization", type=int, default=0)
     result.add_argument("--seed", type=int, default=20260814)

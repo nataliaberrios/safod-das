@@ -56,20 +56,48 @@ DIRS = [
     HERE / "ambient_transfer" / "lellouch2019_exact_stack",
     HERE / "ambient_transfer" / "lellouch2019_exact_stack_days",
 ]
-PATTERN = "chunk_*_src23_ram0p1_cross_correlation_ordered_r0_start*_n0060.npz"
 V_REF = 3200.0
 NULL_COUNT = 10000
 SEED = 20260814
 import os
-ONLY = [d for d in os.environ.get('MDS_DATES','').split(',') if d]
-TAG = os.environ.get('MDS_TAG','')
+ONLY = [d for d in os.environ.get('MDS_DATES', '').split(',') if d]
+TAG = os.environ.get('MDS_TAG', '')
+
+# MDS_BRANCH selects which configuration to stack.
+#
+#   base (default) -- configuration 0, the paper baseline. Reproduces previous
+#                     behaviour exactly.
+#   cm             -- configuration 3, instantaneous median across all acquisition
+#                     channels removed before RAM normalisation.
+#
+# WHY cm IS THE INTERESTING ONE.  The config-0 moveout statistic is ~97 % pedestal:
+# its gates slide toward the dominant zero-lag lobe as trial velocity rises, giving
+# corr(trial velocity, score) = +0.976 and an argmax pinned to the scan ceiling.
+# Common-mode removal eliminates that (corr = -0.381, curve flat at ~0.95), so
+# config 3 is the only branch whose statistic actually measures moveout. Every
+# multi-day stack before 2026-08-14, including the coherent 96 h one, used config 0,
+# so the interpretable branch had never been stacked beyond a single day.
+BRANCH = os.environ.get('MDS_BRANCH', 'base')
+if BRANCH not in ('base', 'cm'):
+    raise SystemExit("MDS_BRANCH must be 'base' or 'cm', got %r" % BRANCH)
+_SUFFIX = '_cm' if BRANCH == 'cm' else ''
+PATTERN = ("chunk_*_src23_ram0p1_cross_correlation_ordered_r0%s_start*_n0060.npz"
+           % _SUFFIX)
 
 
 def collect():
+    """Gather chunks for the selected branch only.
+
+    The two branches are distinguished by the `_cm` element of the filename, so the
+    glob alone separates them: `..._r0_start*` cannot match `..._r0_cm_start*`. The
+    explicit check below is belt-and-braces against a future naming change, and it
+    is what keeps the base branch from silently absorbing common-mode chunks.
+    """
     paths = []
     for d in DIRS:
         for p in sorted(glob.glob(str(d / PATTERN))):
-            if "_cm_" in Path(p).name:
+            has_cm = "_r0_cm_start" in p
+            if has_cm != (BRANCH == 'cm'):
                 continue
             paths.append(Path(p))
     by_date = {}
@@ -86,7 +114,8 @@ def main():
 
     by_date = collect()
     say("Coherent multi-day stack of the paper-faithful Figure 7c observable")
-    say("configuration 0 only; no F-K filter; math imported from the single-day operator")
+    say("branch %s (config %s); no F-K filter; math imported from the single-day operator"
+        % (BRANCH, "3 common-mode" if BRANCH == "cm" else "0 baseline"))
     say("")
     for d in sorted(by_date):
         say("  %s : %d hourly chunks" % (d, len(by_date[d])))
@@ -147,6 +176,9 @@ def main():
                     "ram_samples": int(z["ram_samples"]),
                     "spectral_mode": str(z["spectral_mode"]),
                     "null_method": str(z["null_method"]),
+                    # included so a base chunk can never be summed with a cm chunk
+                    "common_mode": bool(z["common_mode"]) if "common_mode" in z.files else False,
+                    "ram_seconds": float(z["ram_seconds"]) if "ram_seconds" in z.files else -1.0,
                 }
                 if ref is None:
                     ref = meta
