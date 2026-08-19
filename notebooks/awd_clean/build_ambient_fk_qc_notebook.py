@@ -5,7 +5,7 @@ import nbformat as nbf
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "Ambient_FK_QC_workflow.ipynb"
 EXACT_SUMMARY = HERE / "ambient_transfer" / "lellouch2019_exact_stack" / "aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0.json"
-NOTEBOOK_VERSION = "v9" if EXACT_SUMMARY.is_file() else "v7"
+NOTEBOOK_VERSION = "v10" if EXACT_SUMMARY.is_file() else "v7"
 nb = nbf.v4.new_notebook()
 nb.metadata = {"kernelspec": {"display_name": "Python [conda env:das]", "language": "python", "name": "das"}}
 
@@ -823,34 +823,63 @@ else:
     markdown("""## 10. Paper-faithful Figure 7c result — pending
 
 The authoritative implementation is `ambient_lellouch2019_exact_stack.py` at commit `bb48942`. Full-day matrix job `38988141` is queued/running on Sherlock. Dependency-gated aggregation job `38988173` will continue automatically only after all 168 hourly branch tasks succeed. No user notification is required. Until the aggregate JSON appears, all legacy Figure 7c and F–K verdicts remain withdrawn.""")
-markdown("""## 11. Beyond one day — five more days, a coherent stack, and why a small p is still not a reproduction — v9
+markdown("""## 11. Beyond one day — five more days, a coherent stack, and why a small p is still not a reproduction — v10 (census claims withdrawn)
 
 Section 10 tests 20 December 2024 alone, matched to the paper's own one-day design.
 Three questions remained: whether another day does better, whether stacking more
 data recovers the arrival, and what to conclude if some subset does return a small
 p value. All three are now answered.
 
-**Every complete day, not just the tested one.** The raw energy census shows the
-2.5–4 km/s fan share varies from 0.3 % to 4.9 % across days, so 20 December was not
-the most favourable day available. Configuration 0 was therefore run on every other
+**Every complete day, not just the tested one.** One day is a thin basis for a
+statement about an archive, so configuration 0 was run on every other complete day.
+(This was originally motivated by a raw energy census that appeared to rank the days;
+that census is **withdrawn** — see the note at the end of this section — so the days
+are effectively an unselected set, which is a stronger basis for the result than a
+selected one.) Configuration 0 was therefore run on every other
 complete day. Days whose manifest is not exactly continuous at 60.000 s cannot be
 streamed end to end; 2024-11-30, 2024-10-28 and 2025-03-04 each carry two timing
-anomalies, and 2024-11-30 — the richest day in the census — was analysed over its
+anomalies, and 2024-11-30 was analysed over its
 leading 21.3-hour contiguous block rather than excluded.
 
-| date | census fan % | peak | at (m/s) | causal/acausal at 3,200 | p |
+| date | peak | at (m/s) | causal/acausal at 3,200 | p |
 |---|---:|---:|---:|---:|---:|
-| 2024-11-30 (21.3 h) | 4.9 | 6.536 | 5850 | 0.96 | 0.1345 |
-| 2024-12-20 | 4.1 | 6.131 | 5850 | 0.97 | 0.1470 |
-| 2024-06-17 | 4.5 | 1.901 | 5925 | 1.12 | 0.7413 |
-| 2024-06-26 | 3.6 | 1.297 | 5925 | 0.86 | 0.4206 |
-| 2025-02-24 | 3.4 | 2.532 | 5875 | 1.05 | 0.7517 |
-| 2024-05-11 | 0.3 | 1.026 | 1675 | 1.02 | 0.3091 |
+| 2024-11-30 (21.3 h) | 6.536 | 5850 | 0.96 | 0.1345 |
+| 2024-12-20 | 6.131 | 5850 | 0.97 | 0.1470 |
+| 2024-06-17 | 1.901 | 5925 | 1.12 | 0.7413 |
+| 2024-06-26 | 1.297 | 5925 | 0.86 | 0.4206 |
+| 2025-02-24 | 2.532 | 5875 | 1.05 | 0.7517 |
+| 2024-05-11 | 1.026 | 1675 | 1.02 | 0.3091 |
 
 No day reaches significance; the minimum over six days is 0.1345, on the richest
 day. Fisher's combination across the independent days gives χ² = 9.08 on 10 degrees
-of freedom, p = 0.524 — the χ² ≈ df expected from noise. The census does not predict
-the outcome: 4.5 % scores p = 0.7413, worse than the 0.3 % day.
+of freedom, p = 0.524 — the χ² ≈ df expected from noise. Note also that the observed
+score never clears the **per-velocity** null at any of 181 velocities, so the negative
+does not depend on the familywise correction at all.
+
+**Peak velocities in the table are grid ceilings, not velocity estimates.** The score
+samples each trace in a gate at t = offset/v, so as v rises every gate slides toward
+zero lag where these gathers carry a dominant broad lobe; hence
+corr(trial velocity, score) = +0.976 and the argmax lands wherever the scan stops.
+Capping the grid at 3,500 / 4,000 / 8,000 / 20,000 m/s moves the "peak" to
+3,475 / 3,925 / 7,700 / 18,775 m/s. A moveout-free control — every trace replaced by
+the across-receiver median — reproduces the observed curve to within 3.5 % at every
+velocity, including the exact peak location. The p-values remain valid because the
+receiver-order permutation preserves the same gate geometry (97 % of null curves also
+peak at ≥ 5,500 m/s).
+
+**Withdrawn (2026-08-14).** The raw energy census that originally motivated the day
+selection, and that was offered as the mechanism for the non-reproduction, is
+retracted. It had no geometric baseline: 98.4 % of in-band (f,k) cells lie below
+1,500 m/s by construction, so its "81–99 % of energy below 1,500 m/s" is at or below
+the white-noise expectation and cannot distinguish the SAFOD wavefield from noise; per
+cell the data are in fact 2.6–2.8× enriched at body-wave velocities. Its "downgoing
+share never exceeds 49.9 %" is false — the tree's own outputs include 51.6 %. A
+cross-epoch replacement using Lellouch's released 2017 earthquake records is likewise
+withdrawn: the two arms were not processed alike, because `extract_all.py` takes
+DASutils `median=True` by default and stripped the common mode from the 2024–25 arm
+only. **The non-reproduction therefore has no validated mechanism at present.** The
+per-day and multi-day numbers above are unaffected and were verified by an independent
+chunk re-sum reproducing the stored aggregates to max abs difference 0.000e+00.
 
 **A coherent stack, not a pooled p value.** Combining p values is not the same
 experiment as stacking data: a coherent arrival grows with stacked windows while

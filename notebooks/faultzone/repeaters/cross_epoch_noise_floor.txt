@@ -1,3 +1,12 @@
+WITHDRAWN 2026-08-14 -- THE TWO ARMS WERE NOT PROCESSED ALIKE. DO NOT CITE.
+The 2024-25 arm came from caches built by extract_all.py, which calls
+DASutils.readFile_HDF without median=False; that defaults to True, so the common
+mode was removed from the 2024-25 arm and NOT from the 2017 raw binary. The
+2024-25 arm was also differentiated and band-passed and the 2017 arm was not.
+Common-mode removal strips the spatially uniform, long-range-coherent component --
+exactly what this script then measured as missing. See the script docstring.
+================================================================================
+
 Cross-epoch instrument self-noise: incoherent fraction between channels
 band 5-20 Hz, 100 Hz, depth 0-700 m, channel separations 1-40
 NOTE: the 2024-25 gauge is 16.335 m vs 10 m in 2017. A longer gauge

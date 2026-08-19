@@ -4,13 +4,35 @@ Written 2026-08-14. Companion to `AMBIENT_FIG7C_STATUS.md`, which covers
 2024-12-20 in full. This file records the extension to four further days and is
 the basis for widening that document's claim from one day to the archive.
 
+> **CENSUS CLAIMS WITHDRAWN 2026-08-14, same day.** Every statement in this file
+> that rested on `ambient_fk_energy_census.py` is retracted, following an
+> independent audit. The census had no geometric baseline: **98.4 % of in-band
+> (f,k) cells lie below 1,500 m/s by construction**, so its headline "81–99 % of
+> energy below 1,500 m/s" is *at or below* what white noise gives and cannot
+> distinguish the SAFOD wavefield from noise. Measured as energy *density* per
+> cell the data are 2.6–2.8× **enriched** at body-wave velocities — the opposite
+> of what was claimed. Three further defects: the k = 0 column silently dropped
+> 22 % of band energy; no spatial taper, so the fan measurement is largely
+> Dirichlet leakage from the k ≈ 0 peak; and channels 0–22 carry **97 %** of the
+> array's 5–20 Hz energy, so any census run without the `_ch23-896` suffix is
+> determined by 23 uncemented lead-in channels. The "downgoing share never
+> exceeds 49.9 %" claim is simply **false** — the tree's own outputs include
+> 51.6 %.
+>
+> **The per-day and multi-day results below are unaffected** and were verified
+> independently: the chunk re-sum reproduces the stored aggregates to max abs
+> difference 0.000e+00. Only the census-derived *motivation* and the
+> census-derived *mechanism* are withdrawn. The non-reproduction therefore
+> currently has **no validated mechanism**.
+
 ## Why more days
 
 `AMBIENT_FIG7C_STATUS.md` tests 2024-12-20 only, matched to the paper's own
-one-day design. But the raw energy census (`ambient_fk_energy_census.py`) shows
-the 2.5–4 km/s fan share varies by day, 0.3 % to 4.9 %, so the day that had been
-tested was not the most favourable one available. If the arrival exists anywhere
-in this archive it should appear on the richest day.
+one-day design. One day is a thin basis for a claim about an archive, so the
+paper-faithful operator was extended to every other complete day. (The original
+motivation — that a raw energy census identified some days as richer than others
+— is withdrawn; see the banner above. The days were therefore effectively an
+unselected set, which is a *stronger* basis for the result than a selected one.)
 
 ## What was run
 
@@ -34,37 +56,48 @@ usable day is 2024-06-17 at 4.5 %.
 Each day is a complete 1,440-file, 5,759-window stack with its own 10,000-draw
 receiver-order familywise null over the declared 1.5–6.0 km/s scan.
 
-| date | census fan % | peak | at (m/s) | @3,200 causal | @3,200 acausal | null 95 % | p |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| 2024-12-20 | 4.1 | 6.131 | 5850 | 2.752 | 2.831 | 6.324 | 0.1470 |
-| 2025-02-24 | 3.4 | 2.532 | 5875 | 1.806 | 1.725 | 3.400 | 0.7517 |
-| 2024-06-17 | 4.5 | 1.901 | 5925 | 1.185 | 1.054 | 2.196 | 0.7413 |
-| 2024-06-26 | 3.6 | 1.297 | 5925 | 0.948 | 1.105 | 1.531 | 0.4206 |
-| 2024-05-11 | 0.3 | 1.026 | 1675 | 1.014 | 0.994 | 1.034 | 0.3091 |
-| 2024-11-30 † | **4.9** | 6.536 | 5850 | 2.936 | 3.056 | 6.613 | 0.1345 |
+The "census fan %" column that previously appeared here has been removed as
+invalid (see banner). Peak velocities are **grid ceilings, not velocity
+estimates** — see the pedestal note below.
+
+| date | peak | at (m/s) | @3,200 causal | @3,200 acausal | null 95 % | p |
+|---|---:|---:|---:|---:|---:|---:|
+| 2024-12-20 | 6.131 | 5850 | 2.752 | 2.831 | 6.324 | 0.1470 |
+| 2025-02-24 | 2.532 | 5875 | 1.806 | 1.725 | 3.400 | 0.7517 |
+| 2024-06-17 | 1.901 | 5925 | 1.185 | 1.054 | 2.196 | 0.7413 |
+| 2024-06-26 | 1.297 | 5925 | 0.948 | 1.105 | 1.531 | 0.4206 |
+| 2024-05-11 | 1.026 | 1675 | 1.014 | 0.994 | 1.034 | 0.3091 |
+| 2024-11-30 † | 6.536 | 5850 | 2.936 | 3.056 | 6.613 | 0.1345 |
 
 † 21.3 h continuous block (1,278 of 1,441 rows, 5,040 windows) via the opt-in
-`--continuous-prefix` flag. **This is the richest day in the whole census** and the
-last one untestable under the strict guard; it is now tested and it is the closest
-any day comes (p = 0.1345) while still failing, still peaking at 5,850 m/s rather
-than 3,200, and still with causal/acausal below 1.
+`--continuous-prefix` flag — the last day untestable under the strict continuity
+guard. It is the closest any day comes (p = 0.1345) while still failing, still
+peaking at 5,850 m/s rather than 3,200, and still with causal/acausal below 1.
 
-**No day reaches significance; the minimum p over all six days is 0.1345, on the
-richest day in the archive.** Fisher's
+**No day reaches significance; the minimum p over all six days is 0.1345.** Fisher's
 combination across the five independent days gives χ² = 9.08 on 10 degrees of
 freedom, **p = 0.524** — the χ² ≈ df expected from pure noise, with no residual
 signal hiding below per-day significance.
 
 Two further points against the arrival being present but weak:
 
-- **The peak is in the wrong place on four of five days**, sitting at 5,850–5,925
-  m/s, the top edge of the declared scan, i.e. near-flat moveout rather than the
-  paper's ~3,200 m/s.
-- **The census does not predict the outcome.** 2024-06-17 at 4.5 % scores
-  p = 0.7413, worse than the poorest day; 2024-11-30 at 4.9 % scores p = 0.1345,
-  no better than 2024-12-20 at 4.1 %. Whatever occupies the
-  body-wave fan in the raw energy budget is not organised into a receiver-ordered
-  arrival, so "pick a better day" is not an available fix.
+- **The observed score never clears the PER-VELOCITY null, at any velocity.**
+  0 of 181 velocities on 2024-12-20, and at 3,200 m/s specifically 2.752 against
+  a per-velocity threshold of 2.811. That is the maximally powerful test with no
+  multiplicity penalty at all, so the negative does not depend on the familywise
+  correction.
+- **The peak velocity is an artefact of the statistic, not a measurement.** The
+  score samples each trace in a gate at t = offset/v, so as v rises every gate
+  slides toward zero lag where these gathers have a dominant broad lobe. Hence
+  `corr(trial velocity, score) = +0.976` and the argmax simply lands wherever the
+  grid stops: cap the scan at 3,500 / 4,000 / 8,000 / 20,000 m/s and the "peak"
+  moves to 3,475 / 3,925 / 7,700 / 18,775. A moveout-free control — every trace
+  replaced by the across-receiver median — reproduces the observed curve to
+  within 3.5 % at every velocity, including the exact peak location. **The
+  p-values remain valid**, because the receiver-order permutation preserves the
+  gate geometry and so carries the identical bias (97 % of null curves also peak
+  at ≥ 5,500 m/s), but no number in the "at (m/s)" column should be read as a
+  velocity.
 
 ## The coherent stack — the most sensitive test available
 
@@ -146,12 +179,28 @@ and causal dominance — before it will call anything a reproduction.
 ## Conclusion
 
 Figure 7c does not reproduce on the 2024–2025 archive, on the paper's own
-operator, on five independent complete days spanning ten months, including the
-most energy-favourable day available, nor on a coherent 96-hour stack of the four
-days that share an acquisition rate. Taken with the eight-day raw census — 81–99 %
-of 5–20 Hz energy below 1,500 m/s and downgoing share never exceeding 49.9 % — the
-required downgoing body-wave energy is not present in the input, so no processing
-choice recovers it.
+operator, across six independent complete days spanning ten months, nor on a
+coherent 96-hour stack of the four days that share an acquisition rate. The
+minimum p over six days is 0.1345, and the observed score never clears the
+per-velocity null at any of 181 velocities — so the negative does not rest on a
+multiplicity correction.
+
+**The mechanism is open.** This document previously concluded that the required
+downgoing body-wave energy was absent from the input. That explanation came from
+`ambient_fk_energy_census.py` and is withdrawn (see banner): its statistic had no
+geometric baseline and could not distinguish the SAFOD wavefield from white
+noise. A cross-epoch comparison against Lellouch's released 2017 earthquake
+records was then attempted as a replacement and is *also* withdrawn — the two
+arms were not processed alike, because `extract_all.py` takes DASutils
+`median=True` by default and so stripped the common mode from the 2024–25 arm
+only. **No validated mechanism for the non-reproduction currently exists.**
+
+One thing the cross-epoch work does still support: gross sensing failure is ruled
+out. The 2024–25 array records earthquake wavefronts at 92 % of the 2017 array's
+semblance, at lower SNR. That is a normalised within-record measure of a loud
+transient, so it is far less sensitive to the processing asymmetry than the
+coherence curves were — but it is not entirely immune, and should be redone with
+both arms read identically before being relied on.
 
 This is a statement about this archive, this band, and these days. It is not a
 criticism of Lellouch et al. (2019), whose Figure 9 companion model this project

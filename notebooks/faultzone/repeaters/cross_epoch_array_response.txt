@@ -1,3 +1,21 @@
+CAVEAT 2026-08-14 -- THE TWO ARMS WERE NOT READ IDENTICALLY. Result retained, but
+redo before relying on it.
+
+The 2024-25 arm came from caches built by extract_all.py, which calls
+DASutils.readFile_HDF without median=False; that defaults to True, so the common
+mode was removed from the 2024-25 arm and NOT from the 2017 raw binary, which was
+also not differentiated or band-passed as the 2024-25 arm was.
+
+Semblance is a normalised within-record measure of a LOUD transient, so it is far
+less sensitive to this asymmetry than an ambient coherence measure would be -- the
+companion cross_epoch_noise_floor.py result IS withdrawn for exactly that reason.
+The conclusion here, that gross sensing failure is ruled out, is therefore retained.
+But a near-vertically-incident P arrival is partly common-mode-like across the
+array, so median removal will have suppressed some of it in the 2024-25 arm, and
+the 92% figure is not immune. Re-extract both epochs with h5py directly, with no
+median removal, derivative or band-pass, before this number is relied on.
+================================================================================
+
 Cross-epoch array response: 2017 (Lellouch) vs 2024-25, identical operator
 band 5-20 Hz, resampled to 100 Hz, depth 0-700 m below wellhead, 60 m windows
 

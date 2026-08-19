@@ -1,5 +1,38 @@
 #!/usr/bin/env python3
-"""Instrument self-noise across epochs: is the 2024-25 interrogator noisier?
+"""WITHDRAWN 2026-08-14 -- THE TWO ARMS WERE NOT PROCESSED ALIKE. DO NOT CITE.
+
+The conclusion this script printed -- that the 2024-25 ambient field decorrelates
+over ~4 channels against ~26 in 2017, and that the loss is therefore in spatial
+structure rather than noise amplitude -- is confounded and probably an artefact of
+the confound.
+
+The 2024-25 arm reads `cache_all`/`cache_hf`, built by `extract_all.py`, which
+calls `DASutils.readFile_HDF(...)` WITHOUT passing `median=False`. That parameter
+defaults to True, so the cached data has had the MEDIAN ACROSS CHANNELS REMOVED --
+i.e. common-mode removal -- and has additionally been differentiated (`diff=True`),
+band-passed 5-40 Hz and desampled. The 2017 arm is a raw binary read with
+`np.fromfile` and had none of that applied.
+
+Median-across-channels removal subtracts the spatially uniform component, which is
+exactly the long-range-coherent part of the wavefield. It was stripped from the
+2024-25 arm and not from the 2017 arm, and the script then measured 2024-25 as less
+coherent at long separations. Both asymmetries (median, and the derivative) push in
+the same direction, and the median one pushes hard.
+
+TO REDO THIS PROPERLY: bypass the caches and re-extract the six earthquakes from
+HDF5 with `h5py` directly -- no median removal, no derivative, no band-pass -- so
+that the only remaining difference between epochs is the instrument. Retain the
+gauge-length caveat below, which is genuine and runs against the conclusion.
+
+The companion `cross_epoch_array_response.py` semblance result is far less affected
+(normalised within-record measure of a loud transient) and is retained with a
+caveat, but should also be redone on identically-read data.
+
+Original docstring follows.
+
+---
+
+Instrument self-noise across epochs: is the 2024-25 interrogator noisier?
 
 WHY.  `cross_epoch_array_response.py` shows the 2024-25 array records coherent
 earthquake wavefronts at ~92 % of the 2017 array, at lower SNR -- so gross

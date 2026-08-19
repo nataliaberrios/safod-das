@@ -1,5 +1,46 @@
 #!/usr/bin/env python3
-"""Does tapering the F-K wedge remove the ringing that manufactures moveout?
+"""PARTLY WITHDRAWN 2026-08-14. The real/white column is WRONG. DO NOT CITE IT.
+
+Two defects, found by independent audit:
+
+1. THE TWO ARMS WERE NOT PROCESSED ALIKE. The real path applies the
+   phase-to-strain-rate derivative; the noise path does not. The in-code comment
+   claiming the paths were "IDENTICAL ... which is what production does" was false
+   in both halves -- the F-K production family (`ambient_transfer_test.preprocess`)
+   applies no derivative at all. Matching the paths REVERSES the result:
+
+     as written  (real diffed, noise not)   real 0.0837  white 0.1334  ratio 0.63
+     matched, no diff (= production)        real 0.2008  white 0.1334  ratio 1.51
+     matched, diff both                     real 0.0837  white 0.0416  ratio 2.01
+
+   So real data scores ABOVE the manufactured floor, not below it, and the
+   conclusion "tapering buys no discriminating power" is unsupported as stated.
+
+2. THE TAPER WIDENED THE PASSBAND rather than tapering inside it, so the four
+   configurations are four different filters with different support (650 -> 864 /
+   1120 / 1758 passed cells). The reported 0.29x reduction in the white-noise floor
+   is therefore an AREA effect, not an edge-shape effect: a plain brick wall at
+   matched support gives 0.23x, better than the taper. The control needed -- a taper
+   with the transition band INSIDE [FMIN,FMAX] and [VMIN,VMAX] -- was never run.
+
+WHAT SURVIVES: the Part 1 kernel-compactness result is genuine and is an
+edge-shape effect. Tail/peak is 4.10e-3 for the hard mask, 1.64e-3 for a wide brick
+wall at matched support, and 1.79e-5 for the taper -- so the ~229x tail suppression
+is real. The `ramp()` / `build_mask()` mathematics is also verified correct,
+including the `+1.0` term, and zero taper reproduces the production brick wall
+bit-identically.
+
+CONTEXT: this whole script targets the F-K fan, which is NOT part of the paper's
+ambient workflow and was already rejected by this project's own pre-filter
+channel-scramble gate. The authoritative Figure 7c operator
+(`ambient_lellouch2019_exact_stack.py`) applies no F-K filter at all. Fixing the
+ringing was never on the critical path.
+
+Original docstring follows.
+
+---
+
+Does tapering the F-K wedge remove the ringing that manufactures moveout?
 
 THE PROBLEM.  `ambient_fk_transfer_test.fk_filter` applies a binary indicator in
 the 2-D Fourier domain:
