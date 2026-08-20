@@ -1,0 +1,26 @@
+Audit: is the census's 2017 arm actually pre-event noise?
+  census takes the first 2.5 s of each 5 s record and calls it pre-event
+
+--- M1p33 ---
+  record 5.00 s, 800 channels at 1 m spacing, 250 Hz
+  quiet-quarter median STA 8.042e-07 | trigger at 3.0x
+  first arrival picked at t = 4.100 s
+  arrival inside the census's 2.5 s window: no -- the window is genuinely pre-event
+  k=0 share, pre-arrival  (4.10 s, 2 win): 0.13 %
+  k=0 share, post-arrival (0.90 s, 0 win): n/a
+
+--- M2p46 ---
+  record 5.00 s, 800 channels at 1 m spacing, 250 Hz
+  quiet-quarter median STA 7.132e-07 | trigger at 3.0x
+  first arrival picked at t = 4.916 s
+  arrival inside the census's 2.5 s window: no -- the window is genuinely pre-event
+  k=0 share, pre-arrival  (4.92 s, 2 win): 0.11 %
+  k=0 share, post-arrival (0.08 s, 0 win): n/a
+
+=== verdict ===
+  NO picked arrival falls inside the census's 2017 window -- every
+  arrival is later than the 2.5 s cut, so that arm IS pre-event
+  noise. Both arms of the census are therefore noise and the
+  cross-epoch comparison is NOT confounded by signal presence.
+  Its other stated limits still apply: only ~5 s of 2017 data, and
+  gauge length 10 m vs 16.335 m (a 0.1-1.1 %% effect at 3200 m/s).

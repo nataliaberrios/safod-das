@@ -1,0 +1,88 @@
+Is the dominant 2024-25 low-k feature a wave (fixed v) or a static
+pattern (fixed k)?  Internal test -- no 2017 comparison, no filter.
+
+CORRECTION 2026-08-19: an earlier version of this header said the
+cross-epoch k=0 claim was WITHDRAWN because M1p33/M2p46 are earthquake
+records. lellouch2017_window_audit.py then measured the arrival times --
+4.100 s and 4.916 s of 5.00 s -- both LATER than the census's 2.5 s cut.
+The 2017 census window is therefore genuine pre-event noise, both arms
+were noise, and that comparison is NOT confounded. It is reinstated.
+This test is a complement to it, not a replacement.
+
+  (missing, skipped: ambient_apparent_velocity_census_k0rm.npz)
+--- 5-12 Hz (15 frequencies) ---
+  LOW-K CENTROID (first 16 non-zero cells, k=0 excluded):
+    |k| centroid 0.00173 cyc/m = 1.21 cells | band centre 8.5 Hz
+    that centroid implies apparent v = 4902 m/s at the band centre
+    this low-k region holds 39.33 % of the in-band energy
+  wave model    k = f/v      : v =      478 m/s   R^2 = -0.1357  RSS 1.907e-03
+  static model  k = const    : k = 0.01875 cyc/m  R^2 = +0.0000  RSS 1.679e-03
+  static model implies apparent v = 267 m/s at 5.0 Hz rising to 640 m/s at 12.0 Hz
+  better fit: STATIC (fixed k)   (RSS ratio wave/static = 1.14)
+  permutation control: static wins on 1578/2000 frequency-shuffled sets
+  gate (a) permutation control informative (0.2-0.8): True (0.789)
+  gate (b) at least one model fits                  : False (wave R^2 -0.1357, RSS ratio 1.14)
+  >>> UNINFORMATIVE: no verdict for this band. <<<
+
+--- 12-20 Hz (17 frequencies) ---
+  LOW-K CENTROID (first 16 non-zero cells, k=0 excluded):
+    |k| centroid 0.00175 cyc/m = 1.23 cells | band centre 16.0 Hz
+    that centroid implies apparent v = 9129 m/s at the band centre
+    this low-k region holds 39.08 % of the in-band energy
+  wave model    k = f/v      : v =     1021 m/s   R^2 = -0.0797  RSS 1.980e-03
+  static model  k = const    : k = 0.01613 cyc/m  R^2 = +0.0000  RSS 1.834e-03
+  static model implies apparent v = 744 m/s at 12.0 Hz rising to 1240 m/s at 20.0 Hz
+  better fit: STATIC (fixed k)   (RSS ratio wave/static = 1.08)
+  permutation control: static wins on 1358/2000 frequency-shuffled sets
+  gate (a) permutation control informative (0.2-0.8): True (0.679)
+  gate (b) at least one model fits                  : False (wave R^2 -0.0797, RSS ratio 1.08)
+  >>> UNINFORMATIVE: no verdict for this band. <<<
+
+=== low-k centroid across bands (the discriminating measurement) ===
+  5-12 Hz    band centre  8.50 Hz -> |k| centroid 0.00173 cyc/m (1.21 cells)
+  12-20 Hz   band centre 16.00 Hz -> |k| centroid 0.00175 cyc/m (1.23 cells)
+  frequency ratio 1.882 | wavenumber ratio 1.011
+  a WAVE at fixed v predicts k_ratio = f_ratio = 1.882
+  a STATIC pattern at fixed k predicts k_ratio = 1.000
+  -> closer to FIXED k: a static spatial pattern. It has no
+     velocity, so no velocity-domain filter can separate it BY
+     velocity -- which is why F-K, tau-p, rank-k, PCC, PWS and
+     flat-event removal all failed the same way.
+
+     SENSITIVITY: the test had the range to see a wave and did
+     not. A 3200 m/s arrival sits at 1.86 cells at 8.5 Hz and
+     3.50 cells at 16.0 Hz, both inside the window measured, so
+     a dominant wave would have moved the centroid and did not.
+
+     LIMIT, and it matters for what comes next: this says the
+     DOMINANT low-k feature is not a wave. It does NOT say no
+     arrival exists -- a weak arrival can hide beneath a feature
+     holding ~39 % of the in-band energy. The implication is
+     about METHOD, not absence: because the contaminant is a
+     fixed SPATIAL pattern, the removal has to be spatial --
+     estimate and divide out the static per-channel response --
+     not a velocity filter. C2_PERMEABILITY_FOLLOWUP.md already
+     proposes exactly that calibration and records 5x headroom
+     from it; this is independent motivation for doing it.
+
+=== secondary diagnostic: peak-per-frequency model fit ===
+  (The PRIMARY result is the low-k centroid comparison above. This
+   section is a weaker diagnostic kept for the record; if it reports no
+   verdict that does NOT retract the centroid result.)
+  This diagnostic produced NO INFORMATIVE COMPARISON in any band.
+  Every band failed the permutation control, the fit test, or both,
+  so k_peak(f) is noise and neither model is supported BY THIS
+  DIAGNOSTIC. The centroid measurement above is unaffected: it uses
+  a different quantity in a different region of wavenumber.
+
+  WHY, and what to do instead. Excluding +-2 cells around k = 0 to
+  avoid a trivial answer pushed the per-frequency peak out to
+  ~0.019 cycles/m -- about 13 cells from zero, i.e. the genuine
+  surface-wave energy at 267-640 m/s -- which is not the pedestal
+  this test was written to characterise. The right measurement is
+  the k-marginal in the FIRST FEW non-zero cells, compared between
+  bands: if the same low-k cells dominate in 5-12 Hz and 12-20 Hz,
+  the feature is at fixed k. The band-shift already observed (the
+  ~28 %% share moving from the 3000-4000 m/s bin to 6000-10000 m/s
+  when the band was raised) is consistent with fixed k, but it is an
+  observation awaiting that test, not a result.

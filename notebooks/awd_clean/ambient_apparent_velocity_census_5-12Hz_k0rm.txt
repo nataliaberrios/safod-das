@@ -1,0 +1,49 @@
+Apparent-velocity budget along the fibre, k = 0 INCLUDED
+  band 5-12 Hz | common rate 250 Hz | common aperture 700 m | 2.0 s windows
+  k0 removal: interpolate outliers, then subtract across-channel MEAN
+
+  wavenumber resolution at this aperture: dk = 1/700 m = 0.00143 cycles/m
+  a Hann taper's main lobe is +-2 cells, so a target inside 2 cells of
+  k = 0 is UNRESOLVABLE from the pedestal no matter what filter follows:
+      freq     k at 3200 m/s   cells from k=0   resolved?
+       5.0 Hz      0.00156          1.09       NO
+       7.5 Hz      0.00234          1.64       NO
+      10.0 Hz      0.00313          2.19       yes
+
+  Hann taper in space and time; energy summed, not per-window normalised
+  k=0 removal (interp outliers, then subtract across-channel mean): True
+
+    2024-25    trace edit interpolated 0 of 877 channels
+    2017       trace edit interpolated 56 of 800 channels
+
+--- processing applied to each arm ---
+  2024-25  trace_edit_interp(0.2-5.0 x median RMS) -> diff(strain_rate) -> remove_k0_mean -> resample_to_250Hz -> detrend -> bandpass_5-12 -> aperture_700m(686 ch) -> hann_space_and_time -> sum_power(over 180 windows, no per-window normalisation)
+  2017     trace_edit_interp(0.2-5.0 x median RMS) -> diff(strain_rate) -> remove_k0_mean -> resample_to_250Hz(noop) -> detrend -> bandpass_5-12 -> aperture_700m(700 ch) -> hann_space_and_time -> sum_power(over 2 windows, no per-window normalisation)
+  IDENTICAL OPERATION SEQUENCE: True
+
+--- apparent-velocity budget: energy %% (and %% of available cells) ---
+  velocity band                    2017            2024-25
+      0 -   500        96.31% (96.58%)    5.37% (96.51%)
+    500 -  1000         1.95% ( 1.71%)    1.37% ( 1.75%)
+   1000 -  1500         0.64% ( 0.57%)    0.40% ( 0.58%)
+   1500 -  2000         0.31% ( 0.29%)    0.28% ( 0.29%)
+   2000 -  2500         0.20% ( 0.17%)    0.05% ( 0.17%)
+   2500 -  3000         0.15% ( 0.11%)    0.03% ( 0.12%)
+   3000 -  4000         0.17% ( 0.13%)   30.75% ( 0.14%)
+   4000 -  6000         0.10% ( 0.15%)    2.87% ( 0.16%)
+   6000 - 10000         0.14% ( 0.13%)    3.61% ( 0.14%)
+  10000 - 30000         0.00% ( 0.00%)    0.00% ( 0.00%)
+  30000 +  (k=0)        0.03% ( 0.14%)   55.28% ( 0.15%)
+
+  NO ALONG-FIBRE MOVEOUT (>10 km/s, incl. k=0):  2017   0.03%   2024-25  55.28%
+  BODY-WAVE FAN (2.5-4 km/s):                    2017   0.32%   2024-25  30.77%
+  ratio no-moveout / fan:                        2017   0.11    2024-25   1.80
+
+  SUPPORTS the Figure 7d reading: the 2024-25 field carries markedly more
+  of its 5-20 Hz energy with NO along-fibre moveout, and markedly less of
+  it in the body-wave fan, relative to 2017 under identical processing.
+
+  LIMITS: 2017 is 2 records and ~5 s total, so its budget is an estimate from
+  very little data; the 2017 pre-event window of a triggered record is not
+  the same population as continuous ambient; and the gauge lengths differ
+  (10 m vs 16.335 m), though at 3200 m/s that is a 0.1-1.1 %% effect.

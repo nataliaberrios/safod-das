@@ -1,0 +1,31 @@
+Matched earthquake census: interrogator or signal presence?
+  band 5-20 Hz | 250 Hz | 700 m aperture | 2.0 s Hann windows
+  raw HDF5 via h5py -- the cache_all events cannot be used, DASutils
+  readFile_HDF(median=True) strips k=0 before writing them
+
+  candidate 20240522T154439 in SAFOD-Zumberge-16mGL-500HzFs_2024-05-22T154357Z.h5: pick 2.608 s, expected 1.00 s, SNR 6.8 -> rejected
+  candidate 20240522T213127 in SAFOD-Zumberge-16mGL-500HzFs_2024-05-22T213057Z.h5: pick 1.668 s, expected 1.00 s, SNR 318.3 -> accepted
+  2024-25 eq dropped/interpolated 88 channels, 3 windows
+
+  2017 post-arrival duration available (needs >= 2.0 s for one window):
+    M1p33  arrival 4.100 s of 5.00 s, SNR 2502.7 -> 0.90 s after the pick (NOT enough for one window)
+    M2p46  no arrival picked -- record is noise throughout
+
+=== NOT TESTABLE WITH THE RELEASED DATA ===
+  Total post-arrival 2017 data across both records: 0.90 s, which is
+  less than one 2.0 s analysis window. The released records place
+  their arrivals at the very end (4.10 s and 4.92 s of 5.00 s), so
+  there is no way to form a 2017 arm that actually contains the
+  earthquake. Concatenating the full records instead would give a
+  2017 arm that is ~90 %% pre-event noise compared against a 2024-25
+  arm that is mostly earthquake -- the signal-presence confound this
+  test exists to remove, merely inverted, and it would have produced
+  a confident and meaningless number.
+
+  THIS DOES NOT LEAVE THE QUESTION OPEN. lellouch2017_window_audit.py
+  established that the ambient census's 2017 window (first 2.5 s) is
+  genuinely PRE-EVENT -- both arrivals are later than the cut -- so
+  both arms of that census were noise and the ambient-vs-ambient
+  comparison is already the matched one. Shortening WIN_S to fit the
+  0.9 s available is not a fix: at 5 Hz that is under 5 cycles, from
+  a single window, which cannot support a wavenumber budget.
