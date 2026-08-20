@@ -125,11 +125,25 @@ def prepare(x, fs):
 
 
 def remove_rank(x, rank):
+    """Project out the leading `rank` spatial patterns.
+
+    Uses eigh() on the (nch x nch) spatial covariance rather than svd() on the
+    (nch x nsamples) matrix.  The eigenvectors of x x^T ARE the left singular
+    vectors of x, so this is the same operation, but a symmetric
+    eigendecomposition of a 686 x 686 matrix is far more robust -- and faster --
+    than LAPACK gesdd on 686 x 7500.  The first version of this scan died at
+    window 60 of 240 with "SVD did not converge" on a single pathological window,
+    losing the whole run.
+    """
     if rank <= 0:
         return x
     xc = x - x.mean(axis=1, keepdims=True)
-    u, _, _ = np.linalg.svd(xc, full_matrices=False)
-    u = u[:, :rank]
+    c = xc @ xc.T
+    c = 0.5 * (c + c.T)                     # enforce exact symmetry for eigh
+    if not np.all(np.isfinite(c)):
+        raise FloatingPointError("non-finite spatial covariance")
+    w, v = np.linalg.eigh(c)                # ascending eigenvalues
+    u = v[:, -rank:]                        # top `rank` spatial patterns
     return xc - u @ (u.T @ xc)
 
 
@@ -201,6 +215,8 @@ def main():
     say("")
 
     rows = []
+    skipped = {"unreadable": 0, "short": 0, "trace_edit": 0, "non_finite": 0,
+               "rank_removal": 0, "asymmetry": 0}
     for n, i in enumerate(idx):
         row = db.iloc[int(i)]
         f = corrected_path(row.file)
@@ -215,15 +231,31 @@ def main():
                 hi = WELLHEAD_CH + APERTURE_CH
                 x = g["RawData"][:ns, WELLHEAD_CH:hi].astype(np.float32).T
         except Exception as exc:
+            skipped["unreadable"] += 1
             say("  [%3d] %s unreadable: %s" % (n, f.name, exc))
             continue
         if x.shape[0] < APERTURE_CH:
+            skipped["short"] += 1
             continue
         x, fs2, dropped = prepare(x, fs)
         if x is None:
+            skipped["trace_edit"] += 1
             continue
-        res = asymmetry(remove_rank(x, RANK_REMOVE), fs2, dx, rng)
+        if not np.all(np.isfinite(x)):
+            skipped["non_finite"] += 1
+            continue
+        # One bad window must not lose the run. Every skip is counted and
+        # reported, so a scan that quietly measured half the archive cannot be
+        # mistaken for a complete one.
+        try:
+            xr = remove_rank(x, RANK_REMOVE)
+        except (np.linalg.LinAlgError, FloatingPointError) as exc:
+            skipped["rank_removal"] += 1
+            say("  [%3d] %s: rank removal failed (%s), skipped" % (n, f.name, exc))
+            continue
+        res = asymmetry(xr, fs2, dx, rng)
         if res is None:
+            skipped["asymmetry"] += 1
             continue
         rows.append(dict(t=row.t, hour=int(row.t.hour), dow=int(row.t.dayofweek),
                          dropped=dropped, **res))
@@ -238,7 +270,14 @@ def main():
     thresh = int(binom.ppf(0.95, N, ALPHA))
     say("")
     say("=== result ===")
-    say("  windows measured            : %d" % N)
+    say("  windows measured            : %d of %d sampled" % (N, len(idx)))
+    if sum(skipped.values()):
+        say("  windows skipped             : %d  (%s)"
+            % (sum(skipped.values()),
+               ", ".join("%s %d" % (k, v) for k, v in skipped.items() if v)))
+        say("  NOTE: skips are reported so a partial scan cannot be mistaken for")
+        say("  a complete one. The decision rule below uses N = %d, the number" % N)
+        say("  actually measured, not the number requested.")
     say("  |A| median %.4f, 90th %.4f, max %.4f"
         % (df.asym.median(), df.asym.quantile(0.90), df.asym.max()))
     say("  windows with p < %.2f        : %d" % (ALPHA, len(hits)))

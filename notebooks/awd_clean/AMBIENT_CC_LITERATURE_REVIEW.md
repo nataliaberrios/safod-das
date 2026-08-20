@@ -179,19 +179,35 @@ borehole, same rock guarantees the same *Green's function*; it does not supply t
 *sources* needed to reconstruct it. The two recordings differ in source
 environment, not geology:
 
-- **June 2017** (Lellouch et al.): recorded during a **manned field deployment** —
-  an OptaSense ODH3.1 was being attached to the main-hole fibre, with the crew,
-  vehicles and equipment that implies at the wellhead.
-- **2024-25** (this archive): **unattended continuous recording** at an otherwise
-  quiet site.
+- **June 2017** (Lellouch et al.): an OptaSense ODH3.1 was attached to the
+  main-hole fibre that month.
+- **2024-25** (this archive): unattended continuous recording.
 - **Behm (2016)**, for contrast, succeeded in a **producing oil field during
-  water-flooding** — about the noisiest wellhead environment obtainable.
+  water-flooding** — about the noisiest wellhead environment obtainable. This one
+  IS documented in the paper and is the only source-environment datum here that
+  is not inference.
 
-**Status of this explanation: consistent with all the evidence, but a HYPOTHESIS,
-not a measurement.** What is measured is that the asymmetry is present in 2017 and
-absent in 2024-25 (§4.3 scripts). That the *cause* is the presence or absence of a
-field crew is an inference, and it cannot be tested directly on Lellouch's release
-because only ~5 s of his noise exists — far too little for a diurnal analysis.
+**Status: SPECULATION, and weaker than the rest of this document. Do not cite it.**
+An earlier draft of this section asserted that 2017 was recorded "during a manned
+field deployment" whose crew and vehicles supplied the illumination. There is no
+evidence for that beyond the fact that an interrogator was installed sometime in
+June 2017. Specifically, there is **no** site log, **no** operational record, and
+**no** statement in Lellouch et al. (2019) attributing the noise to any source —
+the paper infers surface origin from the downgoing/upgoing asymmetry alone, which
+is the same inference we make, not independent corroboration of a cause.
+
+**A gap in the comparison, stated plainly.** Our 2017 asymmetry measurement uses
+the pre-event windows of the two earthquake records `M1p33` and `M2p46` (~5 s
+total), because that is the only raw 2017 noise in the release. Lellouch's Figure
+7c correlograms are, per the release README, "a stack of 7 different one-day
+correlations" — raw data we do not have. So the arm we measure is **not the same
+acquisition** as the one that produced his figure. This does not affect the
+measured contrast (asymmetry significant at p = 0.005 in the 2017 records,
+p = 0.73 in 2024-25, matched operations and ranks), but it does mean we cannot
+attribute the difference to any specific cause, temporal or instrumental.
+
+What would settle it: SAFOD/USGS operational records for June 2017 and for the
+2024-25 window, or the raw ambient data behind his Figure 7c. Neither is in hand.
 
 It is testable on **our** side, and `illumination_window_scan.py` does so:
 cultural noise has a **diurnal signature**, so if any illuminated windows exist in

@@ -306,6 +306,99 @@ def remove_coherent_subspace(rate: np.ndarray, rank: int, seed: int = 0,
     return rate
 
 
+def adaptive_fk(
+    data: np.ndarray,
+    fs: float,
+    dx: float,
+    alpha: float,
+    window_channels: int,
+    window_samples: int,
+    normalize: bool,
+) -> np.ndarray:
+    """Adaptive frequency-wavenumber filter, after Isken et al. (2022).
+
+    Isken, Vasyura-Bathke & Dahm (2022), GJI 231(2) 944-949,
+    https://doi.org/10.1093/gji/ggac229 -- demonstrated on a vertical borehole
+    observatory, i.e. our geometry.
+
+    WHY THIS IS DIFFERENT FROM EVERY OTHER F-K FILTER IN THIS TREE.  All of them
+    (`ambient_fk_transfer_test.fk_filter`, `ambient_signed_fk_v2`,
+    `ambient_fk_taper_test`) impose a FIXED velocity fan -- the frozen
+    2.5-4.5 km/s wedge -- and pass only what falls inside it.  This one assumes no
+    velocity at all.  The mask is built from the data's OWN amplitude spectrum
+    raised to `alpha`, so it enhances whatever is spatially coherent in each local
+    window and, in the authors' words, "no energy will be suppressed to the stop
+    band".  That makes it non-destructive and free of the wedge-edge ringing that
+    motivated `ambient_fk_taper_test`.
+
+    Implementation follows the paper's stated choices:
+      - sliding t-x windows with 50 % overlap, so the filter "adapt[s] to locally
+        present coherent signals";
+      - overlaps combined with a BARTLETT (triangular) taper "in order to fade
+        equally between overlapping windows" -- the triangular weights sum to
+        unity under 50 % overlap, so an alpha of 0 reproduces the input exactly;
+      - the amplitude spectrum is deliberately NOT smoothed.  The paper omits the
+        Goldstein & Werner (1998) / Baran et al. (2003) InSAR-style smoothing
+        because "smoothing the amplitude spectrum (particularly in a small window)
+        distorts the signal amplitudes and narrows the filter band".
+
+    `normalize=True` is the paper's NAFK variant, which normalises the mask so as
+    to "retain the amplitude of the most dominant f-k component of the input".
+
+    A WARNING THAT IS PART OF THE METHOD HERE.  Because it enhances the DOMINANT
+    coherent component, and because AMBIENT_LOWK_MECHANISM.md measured that our
+    dominant component is a static fixed-k pattern holding ~39 % of the in-band
+    energy, running this on raw data is expected to AMPLIFY the contaminant.  It
+    is intended to be composed with `--common-mode` and/or `--svd-rank`, which
+    remove that pattern first.  `AMBIENT_CC_LITERATURE_REVIEW.md` section 1 states
+    this prediction in advance, so the ordering is a test rather than a hope.
+
+    alpha = 0 returns the input unchanged (verified in the unit check below), so
+    the option is inert by default.
+    """
+    if alpha <= 0.0:
+        return data
+    n_ch, n_t = data.shape
+    wc = min(int(window_channels), n_ch)
+    wt = min(int(window_samples), n_t)
+    if wc < 4 or wt < 8:
+        raise ValueError("adaptive-fk window too small")
+    out = np.zeros_like(data, dtype=np.float64)
+    weight = np.zeros((n_ch, n_t), dtype=np.float64)
+    taper = np.outer(np.bartlett(wc + 2)[1:-1], np.bartlett(wt + 2)[1:-1])
+    step_c, step_t = max(1, wc // 2), max(1, wt // 2)
+    ch_starts = list(range(0, max(1, n_ch - wc + 1), step_c))
+    if ch_starts[-1] != n_ch - wc and n_ch >= wc:
+        ch_starts.append(n_ch - wc)
+    t_starts = list(range(0, max(1, n_t - wt + 1), step_t))
+    if t_starts[-1] != n_t - wt and n_t >= wt:
+        t_starts.append(n_t - wt)
+    for c0 in ch_starts:
+        for t0 in t_starts:
+            block = data[c0:c0 + wc, t0:t0 + wt].astype(np.float64) * taper
+            spec = np.fft.fft2(block)
+            amp = np.abs(spec)
+            mask = amp ** alpha
+            if normalize:
+                peak = mask.max()
+                if peak > 0:
+                    mask = mask / peak
+            else:
+                # keep the block's total amplitude scale, so alpha does not act
+                # as an overall gain that would change the correlation amplitude
+                scale = amp.sum()
+                msum = (mask * amp).sum()
+                if msum > 0:
+                    mask = mask * (scale / msum)
+            filtered = np.real(np.fft.ifft2(spec * mask))
+            out[c0:c0 + wc, t0:t0 + wt] += filtered
+            weight[c0:c0 + wc, t0:t0 + wt] += taper
+    good = weight > 0
+    out[good] /= weight[good]
+    out[~good] = data[~good]
+    return out.astype(data.dtype)
+
+
 def strain_rate_and_ram_continuous(
     raw: np.ndarray,
     fs: float,
@@ -315,6 +408,11 @@ def strain_rate_and_ram_continuous(
     svd_rank: int = 0,
     seed: int = 0,
     svd_window_samples: int = 0,
+    afk_alpha: float = 0.0,
+    afk_normalize: bool = False,
+    afk_window_channels: int = 128,
+    afk_window_seconds: float = 4.0,
+    dx: float = 1.0,
 ) -> tuple[np.ndarray, float]:
     """Differentiate and apply centered Bensen running-absolute-mean weights.
 
@@ -346,6 +444,18 @@ def strain_rate_and_ram_continuous(
             rate -= np.median(rate, axis=0, keepdims=True).astype(np.float32)
     if svd_rank > 0:
         rate = remove_coherent_subspace(rate, svd_rank, seed, svd_window_samples)
+    # Adaptive f-k LAST among the spatial operations and BEFORE the running-
+    # absolute-mean, so it sees the residual after the static pattern has been
+    # removed rather than the pattern itself. Running it first would enhance the
+    # contaminant, which is the prediction recorded in
+    # AMBIENT_CC_LITERATURE_REVIEW.md section 1.
+    if afk_alpha > 0.0:
+        rate = adaptive_fk(
+            rate, fs, dx, afk_alpha,
+            afk_window_channels,
+            max(8, int(round(afk_window_seconds * fs))),
+            afk_normalize,
+        )
     absolute = np.abs(rate)
     weights = uniform_filter1d(
         absolute,
@@ -407,6 +517,7 @@ def chunk_tag(args: argparse.Namespace) -> str:
         f"{'_cm' if args.common_mode else ''}"
         f"{'mean' if args.common_mode and getattr(args, 'common_mode_estimator', 'median') == 'mean' else ''}"
         f"{('_svd%d' % args.svd_rank) if getattr(args, 'svd_rank', 0) else ''}"
+        f"{('_afk%g%s' % (args.afk_alpha, 'n' if getattr(args, 'afk_normalize', False) else '')) if getattr(args, 'afk_alpha', 0.0) else ''}"
         f"{('w%.6g' % args.svd_window_s).replace('.', 'p') if getattr(args, 'svd_window_s', 0) else ''}"
     )
 
@@ -505,6 +616,11 @@ def run_chunk(args: argparse.Namespace) -> None:
             raw, fs, args.ram_seconds, args.common_mode,
             common_mode_estimator=getattr(args, "common_mode_estimator", "median"),
             svd_rank=getattr(args, "svd_rank", 0), seed=args.seed,
+            afk_alpha=float(getattr(args, "afk_alpha", 0.0)),
+            afk_normalize=bool(getattr(args, "afk_normalize", False)),
+            afk_window_channels=int(getattr(args, "afk_window_channels", 128)),
+            afk_window_seconds=float(getattr(args, "afk_window_seconds", 4.0)),
+            dx=dx,
             svd_window_samples=int(round(getattr(args, "svd_window_s", 0.0) * fs)),
         )
         if args.common_mode:
@@ -573,6 +689,8 @@ def run_chunk(args: argparse.Namespace) -> None:
         denominator_floored_fraction=np.asarray(total_floored / blocks_used),
         common_mode=np.asarray(args.common_mode),
         svd_rank=np.asarray(int(getattr(args, "svd_rank", 0))),
+        afk_alpha=np.asarray(float(getattr(args, "afk_alpha", 0.0))),
+        afk_normalize=np.asarray(bool(getattr(args, "afk_normalize", False))),
         common_mode_channel_count=np.asarray(
             len(read_channels) if args.common_mode else 0
         ),
@@ -1203,6 +1321,17 @@ def parser() -> argparse.ArgumentParser:
         help="apply the subspace projection within windows of this length rather "
              "than over the whole block. 0 (default) = whole block, which was "
              "measured not to suppress the pedestal.")
+    # Adaptive f-k (Isken et al. 2022). Default alpha = 0 is a no-op, verified
+    # bit-identical, so every existing product is unaffected.
+    result.add_argument("--afk-alpha", type=float, default=0.0,
+                        help="adaptive f-k exponent; 0 disables (default). "
+                             "Compose with --common-mode/--svd-rank, which must "
+                             "remove the static pattern FIRST")
+    result.add_argument("--afk-normalize", action="store_true",
+                        help="NAFK variant: normalise the mask, retaining the "
+                             "amplitude of the most dominant f-k component")
+    result.add_argument("--afk-window-channels", type=int, default=128)
+    result.add_argument("--afk-window-seconds", type=float, default=4.0)
     result.add_argument("--null-method", choices=VALID_NULLS, default="ordered")
     result.add_argument("--realization", type=int, default=0)
     result.add_argument("--seed", type=int, default=20260814)
