@@ -110,24 +110,45 @@ def acquisition_metadata(path: Path) -> dict[str, float | int | str]:
         }
 
 
-def longest_continuous_prefix(rows: pd.DataFrame, record_seconds: float) -> pd.DataFrame:
+def longest_continuous_prefix(
+    rows: pd.DataFrame, record_seconds: float
+) -> tuple[pd.DataFrame, int]:
     """Truncate a day to its longest run of exactly-contiguous records.
 
     Opt-in only.  Three days in this archive (2024-11-30, 2024-10-28,
     2025-03-04) carry a pair of manifest timing anomalies that sum to one record
     length, so the day is not spliceable end to end even though most of it is
     contiguous.  Rather than weaken `validate_continuity`, which correctly
-    refuses to splice across a discontinuity, this returns the leading
+    refuses to splice across a discontinuity, this returns the longest
     contiguous block so that block can be analysed on its own terms.  The
     truncation is reported by the caller and the guard still runs afterwards.
+
+    Returns (block, start_index).  `start_index` is the offset of the block in
+    the untruncated day and is recorded in the product, because a block that
+    does not begin at row 0 makes `--start` refer to a different wall-clock hour
+    than the same `--start` on an untruncated day.
+
+    This used to return the LEADING contiguous block despite the name.  The two
+    differ materially -- for 2024-10-28 the leading run is 249 records and the
+    longest is 1191 -- so the old behaviour silently discarded 78 % of a usable
+    day.  Any product built with `--continuous-prefix` before 2026-08-19 should
+    be checked for whether its leading run happened to be its longest; for
+    2024-11-30, the only day processed with the flag, it was, so those products
+    are unaffected.
     """
     if len(rows) < 2:
-        return rows
+        return rows, 0
     differences = np.diff(rows.time.astype("int64").to_numpy()) / 1.0e9
     bad = np.flatnonzero(np.abs(differences - record_seconds) > 0.02)
     if not bad.size:
-        return rows
-    return rows.iloc[: int(bad[0]) + 1].reset_index(drop=True)
+        return rows, 0
+    # Break points partition the day into runs [start, stop).  A gap at index i
+    # sits between rows i and i+1, so run boundaries are the gap indices + 1.
+    bounds = np.concatenate(([0], bad + 1, [len(rows)]))
+    lengths = np.diff(bounds)
+    best = int(np.argmax(lengths))
+    start, stop = int(bounds[best]), int(bounds[best + 1])
+    return rows.iloc[start:stop].reset_index(drop=True), start
 
 
 def validate_continuity(rows: pd.DataFrame, record_seconds: float) -> None:
@@ -405,13 +426,20 @@ def run_chunk(args: argparse.Namespace) -> None:
     dx = float(metadata["channel_spacing_m"])
     record_samples = int(metadata["record_samples"])
     record_seconds = float(metadata["record_seconds"])
+    prefix_rows_used, prefix_rows_available, prefix_start_row = len(rows), len(rows), 0
     if getattr(args, "continuous_prefix", False):
-        full = len(rows)
-        rows = longest_continuous_prefix(rows, record_seconds)
-        if len(rows) != full:
+        rows, prefix_start_row = longest_continuous_prefix(rows, record_seconds)
+        prefix_rows_used = len(rows)
+        if prefix_rows_used != prefix_rows_available:
             print(
-                "continuous-prefix: using %d of %d manifest rows (%.1f h)"
-                % (len(rows), full, len(rows) * record_seconds / 3600.0),
+                "continuous-prefix: using %d of %d manifest rows (%.1f h) "
+                "starting at row %d"
+                % (
+                    prefix_rows_used,
+                    prefix_rows_available,
+                    prefix_rows_used * record_seconds / 3600.0,
+                    prefix_start_row,
+                ),
                 flush=True,
             )
     validate_continuity(rows, record_seconds)
@@ -552,6 +580,12 @@ def run_chunk(args: argparse.Namespace) -> None:
         source_power_waterlevel=np.asarray(args.waterlevel),
         null_method=np.asarray(args.null_method),
         realization=np.asarray(args.realization),
+        # --continuous-prefix used to leave no trace in any product, so a
+        # truncated day was indistinguishable from a whole one after the fact.
+        continuous_prefix=np.asarray(bool(getattr(args, "continuous_prefix", False))),
+        prefix_rows_used=np.asarray(prefix_rows_used),
+        prefix_rows_available=np.asarray(prefix_rows_available),
+        prefix_start_row=np.asarray(prefix_start_row),
     )
     print(f"wrote {output}")
     print(f"core files={core_stop-core_first}; windows={total_windows}")
@@ -871,6 +905,14 @@ def aggregate(args: argparse.Namespace) -> None:
             "common_mode_channel_count"
         ],
         "common_mode_status": "not reported; sensitivity only",
+        # The aggregate JSON used to record neither of these, so a surrogate
+        # product was indistinguishable from an observed one once the filename
+        # was out of view -- which made the matched-null design unsummarizable.
+        # Both are taken from metadata_reference, which is guarded by the strict
+        # `metadata != metadata_reference` check above, so every chunk in an
+        # aggregate is known to carry the same null identity.
+        "null_method": metadata_reference["null_method"],
+        "null_realization": metadata_reference["realization"],
         "spectral_mode": args.spectral_mode,
         "source_power_waterlevel": metadata_reference[
             "source_power_waterlevel"

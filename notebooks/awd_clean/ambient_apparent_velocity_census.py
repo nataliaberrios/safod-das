@@ -52,18 +52,38 @@ import matplotlib.pyplot as plt
 from scipy.signal import butter, detrend, resample_poly, sosfiltfilt
 
 HERE = Path(__file__).resolve().parent
-STEM = HERE / "ambient_apparent_velocity_census"
+_STEM = HERE / "ambient_apparent_velocity_census"   # band/k0 tag appended below
 CSV = Path("/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv")
 LEL = Path("/scratch/users/nberrios/lellouch2017")   # raw 2017 binaries (correlograms live in repo lellouch_traces/)
 
-FMIN, FMAX = 5.0, 20.0
+import os
+# Band is env-overridable so the resolution prediction can be tested WITHOUT
+# touching the default.  At a 700 m aperture, dk = 1/700 = 0.001429 cycles/m and
+# a Hann taper's main lobe is +-2 cells wide, so the 3200 m/s target sits at
+#     5 Hz -> 1.09 cells   (INSIDE the k=0 main lobe: unresolvable)
+#    10 Hz -> 2.19 cells   (marginal)
+#    15 Hz -> 3.28 cells   (OUTSIDE: resolved)
+#    20 Hz -> 4.37 cells   (OUTSIDE: resolved)
+# So the target is inseparable from the k=0 pedestal only in the LOWER half of
+# the paper's 5-20 Hz band.  Prediction: in 12-20 Hz the fan energy should
+# separate from k=0; in 5-12 Hz it should not.
+FMIN = float(os.environ.get("CENSUS_FMIN", "5.0"))
+FMAX = float(os.environ.get("CENSUS_FMAX", "20.0"))
 FS_COMMON = 250.0            # the 2017 release rate; 2024-25 decimates 500 -> 250
 APERTURE_M = 700.0           # common aperture both arms can supply after editing
 WIN_S = 2.0                  # the 2017 pre-event window is short; both use 2 s
 EDIT_LO, EDIT_HI = 0.2, 5.0
 CH_LO_2024 = 23              # wellhead (G0)
-import os
 K0_REMOVE = os.environ.get('K0_REMOVE', '0') == '1'
+
+# Never let two band/k0 configurations overwrite each other's product: the
+# default run keeps the historical unsuffixed name, every variant is tagged.
+_tag = ""
+if (FMIN, FMAX) != (5.0, 20.0):
+    _tag += "_%g-%gHz" % (FMIN, FMAX)
+if K0_REMOVE:
+    _tag += "_k0rm"
+STEM = Path(str(_STEM) + _tag)
 
 # apparent-velocity bins, INCLUDING an explicit no-moveout bin at the top
 V_EDGES = np.array([0, 500, 1000, 1500, 2000, 2500, 3000, 4000,
@@ -187,6 +207,23 @@ def main():
     say("Apparent-velocity budget along the fibre, k = 0 INCLUDED")
     say("  band %g-%g Hz | common rate %.0f Hz | common aperture %.0f m | %.1f s windows"
         % (FMIN, FMAX, FS_COMMON, APERTURE_M, WIN_S))
+    say("  k0 removal: %s" % ("interpolate outliers, then subtract across-channel MEAN"
+                              if K0_REMOVE else "off"))
+    # Wavenumber resolution: whether the 3200 m/s target is even SEPARABLE from
+    # the k = 0 pedestal is a property of the aperture, not of any filter.
+    dk = 1.0 / APERTURE_M
+    say("")
+    say("  wavenumber resolution at this aperture: dk = 1/%.0f m = %.5f cycles/m" % (APERTURE_M, dk))
+    say("  a Hann taper's main lobe is +-2 cells, so a target inside 2 cells of")
+    say("  k = 0 is UNRESOLVABLE from the pedestal no matter what filter follows:")
+    say("      freq     k at 3200 m/s   cells from k=0   resolved?")
+    for fq in (5.0, 7.5, 10.0, 12.5, 15.0, 17.5, 20.0):
+        if not (FMIN <= fq <= FMAX):
+            continue
+        cells = (fq / 3200.0) / dk
+        say("      %4.1f Hz  %11.5f      %8.2f       %s"
+            % (fq, fq / 3200.0, cells, "yes" if cells > 2.0 else "NO"))
+    say("")
     say("  Hann taper in space and time; energy summed, not per-window normalised")
     say("  k=0 removal (interp outliers, then subtract across-channel mean): %s" % K0_REMOVE)
     say("")
