@@ -81,7 +81,20 @@ FMIN, FMAX = 5.0, 20.0
 FS_COMMON = 250.0
 APERTURE_M = 700.0
 WIN_S = 2.0
-SECONDS = 20.0                 # per analysis window
+# A weight drop is an IMPULSE of order a second. The first version read 20 s
+# around each drop, so the transient was ~5 % of the window and the positive
+# control came back weak (1 of 5 significant) for a reason that had nothing to do
+# with the fibre. Both arms use the SAME length -- unmatched arms is the error
+# class behind five earlier withdrawals in this tree.
+SECONDS = float(os.environ.get("DEEP_SECONDS", "6.0"))
+# The positive control needs the impulse to DOMINATE its window, and a 6 s window
+# still splits into three WIN_S=2 s FFT windows, so a ~1 s transient is only a
+# third of one of them. Measured: at 20 s the control gave p = 0.14-0.46, at 6 s
+# p = 0.07-0.37 -- improving with shortening, which is the signature of dilution
+# rather than of absence. The drop arm therefore uses a window equal to WIN_S,
+# placed to start at the drop. Both arms keep the same WIN_S and the same number
+# of FFT windows, so the comparison stays matched.
+DROP_LEAD_S = float(os.environ.get("DEEP_DROP_LEAD", "0.2"))
 GUARD_S = 45.0                 # ambient windows must be this far from any drop
 V_LO, V_HI = 2500.0, 4000.0
 RANK_REMOVE = 2
@@ -239,18 +252,31 @@ def main():
     say("  %d Deep files, %s to %s" % (len(ftimes), ftimes[0][1], ftimes[-1][1]))
     say("")
 
-    drops = man.t.to_numpy()
+    # int64 nanoseconds: man.t is tz-aware pandas Timestamps, which come out of
+    # to_numpy() as dtype object and cannot be subtracted from a datetime64.
+    drops_ns = man.t.astype("int64").to_numpy()
 
-    def read_window(path, offset_s, fs_hint=1000.0):
+    def read_window(path, offset_s, fs_hint=1000.0, seconds=None):
+        seconds = SECONDS if seconds is None else seconds
+        # filtfilt and the spatial taper both need padding, so read extra and trim
+        pad = 1.0
         with h5py.File(path, "r") as h:
             g = h["Acquisition/Raw[0]"]
             fs = float(g.attrs.get("OutputDataRate", fs_hint))
             dx = float(h["Acquisition"].attrs.get("SpatialSamplingInterval", 2.0419))
             n_tot = g["RawData"].shape[0]
-            lo = int(max(0, min(n_tot - int(SECONDS * fs), offset_s * fs)))
-            hi = int(min(n_tot, lo + int(SECONDS * fs)))
+            want = int((seconds + 2 * pad) * fs)
+            lo = int(max(0, min(n_tot - want, (offset_s - pad) * fs)))
+            hi = int(min(n_tot, lo + want))
             arr = g["RawData"][lo:hi, :].astype(np.float32).T
-        return arr, fs, dx
+        return arr, fs, dx, pad
+
+    def trim_pad(x, fs, pad_s):
+        """Remove the read-padding after prepare(), at the DECIMATED rate."""
+        n = int(round(pad_s * fs))
+        if n <= 0 or x.shape[1] <= 2 * n + 8:
+            return x
+        return x[:, n:x.shape[1] - n]
 
     results = {"drop": [], "ambient": []}
 
@@ -261,15 +287,18 @@ def main():
         path = DEEP / str(row.deep_file)
         if not path.is_file():
             continue
-        off = max(0.0, float(row.deep_offset_s) - 2.0)
+        # ONE FFT window, starting just before the drop, so the transient fills
+        # it instead of being averaged against neighbouring quiet sub-windows.
+        off = max(0.0, float(row.deep_offset_s) - DROP_LEAD_S)
         try:
-            arr, fs, dx = read_window(path, off)
+            arr, fs, dx, pad_s = read_window(path, off, seconds=WIN_S)
         except Exception as exc:
             say("  %s unreadable: %s" % (path.name, exc))
             continue
         x, fs2, _ = prepare(arr, fs)
         if x is None:
             continue
+        x = trim_pad(x, fs2, pad_s)
         scan = scan_apertures(x, fs2, dx, rng, say, "drop")
         if not scan:
             continue
@@ -284,8 +313,8 @@ def main():
     cand = []
     for p, t in ftimes:
         mid = t + pd.Timedelta(seconds=30)
-        if drops.size:
-            gap = np.min(np.abs((drops - np.datetime64(mid)).astype("timedelta64[s]").astype(float)))
+        if drops_ns.size:
+            gap = float(np.min(np.abs(drops_ns - mid.value)) / 1e9)
         else:
             gap = 1e9
         if gap >= GUARD_S:
@@ -296,14 +325,18 @@ def main():
         raise SystemExit("no ambient windows available")
     sel = [cand[i] for i in np.linspace(0, len(cand) - 1, min(N_AMBIENT, len(cand))).astype(int)]
     for p, t, gap in sel:
+        # Ambient arm uses the SAME window length as the drop arm, so the two
+        # are matched on FFT-window count -- unmatched arms is the error class
+        # behind five earlier withdrawals in this tree.
         try:
-            arr, fs, dx = read_window(p, 20.0)
+            arr, fs, dx, pad_s = read_window(p, 30.0, seconds=WIN_S)
         except Exception as exc:
             say("  %s unreadable: %s" % (p.name, exc))
             continue
         x, fs2, _ = prepare(arr, fs)
         if x is None:
             continue
+        x = trim_pad(x, fs2, pad_s)
         scan = scan_apertures(x, fs2, dx, rng, say, "ambient")
         if not scan:
             continue

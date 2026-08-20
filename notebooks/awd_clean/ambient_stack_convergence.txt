@@ -1,0 +1,50 @@
+Stack convergence: does the score grow like sqrt(N)?
+  2024-12-20, hourly chunks, both branches
+  The quantity to read is DETECTABILITY = score / its own null 95th.
+  A raw score can rise merely because a repeatable contaminant
+  accumulates; detectability rises only if the observation outruns what
+  permuted receiver order produces from the same data.
+
+=== baseline (no common-mode removal): 24 hourly chunks ===
+   1 chunk(s)    240 windows | score  3.7684 at 5950 m/s | null95  4.3917 | detect 0.858 | p 0.9005 | pedestal +0.958
+   2 chunk(s)    480 windows | score  5.3355 at 5950 m/s | null95  5.6187 | detect 0.950 | p 0.4113 | pedestal +0.976
+   4 chunk(s)    960 windows | score  5.1814 at 5950 m/s | null95  6.0367 | detect 0.858 | p 0.9800 | pedestal +0.979
+   8 chunk(s)   1920 windows | score  6.2955 at 5950 m/s | null95  6.5157 | detect 0.966 | p 0.2234 | pedestal +0.983
+  16 chunk(s)   3840 windows | score  6.7556 at 5950 m/s | null95  6.6653 | detect 1.014 | p 0.0170 | pedestal +0.983
+  24 chunk(s)   5759 windows | score  6.3771 at 5950 m/s | null95  6.5667 | detect 0.971 | p 0.1614 | pedestal +0.979
+  fitted exponent, raw score      : N^+0.158
+  fitted exponent, DETECTABILITY  : N^+0.042   (0.5 = stacking works, 0 = flat)
+
+=== common-mode removed: 24 hourly chunks ===
+   1 chunk(s)    240 windows | score  1.3065 at 5975 m/s | null95  1.5670 | detect 0.834 | p 0.8691 | pedestal +0.915
+   2 chunk(s)    480 windows | score  1.6382 at 5950 m/s | null95  2.1722 | detect 0.754 | p 0.9580 | pedestal +0.813
+   4 chunk(s)    960 windows | score  1.8082 at 5975 m/s | null95  2.3651 | detect 0.765 | p 0.9125 | pedestal +0.869
+   8 chunk(s)   1920 windows | score  1.8808 at 5975 m/s | null95  2.5294 | detect 0.744 | p 0.8946 | pedestal +0.892
+  16 chunk(s)   3840 windows | score  2.0643 at 5975 m/s | null95  2.6835 | detect 0.769 | p 0.6807 | pedestal +0.946
+  24 chunk(s)   5759 windows | score  1.0318 at 3575 m/s | null95  1.1206 | detect 0.921 | p 0.8836 | pedestal -0.219
+  fitted exponent, raw score      : N^-0.004
+  fitted exponent, DETECTABILITY  : N^+0.019   (0.5 = stacking works, 0 = flat)
+
+=== reading ===
+  baseline (no common-mode removal)  detectability exponent +0.042 -> FLAT: more data does not help
+  common-mode removed                detectability exponent +0.019 -> FLAT: more data does not help
+
+  NEITHER branch shows sqrt(N) growth in detectability. This is the
+  quantitative answer to 'more data should win': it should, and it
+  does not. Averaging suppresses INCOHERENT noise as 1/sqrt(N), so
+  detectability grows as sqrt(N) ONLY if there is a coherent arrival
+  to accumulate. A flat detectability curve means either the limiting
+  contaminant averages exactly as the signal would -- i.e. it repeats
+  window to window -- or there is no arrival to accumulate. The
+  common-mode-removed branch discriminates: with the repeatable
+  pattern suppressed (pedestal -0.219 at full stack), a flat curve
+  leaves absence as the explanation.
+
+  Consistent with Behm (2016), where 30 s sufficed under adequate
+  illumination, and with the four-day stack (p = 0.9184) sitting
+  further from significance than the best single day (p = 0.1345).
+
+  LIMITS: one day, hourly granularity, so this measures within-day
+  convergence; the four-day result covers the across-day case. The null
+  is receiver-order permutation, which does not contain any pre-
+  correlation operator.

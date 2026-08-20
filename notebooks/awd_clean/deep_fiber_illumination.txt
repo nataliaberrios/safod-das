@@ -1,0 +1,51 @@
+DEEP fibre illumination test, with an active-source positive control
+  band 5-20 Hz | 250 Hz | 700 m aperture | 6 s windows
+  rank-2 spatial removal | fan 2500-4000 m/s | positive f only
+  ambient windows must be >= 45 s from any weight drop
+
+  NOTE: no depth registration exists for this fibre (AWD Deep branch
+  intersections are fibre coordinates, not depth), so a 700 m aperture
+  is slid along the whole fibre and |A| reported per position. Where the
+  fibre is not near-vertical, 'along fibre' is not 'downgoing'.
+
+  926 drops with Deep coverage, 2026-06-16 23:47:09.409500+00:00 to 2026-06-17 22:19:17.114000+00:00
+  2835 Deep files, 2026-06-15 23:06:46+00:00 to 2026-06-17 22:20:48+00:00
+
+=== positive control: windows containing a weight drop ===
+  2026-06-16 23:47:09.409500+00:00  best |A| 0.2011 at fibre 5587 m (p 0.3654)
+  2026-06-17 02:48:36.813500+00:00  best |A| 0.2454 at fibre 349 m (p 0.1860)
+  2026-06-17 06:18:15.110000+00:00  best |A| 0.2232 at fibre 349 m (p 0.1993)
+  2026-06-17 09:20:40.969000+00:00  best |A| 0.3854 at fibre 698 m (p 0.0731)
+  2026-06-17 12:49:56.791000+00:00  best |A| 0.2886 at fibre 698 m (p 0.1761)
+  2026-06-17 16:16:16.580500+00:00  best |A| 0.1935 at fibre 349 m (p 0.2392)
+  2026-06-17 19:17:57.485000+00:00  best |A| 0.2356 at fibre 698 m (p 0.2259)
+  2026-06-17 22:19:17.114000+00:00  best |A| 0.2406 at fibre 349 m (p 0.2159)
+
+=== ambient windows, >= 45 s from any drop ===
+  2630 of 2835 files have no drop within 45 s of their midpoint
+  2026-06-15 23:06:46+00:00  best |A| 0.1488 at fibre 1047 m (p 0.1229, nearest drop 88793 s)
+  2026-06-16 03:58:48+00:00  best |A| 0.1791 at fibre 2095 m (p 0.0266, nearest drop 71271 s)
+  2026-06-16 08:50:48+00:00  best |A| 0.2566 at fibre 4190 m (p 0.0100, nearest drop 53751 s)
+  2026-06-16 13:42:48+00:00  best |A| 0.1684 at fibre 5237 m (p 0.1063, nearest drop 36231 s)
+  2026-06-16 18:34:48+00:00  best |A| 0.2409 at fibre 1397 m (p 0.0033, nearest drop 18711 s)
+  2026-06-16 23:26:48+00:00  best |A| 0.2004 at fibre 3142 m (p 0.0100, nearest drop 1191 s)
+  2026-06-17 05:05:48+00:00  best |A| 0.1865 at fibre 698 m (p 0.0066, nearest drop 662 s)
+  2026-06-17 10:44:48+00:00  best |A| 0.2350 at fibre 0 m (p 0.0066, nearest drop 203 s)
+  2026-06-17 16:32:48+00:00  best |A| 0.2322 at fibre 5587 m (p 0.0033, nearest drop 826 s)
+
+=== reading ===
+  drop     n= 8 | best |A| median 0.2381 max 0.3854 | 0 of 8 windows p<0.05
+  ambient  n= 9 | best |A| median 0.2004 max 0.2566 | 7 of 9 windows p<0.05
+
+  THE POSITIVE CONTROL FAILED. Fewer than half of the windows that
+  CONTAIN a weight drop show significant fan asymmetry. A weight drop
+  is a near-vertical surface source, so the measurement should detect
+  it; that it does not means this configuration lacks sensitivity on
+  this fibre -- most likely the 2500-4000 m/s fan or the 700 m aperture
+  is wrong for this geometry, which has no depth registration. NO
+  conclusion about ambient illumination may be drawn.
+
+  LIMITS: 6 s windows; 8 drop and 9 ambient windows; the fan and
+  aperture are the frozen selections from the main-hole work and may not
+  suit this fibre; no depth registration, so fibre position is not depth;
+  rank-2 removal is conservative against a low-rank arrival.
