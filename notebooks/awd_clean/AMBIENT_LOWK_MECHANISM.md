@@ -5,6 +5,32 @@ figure caption or script docstring disagree, **this file wins** for the ambient
 Figure 7c mechanism question specifically. It does not overrule
 `Ambient_FK_QC_workflow.ipynb` on the F-K fan verdict, which still stands.
 
+> **READ THIS FIRST — there are now TWO findings, and this file holds the second
+> one.** Later the same day, `interrogator_and_illumination_v2.py` found something
+> upstream of everything below: the 2024-25 ambient field carries **no
+> downgoing/upgoing asymmetry** in the body-wave fan, while Lellouch's 2017
+> records do (|A| = 0.348, p = 0.005 versus 0.040, p = 0.73, same measurement,
+> matched spatial ranks). His downgoing P is an *inference from that asymmetry*,
+> so the absence of the asymmetry means there is no arrival of that kind present
+> to be recovered — independent of any filter, and independent of the static
+> pattern described in this file.
+>
+> The correct ordering of the two findings is therefore:
+>
+> 1. **Illumination is absent** (`ambient_directional_asymmetry.py`,
+>    `interrogator_and_illumination_v2.py`, `illumination_window_scan.py`) — the
+>    wavefield does not contain a net downgoing component in this band. This is
+>    the primary explanation and it is about the *recording*.
+> 2. **A static fixed-k pattern dominates** (this file) — which explains why the
+>    eight velocity-domain methods all failed *in the same way*, and why the
+>    pedestal could not be filtered out. This remains correct and useful, but it
+>    is the explanation for the *processing* failures, not for the absence of the
+>    arrival.
+>
+> Do not cite this file alone as the reason Figure 7c does not reproduce. See
+> `AMBIENT_CC_LITERATURE_REVIEW.md` §2 for why illumination is the binding
+> constraint in borehole geometry, and §5 for the overall status.
+
 ## 1. The result
 
 The 2024-25 ambient field at 5-20 Hz is dominated by a **static spatial pattern

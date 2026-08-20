@@ -153,6 +153,52 @@ Ordered by expected value.
 
 ---
 
+## 4a. What controls illumination, and why the two datasets differ
+
+This is the question the review exists to answer, so it is stated explicitly.
+
+**The geometry is unforgiving.** The virtual-source method recovers the Green's
+function between two receivers only if noise sources occupy the *stationary-phase
+zone* for that path. For two channels on a **vertical** line the direct P path
+between them is vertical, so the stationary-phase sources lie on the extension of
+that line: a narrow cone **directly above the wellhead**, radiating steeply down.
+Noise arriving at oblique incidence contributes nothing to that path and simply
+adds to the background. This is why the DAS ambient-noise literature is dominated
+by *surface-wave* dispersion studies (Shao et al. 2023; the Ebao Basin and
+Sanriku studies in §1's search results) — for surface waves, sources anywhere
+along the fibre azimuth are usable. A downgoing body wave in a borehole is the
+hard case.
+
+**What fills that cone is cultural and local:** vehicles and machinery on the
+wellhead pad, drilling, pumps, work on the access road, wind coupling into the
+casing. Not ocean microseism, not distant earthquakes — those do not arrive
+vertically.
+
+**Consequently the medium being identical is not sufficient.** Same fibre, same
+borehole, same rock guarantees the same *Green's function*; it does not supply the
+*sources* needed to reconstruct it. The two recordings differ in source
+environment, not geology:
+
+- **June 2017** (Lellouch et al.): recorded during a **manned field deployment** —
+  an OptaSense ODH3.1 was being attached to the main-hole fibre, with the crew,
+  vehicles and equipment that implies at the wellhead.
+- **2024-25** (this archive): **unattended continuous recording** at an otherwise
+  quiet site.
+- **Behm (2016)**, for contrast, succeeded in a **producing oil field during
+  water-flooding** — about the noisiest wellhead environment obtainable.
+
+**Status of this explanation: consistent with all the evidence, but a HYPOTHESIS,
+not a measurement.** What is measured is that the asymmetry is present in 2017 and
+absent in 2024-25 (§4.3 scripts). That the *cause* is the presence or absence of a
+field crew is an inference, and it cannot be tested directly on Lellouch's release
+because only ~5 s of his noise exists — far too little for a diurnal analysis.
+
+It is testable on **our** side, and `illumination_window_scan.py` does so:
+cultural noise has a **diurnal signature**, so if any illuminated windows exist in
+the 2024-25 archive they should cluster in working hours. A diurnal pattern in
+|A| would support the cultural-source explanation even if no window reaches
+significance.
+
 ## 5. Honest summary of the goal
 
 The goal was to recover the signal, review the literature for how others do
