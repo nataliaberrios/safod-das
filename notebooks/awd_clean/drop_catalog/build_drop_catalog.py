@@ -8,7 +8,8 @@ Inputs (all read-only):
   ../Check shots/p26.cc9.txt   node 453009664 CC picks, 989 drops   [DELIVERED]
   ../Check shots/p26.cc4.txt   node 453001432 CC picks, 989 drops   [DELIVERED]
   ../awd_manifest.csv          drop times x DAS file coverage       (build_manifest.py)
-  ../nano_drop_repeatability.csv  per-drop Nano detection metrics   (nano_drop_repeatability.py)
+  ../nano_drop_repeatability.csv  per-drop Nano detection metrics
+                                  (nano_hierarchical_repeatability.py)
 
 Outputs (this directory):
   awd_drop_catalog.csv         one row per drop: timing, coverage, Nano detection

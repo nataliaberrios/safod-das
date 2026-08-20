@@ -28,7 +28,7 @@ the `Check shots/` delivery was copied in 2026-08-02.
 |---|---|---|
 | 1. Validate the delivered timing against a second node | `faultzone/timing_files_compare.py` | timing uncertainty |
 | 2. Intersect drop times with DAS file coverage | `awd_clean/build_manifest.py` | `awd_manifest.csv` |
-| 3. Test whether each drop is *detectable* on Nano | `awd_clean/nano_drop_repeatability.py` | `nano_drop_repeatability.csv` |
+| 3. Test whether each drop is *detectable* on Nano | `awd_clean/nano_hierarchical_repeatability.py` | `nano_drop_repeatability.csv` |
 | 4. Test whether a drop is *visible at all* on Deep | `awd_clean/deep_drop_visibility.py` | `deep_drop_visibility.{txt,png}` |
 | 5. Join into one catalogue | `drop_catalog/build_drop_catalog.py` | this directory |
 
@@ -48,6 +48,41 @@ drop is *in* the data is a separate measurement.
 | `awd_drop_catalog.csv` | 989 | one row per delivered pick: UTC + local time, burst/drop id, node CC, two-node offset, Nano/Deep coverage, Nano detection metrics and flag |
 | `awd_burst_summary.csv` | 49 | per burst: start UTC + local, duration, drop count, coverage counts, detected count, median beam SNR |
 | `timing_uncertainty.txt` | — | the two-node comparison in full |
+
+## The notebook
+
+`AWD_drop_catalog.ipynb` is the readable version of all of the above: the
+numbers, then three figures. It is **committed with its outputs** so it can be
+read without running anything — the same exception `manuscript/README.md` makes,
+and for the same reason. It is 0.4 MB, not a dashboard.
+
+It has **one switch**, in the first code cell:
+
+| `REBUILD_PRODUCTS` | What happens |
+|---|---|
+| `False` *(default)* | load the committed CSVs and plot. Seconds. |
+| `True` | re-run `build_drop_catalog.py` from the node picks first, then plot. Needs `Check shots/` on disk. |
+
+The figures are identical either way; that is what the switch is for.
+
+The notebook is **generated** — edit `build_drop_notebook.py`, never the
+`.ipynb`. To rebuild and re-execute with figures embedded:
+
+```bash
+sbatch awd_clean/drop_catalog/exec_drop_nb_job.sh
+```
+
+That job does both halves, because they need different interpreters: the build
+step needs the **system `python3`** (it has `nbformat`), and execution needs the
+**`das` kernel** (which does not). Execution goes through
+`manuscript/execute_notebook.py`, which exits non-zero if a cell that draws a
+figure captured none — `run_nb_cells.py` cannot catch that.
+
+Figures: (1) every drop across the 24 h with Nano detection status; (2) six
+drops from six different bursts overlaid, with the delivered drop time marked by
+a red dotted line; (3) one full burst as an image, same marker. Figures 2 and 3
+read from `../nano_hierarchical_repeatability.npz`, which is gitignored — they
+need that file present on Sherlock.
 
 ---
 
