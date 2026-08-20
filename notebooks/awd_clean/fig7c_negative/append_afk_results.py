@@ -93,22 +93,69 @@ if rows:
               ""]
     else:
         L += ["**No configuration satisfied the gates.** Adaptive f-k does not",
-              "recover the arrival either. Given section 4.7, this is expected rather",
-              "than surprising: the filter can only enhance coherent energy that is",
+              "recover the arrival either. Given section 4.7 this is expected rather",
+              "than surprising: a filter can only enhance coherent energy that is",
               "present, and the wavefield carries no net downgoing component to",
-              "enhance. It does, however, close the remaining f-k avenue explicitly",
-              "rather than by argument.", ""]
+              "enhance. It does, however, close the remaining f-k avenue by",
+              "measurement rather than by argument.", ""]
+        # The two results in this table that matter most are easy to miss.
+        solo_ = next((r for r in rows if r["note"] == "predicted WORST"), None)
+        if solo_ and solo_["p"] < 0.05:
+            L += ["**A filter can manufacture significance, and here one did.** The",
+                  "configuration with no prior static removal reached p = %.4f -- which"
+                  % solo_["p"],
+                  "in isolation reads as a detection -- while carrying the worst",
+                  "pedestal diagnostic of the five (%+.3f, i.e. almost pure pedestal)"
+                  % solo_["ped"],
+                  "and peaking at %.0f m/s, the top of the scan, rather than at 3,200."
+                  % solo_["at"],
+                  "The mechanism is specific and worth stating, because it applies to",
+                  "any filtered ambient result: the receiver-order null permutes the",
+                  "FINISHED gather, so an operator applied before the gather is formed",
+                  "sits outside its own null and its amplification of a coherent",
+                  "contaminant is never tested. The adaptive filter raised the score",
+                  "6.6-fold (1.91 to 12.53) and the amplified pedestal then cleared a",
+                  "null that could not see the amplification. Only the predeclared",
+                  "gates caught it. An input-level null -- built before the operator",
+                  "runs -- is the correct control for a filtered result, and is what",
+                  "the F-K QC workflow already requires elsewhere in this project.", ""]
+        cleanest = min(rows, key=lambda r: abs(r["ped"]))
+        if abs(cleanest["ped"]) < 0.2:
+            L += ["**The cleanest statistic this study produced still shows nothing,",
+                  "and that is the strongest form of the negative.** Stacking the",
+                  "removals -- median common mode, then rank-2 subspace, then the",
+                  "adaptive filter -- drives the pedestal diagnostic monotonically to",
+                  "%+.3f (%s), against %+.3f for the unprocessed baseline. That is"
+                  % (cleanest["ped"], cleanest["label"],
+                     next(r["ped"] for r in rows if r["note"] == "predicted WORST")),
+                  "effectively zero: the moveout statistic is finally measuring",
+                  "moveout rather than proximity to the zero-lag lobe, which no",
+                  "earlier configuration in this project achieved (previous best",
+                  "-0.381). With the statistic clean, the result is p = %.4f."
+                  % cleanest["p"],
+                  "",
+                  "Its peak falls at %.0f m/s, close to the published 3,200 m/s, and"
+                  % cleanest["at"],
+                  "that coincidence should not be read as encouraging. At p = %.3f the"
+                  % cleanest["p"],
+                  "observed maximum is LOWER than most receiver-order permutations of",
+                  "the same data. With no pedestal pulling the peak to the scan",
+                  "ceiling, the peak is free to land anywhere, and it landed there.",
+                  "",
+                  "The value of this row is what it rules out. The failure to",
+                  "reproduce is not an artefact of a broken statistic: when the",
+                  "statistic is repaired, the arrival is still absent.", ""]
     if solo and base:
         worse = solo["ped"] > base["ped"] or solo["p"] > base["p"]
         L += ["On the pre-registered prediction: `afk1 only` gives pedestal",
               "corr = %+.3f and p = %.4f against the baseline's %+.3f and %.4f, so the"
               % (solo["ped"], solo["p"], base["ped"], base["p"]),
-              "prediction that applying the adaptive filter without prior static",
-              "removal is %s. %s" % (
-                  "not contradicted" if worse else "**CONTRADICTED**",
+              "pre-registered prediction -- that applying the adaptive filter",
+              "without prior static removal makes matters worse -- is %s.%s" % (
+                  "CONFIRMED" if worse else "**CONTRADICTED**",
                   "" if worse else
-                  "That is evidence against the mechanism argument of section 4.4 "
-                  "and is recorded as such."),
+                  " That is evidence against the mechanism argument of section 4.4"
+                  " and is recorded as such."),
               ""]
 if missing:
     L += ["*Configurations whose aggregate was not available when this section was",
