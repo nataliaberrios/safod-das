@@ -1,0 +1,28 @@
+AWD weight-drop timing uncertainty — two independent nodes
+==========================================================
+
+node 453009664 (p26.cc9) : 989 picks, median Max_CC 0.8604
+node 453001432 (p26.cc4) : 989 picks, median Max_CC 0.7413
+matched within 1 s       : 989
+
+median offset            : -1.00 ms
+MAD                      : 0.50 ms
+5th / 95th percentile    : -2.50 / +0.50 ms
+(picks quantised to 0.5 ms; counts use >= so that a
+ threshold landing on a grid value is unambiguous)
+|offset| >=   2 ms       :  232 drops (23.5%)
+|offset| >=  10 ms       :    5 drops (0.5%)
+|offset| >=  50 ms       :    5 drops (0.5%)
+|offset| >= 100 ms       :    4 drops (0.4%)
+
+drops with node9 CC < 0.9: 779/989 (78.8%)
+
+survey span (UTC)        : 2026-06-16 23:47 -> 2026-06-17 23:47  (24.0 h)
+survey span (local PDT)  : 2026-06-16 16:47 -> 2026-06-17 16:47
+
+Nano drops detected      : 409/988 (LOO NCC > 0.9 AND beam SNR > 10 dB)
+
+Both nodes sit a few tens of metres from the source, so both picks carry the
+SAME unknown source-to-node travel time. This measures RELATIVE pick quality,
+not the absolute offset. The absolute offset is the ~90 ms measured against
+the check shot; see faultzone/digitize_checkshot.py.
