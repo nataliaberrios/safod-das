@@ -14,19 +14,25 @@ We first establish that our implementation is correct: applying our picker to
 Lellouch's own released correlograms returns a monotonic profile from 2,416 to
 4,357 m/s with a depth-velocity correlation of r = 0.948, the range and behaviour
 his Figure 9 reports, while the same picker on our data returns velocities
-spanning 146 to 1.6e7 m/s with a median of 26,380 m/s -- five orders of magnitude
-of scatter about a value an order of magnitude above any crustal velocity. Applied to our archive, the same processing yields no arrival. Six
+spanning 146 to 1.6e7 m/s with a median of 26,382 m/s and an interquartile range of
+7,614 to 85,352 m/s -- orders of magnitude of scatter about a value an order of
+magnitude above any crustal velocity. Applied to our archive, the same processing yields no arrival. Six
 independent days give a minimum p-value of 0.1345 against a receiver-order
 permutation null, with a Fisher combination of p = 0.524; a coherent four-day
 stack gives p = 0.9184; and the observed moveout score exceeds the per-velocity
-null at 0 of 181 trial velocities. In the
+null at 0 of 181 trial velocities. Stacking one day in 1 to 24 hourly chunks grows
+detectability -- the score against the 95th percentile of its own null -- as
+N^+0.042, and as N^+0.019 once the repeatable common mode is removed, where a
+coherent arrival accumulating against incoherent noise requires N^+0.50; the one
+threshold crossing on that curve (p = 0.0170 at 16 chunks) does not survive the
+addition of the remaining data (p = 0.1614 at 24). In the
 constant-offset geometry that produced the published velocity model, his
 correlation peaks migrate from 20.7 to 11.5 ms with depth while ours sit at
-exactly zero lag at every depth.
+exactly zero lag at 13 of 14 depths.
 
 Eight velocity-domain methods fail identically: fixed-fan f-k filtering with
-brick-wall and raised-cosine masks, tau-p slant stacking with a slowness-mute
-sweep, rank-k subspace projection, phase cross-correlation, phase-weighted
+brick-wall and raised-cosine masks, tau-p slant stacking with a 6 km/s slowness
+mute, rank-k subspace projection, phase cross-correlation, phase-weighted
 stacking, offset-axis median flat-event removal, and median and mean common-mode
 removal. We show why. The field is dominated by a **static spatial pattern at fixed
 wavenumber**: raising the analysis band from 5-12 Hz to 12-20 Hz doubles the centre

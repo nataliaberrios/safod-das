@@ -134,9 +134,12 @@ amplitude of the most dominant f-k component.
 Before use on real data we verified four properties: an exponent of zero is a
 bit-identical no-op; Bartlett 50 %-overlap recombination reconstructs the input to
 a maximum relative error of 0.000e+00; the filter raises the coherence of a
-synthetic 3,200 m/s plane wave in noise from 0.0523 to 0.1980; and, critically, it
-does **not** manufacture moveout from pure noise (0.0000 to 0.0000). The last check
-targets the failure mode that recurred throughout this study.
+synthetic 3,200 m/s plane wave in noise from 0.0523 to 0.1980 at the exponent
+alpha = 1 used in production, and to between 0.1231 and 0.1968 across the other five
+exponent and normalisation settings checked; and, critically, it does **not**
+manufacture moveout from pure noise (0.0000 to 0.0000 at both alpha = 1 and
+alpha = 2). The last check targets the failure mode that recurred throughout this
+study.
 
 Because an adaptive filter enhances the *dominant* coherent component, and ours is
 the static pattern, we predicted in advance that applying it without prior spatial

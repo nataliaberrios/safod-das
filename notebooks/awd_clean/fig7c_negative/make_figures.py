@@ -16,6 +16,7 @@ Figures written to figures/ as PNG and PDF:
   fig5_static_pattern       fixed wavenumber, not fixed velocity
   fig6_illumination         the asymmetry Lellouch used, present in 2017 only
   fig7_archive_scan         archive-wide illumination scan
+  fig8_convergence          stack convergence: more data does not help
 
 Run from this directory with the `das` interpreter.
 """
@@ -153,11 +154,24 @@ def fig2():
     record("fig2_r_depth_velocity_his_traces", r_depth, src, "%.3f")
     record("fig2_his_v_shallow", float(lv[0]), src, "%.0f m/s")
     record("fig2_his_v_deep", float(lv[-1]), src, "%.0f m/s")
+    record("fig2_his_v_median", float(np.median(lv)), src, "%.0f m/s")
     finite_ours = int(np.sum(np.isfinite(ours)))
     NUMBERS["fig2_our_picks_finite"] = "%d of %d finite  [%s]" % (
         finite_ours, ours.size, src)
     if finite_ours:
         record("fig2_our_v_median", float(np.nanmedian(ours)), src, "%.0f m/s")
+        record("fig2_our_v_min", float(np.nanmin(ours)), src, "%.0f m/s")
+        record("fig2_our_v_max", float(np.nanmax(ours)), src, "%.3e m/s")
+        # The extremes come from the parabolic sub-sample correction, which is
+        # unbounded even though the argmax is confined to the search window. The
+        # distributional statement is the robust one, so it is recorded too.
+        q25, q75 = (float(x) for x in np.nanpercentile(ours, [25, 75]))
+        record("fig2_our_v_q25", q25, src, "%.0f m/s")
+        record("fig2_our_v_q75", q75, src, "%.0f m/s")
+        in_scan = int(np.sum((ours >= 1500.0) & (ours <= 6000.0)))
+        NUMBERS["fig2_our_picks_in_scan"] = (
+            "%d of %d finite picks inside the 1500-6000 m/s scan  [%s]"
+            % (in_scan, finite_ours, src))
 
     fig, ax = plt.subplots(1, 2, figsize=(8.4, 3.6), constrained_layout=True)
     ax[0].plot(lv, lz, "o-", color=C_2017, ms=4, lw=1.5,
@@ -204,6 +218,19 @@ def fig3():
     finite = int(np.sum(np.isfinite(ours_pick)))
     NUMBERS["fig3_finite_picks"] = "%d of %d picks are finite  [%s]" % (
         finite, ours_pick.size, src)
+    record("fig3_his_lag_shallow", float(his_lag[0] * 1e3), src, "%.1f ms")
+    record("fig3_his_lag_deep", float(his_lag[-1] * 1e3), src, "%.1f ms")
+    # The one finite pick on our side, and the lag it implies. It sits outside the
+    # picker's own 5-45 ms window because the parabolic correction is unbounded,
+    # which is why section 4.3 reports it rather than calling every depth NaN.
+    if np.isfinite(ours_pick).any():
+        j = int(np.flatnonzero(np.isfinite(ours_pick))[0])
+        v_one = float(ours_pick[j])
+        NUMBERS["fig3_our_finite_pick"] = (
+            "%.0f m/s at %.0f m, implied lag %.1f ms; global maximum of that trace "
+            "at %+.3f s  [%s]"
+            % (v_one, float(np.asarray(depths)[j]), 50.0 / v_one * 1e3,
+               float(lags[int(np.argmax(np.abs(ours[j])))]), src))
     ax[1].plot(his_lag * 1e3, lz, "o-", color=C_2017, ms=3.5, lw=1.4,
                label="Lellouch: 50 m / v(z)")
     ok = np.isfinite(ours_pick)
@@ -425,9 +452,96 @@ def fig7():
     save(fig, "fig7_archive_scan")
 
 
+# ---------------------------------------------------------------- figure 8
+def fig8():
+    """Stack convergence. The quantity to read is DETECTABILITY, not the score.
+
+    A raw moveout score can rise with stack length merely because a repeatable
+    contaminant accumulates coherently. Detectability -- the score divided by the
+    95th percentile of its OWN receiver-order null at the same stack length --
+    cannot: the null is rebuilt from the same stacked data, so a contaminant
+    raises observation and null together. Incoherent noise falls as 1/sqrt(N), so
+    detectability grows as N^0.5 if and only if there is a coherent arrival to
+    accumulate. The fitted exponent is therefore the direct test of "more data
+    should win".
+
+    The exponents are refitted here, from the arrays in the product, by the same
+    log-log polyfit the producing script uses (ambient_stack_convergence.py:182),
+    so the figure and the .txt cannot drift apart.
+    """
+    src = "ambient_stack_convergence.py"
+    d = np.load(need(AWD / "ambient_stack_convergence.npz", src), allow_pickle=True)
+    branches = [("baseline", "no common-mode removal", C_2024, "o"),
+                ("common-mode", "common-mode removed", C_2017, "s")]
+    for key, _, _, _ in branches:
+        for f in ("counts", "raw", "det", "p", "ped"):
+            if "%s_%s" % (key, f) not in d.files:
+                raise SystemExit("%s lacks key %s_%s (produced by %s)"
+                                 % (AWD / "ambient_stack_convergence.npz", key, f, src))
+
+    fig, ax = plt.subplots(1, 3, figsize=(12.2, 3.6), constrained_layout=True)
+    for key, lab, col, mk in branches:
+        c = np.asarray(d["%s_counts" % key], float)
+        raw = np.asarray(d["%s_raw" % key], float)
+        det = np.asarray(d["%s_det" % key], float)
+        pv = np.asarray(d["%s_p" % key], float)
+        ped = np.asarray(d["%s_ped" % key], float)
+        b_raw = float(np.polyfit(np.log(c), np.log(raw), 1)[0])
+        ok = np.isfinite(det) & (det > 0)
+        b_det = float(np.polyfit(np.log(c[ok]), np.log(det[ok]), 1)[0])
+        record("fig8_%s_exponent_raw" % key, b_raw, src, "N^%+.3f")
+        record("fig8_%s_exponent_detectability" % key, b_det, src, "N^%+.3f")
+        record("fig8_%s_chunks_max" % key, int(c[-1]), src, "%d hourly chunks")
+        record("fig8_%s_det_full" % key, det[-1], src, "%.3f")
+        record("fig8_%s_p_full" % key, pv[-1], src, "%.4f")
+        record("fig8_%s_pedestal_full" % key, ped[-1], src, "%+.3f")
+        best = int(np.argmax(det))
+        NUMBERS["fig8_%s_best_point" % key] = (
+            "detect %.3f, p %.4f at %d chunks  [%s]"
+            % (det[best], pv[best], int(c[best]), src))
+
+        ax[0].loglog(c, raw, mk + "-", color=col, ms=4.5, lw=1.5, label=lab)
+        ax[1].semilogx(c, det, mk + "-", color=col, ms=4.5, lw=1.5,
+                       label="%s ($N^{%+.3f}$)" % (lab, b_det))
+        ax[2].semilogx(c, pv, mk + "-", color=col, ms=4.5, lw=1.5, label=lab)
+        if key == "baseline":
+            ax[2].annotate("p = %.4f" % pv[best], (c[best], pv[best]),
+                           textcoords="offset points", xytext=(6, 1),
+                           ha="left", va="center", fontsize=6.5, color=col)
+            ax[2].annotate("back to p = %.4f\nat %d chunks" % (pv[-1], int(c[-1])),
+                           (c[-1], pv[-1]), textcoords="offset points",
+                           xytext=(-4, 9), ha="right", fontsize=6.5, color=col)
+        if key == "common-mode":
+            ax[1].text(0.98, 0.50, "pedestal %+.3f\nat the full stack" % ped[-1],
+                       transform=ax[1].transAxes, ha="right", va="center",
+                       fontsize=6.5, color=col)
+
+    ref = np.array([1.0, 24.0])
+    raw0 = float(np.asarray(d["baseline_raw"], float)[0])
+    det0 = float(np.asarray(d["baseline_det"], float)[0])
+    ax[0].loglog(ref, raw0 * np.sqrt(ref), "k--", lw=1.2, label=r"$\sqrt{N}$")
+    ax[0].set(xlabel="hourly chunks stacked", ylabel="raw moveout score",
+              title="(a) Raw score\ncan rise on accumulating contaminant")
+    ax[0].legend(); ax[0].grid(alpha=.3, which="both")
+
+    ax[1].plot(ref, det0 * np.sqrt(ref), "k--", lw=1.2,
+               label=r"$N^{+0.5}$ = stacking works")
+    ax[1].axhline(1.0, color=C_REF, ls="-", lw=1.4, label="detection threshold")
+    ax[1].set(xlabel="hourly chunks stacked",
+              ylabel="detectability = score / own null 95th",
+              yscale="log", title="(b) Detectability: the one to read\nboth branches flat")
+    ax[1].legend(loc="upper left"); ax[1].grid(alpha=.3, which="both")
+
+    ax[2].axhline(0.05, color="k", ls="--", lw=1.2, label="p = 0.05")
+    ax[2].set(xlabel="hourly chunks stacked", ylabel="familywise p", yscale="log",
+              title="(c) A crossing that does not persist")
+    ax[2].legend(loc="lower left"); ax[2].grid(alpha=.3, which="both")
+    save(fig, "fig8_convergence")
+
+
 def main():
     print("Building figures for the Figure 7c non-reproduction document")
-    for fn in (fig1, fig2, fig3, fig4, fig5, fig6, fig7):
+    for fn in (fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8):
         print("- %s" % fn.__name__)
         fn()
     out = HERE / "FIGURE_NUMBERS.txt"

@@ -65,7 +65,8 @@ from time periods as short as 30 seconds is sufficient to obtain robust
 interferograms" -- illumination there came from surface industrial activity. If 30 s
 suffices when illumination is adequate, then a campaign that fails after days of
 stacking is not under-sampled; it is unilluminated. Our own stacks behave exactly
-this way: they get *worse* with more data. Treating non-detection as a signal-to-noise
+this way: detectability grows as `N^+0.04` where a coherent arrival would give
+`N^+0.50`, and across days the stack gets *worse* rather than better (section 4.7). Treating non-detection as a signal-to-noise
 problem, and answering it with longer records or more aggressive filtering, is
 then a category error, and one that consumes substantial acquisition and compute
 budget before it is discovered.

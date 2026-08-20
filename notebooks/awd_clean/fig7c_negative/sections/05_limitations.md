@@ -24,9 +24,9 @@ turned out to be wrong. Recording which ones, and why, is part of the result.
 ### 6.2 The cross-epoch comparison is not perfectly matched
 
 Our 2017 arm uses the pre-event portions of two earthquake records, about 5 s in
-total, because that is the only raw 2017 noise in the public release. Lellouch's
-Figure 7c correlograms are, per the release documentation, "a stack of 7 different
-one-day correlations", and that raw data is not available. **The arm we measure is
+total, because that is the only raw 2017 noise in the public release. The
+correlograms he released are, per the release documentation, "a stack of 7 different
+one-day correlations", and the raw ambient data behind them is not available. **The arm we measure is
 therefore not the same acquisition that produced his figure.**
 
 This does not affect the measured contrast, which uses identical processing on both
@@ -58,9 +58,9 @@ analysis path.
 |---|---|---|
 | "81-99 % of energy below 1,500 m/s implies the arrival is absent" | withdrawn | no geometric baseline; 98.4 % of in-band cells lie below 1,500 m/s by construction, so white noise scores the same |
 | "downgoing never exceeds 49.9 %" | withdrawn | factually false; the same outputs contain 51.6 % |
-| "2024-25 ambient decorrelates in 4 m versus 26 m in 2017" | withdrawn | the two arms were processed differently: the 2024-25 arm passed through a reader whose default subtracts the per-sample median across channels, removing the common mode from one arm only |
+| "2024-25 ambient decorrelates in 4 m versus 26 m in 2017" | withdrawn | the two arms were processed differently: the 2024-25 arm passed through a reader whose default subtracts the per-sample median across channels, removing the common mode from one arm only. The re-run product gives 3.0-3.6 m for 2024-25 and 400 m for 2017 in band, so the "26 m" of the withdrawn claim is reproduced by nothing now on disk |
 | "a detectable coherent component at 5,850 m/s" | withdrawn | that peak is the scan ceiling; a moveout-free control reproduces the curve to 3.5 % |
-| "tapering the f-k mask buys no discriminating power" | withdrawn | the real and synthetic paths were not matched; corrected ratio is 1.51-2.01, not 0.63 |
+| "tapering the f-k mask buys no discriminating power" | withdrawn | the real and synthetic paths were not matched, so the real/white ratio of 0.63 that the claim rested on is not a valid comparison. The corrected ratios quoted when the claim was withdrawn (1.51-2.01) are carried by no product now on disk and should not be requoted; the surviving statement is the one in the section 4.5 table, that the taper suppresses the ringing floor and the fan still fails the pre-filter channel scramble |
 | "the contaminant and target are unresolved at this aperture, so Figure 7c is unachievable" | withdrawn in part | the aperture arithmetic stands, but by its own table the target is resolved above ~12 Hz, and the 12-20 Hz test showed *less* fan energy than 2017 rather than a recovered arrival |
 | withdrawal of the cross-epoch k = 0 comparison | **reinstated** | the withdrawal assumed the 2017 window contained an earthquake; measurement placed the arrivals at 4.100 s and 4.916 s of 5.00 s, outside the 2.5 s window, so both arms are noise |
 | "no surface illumination", first version | superseded | the reported \|A\| = 1e-4 was the algebraic k-symmetry of a separable static pattern, not a property of the wavefield; the corrected measurement gives 0.040 and the same conclusion |
@@ -97,16 +97,23 @@ attractive intermediate finding is strongest.
    wavenumber, holding about 39 % of the in-band energy. Because it has no apparent
    velocity, no velocity-domain filter separates it, which accounts for the
    identical failure of eight such methods.
-4. The binding constraint is **illumination**. The downgoing/upgoing asymmetry that
+4. **More data does not help, and that is measured rather than asserted.** Stacking
+   one contiguous day in 1 to 24 hourly chunks grows detectability as N^+0.042
+   without common-mode removal and N^+0.019 with it, against N^+0.50 for a coherent
+   arrival accumulating against incoherent noise. The common-mode-removed exponent
+   is measured with the pedestal diagnostic at -0.219, so the coherent contaminant
+   is suppressed and the curve is still flat, which points to an absent arrival
+   rather than a masked one.
+5. The binding constraint is **illumination**. The downgoing/upgoing asymmetry that
    the original authors used as evidence for surface sources is significant in their
    records (p = 0.0050) and absent from ours (p = 0.7307), and a pre-registered scan
    of 240 windows across one year finds 11 significant windows against 12.0 expected
    by chance.
-5. Neither the interrogator change nor the gauge-length change accounts for the
+6. Neither the interrogator change nor the gauge-length change accounts for the
    null: the stable instrumental pattern is confined to the surface lead-in, which
    the analysis already excludes, and the gauge-length response attenuates the
    target by 0.1-1.1 %.
-6. Borehole ambient-noise body-wave interferometry should be treated as
+7. Borehole ambient-noise body-wave interferometry should be treated as
    illumination-limited. We recommend measuring the asymmetry as a feasibility gate
    before committing acquisition or compute, and reporting stack convergence, since
    a result that degrades with added data indicates an absent arrival rather than an

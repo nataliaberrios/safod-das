@@ -1,0 +1,10 @@
+1. alpha=0 no-op                      : bit-identical  OK
+2. overlap-add reconstruction         : max rel err 0.000e+00 OK
+3. alpha=0.5 AFK  : coherence with truth 0.0523 -> 0.1289
+3. alpha=0.5 NAFK : coherence with truth 0.0523 -> 0.1282
+3. alpha=1.0 AFK  : coherence with truth 0.0523 -> 0.1980
+3. alpha=1.0 NAFK : coherence with truth 0.0523 -> 0.1968
+3. alpha=2.0 AFK  : coherence with truth 0.0523 -> 0.1231
+3. alpha=2.0 NAFK : coherence with truth 0.0523 -> 0.1453
+4. alpha=1.0 on pure noise: coherence with a 3200 m/s wave 0.0000 (input 0.0000)
+4. alpha=2.0 on pure noise: coherence with a 3200 m/s wave 0.0000 (input 0.0000)

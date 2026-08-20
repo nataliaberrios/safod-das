@@ -49,6 +49,15 @@ day but `+0.951` once four days are coherently stacked. The artefact wins as the
 stack lengthens, which is why our 96-hour stack (p = 0.9184) is worse than our best
 single day (p = 0.1345).
 
+Section 4.7 puts a number on it at fixed geometry. Stacking 1 to 24 hourly chunks
+of one day grows detectability as `N^+0.042` without common-mode removal and
+`N^+0.019` with it, against `N^+0.50` for a coherent arrival accumulating against
+incoherent noise. The second of those exponents is the load-bearing one: it is
+measured with the pedestal diagnostic at `-0.219`, so the coherent artefact has been
+suppressed and the curve is still flat. That distinguishes the two readings of a
+non-improving stack -- an artefact masking a signal, or no signal -- in favour of
+the second.
+
 The practical rule this suggests: **a stack that degrades with added data is
 evidence about the wavefield, not a reason to add more.** Convergence behaviour
 should be reported as a matter of course in ambient-noise studies, because it

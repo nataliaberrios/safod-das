@@ -20,7 +20,7 @@ CAPTIONS = {
   "overlaid; no arrival follows it. (b) The moveout scan for the baseline and "
   "common-mode-removed branches. The baseline rises monotonically with trial "
   "velocity, the signature of a statistic measuring proximity to the zero-lag "
-  "lobe rather than moveout. (c) The observed maximum against 5,000 "
+  "lobe rather than moveout. (c) The observed maximum against 10,000 "
   "receiver-order permutations; the observation sits inside the null.",
  "fig2_method_validation":
   "**Figure 2. The implementation is correct; the data is not.** (a) Our picker, "
@@ -31,28 +31,37 @@ CAPTIONS = {
   "picks, not a point-by-point match to his published curve, which is not "
   "digitised here. (b) The identical picker on our archive, log scale: 114 of 171 "
   "fibre positions return a pick, but they span 146 to 1.6e7 m/s with a median of "
-  "26,380 m/s, against the physical range from (a) shaded for comparison. The "
+  "26,382 m/s and an interquartile range of 7,614 to 85,352 m/s, against the "
+  "physical range from (a) shaded for comparison. Only 10 of the 114 fall inside "
+  "the 1,500-6,000 m/s scan used elsewhere in this study. The "
   "failure is not that the picker returns nothing; it is that it returns whatever "
   "noise maximum falls in its search window, which is what a picker does when the "
   "correlation contains no arrival.",
  "fig3_fig7d_isolation":
   "**Figure 3. The constant-offset geometry isolates the failure.** (a) Our "
   "constant-offset gather, source and receiver 50 m apart and slid down the "
-  "array together. Every trace peaks at zero lag. (b) Peak lag against depth: "
+  "array together, with the common mode already removed. Every trace peaks at "
+  "zero lag. (b) Peak lag against depth: "
   "Lellouch's peaks migrate from 20.7 to 11.5 ms as 50 m / v(z) requires for a "
-  "rising velocity profile, while ours remain at exactly 0.0000 s at every "
-  "depth. A correlation peaking at zero lag independent of receiver separation "
+  "rising velocity profile, while ours remain at exactly 0.0000 s at 13 of the 14 "
+  "depths (the 50 m pair is the exception; see section 4.3). A correlation peaking "
+  "at zero lag independent of receiver separation "
   "indicates a component common to the channels, not a wave propagating between "
   "them.",
  "fig4_eight_methods":
   "**Figure 4. One failure, not eight.** The pedestal diagnostic corr(trial "
-  "velocity, moveout score) for every velocity-domain method applied. Values "
-  "beyond +-0.5 indicate a statistic dominated by proximity to the zero-lag lobe "
-  "rather than by moveout, so its p-value is not interpretable as a detection. "
-  "All of these methods discriminate on velocity, and the contaminant has none.",
+  "velocity, moveout score) for the untreated baseline and for every method whose "
+  "saved product carries the diagnostic. Values beyond +-0.5 indicate a statistic "
+  "dominated by proximity to the zero-lag lobe rather than by moveout, so its "
+  "p-value is not interpretable as a detection. The two fixed-fan f-k mask "
+  "families and rank-k subspace projection are characterised in their own "
+  "products rather than here (section 4.5), so the seven bars are the untreated "
+  "baseline plus five of the eight methods, one of them at two settings. All of "
+  "these methods discriminate on velocity, and the contaminant has none.",
  "fig5_static_pattern":
   "**Figure 5. The contaminant is at fixed wavenumber, not fixed velocity.** "
-  "(a) The low-wavenumber power marginal over the first 16 non-zero cells, for "
+  "(a) The low-wavenumber power marginal over the first 16 non-zero cells "
+  "(+-1 to +-8 on the two-sided wavenumber axis), for "
   "two disjoint bands, with the power-weighted centroids marked. (b) Raising the "
   "band centre by a factor of 1.882 moves the centroid by 1.011. A wave at fixed "
   "velocity requires the wavenumber ratio to equal the frequency ratio; a static "
@@ -72,6 +81,20 @@ CAPTIONS = {
   "median null 95th percentile: 11 windows reach p < 0.05 where 12.0 are expected "
   "by chance, with a pre-registered ceiling of 18. (c) Median |A| by hour of day; "
   "cultural surface sources would concentrate in working hours and do not.",
+ "fig8_convergence":
+  "**Figure 8. More data does not help.** One contiguous day, 2024-12-20, stacked "
+  "in 1, 2, 4, 8, 16 and 24 hourly chunks. (a) The raw moveout score, with a "
+  "sqrt(N) reference. This is not the quantity to read: a raw score can rise "
+  "simply because a repeatable contaminant accumulates coherently. (b) "
+  "Detectability, the score divided by the 95th percentile of its own "
+  "receiver-order null rebuilt at the same stack length. A coherent arrival "
+  "accumulating against incoherent noise would follow the dashed N^+0.5 line; both "
+  "branches are flat, at N^+0.042 and N^+0.019. At the full stack the "
+  "common-mode-removed pedestal is -0.219, so the repeatable contaminant is "
+  "suppressed and detectability still does not climb, which is what makes absence "
+  "rather than contamination the explanation. (c) The familywise p-value. The "
+  "baseline crosses p = 0.05 at 16 chunks and returns to p = 0.161 at 24; a "
+  "genuine arrival does not un-detect itself when data is added.",
 }
 
 

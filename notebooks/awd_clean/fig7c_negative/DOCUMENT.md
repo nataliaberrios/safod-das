@@ -16,19 +16,25 @@ We first establish that our implementation is correct: applying our picker to
 Lellouch's own released correlograms returns a monotonic profile from 2,416 to
 4,357 m/s with a depth-velocity correlation of r = 0.948, the range and behaviour
 his Figure 9 reports, while the same picker on our data returns velocities
-spanning 146 to 1.6e7 m/s with a median of 26,380 m/s -- five orders of magnitude
-of scatter about a value an order of magnitude above any crustal velocity. Applied to our archive, the same processing yields no arrival. Six
+spanning 146 to 1.6e7 m/s with a median of 26,382 m/s and an interquartile range of
+7,614 to 85,352 m/s -- orders of magnitude of scatter about a value an order of
+magnitude above any crustal velocity. Applied to our archive, the same processing yields no arrival. Six
 independent days give a minimum p-value of 0.1345 against a receiver-order
 permutation null, with a Fisher combination of p = 0.524; a coherent four-day
 stack gives p = 0.9184; and the observed moveout score exceeds the per-velocity
-null at 0 of 181 trial velocities. In the
+null at 0 of 181 trial velocities. Stacking one day in 1 to 24 hourly chunks grows
+detectability -- the score against the 95th percentile of its own null -- as
+N^+0.042, and as N^+0.019 once the repeatable common mode is removed, where a
+coherent arrival accumulating against incoherent noise requires N^+0.50; the one
+threshold crossing on that curve (p = 0.0170 at 16 chunks) does not survive the
+addition of the remaining data (p = 0.1614 at 24). In the
 constant-offset geometry that produced the published velocity model, his
 correlation peaks migrate from 20.7 to 11.5 ms with depth while ours sit at
-exactly zero lag at every depth.
+exactly zero lag at 13 of 14 depths.
 
 Eight velocity-domain methods fail identically: fixed-fan f-k filtering with
-brick-wall and raised-cosine masks, tau-p slant stacking with a slowness-mute
-sweep, rank-k subspace projection, phase cross-correlation, phase-weighted
+brick-wall and raised-cosine masks, tau-p slant stacking with a 6 km/s slowness
+mute, rank-k subspace projection, phase cross-correlation, phase-weighted
 stacking, offset-axis median flat-event removal, and median and mean common-mode
 removal. We show why. The field is dominated by a **static spatial pattern at fixed
 wavenumber**: raising the analysis band from 5-12 Hz to 12-20 Hz doubles the centre
@@ -129,7 +135,8 @@ from time periods as short as 30 seconds is sufficient to obtain robust
 interferograms" -- illumination there came from surface industrial activity. If 30 s
 suffices when illumination is adequate, then a campaign that fails after days of
 stacking is not under-sampled; it is unilluminated. Our own stacks behave exactly
-this way: they get *worse* with more data. Treating non-detection as a signal-to-noise
+this way: detectability grows as `N^+0.04` where a coherent arrival would give
+`N^+0.50`, and across days the stack gets *worse* rather than better (section 4.7). Treating non-detection as a signal-to-noise
 problem, and answering it with longer records or more aggressive filtering, is
 then a category error, and one that consumes substantial acquisition and compute
 budget before it is discovered.
@@ -275,9 +282,12 @@ amplitude of the most dominant f-k component.
 Before use on real data we verified four properties: an exponent of zero is a
 bit-identical no-op; Bartlett 50 %-overlap recombination reconstructs the input to
 a maximum relative error of 0.000e+00; the filter raises the coherence of a
-synthetic 3,200 m/s plane wave in noise from 0.0523 to 0.1980; and, critically, it
-does **not** manufacture moveout from pure noise (0.0000 to 0.0000). The last check
-targets the failure mode that recurred throughout this study.
+synthetic 3,200 m/s plane wave in noise from 0.0523 to 0.1980 at the exponent
+alpha = 1 used in production, and to between 0.1231 and 0.1968 across the other five
+exponent and normalisation settings checked; and, critically, it does **not**
+manufacture moveout from pure noise (0.0000 to 0.0000 at both alpha = 1 and
+alpha = 2). The last check targets the failure mode that recurred throughout this
+study.
 
 Because an adaptive filter enhances the *dominant* coherent component, and ours is
 the static pattern, we predicted in advance that applying it without prior spatial
@@ -290,7 +300,7 @@ and is tested in section 4.6.
 
 ![fig2_method_validation](figures/fig2_method_validation.png)
 
-**Figure 2. The implementation is correct; the data is not.** (a) Our picker, unchanged, applied to Lellouch's own released constant-offset correlograms: 14 of 14 depths return a pick, rising monotonically from 2,416 to 4,357 m/s, the range his Figure 9 reports, with a depth-velocity correlation of r = 0.948. Note that r = 0.948 is the correlation between depth and velocity on these picks, not a point-by-point match to his published curve, which is not digitised here. (b) The identical picker on our archive, log scale: 114 of 171 fibre positions return a pick, but they span 146 to 1.6e7 m/s with a median of 26,380 m/s, against the physical range from (a) shaded for comparison. The failure is not that the picker returns nothing; it is that it returns whatever noise maximum falls in its search window, which is what a picker does when the correlation contains no arrival.
+**Figure 2. The implementation is correct; the data is not.** (a) Our picker, unchanged, applied to Lellouch's own released constant-offset correlograms: 14 of 14 depths return a pick, rising monotonically from 2,416 to 4,357 m/s, the range his Figure 9 reports, with a depth-velocity correlation of r = 0.948. Note that r = 0.948 is the correlation between depth and velocity on these picks, not a point-by-point match to his published curve, which is not digitised here. (b) The identical picker on our archive, log scale: 114 of 171 fibre positions return a pick, but they span 146 to 1.6e7 m/s with a median of 26,382 m/s and an interquartile range of 7,614 to 85,352 m/s, against the physical range from (a) shaded for comparison. Only 10 of the 114 fall inside the 1,500-6,000 m/s scan used elsewhere in this study. The failure is not that the picker returns nothing; it is that it returns whatever noise maximum falls in its search window, which is what a picker does when the correlation contains no arrival.
 
 Before reporting a null we establish that the processing works. Lellouch's release
 includes stacked correlograms for the constant-offset geometry. Applying our
@@ -315,7 +325,7 @@ from ours:
 | | picks returned | velocity range | median |
 |---|---|---|---|
 | his released traces | 14 of 14 | 2,416 - 4,357 m/s | 3,268 m/s |
-| our archive | 114 of 171 fibre positions | 146 to 1.6e7 m/s | 26,380 m/s |
+| our archive | 114 of 171 fibre positions | 146 to 1.6e7 m/s | 26,382 m/s |
 
 Our failure is not that the picker returns nothing; it is that what it returns is
 physically impossible -- five orders of magnitude of scatter about a median an
@@ -324,11 +334,19 @@ handed a correlation with no arrival in it: it reports the position of whatever
 noise maximum happens to fall in the search window. The picker, the geometry, the band and the moveout logic are
 therefore not at fault. Anything that follows is a statement about the data.
 
+Two points of precision about that range, so it is not read as stronger than it
+is. The extremes come from the parabolic sub-sample correction, which is unbounded:
+the argmax is constrained to the 5-45 ms search window, but the interpolated offset
+added to it is not, so 146 m/s corresponds to an extrapolated 0.343 s and 1.6e7 m/s
+to 3.15e-6 s. The distribution-level statement is the robust one, and it says the
+same thing: the interquartile range of our finite picks is 7,614 to 85,352 m/s, and
+only 10 of the 114 fall inside the 1,500-6,000 m/s scan the rest of this study uses.
+
 ### 4.2 Figure 7c does not reproduce (Figure 1)
 
 ![fig1_no_reproduction](figures/fig1_no_reproduction.png)
 
-**Figure 1. Figure 7c does not reproduce.** (a) Our fixed-source R+-10 gather from 24 h of 2024-12-20, with the 3,200 m/s trajectory Lellouch reports overlaid; no arrival follows it. (b) The moveout scan for the baseline and common-mode-removed branches. The baseline rises monotonically with trial velocity, the signature of a statistic measuring proximity to the zero-lag lobe rather than moveout. (c) The observed maximum against 5,000 receiver-order permutations; the observation sits inside the null.
+**Figure 1. Figure 7c does not reproduce.** (a) Our fixed-source R+-10 gather from 24 h of 2024-12-20, with the 3,200 m/s trajectory Lellouch reports overlaid; no arrival follows it. (b) The moveout scan for the baseline and common-mode-removed branches. The baseline rises monotonically with trial velocity, the signature of a statistic measuring proximity to the zero-lag lobe rather than moveout. (c) The observed maximum against 10,000 receiver-order permutations; the observation sits inside the null.
 
 Applying the same processing to the 2024-2025 archive yields no arrival that
 survives its controls.
@@ -336,8 +354,8 @@ survives its controls.
 | test | result |
 |---|---|
 | best single day, familywise p | **0.1345** (2024-11-30, 21.3 h block) |
-| six independent days | none reach p < 0.05 |
-| Fisher combination over five independent days | chi-sq = 9.08 on 10 df, **p = 0.524** |
+| six days measured | none reach p < 0.05 |
+| Fisher combination over the five independent days | chi-sq = 9.08 on 10 df, **p = 0.524** |
 | coherent four-day stack, 23,036 windows | **p = 0.9184** |
 | per-velocity null, 181 trial velocities | **0 clear the 95th percentile** |
 | at 3,200 m/s specifically | score 2.752 against a threshold of 2.811 |
@@ -347,20 +365,28 @@ The Fisher combination is worth its own line: chi-sq approximately equal to its
 degrees of freedom is exactly what independent pure-noise p-values produce, so
 there is no residual signal sitting below per-day significance.
 
-Every day's peak falls at 5,850-5,925 m/s, at the top of the scan, rather than at
-the published 3,200 m/s, and the causal-to-acausal ratio at 3,200 m/s is below 1
-on every day. The peak velocity is itself an artefact of the statistic rather than
-a measurement: the score samples each trace in a gate at `t = offset/v`, so as `v`
-rises the gates migrate toward zero lag where the pedestal lives.
+On each of the five 500 Hz days the peak falls at 5,850-5,925 m/s, at the top of
+the scan, rather than at the published 3,200 m/s. (The sixth day, 2024-05-11, was
+recorded at 5,000 Hz and is excluded from the stack; its peak is at 1,675 m/s, at
+the other end of the scan.) The peak velocity is itself an artefact of the statistic
+rather than a measurement: the score samples each trace in a gate at
+`t = offset/v`, so as `v` rises the gates migrate toward zero lag where the pedestal
+lives. The causal-to-acausal ratio at 3,200 m/s never exceeds 1.13 on any day and
+is below 1 on the three days closest to significance, so there is no day on which
+the causal side carries the excess a downgoing arrival would require.
 
-**One configuration does reach p < 0.05, and it is instructive rather than
+**Two pairs of days do reach p < 0.05, and they are instructive rather than
 positive.** Stacking the two days that individually came closest, 2024-11-30 and
-2024-12-20, returns p = 0.039. Those two days were selected *because* they had the
-lowest p-values. Running all ten pairs of the five usable 500 Hz days shows the
-selected pair to be the extreme of a distribution otherwise consistent with noise,
-with pair p-values ranging up to 0.83. We report it because a reader who selected
-the same way would find the same number, and because it is the precise shape of
-the error this study exists to avoid.
+2024-12-20, returns p = 0.0390; the pair 2024-12-20 + 2025-02-24 returns p = 0.0165.
+Over all ten pairs of the five usable 500 Hz days, 2 reach alpha = 0.05 where 0.5
+are expected by chance, and pair p-values run up to 0.8251. **Multiplicity is
+therefore not the objection -- velocity is.** Both pairs that reach p < 0.05 peak
+at 5,850 m/s, with causal/acausal ratios at 3,200 m/s of 0.97 and 1.01: the scan
+ceiling and no causal preference, which is the pedestal signature of section 3.2
+rather than an arrival. We report these pairs because a reader who selected the same way
+would find the same numbers, and because a p-value that survives only while its
+peak sits at the edge of the scan is the precise shape of the error this study
+exists to avoid.
 
 The per-velocity result is the strongest single statement and it needs no
 multiplicity correction: at no trial velocity, including the published 3,200 m/s,
@@ -375,13 +401,14 @@ but does not produce a detection.
 
 A statistic that improves with data is a weak signal. A statistic that degrades
 with data is an absent one plus an accumulating artefact, and section 4.4 identifies
-the artefact.
+the artefact. Section 4.7 measures the convergence directly, on a single day at
+fixed geometry, and finds it flat.
 
 ### 4.3 The constant-offset geometry isolates the failure (Figure 3)
 
 ![fig3_fig7d_isolation](figures/fig3_fig7d_isolation.png)
 
-**Figure 3. The constant-offset geometry isolates the failure.** (a) Our constant-offset gather, source and receiver 50 m apart and slid down the array together. Every trace peaks at zero lag. (b) Peak lag against depth: Lellouch's peaks migrate from 20.7 to 11.5 ms as 50 m / v(z) requires for a rising velocity profile, while ours remain at exactly 0.0000 s at every depth. A correlation peaking at zero lag independent of receiver separation indicates a component common to the channels, not a wave propagating between them.
+**Figure 3. The constant-offset geometry isolates the failure.** (a) Our constant-offset gather, source and receiver 50 m apart and slid down the array together, with the common mode already removed. Every trace peaks at zero lag. (b) Peak lag against depth: Lellouch's peaks migrate from 20.7 to 11.5 ms as 50 m / v(z) requires for a rising velocity profile, while ours remain at exactly 0.0000 s at 13 of the 14 depths (the 50 m pair is the exception; see section 4.3). A correlation peaking at zero lag independent of receiver separation indicates a component common to the channels, not a wave propagating between them.
 
 Figure 7c is a moveout gather, but the velocity model comes from Figure 7d, the
 constant-offset geometry in which source and receiver are held 50 m apart and slid
@@ -392,12 +419,19 @@ In Lellouch's released 7d traces the correlation peak **migrates with depth**, f
 20.7 ms at shallow depth to 11.5 ms at depth, exactly as `50 m / v(z)` requires for
 a rising velocity profile.
 
-In ours the peak sits at **exactly 0.0000 s at every depth**, and the parabolic
-picker returns NaN because there is no off-zero maximum to interpolate. Removing the
-common mode reduces the amplitude by a factor of about 120 and the peak stays at
-zero lag.
+In ours -- with the common mode already removed, which is the branch this product
+was computed in and the branch Figure 3(a) shows -- the peak sits at **exactly
+0.0000 s at 13 of the 14 depths**, and the parabolic picker returns NaN at those 13
+because there is no off-zero maximum to interpolate. The single exception is the
+shallowest, 50 m pair: its global maximum lies at +0.114 s, and inside the picker's
+5-45 ms window it returns 1,010 m/s, an implied lag of 49.5 ms that has been pushed
+past the window edge by the unbounded parabolic correction and is in any case more
+than twice the 20.7 ms his 50 m pair requires. Neither lag is a candidate travel
+time. Removing the common mode therefore does not move the peak off zero lag; it
+only lowers its amplitude.
 
-A correlation that peaks at zero lag for every receiver pair, independent of
+A correlation that peaks at zero lag for essentially every receiver pair,
+independent of
 separation, is the signature of a component common to the channels rather than a
 wave propagating between them. This observation motivated everything that follows.
 
@@ -405,15 +439,16 @@ wave propagating between them. This observation motivated everything that follow
 
 ![fig5_static_pattern](figures/fig5_static_pattern.png)
 
-**Figure 5. The contaminant is at fixed wavenumber, not fixed velocity.** (a) The low-wavenumber power marginal over the first 16 non-zero cells, for two disjoint bands, with the power-weighted centroids marked. (b) Raising the band centre by a factor of 1.882 moves the centroid by 1.011. A wave at fixed velocity requires the wavenumber ratio to equal the frequency ratio; a static spatial pattern requires 1.000. The measurement had the range to see a wave: a 3,200 m/s arrival would sit at 1.86 and 3.50 cells respectively.
+**Figure 5. The contaminant is at fixed wavenumber, not fixed velocity.** (a) The low-wavenumber power marginal over the first 16 non-zero cells (+-1 to +-8 on the two-sided wavenumber axis), for two disjoint bands, with the power-weighted centroids marked. (b) Raising the band centre by a factor of 1.882 moves the centroid by 1.011. A wave at fixed velocity requires the wavenumber ratio to equal the frequency ratio; a static spatial pattern requires 1.000. The measurement had the range to see a wave: a 3,200 m/s arrival would sit at 1.86 and 3.50 cells respectively.
 
 Apparent velocity is `v = f / k`, so how a feature behaves as the analysis band
 moves identifies what it is. A wave at fixed velocity must have its wavenumber
 track frequency; a static spatial pattern sits at fixed wavenumber and its
 *apparent* velocity therefore rises with frequency.
 
-Measured on the first 16 non-zero wavenumber cells of a 700 m aperture, with k = 0
-itself excluded so the answer is not fixed by construction:
+Measured on the first 16 non-zero wavenumber cells of a 700 m aperture -- `+-1` to
+`+-8` on the two-sided wavenumber axis -- with k = 0 itself excluded so the answer
+is not fixed by construction:
 
 | | 5-12 Hz | 12-20 Hz | ratio |
 |---|---|---|---|
@@ -434,11 +469,20 @@ about 28 % of the in-band energy from the 3,000-4,000 m/s bin to the
 6,000-10,000 m/s bin. Energy that changes apparent velocity when the band changes
 is at fixed wavenumber, not fixed velocity.
 
+**What this measurement does not show**, stated because the product that produced it
+states it. It identifies the *dominant* low-wavenumber feature as a static pattern.
+It does not show that no arrival exists: an arrival weak relative to a feature
+holding about 39 % of the in-band energy would not move the centroid. The
+implication is about method rather than absence -- because the contaminant is a
+fixed *spatial* pattern, removing it has to be a spatial operation, an estimate of
+the static per-channel response divided out, rather than a velocity filter. The
+evidence for absence is sections 4.7 and 4.8, not this one.
+
 ### 4.5 Why eight velocity-domain methods fail identically (Figure 4)
 
 ![fig4_eight_methods](figures/fig4_eight_methods.png)
 
-**Figure 4. One failure, not eight.** The pedestal diagnostic corr(trial velocity, moveout score) for every velocity-domain method applied. Values beyond +-0.5 indicate a statistic dominated by proximity to the zero-lag lobe rather than by moveout, so its p-value is not interpretable as a detection. All of these methods discriminate on velocity, and the contaminant has none.
+**Figure 4. One failure, not eight.** The pedestal diagnostic corr(trial velocity, moveout score) for the untreated baseline and for every method whose saved product carries the diagnostic. Values beyond +-0.5 indicate a statistic dominated by proximity to the zero-lag lobe rather than by moveout, so its p-value is not interpretable as a detection. The two fixed-fan f-k mask families and rank-k subspace projection are characterised in their own products rather than here (section 4.5), so the seven bars are the untreated baseline plus five of the eight methods, one of them at two settings. All of these methods discriminate on velocity, and the contaminant has none.
 
 A static pattern at fixed wavenumber has **no velocity**. Every method we applied
 separates energy by velocity, so all of them are asking a question the contaminant
@@ -447,32 +491,194 @@ does not answer:
 | method | outcome |
 |---|---|
 | fixed-fan f-k, brick-wall mask | apparent ridge; fails the pre-filter channel-scramble gate |
-| fixed-fan f-k, raised-cosine taper | no discriminating power gained |
-| tau-p slant stack, slowness mute swept to 8 km/s | pedestal survives every mute |
+| fixed-fan f-k, raised-cosine taper | ringing floor suppressed; the fan still fails the pre-filter channel scramble |
+| tau-p slant stack, 6 km/s slowness mute | pedestal worsens, +0.740 before the mute to +0.940 after |
 | rank-k subspace projection, global and windowed | pedestal not suppressed |
 | phase cross-correlation | amplitude-blind; does not remove a phase-coherent pedestal |
 | phase-weighted stacking | no recovery |
 | offset-axis median flat-event removal | no recovery |
 | median / mean common-mode removal | diagnostic improves, no detection |
 
-This is one failure, not eight. Figure 4 shows the pedestal diagnostic for each.
+This is one failure, not eight. Figure 4 shows the pedestal diagnostic for the five
+of these that have one in a saved product, alongside the untreated baseline; the two
+fixed-fan mask families and rank-k are characterised in their own products instead.
+
+Two rows carry a provenance caveat and are marked here rather than left to be
+found. The rank-k outcome is recorded in a source comment
+(`ambient_lellouch2019_exact_stack.py:284`, `corr` stays at +0.96 to +0.98 for ranks
+1, 2, 4 and 8) and not in a standalone product. The tau-p mute is a single declared
+value, not a sweep: an earlier version of this table claimed a sweep to 8 km/s,
+which was the script's default rather than the value the run used.
 
 The mean is the exact projection that annihilates k = 0, and it performs *worse*
 than the robust median (`corr = +0.888` versus `-0.381`) because it is not robust to
 the glitched channels that the 2017 release documentation itself warns require
 trace editing: subtracting a mean contaminated by glitches injects them into every
 channel. Order matters -- outliers must be interpolated before any exact projection.
+The `+0.888` is a third provenance caveat: it survives only as a measurement
+recorded in a source comment (`ambient_apparent_velocity_census.py:136`) and is not
+carried by any saved product, so it cannot be recomputed from what is on disk.
 
 We also note a resolution limit that constrains fixed-fan filtering specifically.
 At a 700 m aperture, `dk = 1/700` and a Hann taper's main lobe spans +-2 cells, so a
-3,200 m/s target lies 1.09 cells from k = 0 at 5 Hz and 4.37 cells at 20 Hz. Below
+3,200 m/s target lies 1.09 cells from k = 0 at 5 Hz and 4.38 cells at 20 Hz. Below
 about 12 Hz the target is inside the main lobe of the zero-wavenumber peak and is
 not resolvable from it at this aperture. Above 12 Hz it is resolved -- and we tested
 that: in 12-20 Hz our fan energy is *lower* (0.42 %) than 2017's (1.15 %) and the
 zero-wavenumber share remains 54.74 %. Better resolution exposed no arrival, which
 is why resolution is a contributing limitation and not the explanation.
 
-### 4.7 Illumination is the binding constraint (Figures 6 and 7)
+### 4.6 Adaptive f-k
+
+The adaptive filter of Isken et al. (2022) is the one f-k family that makes
+no velocity assumption, and therefore the one not addressed by section 4.5.
+Before use it was verified that an exponent of zero is a bit-identical no-op,
+that Bartlett 50 %-overlap recombination reconstructs the input to a maximum
+relative error of 0.000e+00, that at the production exponent alpha = 1 it
+raises the coherence of a synthetic 3,200 m/s plane wave in noise from
+0.0523 to 0.1980, and that it does not manufacture moveout from pure noise
+(0.0000 to 0.0000). The full check is `_afk_unit_check.txt`.
+
+Five configurations were run on a common 300-record block of 2024-12-20,
+with the prediction fixed in advance that applying the filter *without*
+prior static-pattern removal would be the worst configuration, because an
+adaptive filter enhances the dominant coherent component and here that is the
+static pattern rather than an arrival.
+
+| configuration | peak | at (m/s) | p | pedestal corr | causal/acausal at 3,200 | recovered |
+|---|---:|---:|---:|---:|---:|:--:|
+| afk1 only, no static removal (predicted WORST) | 12.5285 | 5900 | 0.0060 | +0.987 | 1.03 | no |
+| median common mode, no AFK (baseline) | 1.9069 | 5900 | 0.8796 | +0.820 | 0.89 | no |
+| median common mode + AFK alpha=1 | 1.2109 | 5900 | 0.5199 | +0.766 | 1.00 | no |
+| median common mode + AFK alpha=2 | 1.1221 | 5900 | 0.3465 | +0.737 | 1.01 | no |
+| median common mode + rank-2 + AFK alpha=1 | 1.0781 | 3300 | 0.9392 | -0.036 | 1.01 | no |
+
+Recovery requires all five predeclared gates: pedestal suppressed
+(|corr| < 0.5), peak inside 2,500-4,000 m/s, peak not at a scan edge,
+causal side dominant at 3,200 m/s, and p < 0.05.
+
+**No configuration satisfied the gates.** Adaptive f-k does not
+recover the arrival either. Given section 4.8 this is expected rather
+than surprising: a filter can only enhance coherent energy that is
+present, and the wavefield carries no net downgoing component to
+enhance. It does, however, close the remaining f-k avenue by
+measurement rather than by argument.
+
+**A filter can manufacture significance, and here one did.** The
+configuration with no prior static removal reached p = 0.0060 -- which
+in isolation reads as a detection -- while carrying the worst
+pedestal diagnostic of the five (+0.987, i.e. almost pure pedestal)
+and peaking at 5900 m/s, the top of the scan, rather than at 3,200.
+The mechanism is specific and worth stating, because it applies to
+any filtered ambient result: the receiver-order null permutes the
+FINISHED gather, so an operator applied before the gather is formed
+sits outside its own null and its amplification of a coherent
+contaminant is never tested. The adaptive filter raised the score
+6.6-fold (1.91 to 12.53) and the amplified pedestal then cleared a
+null that could not see the amplification. Only the predeclared
+gates caught it. An input-level null -- built before the operator
+runs -- is the correct control for a filtered result, and is what
+the F-K QC workflow already requires elsewhere in this project.
+
+**The cleanest statistic this study produced still shows nothing,
+and that is the strongest form of the negative.** Stacking the
+removals -- median common mode, then rank-2 subspace, then the
+adaptive filter -- drives the pedestal diagnostic monotonically to
+-0.036 (median common mode + rank-2 + AFK alpha=1), against +0.987 for the unprocessed baseline. That is
+effectively zero: the moveout statistic is finally measuring
+moveout rather than proximity to the zero-lag lobe, which no
+earlier configuration in this project achieved (previous best
+-0.381). With the statistic clean, the result is p = 0.9392.
+
+Its peak falls at 3300 m/s, close to the published 3,200 m/s, and
+that coincidence should not be read as encouraging. At p = 0.939 the
+observed maximum is LOWER than most receiver-order permutations of
+the same data. With no pedestal pulling the peak to the scan
+ceiling, the peak is free to land anywhere, and it landed there.
+
+The value of this row is what it rules out. The failure to
+reproduce is not an artefact of a broken statistic: when the
+statistic is repaired, the arrival is still absent.
+
+On the pre-registered prediction: `afk1 only` gives pedestal
+corr = +0.987 and p = 0.0060 against the baseline's +0.820 and 0.8796, so the
+pre-registered prediction -- that applying the adaptive filter
+without prior static removal makes matters worse -- is CONFIRMED.
+
+### 4.7 More data does not help (Figure 8)
+
+![fig8_convergence](figures/fig8_convergence.png)
+
+**Figure 8. More data does not help.** One contiguous day, 2024-12-20, stacked in 1, 2, 4, 8, 16 and 24 hourly chunks. (a) The raw moveout score, with a sqrt(N) reference. This is not the quantity to read: a raw score can rise simply because a repeatable contaminant accumulates coherently. (b) Detectability, the score divided by the 95th percentile of its own receiver-order null rebuilt at the same stack length. A coherent arrival accumulating against incoherent noise would follow the dashed N^+0.5 line; both branches are flat, at N^+0.042 and N^+0.019. At the full stack the common-mode-removed pedestal is -0.219, so the repeatable contaminant is suppressed and detectability still does not climb, which is what makes absence rather than contamination the explanation. (c) The familywise p-value. The baseline crosses p = 0.05 at 16 chunks and returns to p = 0.161 at 24; a genuine arrival does not un-detect itself when data is added.
+
+Section 4.2 reported that our coherent four-day stack (p = 0.9184) sits further
+from significance than our best single day (p = 0.1345). That comparison is
+suggestive but it varies the days as well as the stack length, so it does not
+isolate the effect of adding data. Here we isolate it. On one contiguous day,
+2024-12-20, we stack 1, 2, 4, 8, 16 and 24 hourly chunks of the same day's
+correlations and fit `score ~ N^b`, in both the baseline and the
+common-mode-removed branch.
+
+The quantity to read is **not** the raw score. A raw score can rise merely because
+a repeatable contaminant accumulates coherently, which is exactly what section 4.4
+says this field contains. We therefore report **detectability**: the score divided
+by the 95th percentile of its *own* receiver-order null, rebuilt from the same
+stacked data at every stack length. A contaminant raises the observation and its
+null together and leaves detectability flat, whereas averaging suppresses
+incoherent noise as `1/sqrt(N)`, so detectability grows as `N^+0.50` if and only if
+there is a coherent arrival to accumulate.
+
+| chunks | windows | baseline detectability | baseline p | c-m removed detectability | c-m removed p | c-m pedestal |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 240 | 0.858 | 0.9005 | 0.834 | 0.8691 | +0.915 |
+| 2 | 480 | 0.950 | 0.4113 | 0.754 | 0.9580 | +0.813 |
+| 4 | 960 | 0.858 | 0.9800 | 0.765 | 0.9125 | +0.869 |
+| 8 | 1,920 | 0.966 | 0.2234 | 0.744 | 0.8946 | +0.892 |
+| 16 | 3,840 | **1.014** | **0.0170** | 0.769 | 0.6807 | +0.946 |
+| 24 | 5,759 | 0.971 | 0.1614 | 0.921 | 0.8836 | **-0.219** |
+
+| fitted exponent | baseline | c-m removed | stacking works |
+|---|---:|---:|---:|
+| raw score | N^+0.158 | N^-0.004 | N^+0.50 |
+| **detectability** | **N^+0.042** | **N^+0.019** | N^+0.50 |
+
+Both branches are flat. Twenty-four times the data buys a factor of 1.14 in
+detectability where a coherent arrival would buy a factor of 4.9.
+
+**The one threshold crossing, reported as what it is.** At 16 chunks the baseline
+reaches detectability 1.014 at p = 0.0170, which in isolation reads as a detection.
+At 24 chunks, with 50 % more data, it falls back to 0.971 at p = 0.1614. We report
+the trajectory rather than either endpoint because the shape is the diagnostic: a
+genuine arrival does not un-detect itself when data is added. It is the same
+failure mode as the selected day-pairs of section 4.2 and the unfiltered adaptive
+f-k configuration of section 4.6 -- a threshold crossed by a statistic whose
+fluctuation exceeds the effect being sought.
+
+**Why the flat curve indicates absence rather than contamination.** A flat
+detectability curve admits two explanations: there is no arrival to accumulate, or
+there is one and the limiting contaminant accumulates exactly as it would. The
+common-mode-removed branch discriminates. At the full 24-chunk stack its pedestal
+diagnostic is **-0.219**, so by the criterion of section 3.2 the repeatable
+component is suppressed and the statistic is finally measuring moveout rather than
+proximity to the zero-lag lobe; consistently, its peak leaves the scan ceiling for
+3,575 m/s, inside the physical fan. With the contaminant demonstrably suppressed,
+detectability is still 0.921 at p = 0.8836 and the exponent is still N^+0.019.
+Contamination does not account for the flat curve. Absence does.
+
+This is the quantitative form of the comparison with Behm (2016), who obtained
+robust borehole interferograms from 30 s of noise under adequate illumination. If
+30 s suffices when the wavefield contains the arrival, then a day that yields no
+growth in detectability is not an under-sampled recording.
+
+**Limits.** The scan covers one day at hourly granularity, so it measures
+within-day convergence; the four-day stack of section 4.2 covers the across-day
+case and also degrades. The 24-chunk row uses 5,759 windows, the full contiguous
+day of section 3.1, so the endpoint is the same quantity reported there. The null
+is a receiver-order permutation of the finished gather and therefore contains no
+pre-correlation operator -- the limitation identified in section 4.6 -- so this
+test bounds stack length, not operator choice.
+
+### 4.8 Illumination is the binding constraint (Figures 6 and 7)
 
 ![fig6_illumination](figures/fig6_illumination.png)
 
@@ -521,106 +727,40 @@ percentile of Binomial(N, 0.05).
 Eleven hits against twelve expected. The archive contains no illuminated windows,
 and no diurnal concentration appears that would indicate weak cultural sources.
 
-### 4.8 The interrogator is not responsible inside the analysed aperture
+### 4.9 The interrogator is not responsible inside the analysed aperture
 
 Because the two acquisitions used different interrogators, an instrumental origin
 for the static pattern is a natural hypothesis, and an instrumental term makes a
 testable prediction: a fixed optical or electronic response has a fixed spatial
 fingerprint, whereas an earth or site pattern varies with conditions. We correlated
-the leading spatial pattern between six days spanning a year, against a control of
-correlations between the leading pattern of one day and the second-to-fifth patterns
-of another.
+the leading spatial pattern between six days spanning a year (2024-05-21, 08-29,
+11-24, 2025-01-17, 03-13, 05-06), against a control of correlations between the
+leading pattern of one day and the sub-leading patterns of another. The two channel
+ranges come from two separate runs, and their controls use four and five sub-leading
+patterns respectively, so the control percentiles are not interchangeable.
 
 | channel range | cross-day median \|corr\| | control 95th | reading |
 |---|---|---|---|
-| 0-699 (lead-in included) | **0.8426** | 0.3889 | stable: instrumental |
-| 23-708 (as analysed) | **0.0188** | 0.1282 | not stable |
+| 0-699 (lead-in included) | **0.8426** | 0.3889 (n = 120) | stable: instrumental |
+| 23-708 (as analysed) | **0.0188** | 0.1282 (n = 150) | not stable |
 
 The distinction is the whole result. There *is* a highly stable instrumental
-pattern, but it lives in the surface lead-in: its lead-in to deep power ratio is
-2 x 10^4 to 1.3 x 10^5. Channel 23 is the wellhead, and the analysis begins there,
-so that pattern is already excluded. Inside the analysed aperture the dominant
-pattern is indistinguishable from unrelated patterns, so a fixed instrumental
-fingerprint is not supported where it would matter.
+pattern, but it lives in the surface lead-in. Its lead-in to deep power ratio
+reaches 2 x 10^4 to 1.3 x 10^5 on four of the six days, with a median across days of
+2.3 x 10^4; the remaining two days give 323 and 0.01, so the concentration in the
+lead-in is strong but not uniform, and we quote the range with that qualification
+rather than as a property of every record. Channel 23 is the wellhead, and the
+analysis begins there, so that pattern is already excluded. Inside the analysed
+aperture the dominant pattern is indistinguishable from unrelated patterns, so a
+fixed instrumental fingerprint is not supported where it would matter.
+
+Two limits on this section. The lead-in records real surface ground motion, so a
+high lead-in to deep ratio is by itself not proof of an instrumental origin, and the
+product that measures it says so. And the test is one file per day, so a pattern
+that is stable within a day but drifts over weeks could read either way.
 
 Gauge length is likewise ruled out: the `sinc(pi k L)` response attenuates a
 3,200 m/s arrival by 0.1-1.1 % across the band for a 16.335 m gauge.
-
-### 4.6 Adaptive f-k
-
-The adaptive filter of Isken et al. (2022) is the one f-k family that makes
-no velocity assumption, and therefore the one not addressed by section 4.5.
-Before use it was verified that an exponent of zero is a bit-identical no-op,
-that Bartlett 50 %-overlap recombination reconstructs the input to a maximum
-relative error of 0.000e+00, that it raises the coherence of a synthetic
-3,200 m/s plane wave in noise from 0.0523 to 0.1980, and that it does not
-manufacture moveout from pure noise (0.0000 to 0.0000).
-
-Five configurations were run on a common 300-record block of 2024-12-20,
-with the prediction fixed in advance that applying the filter *without*
-prior static-pattern removal would be the worst configuration, because an
-adaptive filter enhances the dominant coherent component and here that is the
-static pattern rather than an arrival.
-
-| configuration | peak | at (m/s) | p | pedestal corr | causal/acausal at 3,200 | recovered |
-|---|---:|---:|---:|---:|---:|:--:|
-| afk1 only, no static removal (predicted WORST) | 12.5285 | 5900 | 0.0060 | +0.987 | 1.03 | no |
-| median common mode, no AFK (baseline) | 1.9069 | 5900 | 0.8796 | +0.820 | 0.89 | no |
-| median common mode + AFK alpha=1 | 1.2109 | 5900 | 0.5199 | +0.766 | 1.00 | no |
-| median common mode + AFK alpha=2 | 1.1221 | 5900 | 0.3465 | +0.737 | 1.01 | no |
-| median common mode + rank-2 + AFK alpha=1 | 1.0781 | 3300 | 0.9392 | -0.036 | 1.01 | no |
-
-Recovery requires all five predeclared gates: pedestal suppressed
-(|corr| < 0.5), peak inside 2,500-4,000 m/s, peak not at a scan edge,
-causal side dominant at 3,200 m/s, and p < 0.05.
-
-**No configuration satisfied the gates.** Adaptive f-k does not
-recover the arrival either. Given section 4.7 this is expected rather
-than surprising: a filter can only enhance coherent energy that is
-present, and the wavefield carries no net downgoing component to
-enhance. It does, however, close the remaining f-k avenue by
-measurement rather than by argument.
-
-**A filter can manufacture significance, and here one did.** The
-configuration with no prior static removal reached p = 0.0060 -- which
-in isolation reads as a detection -- while carrying the worst
-pedestal diagnostic of the five (+0.987, i.e. almost pure pedestal)
-and peaking at 5900 m/s, the top of the scan, rather than at 3,200.
-The mechanism is specific and worth stating, because it applies to
-any filtered ambient result: the receiver-order null permutes the
-FINISHED gather, so an operator applied before the gather is formed
-sits outside its own null and its amplification of a coherent
-contaminant is never tested. The adaptive filter raised the score
-6.6-fold (1.91 to 12.53) and the amplified pedestal then cleared a
-null that could not see the amplification. Only the predeclared
-gates caught it. An input-level null -- built before the operator
-runs -- is the correct control for a filtered result, and is what
-the F-K QC workflow already requires elsewhere in this project.
-
-**The cleanest statistic this study produced still shows nothing,
-and that is the strongest form of the negative.** Stacking the
-removals -- median common mode, then rank-2 subspace, then the
-adaptive filter -- drives the pedestal diagnostic monotonically to
--0.036 (median common mode + rank-2 + AFK alpha=1), against +0.987 for the unprocessed baseline. That is
-effectively zero: the moveout statistic is finally measuring
-moveout rather than proximity to the zero-lag lobe, which no
-earlier configuration in this project achieved (previous best
--0.381). With the statistic clean, the result is p = 0.9392.
-
-Its peak falls at 3300 m/s, close to the published 3,200 m/s, and
-that coincidence should not be read as encouraging. At p = 0.939 the
-observed maximum is LOWER than most receiver-order permutations of
-the same data. With no pedestal pulling the peak to the scan
-ceiling, the peak is free to land anywhere, and it landed there.
-
-The value of this row is what it rules out. The failure to
-reproduce is not an artefact of a broken statistic: when the
-statistic is repaired, the arrival is still absent.
-
-On the pre-registered prediction: `afk1 only` gives pedestal
-corr = +0.987 and p = 0.0060 against the baseline's +0.820 and 0.8796, so the
-pre-registered prediction -- that applying the adaptive filter
-without prior static removal makes matters worse -- is CONFIRMED.
 
 ## 5. Discussion
 
@@ -672,6 +812,15 @@ faster. We measured this directly: the pedestal diagnostic is `-0.381` for a sin
 day but `+0.951` once four days are coherently stacked. The artefact wins as the
 stack lengthens, which is why our 96-hour stack (p = 0.9184) is worse than our best
 single day (p = 0.1345).
+
+Section 4.7 puts a number on it at fixed geometry. Stacking 1 to 24 hourly chunks
+of one day grows detectability as `N^+0.042` without common-mode removal and
+`N^+0.019` with it, against `N^+0.50` for a coherent arrival accumulating against
+incoherent noise. The second of those exponents is the load-bearing one: it is
+measured with the pedestal diagnostic at `-0.219`, so the coherent artefact has been
+suppressed and the curve is still flat. That distinguishes the two readings of a
+non-improving stack -- an artefact masking a signal, or no signal -- in favour of
+the second.
 
 The practical rule this suggests: **a stack that degrades with added data is
 evidence about the wavefield, not a reason to add more.** Convergence behaviour
@@ -767,9 +916,9 @@ turned out to be wrong. Recording which ones, and why, is part of the result.
 ### 6.2 The cross-epoch comparison is not perfectly matched
 
 Our 2017 arm uses the pre-event portions of two earthquake records, about 5 s in
-total, because that is the only raw 2017 noise in the public release. Lellouch's
-Figure 7c correlograms are, per the release documentation, "a stack of 7 different
-one-day correlations", and that raw data is not available. **The arm we measure is
+total, because that is the only raw 2017 noise in the public release. The
+correlograms he released are, per the release documentation, "a stack of 7 different
+one-day correlations", and the raw ambient data behind them is not available. **The arm we measure is
 therefore not the same acquisition that produced his figure.**
 
 This does not affect the measured contrast, which uses identical processing on both
@@ -801,9 +950,9 @@ analysis path.
 |---|---|---|
 | "81-99 % of energy below 1,500 m/s implies the arrival is absent" | withdrawn | no geometric baseline; 98.4 % of in-band cells lie below 1,500 m/s by construction, so white noise scores the same |
 | "downgoing never exceeds 49.9 %" | withdrawn | factually false; the same outputs contain 51.6 % |
-| "2024-25 ambient decorrelates in 4 m versus 26 m in 2017" | withdrawn | the two arms were processed differently: the 2024-25 arm passed through a reader whose default subtracts the per-sample median across channels, removing the common mode from one arm only |
+| "2024-25 ambient decorrelates in 4 m versus 26 m in 2017" | withdrawn | the two arms were processed differently: the 2024-25 arm passed through a reader whose default subtracts the per-sample median across channels, removing the common mode from one arm only. The re-run product gives 3.0-3.6 m for 2024-25 and 400 m for 2017 in band, so the "26 m" of the withdrawn claim is reproduced by nothing now on disk |
 | "a detectable coherent component at 5,850 m/s" | withdrawn | that peak is the scan ceiling; a moveout-free control reproduces the curve to 3.5 % |
-| "tapering the f-k mask buys no discriminating power" | withdrawn | the real and synthetic paths were not matched; corrected ratio is 1.51-2.01, not 0.63 |
+| "tapering the f-k mask buys no discriminating power" | withdrawn | the real and synthetic paths were not matched, so the real/white ratio of 0.63 that the claim rested on is not a valid comparison. The corrected ratios quoted when the claim was withdrawn (1.51-2.01) are carried by no product now on disk and should not be requoted; the surviving statement is the one in the section 4.5 table, that the taper suppresses the ringing floor and the fan still fails the pre-filter channel scramble |
 | "the contaminant and target are unresolved at this aperture, so Figure 7c is unachievable" | withdrawn in part | the aperture arithmetic stands, but by its own table the target is resolved above ~12 Hz, and the 12-20 Hz test showed *less* fan energy than 2017 rather than a recovered arrival |
 | withdrawal of the cross-epoch k = 0 comparison | **reinstated** | the withdrawal assumed the 2017 window contained an earthquake; measurement placed the arrivals at 4.100 s and 4.916 s of 5.00 s, outside the 2.5 s window, so both arms are noise |
 | "no surface illumination", first version | superseded | the reported \|A\| = 1e-4 was the algebraic k-symmetry of a separable static pattern, not a property of the wavefield; the corrected measurement gives 0.040 and the same conclusion |
@@ -840,16 +989,23 @@ attractive intermediate finding is strongest.
    wavenumber, holding about 39 % of the in-band energy. Because it has no apparent
    velocity, no velocity-domain filter separates it, which accounts for the
    identical failure of eight such methods.
-4. The binding constraint is **illumination**. The downgoing/upgoing asymmetry that
+4. **More data does not help, and that is measured rather than asserted.** Stacking
+   one contiguous day in 1 to 24 hourly chunks grows detectability as N^+0.042
+   without common-mode removal and N^+0.019 with it, against N^+0.50 for a coherent
+   arrival accumulating against incoherent noise. The common-mode-removed exponent
+   is measured with the pedestal diagnostic at -0.219, so the coherent contaminant
+   is suppressed and the curve is still flat, which points to an absent arrival
+   rather than a masked one.
+5. The binding constraint is **illumination**. The downgoing/upgoing asymmetry that
    the original authors used as evidence for surface sources is significant in their
    records (p = 0.0050) and absent from ours (p = 0.7307), and a pre-registered scan
    of 240 windows across one year finds 11 significant windows against 12.0 expected
    by chance.
-5. Neither the interrogator change nor the gauge-length change accounts for the
+6. Neither the interrogator change nor the gauge-length change accounts for the
    null: the stable instrumental pattern is confined to the surface lead-in, which
    the analysis already excludes, and the gauge-length response attenuates the
    target by 0.1-1.1 %.
-6. Borehole ambient-noise body-wave interferometry should be treated as
+7. Borehole ambient-noise body-wave interferometry should be treated as
    illumination-limited. We recommend measuring the asymmetry as a feasibility gate
    before committing acquisition or compute, and reporting stack convergence, since
    a result that degrades with added data indicates an absent arrival rather than an
