@@ -37,8 +37,11 @@ $PY -u ambient_lellouch2019_exact_stack.py --action chunk \
   --null-method ordered --realization 0 \
   "${ARGS[@]}" --output-dir "$OUT"
 
+# --nfiles MUST match the chunk step: aggregate() builds expected chunk names as
+# range(0, total_files, nfiles), so omitting it here made the aggregate look for
+# five 60-file chunks when the chunk step had written one 300-file chunk.
 $PY -u ambient_lellouch2019_exact_stack.py --action aggregate \
-  --date 2024-12-20 --total-files 300 --block-files 10 \
+  --date 2024-12-20 --total-files 300 --nfiles 300 --block-files 10 \
   --source-channel 23 --ram-seconds 0.1 --spectral-mode cross_correlation \
   --null-method ordered --realization 0 \
   "${ARGS[@]}" --output-dir "$OUT"

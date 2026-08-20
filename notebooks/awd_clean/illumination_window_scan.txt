@@ -1,0 +1,50 @@
+Scanning the archive for ILLUMINATED windows
+  |A| in the 2500-4000 m/s fan, positive f, after rank-2 spatial removal
+  channels 23-708 | 30 s windows | 240 windows requested
+  DECISION RULE fixed before the run: illumination is claimed only if the
+  count of windows with p < 0.05 exceeds the 95th percentile of
+  Binomial(N, 0.05). Hour-of-day clustering is supporting, not gating.
+
+  manifest spans 2024-05-21 23:42:56.133000+00:00 to 2025-05-06 07:22:44.969500+00:00 (377680 continuous files)
+
+  [  0/240] 2024-05-21 23:42:56.133000+00:00 |A| 0.0389 p 0.4518
+  [ 20/240] 2024-06-13 00:41:35.622100+00:00 |A| 0.0975 p 0.2093
+  [ 40/240] 2024-07-04 23:59:16.057600+00:00 |A| 0.0472 p 0.3688
+  [ 60/240] 2024-10-03 13:21:03.977400+00:00 |A| 0.0271 p 0.5349
+  [ 80/240] 2024-10-25 12:20:03.978800+00:00 |A| 0.0560 p 0.3555
+  [100/240] 2024-12-04 02:50:06.081400+00:00 |A| 0.0703 p 0.3056
+  [120/240] 2024-12-26 01:47:06.082600+00:00 |A| 0.0291 p 0.5548
+  [140/240] 2025-01-17 00:41:06.083500+00:00 |A| 0.0550 p 0.5648
+  [160/240] 2025-02-08 01:35:07.969000+00:00 |A| 0.0005 p 0.9900
+  [180/240] 2025-03-02 00:37:07.970700+00:00 |A| 0.0232 p 0.6545
+  [200/240] 2025-03-23 23:33:07.971800+00:00 |A| 0.0541 p 0.1130
+  [220/240] 2025-04-14 22:26:07.972600+00:00 |A| 0.0178 p 0.6811
+
+=== result ===
+  windows measured            : 240 of 240 sampled
+  |A| median 0.0296, 90th 0.0753, max 0.2385
+  windows with p < 0.05        : 11
+  expected by chance           : 12.0 (95th percentile of Binomial = 18)
+
+  NO ILLUMINATED WINDOWS. 11 windows clear p < 0.05 against a chance
+  ceiling of 18, so the count is consistent with pure chance.
+
+  This closes the ambient route on this archive at 5-20 Hz. The field
+  carries no net directional preference in the body-wave fan in ANY
+  window sampled, and Lellouch's downgoing P is an inference FROM that
+  asymmetry, so there is no arrival of that kind to recover. This is a
+  property of the recording, not of the processing: the same
+  measurement finds the asymmetry in his 2017 data (|A| = 0.348,
+  p = 0.005) from only ~5 s.
+
+  The honest write-up is this negative plus the per-velocity result
+  (0 of 181 velocities clear the per-velocity null). The velocity model
+  itself remains reachable via earthquakes -- Lellouch's Figure 9 was
+  mainly earthquake-derived, 206 events are cached, and G0 already
+  matched the 2005 check shot to 0.2 %.
+
+  LIMITS: 30 s per window and one window per sampled file, so a burst
+  shorter than 30 s could be missed; rank-2 removal is conservative
+  against a low-rank plane-wave arrival; the fan is the frozen
+  2500-4000 m/s selection; and |A| is along-fibre, near-vertical but not
+  exactly vertical in this borehole.
