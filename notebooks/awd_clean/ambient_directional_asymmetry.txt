@@ -1,0 +1,33 @@
+Directional asymmetry of the ambient field in the body-wave fan
+  This is Lellouch et al. (2019)'s own diagnostic for surface
+  illumination: downgoing energy strongly exceeding upgoing.
+  Reported as |A| only -- convention-free, see module docstring.
+  Fan 2500-4000 m/s, positive frequencies only.
+
+=== 5-12 Hz ===
+  2017 pre-event   |A| = 0.0007  (null 95th 0.2871, p = 0.9975)  fan holds 0.32% of in-band energy over 26 cells
+  2024-25 ambient  |A| = 0.0001  (null 95th 0.9983, p = 0.9726)  fan holds 30.77% of in-band energy over 26 cells
+
+=== 12-20 Hz ===
+  2017 pre-event   |A| = 0.4158  (null 95th 0.2687, p = 0.0025)  fan holds 1.15% of in-band energy over 56 cells
+  2024-25 ambient  |A| = 0.0009  (null 95th 0.4146, p = 0.9975)  fan holds 0.42% of in-band energy over 56 cells
+
+=== interpretation ===
+  2017 pre-event   significant asymmetry in 1 of 2 bands
+  2024-25 ambient  significant asymmetry in 0 of 2 bands
+
+  THE MISSING INGREDIENT. The 2017 pre-event noise carries a
+  significant directional preference in the body-wave fan and the
+  2024-25 ambient field does not. Lellouch's inference of surface
+  sources rests on exactly that asymmetry, so this says the
+  2024-25 field is NOT illuminated from the surface in this band.
+  A downgoing P cannot be recovered from a field that has no net
+  downgoing energy: no filter can create a propagation direction
+  that is not in the data. This is consistent with Behm (2016),
+  where 30 s sufficed under good illumination, and with our stacks
+  getting WORSE with more data (96 h coherent stack p = 0.9184).
+
+  LIMITS: 2017 is ~5 s of pre-event noise from two records, so its
+  estimate is noisy; the fan is the frozen 2500-4000 m/s selection; and
+  |A| measures a preferred direction ALONG THE FIBRE, which in a near-
+  vertical borehole is close to but not exactly vertical.

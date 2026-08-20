@@ -1,0 +1,75 @@
+Interrogator blame and surface illumination, measured correctly (v2)
+  band 5-20 Hz | 250 Hz | channels 23-708 (lead-in EXCLUDED, as the
+  Figure 7c pipeline does) | 30 s/day | fan 2500-4000 m/s
+
+  v1 is superseded on both counts. Its 'instrumental' verdict is
+  RESTRICTED to the surface lead-in (channels 0-22), where u1's
+  lead-in/deep power ratio was 2e4-1.3e5 -- a real and stable pattern
+  that the pipeline already excludes. Its 'no illumination' verdict is
+  WITHDRAWN: |A| = 1e-4 was the algebraic k-symmetry of a separable
+  static pattern, not a property of the wavefield.
+
+  2024-05-21  u1 31.99 %  u1..u4 73.02 %  (72 channels edited)
+  2024-08-29  u1 44.59 %  u1..u4 73.47 %  (0 channels edited)
+  2024-11-24  u1 28.35 %  u1..u4 45.23 %  (0 channels edited)
+  2025-01-17  u1 42.10 %  u1..u4 54.26 %  (0 channels edited)
+  2025-03-13  u1 62.54 %  u1..u4 76.10 %  (107 channels edited)
+  2025-05-06  u1 42.80 %  u1..u4 57.78 %  (24 channels edited)
+
+=== T1  is the dominant spatial pattern of channels >= 23 stable? ===
+  |corr(u1)| 2024-05-21 vs 2024-08-29 = 0.8839
+  |corr(u1)| 2024-05-21 vs 2024-11-24 = 0.0420
+  |corr(u1)| 2024-05-21 vs 2025-01-17 = 0.0802
+  |corr(u1)| 2024-05-21 vs 2025-03-13 = 0.0077
+  |corr(u1)| 2024-05-21 vs 2025-05-06 = 0.0007
+  |corr(u1)| 2024-08-29 vs 2024-11-24 = 0.0324
+  |corr(u1)| 2024-08-29 vs 2025-01-17 = 0.0710
+  |corr(u1)| 2024-08-29 vs 2025-03-13 = 0.0059
+  |corr(u1)| 2024-08-29 vs 2025-05-06 = 0.0088
+  |corr(u1)| 2024-11-24 vs 2025-01-17 = 0.0184
+  |corr(u1)| 2024-11-24 vs 2025-03-13 = 0.0237
+  |corr(u1)| 2024-11-24 vs 2025-05-06 = 0.0137
+  |corr(u1)| 2025-01-17 vs 2025-03-13 = 0.0188
+  |corr(u1)| 2025-01-17 vs 2025-05-06 = 0.0255
+  |corr(u1)| 2025-03-13 vs 2025-05-06 = 0.0036
+
+  cross-day |corr(u1,u1)| : median 0.0188  min 0.0007  max 0.8839  (n=15)
+  control   |corr(u1,u2+)|: median 0.0241  95th 0.1282            (n=150)
+  -> NOT distinguishable from unrelated patterns: a fixed instrumental fingerprint is NOT supported here
+
+=== illumination: |A| in the fan as the static pattern is removed ===
+  rank 0 reproduces the v1 number in place. If |A| stays at ~1e-4 as
+  rank rises, the field really is balanced; if it lifts above the null,
+  the v1 zero was the separable pattern's symmetry.
+
+  --- 2024-25 (2025-01-17) ---
+    rank 0  removed: |A| = 0.0399  (null95 0.1930, p = 0.7307)  fan 1.23%
+    rank 1  removed: |A| = 0.0403  (null95 0.0994, p = 0.4314)  fan 1.98%
+    rank 2  removed: |A| = 0.0363  (null95 0.0944, p = 0.4638)  fan 2.00%
+    rank 4  removed: |A| = 0.0008  (null95 0.1003, p = 0.9875)  fan 1.98%
+    rank 8  removed: |A| = 0.0110  (null95 0.1008, p = 0.8279)  fan 2.20%
+  --- 2017 pre-event (positive control) ---
+    rank 0  removed: |A| = 0.3478  (null95 0.2484, p = 0.0050)  fan 0.91%
+    rank 1  removed: |A| = 0.3289  (null95 0.2416, p = 0.0050)  fan 0.94%
+    rank 2  removed: |A| = 0.2497  (null95 0.2134, p = 0.0299)  fan 0.89%
+    rank 4  removed: |A| = 0.1234  (null95 0.2108, p = 0.2718)  fan 0.62%
+    rank 8  removed: |A| = 0.0805  (null95 0.1966, p = 0.4489)  fan 1.42%
+
+=== reading ===
+  2024-25: significant asymmetry at ranks NONE of [0, 1, 2, 4, 8]
+  2017   : significant asymmetry at ranks [0, 1, 2]
+
+  With a working positive control (2017 significant at ranks [0, 1, 2]) and
+  2024-25 not significant at ANY rank tested, the 2024-25 field
+  carries no net directional preference in the fan even after the
+  static pattern is projected out. No filter can create a propagation
+  direction that is absent from the data, so body-wave retrieval in
+  this band is not achievable on this recording. Consistent with Behm
+  (2016), where 30 s sufficed under good illumination, and with our
+  stacks degrading with more data (96 h coherent stack p = 0.9184).
+
+  LIMITS: one 30 s file per day; 2017 is ~5 s from two records; the fan
+  is the frozen 2500-4000 m/s selection; |A| measures a preferred
+  direction ALONG THE FIBRE, near-vertical but not exactly vertical;
+  and rank-k removal takes out any genuinely plane-wave arrival that is
+  itself low-rank, so high ranks are conservative against detection.

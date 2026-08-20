@@ -1,0 +1,75 @@
+Is the interrogator to blame for the static fixed-k pattern?
+  2024-25 raw HDF5 via h5py only (readFile_HDF's median=True would
+  delete the quantity under test)
+  band 5-20 Hz | 250 Hz | channels 0-699 (lead-in INCLUDED) | 30 s/day
+
+  days sampled across the archive: 2024-05-21, 2024-08-29, 2024-11-24, 2025-01-17, 2025-03-13, 2025-05-06
+
+  2024-05-21  SAFOD-Zumberge-16mGL-500HzFs_2024-05-21T235157Z.h5         u1 holds 84.54 % of variance, 95 channels edited
+  2024-08-29  SAFOD-Zumberge-16mGL-500HzFs_2024-08-29T190738Z.h5         u1 holds 92.79 % of variance, 18 channels edited
+  2024-11-24  SAFOD-Zumberge-16mGL-500HzFs_2024-11-24T120006Z.h5         u1 holds 94.51 % of variance, 0 channels edited
+  2025-01-17  SAFOD-Zumberge-16mGL-500HzFs_2025-01-17T120006Z.h5         u1 holds 68.67 % of variance, 0 channels edited
+  2025-03-13  SAFOD-Zumberge-16mGL-500HzFs_2025-03-13T115907Z.h5         u1 holds 60.05 % of variance, 129 channels edited
+  2025-05-06  SAFOD-Zumberge-16mGL-500HzFs_2025-05-06T034144Z.h5         u1 holds 83.31 % of variance, 42 channels edited
+
+=== T1  stationarity of the dominant spatial pattern (the strong test) ===
+  |corr(u1)| 2024-05-21 vs 2024-08-29 = 0.8761
+  |corr(u1)| 2024-05-21 vs 2024-11-24 = 0.7970
+  |corr(u1)| 2024-05-21 vs 2025-01-17 = 0.7496
+  |corr(u1)| 2024-05-21 vs 2025-03-13 = 0.0094
+  |corr(u1)| 2024-05-21 vs 2025-05-06 = 0.8426
+  |corr(u1)| 2024-08-29 vs 2024-11-24 = 0.9197
+  |corr(u1)| 2024-08-29 vs 2025-01-17 = 0.8690
+  |corr(u1)| 2024-08-29 vs 2025-03-13 = 0.0086
+  |corr(u1)| 2024-08-29 vs 2025-05-06 = 0.9724
+  |corr(u1)| 2024-11-24 vs 2025-01-17 = 0.9487
+  |corr(u1)| 2024-11-24 vs 2025-03-13 = 0.0067
+  |corr(u1)| 2024-11-24 vs 2025-05-06 = 0.9814
+  |corr(u1)| 2025-01-17 vs 2025-03-13 = 0.0063
+  |corr(u1)| 2025-01-17 vs 2025-05-06 = 0.9252
+  |corr(u1)| 2025-03-13 vs 2025-05-06 = 0.0073
+
+  cross-day  |corr(u1,u1)| : median 0.8426, min 0.0063, max 0.9814  (n=15)
+  control    |corr(u1,u2+)|: median 0.0520, 95th 0.3889              (n=120)
+  -> STABLE across months: points to an INSTRUMENTAL origin
+
+=== T2  is the pattern present in the uncoupled surface lead-in? ===
+  channel 23 is the wellhead (G0); 0-22 is surface lead-in
+  2024-05-21  mean u1^2 lead-in 3.985e-02 vs deep 1.232e-04 -> ratio 323.37
+  2024-08-29  mean u1^2 lead-in 4.343e-02 vs deep 1.637e-06 -> ratio 26530.29
+  2024-11-24  mean u1^2 lead-in 4.347e-02 vs deep 3.394e-07 -> ratio 128079.92
+  2025-01-17  mean u1^2 lead-in 4.342e-02 vs deep 2.080e-06 -> ratio 20873.86
+  2025-03-13  mean u1^2 lead-in 9.174e-06 vs deep 1.477e-03 -> ratio 0.01
+  2025-05-06  mean u1^2 lead-in 4.343e-02 vs deep 1.751e-06 -> ratio 24799.78
+  median lead-in/deep power ratio in u1: 22836.82
+  NOTE: the lead-in is at the surface and records real surface ground
+  motion, so a high ratio alone is NOT proof of an instrumental origin.
+  This test is reported for completeness and does not decide on its own.
+
+=== T3  spectral character of the projection onto u1 ===
+  2024-05-21  strongest line / median =  41.83 | spectral flatness = 0.389
+  2024-08-29  strongest line / median = 2349.80 | spectral flatness = 0.035
+  2024-11-24  strongest line / median =  16.82 | spectral flatness = 0.409
+  2025-01-17  strongest line / median =   6.15 | spectral flatness = 0.567
+  2025-03-13  strongest line / median =   3.77 | spectral flatness = 0.823
+  2025-05-06  strongest line / median =  14.48 | spectral flatness = 0.456
+  median line-to-median ratio: 15.65
+  -> no strong narrow line; broadband. NOT evidence against an instrumental origin (a drifting laser term is broadband too), so this test does not decide.
+
+=== combined reading ===
+  T1 stationarity : instrument
+  T2 lead-in      : reported only, cannot decide (surface motion is real)
+  T3 spectral     : undecided
+
+  VERDICT: the dominant spatial pattern is essentially the SAME across
+  months. An earth or site noise pattern does not hold its shape over
+  that span while noise conditions change; a fixed optical/electronic
+  response does. The interrogator (or the fixed per-channel response
+  of this installation) is the leading explanation for the static
+  fixed-k contaminant, and the remedy follows directly: estimate that
+  per-channel response ONCE and divide it out, which is the spatial
+  calibration C2_PERMEABILITY_FOLLOWUP.md already proposes.
+
+  LIMITS: %d days x %.0f s each, one file per day, so a pattern that is
+  stable within a day but drifts over weeks could read either way;
+  channels 0-22 are included, which mixes the surface lead-in into u1.
