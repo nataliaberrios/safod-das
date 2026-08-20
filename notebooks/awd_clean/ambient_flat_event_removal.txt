@@ -1,0 +1,37 @@
+Median flat-event removal along the offset axis, then rescore
+  source aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0.npz
+  14 offsets 50-700 m, 351 lags
+  null: the IDENTICAL removal is applied to every permuted gather, so the
+        operator is inside the null and cannot inflate the p-value
+
+--- no removal (reference) ---
+  corr(velocity, score) +0.979   peak 6.3771 at 5950 m/s
+  at 3200: causal 2.6359 acausal 2.7137 ratio 0.97
+  null95 6.5833 | observed 6.3771 | p = 0.1615
+  preconditions: pedestal False | in fan False | off edge True | causal False | p<0.05 False
+  not recovered
+
+--- median removed x1 ---
+  corr(velocity, score) +0.405   peak 1.2070 at 5975 m/s
+  at 3200: causal 1.1006 acausal 1.2927 ratio 0.85
+  null95 2.1472 | observed 1.2070 | p = 0.8328
+  preconditions: pedestal True | in fan False | off edge True | causal False | p<0.05 False
+  not recovered
+
+--- median removed x2 ---
+  corr(velocity, score) +0.405   peak 1.2070 at 5975 m/s
+  at 3200: causal 1.1006 acausal 1.2927 ratio 0.85
+  null95 2.1520 | observed 1.2070 | p = 0.8305
+  preconditions: pedestal True | in fan False | off edge True | causal False | p<0.05 False
+  not recovered
+
+--- median removed x3 ---
+  corr(velocity, score) +0.405   peak 1.2070 at 5975 m/s
+  at 3200: causal 1.1006 acausal 1.2927 ratio 0.85
+  null95 2.1443 | observed 1.2070 | p = 0.8375
+  preconditions: pedestal True | in fan False | off edge True | causal False | p<0.05 False
+  not recovered
+
+Best pedestal suppression: median removed x2 at corr = +0.405
+No configuration satisfies every precondition. Flat-event removal does
+not expose a 3200 m/s arrival in this gather.

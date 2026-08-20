@@ -1,0 +1,31 @@
+Figure 7d constant-offset gather -- 2024-12-20
+  24 chunks, 1440 files, 5759 windows; source-receiver separation 50 m
+  common-mode removal: True
+
+--- our 2024-25 picks (paper's picker, 5-45 ms window) ---
+  depth        centre      R+-10 R+-10 shift
+      50 m       1010        nan        nan
+     100 m        nan        nan        nan
+     150 m        nan        nan        nan
+     200 m        nan        nan        nan
+     250 m        nan        nan        nan
+     300 m        nan        nan        nan
+     350 m        nan        nan        nan
+     400 m        nan        nan        nan
+     450 m        nan        nan        nan
+     500 m        nan        nan        nan
+     550 m        nan        nan        nan
+     600 m        nan        nan        nan
+     650 m        nan        nan        nan
+     700 m        nan        nan        nan
+
+--- Lellouch 2017 released 7d, identical picker ---
+  50:2416  100:2481  150:2803  200:2854  250:3192  300:3224  350:3435  400:3231  450:3305  500:3422  550:4061  600:3761  650:3797  700:4357
+  fit r = 0.948  (his Figure 9 model)
+
+--- comparison ---
+  Lellouch 2017                  v(50m)= 2416 v(700m)= 4357  r vs depth = +0.948
+
+  A recovered 7d needs a MONOTONIC velocity-depth trend like his
+  (2416 -> 4357 m/s, r = +0.948). Scatter or a flat/negative r means the
+  peak lag is not a travel time.
