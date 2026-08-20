@@ -290,6 +290,7 @@ def strain_rate_and_ram_continuous(
     fs: float,
     ram_seconds: float,
     common_mode: bool,
+    common_mode_estimator: str = "median",
     svd_rank: int = 0,
     seed: int = 0,
     svd_window_samples: int = 0,
@@ -311,7 +312,17 @@ def strain_rate_and_ram_continuous(
     # channel-dependent-gain common mode. Applying svd_rank alone was measured on
     # 2026-08-14 to leave the pedestal untouched.
     if common_mode:
-        rate -= np.median(rate, axis=0, keepdims=True).astype(np.float32)
+        # MEAN is the exact projection that annihilates k = 0; MEDIAN is a robust
+        # approximation that leaves a residual. Measured 2026-08-14: 66.49% of the
+        # 2024-25 5-20 Hz energy sits at exactly k = 0 (0.17% in 2017), so the
+        # residual left by the median is large, is coherent, and ACCUMULATES under
+        # stacking -- corr(trial velocity, score) is -0.381 for one day but +0.951
+        # once four days are coherently stacked. Mean removal kills the k = 0
+        # component outright.
+        if common_mode_estimator == "mean":
+            rate -= rate.mean(axis=0, keepdims=True).astype(np.float32)
+        else:
+            rate -= np.median(rate, axis=0, keepdims=True).astype(np.float32)
     if svd_rank > 0:
         rate = remove_coherent_subspace(rate, svd_rank, seed, svd_window_samples)
     absolute = np.abs(rate)
@@ -373,6 +384,7 @@ def chunk_tag(args: argparse.Namespace) -> str:
         f"{args.date}_src{args.source_channel}_ram{ram}_"
         f"{args.spectral_mode}_{args.null_method}_r{args.realization}"
         f"{'_cm' if args.common_mode else ''}"
+        f"{'mean' if args.common_mode and getattr(args, 'common_mode_estimator', 'median') == 'mean' else ''}"
         f"{('_svd%d' % args.svd_rank) if getattr(args, 'svd_rank', 0) else ''}"
         f"{('w%.6g' % args.svd_window_s).replace('.', 'p') if getattr(args, 'svd_window_s', 0) else ''}"
     )
@@ -463,6 +475,7 @@ def run_chunk(args: argparse.Namespace) -> None:
         del pieces
         normalized, floored_fraction = strain_rate_and_ram_continuous(
             raw, fs, args.ram_seconds, args.common_mode,
+            common_mode_estimator=getattr(args, "common_mode_estimator", "median"),
             svd_rank=getattr(args, "svd_rank", 0), seed=args.seed,
             svd_window_samples=int(round(getattr(args, "svd_window_s", 0.0) * fs)),
         )
@@ -1130,6 +1143,11 @@ def parser() -> argparse.ArgumentParser:
                              "manifest has a timing anomaly; off by default, so default "
                              "behaviour is unchanged and the guard still runs")
     result.add_argument("--common-mode", action="store_true")
+    result.add_argument(
+        "--common-mode-estimator", choices=("median", "mean"), default="median",
+        help="mean is the EXACT k=0 projection; median is robust but leaves a "
+             "coherent residual that accumulates under stacking. Default median "
+             "preserves previous behaviour.")
     result.add_argument(
         "--svd-rank", type=int, default=0,
         help="project out the leading k left singular vectors instead of the "

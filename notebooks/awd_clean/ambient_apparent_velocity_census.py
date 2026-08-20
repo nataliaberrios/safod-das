@@ -62,6 +62,8 @@ APERTURE_M = 700.0           # common aperture both arms can supply after editin
 WIN_S = 2.0                  # the 2017 pre-event window is short; both use 2 s
 EDIT_LO, EDIT_HI = 0.2, 5.0
 CH_LO_2024 = 23              # wellhead (G0)
+import os
+K0_REMOVE = os.environ.get('K0_REMOVE', '0') == '1'
 
 # apparent-velocity bins, INCLUDING an explicit no-moveout bin at the top
 V_EDGES = np.array([0, 500, 1000, 1500, 2000, 2500, 3000, 4000,
@@ -106,6 +108,14 @@ def analyse(raw, fs, dx, label, ops, log):
     log.append("    %-10s trace edit interpolated %d of %d channels" % (label, dropped, x.shape[0]))
 
     x = np.diff(x, axis=1, prepend=x[:, :1]); steps.append("diff(strain_rate)")
+
+    if K0_REMOVE:
+        # EXACT k = 0 projection, applied AFTER outlier interpolation so the mean
+        # is not itself contaminated. Subtracting a mean computed over glitched
+        # channels injects those glitches everywhere -- measured: doing so on
+        # unedited data gives corr(v,score) +0.888, worse than the robust median's
+        # -0.381. Order matters.
+        x = x - x.mean(axis=0, keepdims=True); steps.append("remove_k0_mean")
 
     if abs(fs - FS_COMMON) > 1e-9:
         from math import gcd
@@ -178,6 +188,7 @@ def main():
     say("  band %g-%g Hz | common rate %.0f Hz | common aperture %.0f m | %.1f s windows"
         % (FMIN, FMAX, FS_COMMON, APERTURE_M, WIN_S))
     say("  Hann taper in space and time; energy summed, not per-window normalised")
+    say("  k=0 removal (interp outliers, then subtract across-channel mean): %s" % K0_REMOVE)
     say("")
 
     # ---- 2024-25, raw HDF5, no DASutils ----
