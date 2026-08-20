@@ -5,7 +5,7 @@ import nbformat as nbf
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "Ambient_FK_QC_workflow.ipynb"
 EXACT_SUMMARY = HERE / "ambient_transfer" / "lellouch2019_exact_stack" / "aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0.json"
-NOTEBOOK_VERSION = "v10" if EXACT_SUMMARY.is_file() else "v7"
+NOTEBOOK_VERSION = "v11" if EXACT_SUMMARY.is_file() else "v7"
 nb = nbf.v4.new_notebook()
 nb.metadata = {"kernelspec": {"display_name": "Python [conda env:das]", "language": "python", "name": "das"}}
 
@@ -28,6 +28,22 @@ This is the single advisor-facing notebook for the ambient-noise analysis. It fo
 The notebook is a decision document, not a gallery. A processing choice passes only if the measured result survives controls using the same segmentation, receiver stack, display band, and velocity-selection rule.
 
 **v8 result.** The paper-faithful one-day rerun is complete. It uses all 1,440 files and 5,759 continuous 30-s windows, the literal unshifted R±10 sum, and no F–K filter. The measured baseline peaks at 5.85 km s⁻¹ rather than 3.2 km s⁻¹ and does not exceed the receiver-order scan-max null (p = 0.147). Its gather remains almost unchanged after receiver channels are scrambled before preprocessing (flattened correlation 0.9976), so the dominant structure is not ordered moveout. This rejects a Figure 7c reproduction for the matched 20 December 2024 day; it does not invalidate F–K filtering as a standard directional tool or rule out other dates and longer stacks.
+
+---
+
+## v11 summary — read this before anything below
+
+Two new sections (12 and 13) and two withdrawals. In short: **the question is now closed, and the reason is illumination.**
+
+**1. The F–K fan verdict still stands, unchanged.** The 2.5–4.5 km/s fan produces an apparent ridge but **fails the pre-filter channel-scramble gate**, so it is *not* accepted as an independently recovered physical arrival. Nothing in v11 reopens it. Sections 5–7 remain the record. Section 13 is a second, independent instance of the *same* failure mode arriving from a different filter family, which strengthens rather than weakens that decision.
+
+**2. NEW — illumination is the binding constraint (Section 12).** Lellouch's downgoing P is an *inference from a measured downgoing/upgoing asymmetry*, not a direct observation. Under the identical measurement at matched spatial rank, that asymmetry is present in his 2017 records (|A| = 0.348, p = 0.0050) and absent in ours (|A| = 0.040, p = 0.7307). An archive-wide scan of **240 windows** spanning 2024-05-21 to 2025-05-06, under a decision rule fixed before the run, found **11 significant against 12.0 expected by chance** (Binomial 95th percentile 18) — no illuminated window anywhere. No filter can create a propagation direction that is absent from the data, so there is no arrival of that kind present to recover. This is a property of the **recording**, not of the processing, and it sits upstream of every section in this notebook.
+
+**3. NEW — adaptive F–K was implemented and run; it does not rescue the result (Section 13).** Isken et al. (2022), the one F–K family this project had never tried, in five configurations. None passed the predeclared gates. The configuration with no prior static removal produced a **spurious p = 0.0060** by amplifying the pedestal 6.6-fold, and the cleanest configuration reached pedestal −0.036 and **p = 0.9392**.
+
+**4. WITHDRAWN in v11 — "this archive does contain a statistically detectable coherent component".** That sentence appeared in Section 11 of v10 and is retracted; see the banner in Section 11. A peak at 5,850–5,900 m/s is where the velocity grid stops, and a moveout-free control reproduces the whole curve to within 3.5 %.
+
+**5. WITHDRAWN in v11 — "the non-reproduction has no validated mechanism".** It has two, in precedence order: illumination (Section 12) and a static fixed-wavenumber spatial pattern (`AMBIENT_LOWK_MECHANISM.md`). Also newly *ruled out* rather than left open: gauge length (a 0.1–1.1 % effect at 3,200 m/s) and the interrogator inside the analysed aperture.
 """)
 
 markdown(f"""{NOTEBOOK_VERSION}""")
@@ -823,7 +839,9 @@ else:
     markdown("""## 10. Paper-faithful Figure 7c result — pending
 
 The authoritative implementation is `ambient_lellouch2019_exact_stack.py` at commit `bb48942`. Full-day matrix job `38988141` is queued/running on Sherlock. Dependency-gated aggregation job `38988173` will continue automatically only after all 168 hourly branch tasks succeed. No user notification is required. Until the aggregate JSON appears, all legacy Figure 7c and F–K verdicts remain withdrawn.""")
-markdown("""## 11. Beyond one day — five more days, a coherent stack, and why a small p is still not a reproduction — v10 (census claims withdrawn)
+markdown("""## 11. Beyond one day — five more days, a coherent stack, and why a small p is still not a reproduction — v10, revised v11
+
+*v10: census claims withdrawn. v11: the "statistically detectable coherent component" reading withdrawn, the "no validated mechanism" statement superseded, and the selected-pair figure panel removed. Both changes are banner-marked in place below.*
 
 Section 10 tests 20 December 2024 alone, matched to the paper's own one-day design.
 Three questions remained: whether another day does better, whether stacking more
@@ -877,9 +895,17 @@ share never exceeds 49.9 %" is false — the tree's own outputs include 51.6 %. 
 cross-epoch replacement using Lellouch's released 2017 earthquake records is likewise
 withdrawn: the two arms were not processed alike, because `extract_all.py` takes
 DASutils `median=True` by default and stripped the common mode from the 2024–25 arm
-only. **The non-reproduction therefore has no validated mechanism at present.** The
-per-day and multi-day numbers above are unaffected and were verified by an independent
-chunk re-sum reproducing the stored aggregates to max abs difference 0.000e+00.
+only. The per-day and multi-day numbers above are unaffected and were verified by an
+independent chunk re-sum reproducing the stored aggregates to max abs difference
+0.000e+00.
+
+**Superseded in v11.** This paragraph ended "the non-reproduction therefore has no
+validated mechanism at present." That is no longer true. There are now two
+mechanisms, in precedence order: **illumination** (Section 12 — the binding
+constraint, and about the recording) and a **static fixed-wavenumber spatial
+pattern** (`AMBIENT_LOWK_MECHANISM.md` — which explains why every velocity-domain
+method failed in the same way, and is about the processing). Neither derives from
+the withdrawn census.
 
 **A coherent stack, not a pooled p value.** Combining p values is not the same
 experiment as stacking data: a coherent arrival grows with stacked windows while
@@ -908,12 +934,34 @@ propagating body wave. Figure 7c is a specific claim: a packet near 3,200 m/s wi
 the causal side dominant. At 3,200 m/s the score is consistently about half the peak
 and the causal side never dominates.
 
-This archive therefore does contain a statistically detectable coherent component,
-and it is not the arrival Lellouch et al. (2019) report. Accepting it on its p value
-alone would repeat, in a new form, the error that Sections 5–7 document for the F–K
-fan. The multi-day tool now requires three conditions jointly — p < 0.05, a peak
-inside the 2,500–4,000 m/s fan, and causal dominance — before it will report a
-recovery.
+> **WITHDRAWN in v11.** This section previously concluded: *"This archive therefore
+> does contain a statistically detectable coherent component, and it is not the
+> arrival Lellouch et al. (2019) report."* The second clause is right. The first is
+> **withdrawn** — calling it a *coherent component* overstates what was measured,
+> and this same section already shows why, two paragraphs above: `corr(trial
+> velocity, score) = +0.976`, moving the grid cap moves the "peak" with it, and a
+> moveout-free control (every trace replaced by the across-receiver median)
+> reproduces the observed curve to within 3.5 % at **every** velocity. A statistic
+> that a moveout-free control reproduces is not evidence of a coherent propagating
+> component. What the small p values do establish is only that the gather contains
+> **repeatable structure insensitive to receiver order** — the same object
+> `AMBIENT_LOWK_MECHANISM.md` identifies as a static fixed-wavenumber spatial
+> pattern, and a static pattern has no velocity at all.
+
+Accepting a small p on its own would repeat, in a new form, the error that
+Sections 5–7 document for the F–K fan. The multi-day tool therefore requires three
+conditions jointly — p < 0.05, a peak inside the 2,500–4,000 m/s fan, and causal
+dominance — before it will report anything.
+
+**Strengthened in v11: those three conditions are necessary but NOT sufficient**,
+and `ambient_lellouch2019_multiday_stack.py` now prints **CANDIDATE ONLY** on a
+pass rather than a recovery. The reason is structural and is the most transferable
+result in this notebook: **the receiver-order null permutes the *finished* gather,
+so any operator applied *before* the gather is formed sits outside its own null.**
+Adaptive F–K with no prior static removal exploited exactly that to reach
+p = 0.0060 while carrying the worst pedestal diagnostic of five configurations
+(Section 13). A pass now additionally owes an illumination measurement, an
+input-level null, and a reported pedestal diagnostic.
 """)
 
 python("""from pathlib import Path
@@ -941,16 +989,177 @@ print()
 print('No day clears alpha = 0.05. Every peak but one sits at the top edge of the scan,')
 print('i.e. flat moveout, rather than at the ~3200 m/s the paper reports.')
 
-for png in (base/'ambient_lellouch2019_multiday_stack.png',
-            base/'ambient_lellouch2019_multiday_stack_best2.png'):
+display(Image(filename=str(base/'ambient_lellouch2019_multiday_stack.png'), width=1100))
+""")
+
+markdown("""**Figure 12. The coherent four-day stack.** The 96.0-hour, 23,036-window stack of the four full days sharing a 500 Hz acquisition rate. The left panel shows the R−10:R+10 gather with the 3.2 km s⁻¹ trajectory overlaid as a reference, not a fit; the right panel shows the causal velocity scan against the 95th percentile of the receiver-order null. The stack does not place its maximum near 3.2 km s⁻¹ and is nonsignificant: peak 1.912 at 5,925 m s⁻¹ against a null 95th percentile of 2.649, **p = 0.9184**, detectability 0.72 where 1.00 is required, and causal/acausal 0.99 at 3,200 m s⁻¹. Four times the data leaves the statistic *further* from threshold than the single best day, which is the behaviour of noise rather than of an arrival too weak to see in 24 hours.
+
+**Changed in v11 — the selected-pair panel was removed.** v10 displayed a second panel pair for the two best-scoring days (p = 0.039) beside this one. That panel is withdrawn from the notebook, for two reasons. First, it is a **selection artefact and not a result**: those two days were chosen precisely because they scored lowest out of ten pairs, and the pair peaks at 5,850 m s⁻¹ — the scan ceiling — with causal/acausal 0.97. Displaying it next to the honest stack invited exactly the misreading this notebook exists to prevent. Second, its product file (`ambient_lellouch2019_multiday_stack_best2.png`) is not present on disk, so the v10 code silently rendered nothing there and the caption described a figure the reader could not see. The day-pair survey is still reported in full, as a table, in the text of Section 11 above — which is the right register for it.""")
+
+markdown("""## 12. Illumination — the binding constraint — v11
+
+Sections 1–11 all ask *processing* questions: which filter, which normalisation, how many days. This section asks the question that sits upstream of all of them, and it is the one that closes the ambient route on this archive.
+
+**Why this is the right question, and why it is Lellouch's own diagnostic.** His downgoing P wave is an **inference**, not a direct observation. Section 4.1 of the paper: after a 5–20 Hz bandpass, "the strong signals of these downgoing waves compared to the upgoing ones suggest that the dominant ambient field sources originate at the surface". So the primitive observable behind Figure 7c is a **downgoing/upgoing asymmetry**, and that can be measured directly — with no velocity scan, no correlation stack, and no filter. If the asymmetry is absent, there is no arrival of that kind present to recover, and no filter can create a propagation direction that is not in the data.
+
+**Why borehole geometry makes this unforgiving.** The virtual-source method recovers the Green's function between two receivers only if noise sources occupy the *stationary-phase zone* for that path. For two channels on a **vertical** line the direct P path between them is vertical, so the usable sources lie in a narrow cone **directly above the wellhead**, radiating steeply down. Noise arriving at oblique incidence contributes nothing to that path and only adds background. This is why the DAS ambient-noise literature is dominated by *surface-wave* studies, where sources anywhere along the fibre azimuth are usable. A downgoing body wave in a borehole is the hard case, and same-fibre/same-borehole/same-rock guarantees the same *Green's function* without supplying the *sources* needed to reconstruct it.
+
+**The measurement, with a working positive control.** |A| is the downgoing/upgoing asymmetry inside the frozen 2,500–4,000 m/s fan, positive frequencies, channels 23–708 (the lead-in is excluded, as the Figure 7c pipeline does), measured identically on both arms and compared at matched spatial rank:
+
+| arm | \\|A\\| | null 95th | p |
+|---|---:|---:|---:|
+| Lellouch 2017 pre-event records (positive control) | **0.348** | 0.248 | **0.0050** |
+| 2024–25, same measurement, rank 0 | 0.040 | 0.193 | 0.7307 |
+
+The 2017 arm is significant at spatial ranks 0, 1 and 2. The 2024–25 arm is significant at **no** rank tested (0, 1, 2, 4, 8). The control works — the measurement can find the asymmetry when it is there, from only ~5 s of data.
+
+**The archive-wide scan, decision rule fixed before the run.** One 30-s window per sampled file, 240 windows spanning 2024-05-21 to 2025-05-06, |A| after rank-2 spatial removal. Illumination was to be claimed **only** if the count of windows with p < 0.05 exceeded the 95th percentile of Binomial(N, 0.05); hour-of-day clustering was declared *supporting, not gating*.
+
+| quantity | value |
+|---|---|
+| windows measured | 240 of 240 sampled |
+| \\|A\\| median / 90th / max | 0.0296 / 0.0753 / 0.2385 |
+| windows with p < 0.05 | **11** |
+| expected by chance | **12.0** (Binomial 95th percentile 18) |
+
+**Result: no illuminated windows anywhere in the sampled archive.** The count is *below* chance expectation, so there is no positive signal whose diurnal timing could even be examined — the supporting test is moot rather than failed.
+
+**What this does and does not say.** It says the 2024–25 field carries no net directional preference in the body-wave fan in any window sampled, that this is a property of the **recording** rather than the processing, and that the same measurement finds the asymmetry in Lellouch's 2017 data. It does **not** identify a cause. The cultural-noise explanation (vehicles and machinery on the wellhead pad supplying the vertical cone) remains **speculation** — there is no site log, no operational record, and no statement in Lellouch et al. attributing the noise to any source. An earlier draft of this project's own write-up asserted that a manned field deployment supplied the 2017 illumination; that assertion is **withdrawn** as having no supporting record. Keep the two separate: the *absence* is measured, the *cause* is not.
+
+**Stated limits.** 30 s per window and one window per sampled file, so a burst shorter than 30 s could be missed; the 2017 arm is ~5 s from two records, and is **not the same acquisition** that produced his Figure 7c (per the release README that figure is "a stack of 7 different one-day correlations", raw data we do not have); the fan is the frozen 2,500–4,000 m/s selection; |A| measures a preferred direction **along the fibre**, near-vertical but not exactly vertical in this borehole; and rank-*k* removal would take out a genuinely plane-wave arrival that is itself low-rank, so high ranks are conservative *against* detection.
+
+Products: `interrogator_and_illumination_v2.txt`, `illumination_window_scan.txt`, `ambient_directional_asymmetry.txt`.
+""")
+
+python("""from pathlib import Path
+from IPython.display import Image, display
+
+base = ROOT if 'ROOT' in globals() else Path.cwd()
+for stem in ('interrogator_and_illumination_v2', 'illumination_window_scan',
+             'ambient_directional_asymmetry'):
+    txt, png = base/(stem+'.txt'), base/(stem+'.png')
+    print('='*78); print(stem); print('='*78)
+    print(txt.read_text() if txt.is_file() else '  MISSING: '+str(txt))
     if png.is_file():
         display(Image(filename=str(png), width=1100))
 """)
 
-markdown("""**Figure 12. Coherent multi-day stacks.** The first panel pair is the 96.0-hour stack of the four full days sharing a 500 Hz acquisition rate; the second is the two best-scoring days only. Left panels show the R−10:R+10 gather with the 3.2 km s⁻¹ trajectory overlaid as a reference, not a fit; right panels show the causal velocity scan against the 95th percentile of the receiver-order null. Neither stack places its maximum near 3.2 km s⁻¹. The 96-hour stack is nonsignificant (p = 0.918); the hand-picked two-day stack reaches p = 0.039 but peaks at 5,850 m s⁻¹ with causal/acausal 0.97, which is flat moveout rather than a propagating arrival, and was selected as the best of ten pairs. Neither is a reproduction of Figure 7c.""")
+markdown("""**Figure 13. Illumination, measured directly and scanned across the archive.** The first block is the interrogator/illumination test: the upper table asks whether the dominant spatial pattern of channels ≥ 23 is stable across six days spanning a year (it is not — cross-day median |corr| 0.0188 against a control 95th percentile of 0.1282, so an instrumental fingerprint is **not** supported inside the analysed aperture), and the lower block sweeps |A| against spatial rank for the 2024–25 arm and the 2017 positive control. The second block is the 240-window archive scan, with the pre-registered Binomial decision rule and its outcome (11 significant against 12.0 expected). The third is the standalone directional-asymmetry diagnostic. Together these show that the prerequisite Lellouch's inference rests on is present in his data and absent in ours, which is upstream of every filter tested in Sections 2–11.
+
+**One further attribution ruled out.** The interrogator *does* imprint a real, stable cross-day spatial pattern — |corr| **0.8426** against a control of 0.3889 — but **only in the uncemented surface lead-in, channels 0–22, which the Figure 7c pipeline already excludes.** Inside channels 23–708 the pattern is not distinguishable from unrelated patterns. **Gauge length is also not the explanation**: 10 m in 2017 against 16.335 m here is a 0.1–1.1 % attenuation effect at 3,200 m/s, three orders below what would be required. This supersedes v1 of that script, whose "instrumental" verdict was unrestricted and whose |A| ≈ 1e-4 "no illumination" figure was the algebraic *k*-symmetry of a separable static pattern rather than a property of the wavefield.""")
+
+markdown("""## 13. Adaptive F–K, and stacking that does not converge — v11
+
+Two experiments that close the two loudest remaining objections to the negative result: *"you never tried the adaptive F–K family"* and *"you just need more data."*
+
+### 13.1 Adaptive F–K (Isken et al. 2022) — the one F–K family never tried here
+
+Everything in Sections 2–7 imposes a **fixed velocity fan**. Isken et al.'s filter makes no velocity assumption at all: the mask is built from the observed amplitude spectrum raised to a power α, applied in sliding *t–x* windows with Bartlett-tapered overlaps, so it "enhances the energy of coherent waves (wavenumbers) within individual filter windows and no energy will be suppressed to the stop band." They demonstrate it on a **vertical borehole observatory** — our geometry. So the criticism that the F–K work was not pushed to full breadth was **correct**, and this closes it.
+
+**A prediction was registered before the run** (in `afk_recovery.sbatch` and in `AMBIENT_CC_LITERATURE_REVIEW.md` §1): an adaptive filter enhances the *dominant coherent* f–k component, and in these data that is the **static fixed-wavenumber pattern** holding ~39 % of in-band energy, so AFK applied without a prior spatial static removal should **amplify the contaminant**. The correct ordering is *static per-channel removal (spatial) → AFK (adaptive)*, and only in that order.
+
+**Five configurations. None passed the five predeclared gates.** Run on 2024-12-20, 300 files / 1,200 windows, source channel 23, RAM 0.1 s; the pedestal column is the flat-moveout diagnostic (lower is cleaner):
+
+| configuration | peak | at (m/s) | p | pedestal |
+|---|---:|---:|---:|---:|
+| AFK α=1, **no** static removal | 12.53 | 5900 | **0.0060** | **+0.987** |
+| median common mode, no AFK | 1.91 | 5900 | 0.8796 | +0.820 |
+| median common mode + AFK α=1 | 1.21 | 5900 | 0.5199 | +0.766 |
+| median common mode + AFK α=2 | 1.12 | 5900 | 0.3465 | +0.737 |
+| median common mode + rank-2 + AFK α=1 | 1.08 | **3300** | 0.9392 | **−0.036** |
+
+**Row 1 — a filter manufactured significance, exactly as predicted.** p = 0.0060 reads in isolation as a detection. It is not one: it carries the **worst** pedestal of the five (+0.987) and peaks at 5,900 m/s, the scan ceiling, not 3,200. The filter raised the score **6.6-fold** (1.91 → 12.53) by amplifying the pedestal, and the amplified pedestal then cleared a null that could not see the amplification.
+
+**The generalisable lesson, and the most transferable result in this notebook.** The receiver-order null permutes the **finished gather**. An operator applied *before* the gather is formed therefore sits **outside its own null**, and its amplification of a coherent contaminant is never tested. Only the predeclared gates caught this. **Any pre-correlation operator in this tree owes an input-level null, not merely a gather-level one** — which is precisely the standard Sections 5–7 applied to reject the fixed 2.5–4.5 km/s fan. This row is an independent second instance of the same failure mode, and it **strengthens** that earlier decision rather than reopening it.
+
+**Row 5 — the cleanest configuration, and the cleanest form of the negative.** Common mode + rank-2 + AFK is the only row that drives the pedestal to essentially zero (−0.036) and the only one whose peak lands in the physical range (3,300 m/s). It gives **p = 0.9392**. Repair the statistic and the peak moves where it should — and it is worth nothing.
+
+### 13.2 Stack convergence — the quantitative answer to "more data should win"
+
+Ambient interferometry should improve detectability as **√N**. Stacking 1, 2, 4, 8, 16 and 24 hourly chunks of 2024-12-20 and scoring each partial stack identically:
+
+| branch | raw score | **detectability** |
+|---|---|---|
+| baseline | N^+0.158 | **N^+0.042** |
+| common-mode removed | N^−0.004 | **N^+0.019** |
+
+Theory says **+0.50**. Observed **+0.02 to +0.04**. Stacking 24× more data should have improved detectability 4.9-fold; it improved it by about **4 %**, and detectability never reaches the 1.00 a detection requires (0.834 → 0.921 on the clean branch).
+
+The quantity fitted is deliberately **detectability, not raw score**: a raw score can climb purely because a repeatable contaminant accumulates, and the baseline's +0.158 is exactly that. Reported without trimming: the baseline touches detectability 1.014 at 16 chunks with p = 0.0170, then falls back to p = 0.1614 at 24 chunks. **That is noise crossing the line and back, not a signal emerging** — and it is a second reason the one selected day-pair at p = 0.039 in Section 11 must be read as a selection artefact.
+
+This is what Behm (2016) makes diagnostic. He reconstructed borehole P and S waves where "ambient noise from time periods as short as **30 seconds** is sufficient to obtain robust interferograms" — and he could tell the illumination came from above the array. Under adequate illumination, 30 s suffices. **A stack that fails to converge is the signature of an absent signal, not a weak one**, and this project had the inference backwards for most of the thread: non-detection was treated as an SNR problem and answered with more data (6 days, then a coherent 96-hour stack), and the results went the *wrong* way.
+""")
+
+python("""from pathlib import Path
+import json
+from IPython.display import Image, display
+
+base = ROOT if 'ROOT' in globals() else Path.cwd()
+afk = base/'ambient_transfer'/'lellouch2019_exact_stack_afk'
+
+# Read the AFK verdict straight from the aggregates so this cell cannot drift
+# from them. Pedestal values are quoted in the markdown above from
+# fig7c_negative/append_afk_results.py, which is the generator of record.
+labels = [('_afk1',           'AFK a=1, NO static removal'),
+          ('_cm',             'median common mode, no AFK'),
+          ('_cm_afk1',        'median common mode + AFK a=1'),
+          ('_cm_afk2',        'median common mode + AFK a=2'),
+          ('_cm_svd2_afk1',   'median common mode + rank-2 + AFK a=1')]
+stem = 'aggregate_2024-12-20_src23_ram0p1_cross_correlation_ordered_r0'
+print(f"{'configuration':<40}{'peak':>8}{'at m/s':>9}{'p':>10}")
+gates_passed = 0
+for suf, lab in labels:
+    f = afk/(stem+suf+'.json')
+    if not f.is_file():
+        print(f'{lab:<40}{"MISSING":>27}')
+        continue
+    d = json.loads(f.read_text())
+    v = d['best_causal_velocity_m_s']; p = d['receiver_order_scan_max_null_p']
+    print(f"{lab:<40}{d['best_causal_score']:>8.2f}{v:>9.0f}{p:>10.4f}")
+    if p < 0.05 and 2500.0 <= v <= 4000.0:
+        gates_passed += 1
+print()
+print('configurations with p < 0.05 AND a peak inside the 2500-4000 m/s fan:',
+      gates_passed)
+assert gates_passed == 0, 'a configuration now passes both -- re-read section 13'
+print('None passes. The single p < 0.05 row peaks at the scan ceiling and carries')
+print('the worst pedestal of the five: a filter amplifying the contaminant, not a')
+print('detection. See section 13.1.')
+
+conv = base/'ambient_stack_convergence.txt'
+print(); print('='*78); print('stack convergence'); print('='*78)
+print(conv.read_text() if conv.is_file() else '  MISSING: '+str(conv))
+for png in (base/'ambient_stack_convergence.png', base/'ambient_fixed_k_test.png'):
+    if png.is_file():
+        display(Image(filename=str(png), width=1100))
+""")
+
+markdown("""**Figure 14. Stack convergence, and the fixed-wavenumber character of the contaminant.** The upper figure fits detectability against the number of stacked hourly chunks for the baseline and common-mode-removed branches; the fitted exponents are +0.042 and +0.019 against the +0.50 that stacking a real arrival requires, and the baseline's excursion above 1.00 at 16 chunks followed by its fall back at 24 is shown rather than trimmed. The lower figure is the fixed-*k* test that identifies **what** is being stacked: raising the band from 5–12 Hz to 12–20 Hz multiplies the band centre by **1.882** while the power-weighted low-|k| centroid moves by only **1.011**. A wave at fixed velocity requires those ratios to be equal (v = f/k); a static spatial pattern at fixed wavenumber predicts 1.000. Observed 1.011 — the feature is at fixed wavenumber, and it holds ~39 % of in-band energy. The test had the range to see a wave and did not: a 3,200 m/s arrival sits at 1.86 cells at 8.5 Hz and 3.50 cells at 16.0 Hz, both inside the 16-cell window measured. A static pattern **has no velocity**, which is why all eight velocity-domain methods tried in this tree failed in the same way — and why the remedy has to be **spatial** (calibrating the static per-channel response) rather than another velocity filter. This does **not** say no arrival exists; a weak arrival could hide beneath a feature holding 39 % of the energy. What rules the arrival out is Section 12, not this figure. Full treatment in `AMBIENT_LOWK_MECHANISM.md`.""")
+
+markdown("""## 14. Where this leaves the notebook — v11
+
+**The F–K fan verdict is unchanged and still stands.** The 2.5–4.5 km/s fan produces an apparent ridge but **fails the pre-filter channel-scramble gate**, so it is not accepted as an independently recovered physical arrival, and it must not be reported as a Lellouch reproduction. Sections 5–7 remain the record. Section 13.1 is a second, independent instance of the same failure mode from a different filter family and strengthens that decision.
+
+**The negative result, in the three forms that do not depend on a multiplicity correction:**
+
+- six complete days give minimum **p = 0.1345**; Fisher's combination **p = 0.524**; the coherent four-day 96.0-hour, 23,036-window stack **p = 0.9184**;
+- **0 of 181 velocities clear the per-velocity null** — at 3,200 m/s, 2.752 against a threshold of 2.811. This is the maximally powerful test with no multiplicity penalty at all;
+- detectability grows as **N^+0.042 / N^+0.019** where stacking a real arrival requires **N^+0.50**.
+
+**The one selected day-pair at p = 0.039 is a selection artefact, not a result.** It was chosen because it scored lowest of ten pairs, and it peaks at the scan ceiling with causal/acausal 0.97.
+
+**The mechanism, in precedence order.** (1) **Illumination is the binding constraint** — Section 12, about the *recording*, upstream of all processing. (2) **A static fixed-wavenumber spatial pattern is the contaminant** — `AMBIENT_LOWK_MECHANISM.md`, about the *processing* failures. Do not cite (2) alone as the reason Figure 7c does not reproduce.
+
+**Ruled out rather than left open:** gauge length (0.1–1.1 % at 3,200 m/s); the interrogator inside the analysed aperture (stable only in channels 0–22, which the pipeline excludes); and day selection (the richest day by the withdrawn census scored *worst*).
+
+**Scope, unchanged since v8.** This is a statement about **this archive, this band (5–20 Hz), and these days**. It is not a criticism of Lellouch et al. (2019), not a claim that ambient interferometry fails in general, and not a claim that F–K filtering is invalid as a directional tool. The velocity model itself remains reachable on this archive by a different route — earthquakes, of which 206 are cached, and G0 already matched the 2005 check shot to 0.2 %.
+
+**Status doc precedence.** Where this notebook and a status document disagree: `AMBIENT_LOWK_MECHANISM.md` wins on the fixed-*k* mechanism, `AMBIENT_CC_LITERATURE_REVIEW.md` wins on illumination and adaptive F–K, `FIG7C_MULTIDAY_RESULT.md` wins on the multi-day numbers, and **this notebook remains authoritative on the F–K fan verdict** — which those files explicitly defer to. `AMBIENT_FIG7C_STATUS.md` remains authoritative for the single-day 2024-12-20 operator; see `AMBIENT_FIG7C_STATUS_ADDENDUM.md` for the items in it that later work touched.
+""")
 
 markdown("""## References
 
+- Behm, M. (2016), Feasibility of borehole ambient noise interferometry for permanent reservoir monitoring, *Geophysical Prospecting*, 65, 563–580. [https://doi.org/10.1111/1365-2478.12424](https://doi.org/10.1111/1365-2478.12424)
 - Bensen, G. D., et al. (2007), Processing seismic ambient noise data to obtain reliable broad-band surface wave dispersion measurements, *Geophysical Journal International*, 169, 1239–1260. [https://doi.org/10.1111/j.1365-246X.2007.03374.x](https://doi.org/10.1111/j.1365-246X.2007.03374.x)
 - Ehsaninezhad, L., C. Wollin, V. Rodríguez Tribaldos, B. Schwarz, and C. M. Krawczyk (2024), Urban subsurface exploration improved by denoising of virtual shot gathers from distributed acoustic sensing ambient noise, *Geophysical Journal International*, 237, 1751–1764. [https://doi.org/10.1093/gji/ggae134](https://doi.org/10.1093/gji/ggae134)
 - Isken, M. P., H. Vasyura-Bathke, T. Dahm, and S. Heimann (2022), De-noising distributed acoustic sensing data using an adaptive frequency–wavenumber filter, *Geophysical Journal International*, 231, 944–949. [https://doi.org/10.1093/gji/ggac229](https://doi.org/10.1093/gji/ggac229)

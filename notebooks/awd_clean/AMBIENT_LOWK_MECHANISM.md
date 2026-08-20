@@ -20,7 +20,12 @@ Figure 7c mechanism question specifically. It does not overrule
 > 1. **Illumination is absent** (`ambient_directional_asymmetry.py`,
 >    `interrogator_and_illumination_v2.py`, `illumination_window_scan.py`) — the
 >    wavefield does not contain a net downgoing component in this band. This is
->    the primary explanation and it is about the *recording*.
+>    the primary explanation and it is about the *recording*. The archive-wide
+>    scan is now complete and closes the route rather than merely suggesting it:
+>    of **240 windows** spanning 2024-05-21 to 2025-05-06, **11 reach p < 0.05
+>    against 12.0 expected by chance** (Binomial 95th percentile 18), so no
+>    illuminated window was found anywhere. The decision rule was fixed before the
+>    run. `illumination_window_scan.txt`.
 > 2. **A static fixed-k pattern dominates** (this file) — which explains why the
 >    eight velocity-domain methods all failed *in the same way*, and why the
 >    pedestal could not be filtered out. This remains correct and useful, but it
@@ -89,10 +94,20 @@ the in-band energy. Do not cite this file as evidence that the ambient arrival i
 absent.
 
 Independently established and unchanged: 6 days give min p = 0.1345; the coherent
-96 h stack gives p = 0.9184; **0 of 181 velocities clear the per-velocity null**;
-and the Figure 7d constant-offset gather peaks at exactly 0.0000 s at every
-depth while Lellouch's migrates 20.7 -> 11.5 ms. Our picker reproduces his
-Figure 9 from his own released traces at r = 0.948, so the method is not at fault.
+96 h stack gives p = 0.9184; **0 of 181 velocities clear the per-velocity null**
+(at 3,200 m/s specifically, 2.752 against a per-velocity threshold of 2.811); and
+the Figure 7d constant-offset gather peaks at exactly 0.0000 s at every depth
+while Lellouch's migrates 20.7 -> 11.5 ms.
+
+**Corrected 2026-08-19.** This paragraph previously ended "Our picker reproduces
+his Figure 9 from his own released traces at r = 0.948, so the method is not at
+fault." That is **withdrawn as worded**. r = 0.948 is `corr(depth, velocity)` for
+picks our picker made on his released 7d traces — a measure of how monotonic our
+own picks are, **not** agreement with his published Figure 9 curve, which was
+never compared value-for-value. The supportable version: on known-good input our
+picker returns a monotonic velocity-depth trend of the expected form (2,416 m/s
+at 50 m rising to 4,357 m/s at 700 m), so the picking stage is not what fails on
+the 2024-25 data.
 
 ## 4. Two retractions, in order — read this before quoting any k = 0 number
 
@@ -140,7 +155,30 @@ Measured k = 0 share of the 2017 pre-event window: **0.13 %** (M1p33) and
 
 ## 5. Is it the interrogator?
 
-Open, and not answerable with the released data. The settings that differ:
+**Partly answered 2026-08-19, and the answer is no — not inside the aperture that
+matters.** `interrogator_and_illumination_v2.py` tested whether the dominant
+spatial pattern is *stable across days*, which a fixed instrumental fingerprint
+must be, on six days spanning 2024-05-21 to 2025-05-06:
+
+| channels | cross-day median \|corr(u1,u1)\| | control \|corr(u1,u2+)\| | verdict |
+|---|---:|---:|---|
+| 0–22 (surface lead-in) | **0.8426** | 0.3889 | stable — instrumental |
+| 23–708 (the analysed aperture) | **0.0188** | 0.1282 (95th) | **not** stable — not an instrumental fingerprint |
+
+So the interrogator does imprint a real, stable spatial pattern, but **only in the
+uncemented surface lead-in, channels 0–22 — which the Figure 7c pipeline already
+excludes.** Inside channels 23–708 the dominant pattern is not distinguishable
+from unrelated patterns, so an instrumental fingerprint is not supported there.
+This also supersedes v1 of that script, whose "instrumental" verdict was
+unrestricted and whose |A| = 1e-4 "no illumination" number was the algebraic
+k-symmetry of a separable static pattern rather than a property of the wavefield.
+
+Note this does **not** retract section 1: the static fixed-k pattern is still
+there and still holds ~39 % of in-band energy. It says only that the pattern is
+not a *time-invariant instrument signature*; a day-to-day-varying static spatial
+pattern is fully consistent with section 1.
+
+The settings that differ between the two acquisitions, retained for the record:
 
 | | Lellouch 2017 | 2024-25 |
 |---|---|---|
@@ -149,12 +187,25 @@ Open, and not answerable with the released data. The settings that differ:
 | gauge length | 10 m | 16.335 m |
 | output unit | — | `rad * 2PI/2^16`, i.e. absolute optical phase |
 
-Channel spacing is effectively identical and the gauge-length effect is measured
-at 0.1-1.1 % at 3200 m/s, so neither explains the difference. The last row is the
-plausible candidate: absolute optical phase with no common-mode rejection carries
-a laser/temperature/PSU term shared across channels, which is low-wavenumber
-energy by construction, and it is consistent with the fixed-k finding in
-section 1.
+Channel spacing is effectively identical and **gauge length is not the
+explanation** — the effect is measured at 0.1-1.1 % at 3200 m/s, three orders
+below what would be needed. The last row remains the most plausible instrumental
+candidate: absolute optical phase with no common-mode rejection carries a
+laser/temperature/PSU term shared across channels, which is low-wavenumber energy
+by construction, and it is consistent with the fixed-k finding in section 1.
+
+**But it is now a weaker candidate than when this was written**, because a
+laser/PSU term should be *stable across days* and the table above shows the
+dominant pattern over channels 23-708 is not (0.0188 against a control 95th of
+0.1282). Either the term drifts substantially on month timescales, or the
+low-wavenumber energy inside the aperture is environmental rather than
+instrumental. This is not resolved here.
+
+**And it is not the load-bearing question any more.** Even a complete answer to
+"which box made the pedestal" would not change the outcome, because the binding
+constraint is upstream of the instrument: the 2024-25 wavefield carries no
+downgoing/upgoing asymmetry in the fan, in any of 240 windows scanned across the
+archive. See the banner at the top of this file.
 
 **The test that would settle it cannot be run.** `matched_earthquake_census.py`
 was written to put an earthquake in *both* arms, which controls for signal

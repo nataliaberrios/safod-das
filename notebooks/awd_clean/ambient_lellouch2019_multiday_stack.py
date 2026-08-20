@@ -227,11 +227,43 @@ def main():
     # the top edge of the scan is a flat-moveout feature arriving at every
     # receiver at once -- common-mode structure, not a propagating wave. All
     # three conditions must hold.
+    #
+    # 2026-08-19: these three conditions are NECESSARY BUT NOT SUFFICIENT, and
+    # this script must not print a positive verdict on them alone. Two later
+    # results make that unsafe:
+    #   * ILLUMINATION. The 2024-25 field carries no downgoing/upgoing asymmetry
+    #     in the 2500-4000 m/s fan (|A| = 0.040, p = 0.7307) where Lellouch's
+    #     2017 records do (|A| = 0.348, p = 0.0050) at matched spatial rank, and
+    #     an archive scan of 240 windows found 11 significant against 12.0
+    #     expected by chance. See interrogator_and_illumination_v2.txt and
+    #     illumination_window_scan.txt. Lellouch's downgoing P is an INFERENCE
+    #     from that asymmetry, so with the asymmetry absent there is no arrival
+    #     of that kind present to recover.
+    #   * THE RECEIVER-ORDER NULL CANNOT SEE A PRE-GATHER OPERATOR. It permutes
+    #     the FINISHED gather, so anything applied before the gather is formed
+    #     sits outside its own null. Adaptive f-k with no prior static removal
+    #     reached p = 0.0060 this way, purely by amplifying the fixed-k pedestal
+    #     6.6-fold (AMBIENT_CC_LITERATURE_REVIEW.md section 1).
+    # A pass here is therefore a CANDIDATE that still owes an illumination
+    # measurement and an input-level (pre-gather) null.
     near_3200 = 2500.0 <= vpeak <= 4000.0
     causal_dominates = (c32 / a32) > 1.0 if a32 else False
     if p < 0.05 and near_3200 and causal_dominates:
-        say("  VERDICT: a ~3200 m/s causal arrival IS recovered (p < 0.05, peak in the"
-            " 2500-4000 m/s fan, causal side dominant).")
+        say("  VERDICT: CANDIDATE ONLY -- not a reproduction on this evidence.")
+        say("    All three necessary conditions are met (p < 0.05, peak in the")
+        say("    2500-4000 m/s fan, causal side dominant), which no configuration")
+        say("    has previously achieved. They are NOT sufficient. Before this may")
+        say("    be reported as a recovered arrival it owes, and does not yet have:")
+        say("      1. an illumination measurement -- |A| in the fan must be")
+        say("         significant in THESE data. The archive-wide answer so far is")
+        say("         no (11 of 240 windows vs 12.0 expected by chance), while the")
+        say("         same measurement finds it in 2017 (|A| = 0.348, p = 0.0050).")
+        say("      2. an INPUT-LEVEL null. The receiver-order null permutes the")
+        say("         finished gather and cannot see any operator applied before")
+        say("         the gather is formed; adaptive f-k reached p = 0.0060 that")
+        say("         way by amplifying the fixed-k pedestal 6.6-fold.")
+        say("      3. a pedestal diagnostic near or below zero, reported with it.")
+        say("    See AMBIENT_LOWK_MECHANISM.md and AMBIENT_CC_LITERATURE_REVIEW.md.")
     elif p < 0.05:
         say("  VERDICT: NOT a reproduction despite p = %.4f." % p)
         say("    peak at %.0f m/s %s the 2500-4000 m/s fan" %

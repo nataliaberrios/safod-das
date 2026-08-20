@@ -1,5 +1,44 @@
 # Figure 7c across days — the paper-faithful operator on four complete days
 
+> # SUPERSEDED — do not cite this file
+>
+> **Marked 2026-08-19.** This is the four-day version of a result that was extended
+> to six days the same week. **`FIG7C_MULTIDAY_RESULT.md` replaces it in full** and
+> is the file to cite. Its headline conclusion — Figure 7c does not reproduce — is
+> unchanged and was strengthened; what is wrong here is the *motivation* and one
+> whole section of *interpretation*.
+>
+> **Specifically withdrawn from this file:**
+>
+> 1. **The entire "census fan %" column** in the Result table, and the section
+>    "Why another day was worth trying" that rests on it. The raw energy census
+>    (`ambient_fk_energy_census.py`) is **withdrawn**: it had no geometric
+>    baseline, 98.4 % of in-band (f,k) cells lie below 1,500 m/s by construction,
+>    and any run without the `_ch23-896` suffix is determined by 23 uncemented
+>    lead-in channels that carry 97 % of the array's 5–20 Hz energy. The day-level
+>    p values in that table are **unaffected** and were independently verified
+>    (chunk re-sum reproduces the stored aggregates to max abs difference 0.000e+00).
+> 2. **The section "The result that matters most"** — "census fan share does not
+>    predict the correlation outcome". Both sides of that comparison are census
+>    numbers, so the statement is neither true nor false; it is void. Nothing
+>    follows from it either way.
+> 3. **"an eight-day raw-input census"** in "What this closes" — same reason.
+> 4. **"Not closed: a true multi-day stack."** It was done. The coherent four-day,
+>    96.0-hour, 23,036-window stack gives **p = 0.9184** — further from
+>    significance than the best single day.
+> 5. **"2024-05-11 was submitted but its aggregate did not complete."** It
+>    completed (p = 0.3091), and separately it turned out to be recorded at
+>    **5000 Hz** against 500 Hz on every other day, so it cannot be coherently
+>    pooled with them.
+> 6. **The excluded days were later run.** 2024-11-30 was analysed over its
+>    leading 21.3 h contiguous block and is the closest any day comes, at
+>    **p = 0.1345** — still failing, still peaking at 5,850 m/s.
+>
+> The mechanism, which this file does not discuss at all, is in
+> `AMBIENT_LOWK_MECHANISM.md` (static fixed-k contaminant) and
+> `AMBIENT_CC_LITERATURE_REVIEW.md` §4.3 (illumination, the binding constraint).
+> Everything below is retained as audit history only.
+
 Written 2026-08-14. Companion to `AMBIENT_FIG7C_STATUS.md`, which remains the
 authoritative single-day record. This file answers one question that document
 left open: **the faithful operator had only ever been run on 2024-12-20. Does

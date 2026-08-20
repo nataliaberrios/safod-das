@@ -10,10 +10,19 @@ correlations (github.com/ariellellouch/SAFODDAS, `lellouch_traces/`).
 
 Two facts make 7d the decisive comparison:
 
-  1. Our picker already recovers HIS result from HIS 7d traces -- the paper's
-     3-sample parabolic maximum gives 2416 m/s at 50 m rising to 4357 m/s at
-     700 m, r = 0.948 against depth, reproducing his Figure 9. So the downstream
-     is known-good on known-good input.
+  1. Our picker behaves sensibly on HIS 7d traces -- the paper's 3-sample
+     parabolic maximum gives 2416 m/s at 50 m rising to 4357 m/s at 700 m, with
+     corr(depth, velocity) = +0.948. So the downstream is known-good on
+     known-good input.
+
+     CAREFUL, corrected 2026-08-19: r = 0.948 is corr(depth, velocity) for OUR
+     picks on HIS traces -- a measure of how monotonic our own picks are. It is
+     NOT agreement with his published Figure 9 curve, which has never been
+     compared here value-for-value. Earlier wording in this docstring and in two
+     status files said this "reproduc[es] his Figure 9"; that is withdrawn as an
+     overstatement. The supportable claim is only that on known-good input the
+     picker returns a monotonic velocity-depth trend of the expected form, so the
+     picking stage is not what fails on 2024-25.
   2. Figure 7d, not 7c, is what the paper's velocity model comes from. Section 4.1:
      "we deduce we are observing a P wave and take the correlation functions shown
      in Figure 7d to estimate its velocity every 50 m."
@@ -272,8 +281,9 @@ def aggregate(a):
             % ("Lellouch 2017", lel_v[0], lel_v[-1], np.corrcoef(lel_z, lel_v)[0, 1]))
     say("")
     say("  A recovered 7d needs a MONOTONIC velocity-depth trend like his")
-    say("  (2416 -> 4357 m/s, r = +0.948). Scatter or a flat/negative r means the")
-    say("  peak lag is not a travel time.")
+    say("  (2416 -> 4357 m/s, corr(depth,v) = +0.948 for OUR picks on HIS traces;")
+    say("  that is our picks' monotonicity, NOT agreement with his Figure 9 curve).")
+    say("  Scatter or a flat/negative r means the peak lag is not a travel time.")
 
     fig, ax = plt.subplots(1, 3, figsize=(17, 6), constrained_layout=True)
     for i, (k, lab) in enumerate((("shifted", "ours R+-10 shifted"),

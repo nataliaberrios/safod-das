@@ -1,8 +1,38 @@
 # Figure 7c across five complete days — paper-faithful
 
-Written 2026-08-14. Companion to `AMBIENT_FIG7C_STATUS.md`, which covers
-2024-12-20 in full. This file records the extension to four further days and is
-the basis for widening that document's claim from one day to the archive.
+Written 2026-08-14. **Reconciled 2026-08-19** against the mechanism and
+illumination results that postdate it; see the banner immediately below. Companion
+to `AMBIENT_FIG7C_STATUS.md`, which covers 2024-12-20 in full. This file records
+the extension to four further days and is the basis for widening that document's
+claim from one day to the archive.
+
+> **RECONCILED 2026-08-19 — this file no longer holds the mechanism question, and
+> two of its own statements are withdrawn.** The negative result below stands
+> unchanged and every number in it was re-checked. What changed is the
+> explanation, which this file said was open. Read in order:
+>
+> 1. **Illumination is the binding constraint** — the 2024-25 field carries no
+>    downgoing/upgoing asymmetry in the body-wave fan (|A| = 0.040, p = 0.7307)
+>    where Lellouch's 2017 records do (|A| = 0.348, p = 0.0050) at matched
+>    spatial rank, and an archive scan of 240 windows found 11 significant
+>    against 12.0 expected by chance. `interrogator_and_illumination_v2.txt`,
+>    `illumination_window_scan.txt`.
+> 2. **The contaminant is a static fixed-wavenumber spatial pattern** —
+>    `AMBIENT_LOWK_MECHANISM.md`, `ambient_fixed_k_test.txt`. This explains why
+>    every velocity-domain method failed identically.
+>
+> Withdrawn from this file, 2026-08-19: the "**statistically detectable coherent
+> component**" at 5,850–5,900 m/s (see "Day-pair survey" below — it was the scan
+> ceiling, which this same file already explains two sections earlier), and the
+> claim that this project "**reproduces**" Lellouch's Figure 9 at r = 0.948 (see
+> "Conclusion").
+>
+> **On disagreement with `AMBIENT_FIG7C_MULTIDAY.md`:** that file is the earlier,
+> four-day version of this one and still carries a "census fan %" column plus a
+> section built on it. Those are withdrawn (next banner). Where the two files
+> disagree, **this one is later and wins**; where this file and
+> `AMBIENT_LOWK_MECHANISM.md` or `AMBIENT_CC_LITERATURE_REVIEW.md` disagree on
+> mechanism, **those are later and they win.**
 
 > **CENSUS CLAIMS WITHDRAWN 2026-08-14, same day.** Every statement in this file
 > that rested on `ambient_fk_energy_census.py` is retracted, following an
@@ -22,8 +52,11 @@ the basis for widening that document's claim from one day to the archive.
 > **The per-day and multi-day results below are unaffected** and were verified
 > independently: the chunk re-sum reproduces the stored aggregates to max abs
 > difference 0.000e+00. Only the census-derived *motivation* and the
-> census-derived *mechanism* are withdrawn. The non-reproduction therefore
-> currently has **no validated mechanism**.
+> census-derived *mechanism* are withdrawn. (When written, this left the
+> non-reproduction with no validated mechanism. That sentence is now **out of
+> date** — see the 2026-08-19 banner above: there is a mechanism, and it is
+> illumination plus a static fixed-k pattern, neither of which comes from the
+> census.)
 
 ## Why more days
 
@@ -171,10 +204,28 @@ common-mode or instrumental structure, not a propagating body wave. Figure 7c is
 specific claim: a packet near 3,200 m/s with the causal side dominant. At 3,200 m/s
 the score is consistently about half the peak and the causal side never dominates.
 
-So this data does contain a statistically detectable coherent component, and it is
-emphatically not the arrival the paper reports. `ambient_lellouch2019_multiday_stack.py`
-now requires all three conditions — p < 0.05, peak inside the 2,500–4,000 m/s fan,
-and causal dominance — before it will call anything a reproduction.
+> **WITHDRAWN 2026-08-19.** This paragraph originally read: "So this data does
+> contain a statistically detectable coherent component, and it is emphatically
+> not the arrival the paper reports." The second half is right; the first half is
+> **withdrawn**. Calling it a *coherent component* overstates what was measured.
+> A peak at 5,850–5,900 m/s is where the scan stops, and this same file already
+> shows why two sections earlier: `corr(trial velocity, score) = +0.976`, moving
+> the grid cap moves the "peak" with it, and a moveout-free control (every trace
+> replaced by the across-receiver median) reproduces the curve to within 3.5 % at
+> every velocity. A statistic that a moveout-free control reproduces is not
+> evidence of a coherent propagating component. What the small p values in the
+> table do establish is only that the gather contains **repeatable structure that
+> is insensitive to receiver order** — which is the same object
+> `AMBIENT_LOWK_MECHANISM.md` identifies as a static fixed-wavenumber spatial
+> pattern, and a static pattern has no velocity at all.
+
+`ambient_lellouch2019_multiday_stack.py` requires all three conditions — p < 0.05,
+peak inside the 2,500–4,000 m/s fan, and causal dominance — before it will report
+anything, and as of 2026-08-19 a pass prints **CANDIDATE ONLY**: the three
+conditions are necessary but not sufficient, because the receiver-order null
+permutes the finished gather and therefore cannot see any operator applied before
+the gather is formed. Adaptive f-k with no prior static removal reached p = 0.0060
+exactly that way, by amplifying the pedestal 6.6-fold.
 
 ## Conclusion
 
@@ -185,15 +236,51 @@ minimum p over six days is 0.1345, and the observed score never clears the
 per-velocity null at any of 181 velocities — so the negative does not rest on a
 multiplicity correction.
 
-**The mechanism is open.** This document previously concluded that the required
-downgoing body-wave energy was absent from the input. That explanation came from
-`ambient_fk_energy_census.py` and is withdrawn (see banner): its statistic had no
-geometric baseline and could not distinguish the SAFOD wavefield from white
-noise. A cross-epoch comparison against Lellouch's released 2017 earthquake
-records was then attempted as a replacement and is *also* withdrawn — the two
-arms were not processed alike, because `extract_all.py` takes DASutils
-`median=True` by default and so stripped the common mode from the 2024–25 arm
-only. **No validated mechanism for the non-reproduction currently exists.**
+**The mechanism is no longer open — updated 2026-08-19.** This section previously
+ended "no validated mechanism for the non-reproduction currently exists." That is
+superseded. The history is kept because both retracted attempts are cited in
+pushed commits:
+
+- The **energy census** explanation ("the required downgoing body-wave energy is
+  absent from the input") came from `ambient_fk_energy_census.py` and is
+  withdrawn — its statistic had no geometric baseline and could not distinguish
+  the SAFOD wavefield from white noise.
+- The **cross-epoch coherence** replacement is also withdrawn — the two arms were
+  not processed alike, because `extract_all.py` takes DASutils `median=True` by
+  default and so stripped the common mode from the 2024–25 arm only.
+
+What replaced them, in dependency order:
+
+1. **Illumination — the binding constraint.** Lellouch's downgoing P is an
+   *inference from a measured downgoing/upgoing asymmetry*, not a direct
+   observation. That asymmetry is present in his 2017 records (|A| = 0.348,
+   p = 0.0050) and absent in ours (|A| = 0.040, p = 0.7307) under the identical
+   measurement at matched spatial rank; an archive scan of 240 windows found 11
+   significant against 12.0 expected by chance, so no illuminated window was
+   found anywhere in 2024–25. No filter can create a propagation direction that
+   is not in the data. `interrogator_and_illumination_v2.txt`,
+   `illumination_window_scan.txt`.
+2. **A static fixed-wavenumber spatial pattern — why every method failed the same
+   way.** Raising the band from 5–12 to 12–20 Hz multiplies band centre by 1.882
+   and the low-k centroid by only 1.011; a wave requires those to be equal. It
+   holds ~39 % of in-band energy. `AMBIENT_LOWK_MECHANISM.md`,
+   `ambient_fixed_k_test.txt`.
+3. **Stacking does not converge.** Detectability grows as N^+0.042 (baseline) and
+   N^+0.019 (common-mode removed) where a real arrival requires N^+0.50.
+   `ambient_stack_convergence.txt`.
+4. **Adaptive f-k does not rescue it.** Isken et al. (2022) implemented and run in
+   five configurations; none passed the gates. The cleanest (common mode +
+   rank-2 + AFK) drove the pedestal to −0.036 and still gave p = 0.9392. With no
+   prior static removal it produced a **spurious** p = 0.0060 by amplifying the
+   pedestal 6.6-fold. `AMBIENT_CC_LITERATURE_REVIEW.md` §1.
+
+Two candidate explanations are ruled out rather than left open: **gauge length is
+not the explanation** (10 m against 16.335 m is a 0.1–1.1 % effect at 3,200 m/s),
+and **the interrogator is not responsible inside the analysed aperture** — it
+produces a stable cross-day spatial pattern only in the surface lead-in, channels
+0–22 (|corr| 0.8426 against a control of 0.3889), which the Figure 7c pipeline
+already excludes; over channels 23–708 the pattern is not stable (0.0188 against
+a control 95th percentile of 0.1282).
 
 One thing the cross-epoch work does still support: gross sensing failure is ruled
 out. The 2024–25 array records earthquake wavefronts at 92 % of the 2017 array's
@@ -203,5 +290,16 @@ coherence curves were — but it is not entirely immune, and should be redone wi
 both arms read identically before being relied on.
 
 This is a statement about this archive, this band, and these days. It is not a
-criticism of Lellouch et al. (2019), whose Figure 9 companion model this project
-reproduces from the released Figure 7d correlograms at r = 0.948.
+criticism of Lellouch et al. (2019).
+
+**Correction, 2026-08-19 — what r = 0.948 is and is not.** This file previously
+said the project "reproduces" Lellouch's Figure 9 companion model "from the
+released Figure 7d correlograms at r = 0.948". That **overstates** it and is
+withdrawn as worded. r = 0.948 is `corr(depth, velocity)` for picks our picker
+made on *his released 7d traces* — i.e. a measure of how monotonic our own
+velocity–depth picks are. It is **not** a measure of agreement with his published
+Figure 9 curve, which was never compared trace-for-trace or value-for-value. The
+weaker statement it does support is the one worth keeping: run on known-good
+input, our picker returns a monotonic velocity–depth trend of the expected form
+(2,416 m/s at 50 m rising to 4,357 m/s at 700 m), so the downstream picking stage
+is not what fails on the 2024–25 data.
