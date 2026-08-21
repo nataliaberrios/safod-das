@@ -155,6 +155,9 @@ md("""
 ## 3. The numbers
 
 Coverage, then detection. The gap between the two columns is the point.
+
+
+**Source.** All values read from `drop_catalog/awd_drop_catalog.csv`, `awd_burst_summary.csv` and `timing_uncertainty.txt`, all three written by **`drop_catalog/build_drop_catalog.py`**. Nothing here is computed in the notebook.
 """)
 
 co("""
@@ -206,6 +209,9 @@ loss.
 > fibre entry at **channel 73**, so channels 0–72 are in the **air**, and
 > `AUDIT_2026-08-20.md` §1.4 voids Nano results built on air channels. The
 > channel here is picked from the data within the cemented range instead.
+
+
+**Source.** Figure drawn by this notebook from `drop_catalog/burst_timeseries.npz`, which is written by **`drop_catalog/build_burst_timeseries.py`** reading raw Nano `.pb` files on `$OAK/SAFOD/ActiveJune2026/Nano/` plus `../awd_manifest.csv`. Channel chosen at run time inside the cemented range; wellhead from `../nano_find_wellhead.txt`. Reproduces `../../JULY24_fml_coupling.ipynb` cell 17.
 """)
 
 co("""
@@ -268,6 +274,9 @@ was actually getting into the fibre.
 
 Detection = leave-one-out signal NCC > 0.90 **and** beam SNR > 10 dB. Those
 thresholds are descriptive, not pre-registered — see the caveats at the end.
+
+
+**Source.** Figure drawn by this notebook from `drop_catalog/awd_drop_catalog.csv` (written by **`drop_catalog/build_drop_catalog.py`**).
 """)
 
 co("""
@@ -315,6 +324,9 @@ the delivered timing is usable.
 The horizontal banding is real: it is the 49 bursts, and the bands where the
 stripe fades are the hours when the source was not getting into the fibre. That
 is the same structure Figure 1 shows as colour.
+
+
+**Source.** Figure drawn by this notebook from `../nano_hierarchical_repeatability.npz` (`beam_waveforms`), written by **`../nano_hierarchical_repeatability.py`**.
 """)
 
 co("""
@@ -378,6 +390,9 @@ md("""
 The same data reduced to **one row per burst** — each is the 20-drop stack for
 that burst, so this is the 24 hours at a glance without 988 rows of speckle.
 Red dotted line is again the delivered drop time.
+
+
+**Source.** Figure drawn by this notebook from `../nano_hierarchical_repeatability.npz` (`normalized_burst_templates`), written by **`../nano_hierarchical_repeatability.py`**.
 """)
 
 co("""
@@ -426,6 +441,9 @@ delivered timing is good enough to stack on.
 > The red line is the *node pick*, not the true source instant. Both nodes sit
 > metres from the source and share the same unknown source-to-node travel time;
 > the absolute offset is the ~90 ms measured against the check shot.
+
+
+**Source.** Figure drawn by this notebook from `../nano_hierarchical_repeatability.npz` (`beam_waveforms`), written by **`../nano_hierarchical_repeatability.py`**. SNR joined on timestamp from `drop_catalog/awd_drop_catalog.csv`.
 """)
 
 co("""
@@ -472,6 +490,9 @@ Every drop in a single burst as an image, so repeatability is visible directly:
 each row is one drop, time runs left to right, and the **red dotted line is
 again the delivered drop time**. A vertical arrival means every drop in the
 burst landed at the same time relative to its own pick.
+
+
+**Source.** Figure drawn by this notebook from `../nano_hierarchical_repeatability.npz` (`beam_waveforms`), written by **`../nano_hierarchical_repeatability.py`**.
 """)
 
 co("""
@@ -601,7 +622,62 @@ md("""
 
 # ----------------------------------------------------------------- caveats
 md("""
-## 11. What to be careful about
+## 11. Provenance — what produced every figure and number
+
+Every output in this notebook, traced to the script that made it and the data it
+read. Same convention as `awd_clean/manuscript/REPRODUCE.md`. Paths are relative
+to `notebooks/awd_clean/`.
+
+### Written by this notebook
+
+| Output | Script | Reads |
+|---|---|---|
+| §3 numbers | `drop_catalog/build_drop_catalog.py` | the three products below |
+| Figure 1 | this notebook ← `drop_catalog/build_burst_timeseries.py` | `drop_catalog/burst_timeseries.npz` |
+| Figure 2 | this notebook | `drop_catalog/awd_drop_catalog.csv` |
+| Figures 3–6 | this notebook | `nano_hierarchical_repeatability.npz` |
+| Figures 7–12 | `awd_virtual_source.py` | `canonical_epoch_stacks_paired_deep_all.npz` |
+
+### The products, and what made them
+
+| Product | Script | Reads |
+|---|---|---|
+| `drop_catalog/awd_drop_catalog.csv` | `drop_catalog/build_drop_catalog.py` | node picks + manifest + Nano metrics |
+| `drop_catalog/awd_burst_summary.csv` | same | same |
+| `drop_catalog/timing_uncertainty.txt` | same | `Check shots/p26.cc9.txt`, `p26.cc4.txt` |
+| `drop_catalog/burst_timeseries.npz` | `drop_catalog/build_burst_timeseries.py` | Nano `.pb` on `$OAK`, `awd_manifest.csv` |
+| `awd_manifest.csv` | `build_manifest.py` | `../p26.cc9.txt` × Nano/Deep file coverage |
+| `nano_drop_repeatability.csv` | `nano_hierarchical_repeatability.py` | Nano `.pb` on `$OAK` |
+| `nano_hierarchical_repeatability.npz` | same | same |
+| `canonical_epoch_stacks_paired_deep_all.npz` | `paired_stack_job_deep_all.py` | Nano `.pb` + Deep `.h5` on `$OAK` |
+| `figures/.../virtual_source/vs_fig0*.png` | `awd_virtual_source.py` | the paired stack above |
+| `deep_channel_depth.npz` | `safod_geometry.py` | `SAFOD_Phase2_GeoReferenced_Channels.xlsx` |
+
+### Inputs this project did not produce
+
+| File | What it is |
+|---|---|
+| `Check shots/p26.cc9.txt` | node 453009664 cross-correlation drop picks — **delivered** |
+| `Check shots/p26.cc4.txt` | node 453001432, same 989 drops — **delivered** |
+| `SAFOD_Phase2_GeoReferenced_Channels.xlsx` | Deep channel→depth registration — **delivered** |
+| `$OAK/.../ActiveJune2026/` | the raw DAS |
+
+Both `Check shots/` and `*.npz` are gitignored, so a fresh clone has the scripts
+and the committed CSVs but must regenerate the large intermediates on Sherlock.
+
+### Rebuilding this notebook
+
+```bash
+sbatch awd_clean/drop_catalog/exec_drop_nb_job.sh
+```
+
+It runs `build_drop_notebook.py` under the system `python3` (which has
+`nbformat`) then `manuscript/execute_notebook.py` under the `das` kernel (which
+does not). Edit `build_drop_notebook.py`, never the `.ipynb`.
+""")
+
+md("""
+## 12. What to be careful about
 
 - **The detection thresholds are descriptive.** NCC > 0.90 and SNR > 10 dB were
   chosen to make the flag reproducible, **not** pre-registered before looking.
