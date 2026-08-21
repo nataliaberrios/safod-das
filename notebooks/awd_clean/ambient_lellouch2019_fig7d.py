@@ -261,7 +261,11 @@ def aggregate(a):
         say("--- Lellouch 2017 released 7d, identical picker ---")
         say("  " + "  ".join("%.0f:%0.f" % (z, v) for z, v in zip(lel_z, lel_v)))
         r = np.corrcoef(lel_z, lel_v)[0, 1]
-        say("  fit r = %.3f  (his Figure 9 model)" % r)
+        # Label deliberately does NOT say "his Figure 9 model": r is the
+        # monotonicity of OUR picks on HIS traces, not agreement with his
+        # published curve, which is not digitised anywhere in this tree.
+        say("  fit r = %.3f  (corr(depth, velocity) of OUR picks on HIS "
+            "released traces)" % r)
     except Exception as e:
         say("  (released comparison unavailable: %r)" % (e,))
 

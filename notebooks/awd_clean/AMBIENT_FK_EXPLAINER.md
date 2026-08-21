@@ -59,7 +59,8 @@ notebook. `Ambient_FK_QC_workflow.ipynb` is the record; this is an index.
 | 6 | **Pre-filter channel scramble** | destroys spatial order *before* F–K | **FAILED** — the deciding gate |
 | 6 | Independent circular time shifts | destroys phase, preserves each spectrum | **FAILED** |
 | 7 | "Is F–K required?" | visual vs scientific claim | visually yes, scientifically unresolved → rejected |
-| 8 | Stack convergence, 5 h → 8 days | √N growth expected | **N^+0.042** vs theory **N^+0.50** |
+| 8 | Day-combination waveform correlation, 5 h → 8 days | consistency across days | no exponent reported by §8 |
+| 13.2 | Stack convergence, **one day, 1 → 24 hourly chunks** | √N growth expected | **N^+0.042** vs theory **N^+0.50** |
 | 13.1 | Adaptive F–K (Isken et al. 2022) | the one filter family never tried | 5 configs, none passed predeclared gates |
 
 **The white-noise null passed.** That is why the programme did not look broken
@@ -113,16 +114,24 @@ Production pre-filter null, **5.0 hours** of 2024-12-20 UTC (local start
 2024-12-19 16:00 PST), 20 realizations
 (`fk_full_pipeline_null_v2_n300_r20/…_aggregate.json`):
 
-| Null placement | Observed | Null 95th | p |
-|---|---:|---:|---:|
-| **After** the filter (distance permutation) | 0.222 | 0.098 | **0.002** |
-| **Before** the filter (channel permutation) | 0.283 | **0.365** | **1.00** |
-| **Before** the filter (circular time shift) | 0.283 | 0.333 | **1.00** |
+| Null placement | Observed | Null 95th | p | product |
+|---|---:|---:|---:|---|
+| **After** the filter (distance permutation) | 0.279 | 0.102 | **0.0005** | `interim_2024-12-20_n300.json` |
+| **Before** the filter (channel permutation) | 0.283 | **0.365** | **1.00** | `…_v2_aggregate.json` |
+| **Before** the filter (circular time shift) | 0.283 | 0.333 | **1.00** | `…_v2_aggregate.json` |
 
-The scrambled data scored **higher than the real data**, on both null families.
+> **Corrected 2026-08-20 (audit).** Row 1 previously read `0.222 | 0.098 |
+> **0.002**`. **None of those three numbers occurs in any product in this tree.**
+> The matched post-filter product for the same date and the same 300 files gives
+> 0.2789 / 0.1022 / 0.0005. Note also that the observed value differs between
+> row 1 and rows 2–3 (0.279 vs 0.283) because they come from two aggregations of
+> the same data, not because the observation changed.
 
-The diagnostic quantity is the null's own 95th percentile: it rises from ~0.10 to
-~0.36, a factor of **3.7**, purely by letting the surrogate pass through the
+The scrambled data scored **higher than the real data**, on both pre-filter null
+families.
+
+The diagnostic quantity is the null's own 95th percentile: it rises from 0.102 to
+0.365, a factor of **3.6**, purely by letting the surrogate pass through the
 filter. That increase *is* the structure the fan manufactures.
 
 **Caveat, from the notebook itself (§7):** these two products use different
@@ -147,8 +156,11 @@ survive the larger stack, so reason 4 above never actually held.
 
 Frequency nearly doubled; wavenumber moved **1.1 %**. The dominant feature is at
 fixed wavenumber — a **static spatial pattern, not a propagating wave**. It holds
-~39 % of in-band energy; k = 0 holds **~66 %**, against **0.13 %** in Lellouch's
-2017 records.
+~39 % of in-band energy; k = 0 holds **52.12 %**, against **0.04 %** in
+Lellouch's 2017 records, both arms measured by the same script in the same band
+(`ambient_apparent_velocity_census.txt`). *Corrected 2026-08-20 — this read
+"~66 %, against 0.13 %"; 66 % is in no product, and the 0.13 % came from a
+different script with different processing.*
 
 The circularity is then complete:
 
@@ -168,7 +180,7 @@ changed nothing (`8146dee`), because ringing was never the mechanism.
 **One synthesis of mine, flagged as such:** the aperture table in
 `AMBIENT_LOWK_MECHANISM.md` §4.1 gives `dk = 1/700 m⁻¹`, so a 3,200 m/s target at
 5 Hz sits **1.09 cells from k = 0** — inside the leakage skirt of a pedestal
-carrying ~66 % of the energy. The mask excludes the k = 0 column and passes cells
+carrying ~52 % of the energy. The mask excludes the k = 0 column and passes cells
 1, 2, 3…, where that leakage lives. Both facts are in the docs; joining them is
 my reading, not an established result.
 
@@ -197,9 +209,23 @@ a real arrival needs N^+0.50. Per Behm (2016), 30 s suffices under adequate
 illumination — **a stack that fails to converge is the signature of an absent
 signal, not a weak one**.
 
-Ruled out rather than left open: gauge length (0.1–1.1 % at 3,200 m/s); the
-interrogator inside the analysed aperture (stable only in channels 0–22, which
-the pipeline excludes); day selection (the richest day scored *worst*).
+Ruled out rather than left open: gauge length (0.1–1.1 % at 3,200 m/s); and the
+interrogator inside the analysed aperture — over channels 23–708 the dominant
+spatial pattern is not stable across days (|corr| 0.0188 against a control 95th
+of 0.1282), so no instrumental fingerprint is supported there.
+
+> **Two corrections, 2026-08-20 (audit).**
+> 1. "stable only in channels 0–22" overstated what was measured. The 0.8426
+>    stability figure is v1's run over **channels 0–699** with the lead-in
+>    included; no channels-0–22-only correlation exists. See
+>    `AMBIENT_LOWK_MECHANISM.md` §5.
+> 2. **"day selection (the richest day scored *worst*)" is withdrawn.** It is
+>    doubly wrong. The richest day by census (2024-11-30, 4.9 %) scored *best*
+>    (p = 0.1345), not worst, and was excluded from the four-day set; and the
+>    "census fan %" ranking that defines "richest" is itself **withdrawn** —
+>    `FIG7C_MULTIDAY_RESULT.md` retired it for having no geometric baseline. Day
+>    selection is still closed as an avenue, but by the six-day sweep and the
+>    96 h coherent stack, not by this comparison.
 
 ---
 

@@ -1,4 +1,4 @@
-# Figure 7c across five complete days — paper-faithful
+# Figure 7c across five complete days plus one 21.3 h block — paper-faithful
 
 Written 2026-08-14. **Reconciled 2026-08-19** against the mechanism and
 illumination results that postdate it; see the banner immediately below. Companion
@@ -229,12 +229,18 @@ exactly that way, by amplifying the pedestal 6.6-fold.
 
 ## Conclusion
 
-Figure 7c does not reproduce on the 2024–2025 archive, on the paper's own
-operator, across six independent complete days spanning ten months, nor on a
+Figure 7c does not reproduce on the 2024–2025 archive, at 5–20 Hz, in the paper's
+own operator and geometry (wellhead source at channel 23, receiver centres every
+50 m from 50 to 700 m), across six independent days spanning ten months — five
+complete and one a 21.3 h continuous block — nor on a
 coherent 96-hour stack of the four days that share an acquisition rate. The
-minimum p over six days is 0.1345, and the observed score never clears the
-per-velocity null at any of 181 velocities — so the negative does not rest on a
-multiplicity correction.
+minimum p over those six days is 0.1345, and the observed score never clears the
+per-velocity null at any of 181 velocities **on 2024-12-20** — so the negative
+does not rest on a multiplicity correction. (Header wording corrected 2026-08-20:
+this file and its title previously disagreed, saying "five complete days" above
+and "six independent complete days" here, and 2024-11-30 is not a complete day.
+The per-velocity "0 of 181" was also stated undated in three downstream
+documents; it is a 2024-12-20 result.)
 
 **The mechanism is no longer open — updated 2026-08-19.** This section previously
 ended "no validated mechanism for the non-reproduction currently exists." That is

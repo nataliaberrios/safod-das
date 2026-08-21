@@ -229,7 +229,14 @@ arrival. Do not cite this section as a list of open options.
    stacked hourly chunks and finds **N^+0.042** (baseline) and **N^+0.019**
    (common-mode removed), where a real arrival requires **N^+0.50**. Stacking 24×
    more data should have improved detectability 4.9-fold; it improved it by about
-   4 %, and detectability never reaches the 1.00 a detection needs. The
+   **13 %** (0.858 at 1 chunk to 0.971 at 24; 24^0.042 = 1.14). *Corrected
+   2026-08-20 — this read "about 4 %", which was the exponent 0.042 misread as a
+   percentage.* Detectability crosses 1.00 once, at 16 chunks (**1.014,
+   p = 0.0170**), and falls back to 0.971 at 24; that excursion peaks at
+   5,950 m/s with a pedestal diagnostic of +0.983, i.e. it is the scan-ceiling
+   artefact, not a detection. *Corrected 2026-08-20 — this read "detectability
+   never reaches the 1.00 a detection needs", which its own product
+   (`ambient_stack_convergence.txt`) contradicts.* The
    illumination scan in item 3 also sampled 30 s windows directly and found
    nothing, so the "appears, then degrades with stacking" scenario has no
    support. Low priority now.
@@ -355,10 +362,13 @@ Updated 2026-08-19, after the two gaps this section left open were closed.
   worst pedestal of the five configurations. Any pre-correlation operator in this
   tree owes an **input-level** null, not just a gather-level one.
 - **Ruled out as explanations:** gauge length (0.1-1.1 % at 3,200 m/s), and the
-  interrogator inside the analysed aperture — its stable cross-day spatial pattern
-  is confined to the surface lead-in, channels 0-22 (|corr| 0.8426 vs control
-  0.3889), which the pipeline already excludes; over channels 23-708 it is not
-  stable (0.0188 vs control 0.1282).
+  interrogator inside the analysed aperture — over channels 23-708 the dominant
+  spatial pattern is **not** stable across days (|corr| 0.0188 against a control
+  95th of 0.1282), so no instrumental fingerprint is supported there. *Corrected
+  2026-08-20 — this previously attributed |corr| 0.8426 vs 0.3889 to "channels
+  0-22". That measurement is v1's run over channels **0-699** with the lead-in
+  included (`interrogator_blame_test.txt`); no channels-0-22-only correlation was
+  ever computed. See `AMBIENT_LOWK_MECHANISM.md` §5.*
 
 ## References
 

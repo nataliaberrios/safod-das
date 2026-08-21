@@ -151,7 +151,18 @@ pre-event noise, both arms were noise, and the comparison is not confounded by
 signal presence. Its originally stated limits still apply: only ~5 s of 2017
 data, and gauge length 10 m against 16.335 m (a 0.1-1.1 % effect at 3200 m/s).
 Measured k = 0 share of the 2017 pre-event window: **0.13 %** (M1p33) and
-**0.11 %** (M2p46), against ~66 % for 2024-25 ambient.
+**0.11 %** (M2p46), from `lellouch2017_window_audit.txt`.
+
+> **Corrected 2026-08-20 (audit).** This sentence previously ended "against
+> **~66 %** for 2024-25 ambient." **No product in this tree contains 66 %.** The
+> matched measurement — both arms through
+> `ambient_apparent_velocity_census.py`, same band, same k = 0 handling — gives
+> **52.12 %** for 2024-25 against **0.04 %** for 2017
+> (`ambient_apparent_velocity_census.txt:26`). Quoting 66 % against the 0.13 %
+> from a *different* product with different processing was exactly the
+> unmatched-arms error that caused five of this project's ten withdrawals. The
+> direction of the contrast is unchanged and is, if anything, starker on the
+> matched numbers; only the figure quoted was wrong.
 
 ## 5. Is it the interrogator?
 
@@ -160,14 +171,28 @@ matters.** `interrogator_and_illumination_v2.py` tested whether the dominant
 spatial pattern is *stable across days*, which a fixed instrumental fingerprint
 must be, on six days spanning 2024-05-21 to 2025-05-06:
 
-| channels | cross-day median \|corr(u1,u1)\| | control \|corr(u1,u2+)\| | verdict |
-|---|---:|---:|---|
-| 0–22 (surface lead-in) | **0.8426** | 0.3889 | stable — instrumental |
-| 23–708 (the analysed aperture) | **0.0188** | 0.1282 (95th) | **not** stable — not an instrumental fingerprint |
+| channels measured | cross-day median \|corr(u1,u1)\| | control \|corr(u1,u2+)\| | verdict | product |
+|---|---:|---:|---|---|
+| **0–699, lead-in INCLUDED** | **0.8426** | 0.3889 (95th) | stable | `interrogator_blame_test.txt` (v1) |
+| 23–708 (the analysed aperture) | **0.0188** | 0.1282 (95th) | **not** stable — not an instrumental fingerprint | `interrogator_and_illumination_v2.txt` (v2) |
 
-So the interrogator does imprint a real, stable spatial pattern, but **only in the
-uncemented surface lead-in, channels 0–22 — which the Figure 7c pipeline already
-excludes.** Inside channels 23–708 the dominant pattern is not distinguishable
+> **Corrected 2026-08-20 (audit).** The first row previously read
+> "0–22 (surface lead-in) | 0.8426 | 0.3889 | stable — instrumental", implying two
+> matched measurements over disjoint channel ranges. **There is no
+> channels-0–22-only correlation measurement.** 0.8426 is v1's run over
+> **channels 0–699** with the lead-in included; the row is relabelled above to
+> what was actually computed. The inference that the stability *comes from* the
+> lead-in rests on v1's separate **power-ratio** test (T2), not on a correlation
+> over 0–22 — and that test's own output warns "a high ratio alone is NOT proof
+> of an instrumental origin … does not decide on its own", with one of its six
+> days (2025-03-13) giving an *inverted* ratio of 0.01 against the 2e4–1.3e5 band
+> quoted elsewhere in this file.
+
+So the interrogator imprints a stable spatial pattern on the array **as a whole
+when the uncemented surface lead-in is included**, and the most likely seat of it
+is that lead-in — **which the Figure 7c pipeline already excludes.** What is
+directly measured, and what the conclusion rests on, is the second row: inside
+channels 23–708 the dominant pattern is not distinguishable
 from unrelated patterns, so an instrumental fingerprint is not supported there.
 This also supersedes v1 of that script, whose "instrumental" verdict was
 unrestricted and whose |A| = 1e-4 "no illumination" number was the algebraic
