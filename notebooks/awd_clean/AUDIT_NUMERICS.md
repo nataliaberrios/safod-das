@@ -298,9 +298,27 @@ C6  differentiate exact and dtype-preserving (float64)  max abs diff 0.000e+00
 C6b ram_normalise float32 == float64                    max rel diff 6.272e-08
 ```
 
-Peak memory drops roughly 42 GB → 21 GB (confirmed in the re-run: `raw shape
-(295, 3600000) float32`). Re-run under `deep_cc_steps_job.sh`, which carries
-`--verify`. That check got **stronger**, not weaker:
+Memory after the fix, **measured, not projected** — `sacct -j 40081870`:
+
+```
+State COMPLETED, Elapsed 00:03:50, MaxRSS 51372648K = 49.0 GB, ReqMem 64G
+  raw shape (295, 3600000) float32     (was float64, i.e. 8.5 GB -> 4.25 GB/array)
+```
+
+**49 GB against a 64 GB request is still tight**, and my own pre-run estimate of
+"~21 GB after the fix" was wrong: it counted the three named arrays and missed
+that the ablation ladder re-runs `ram_normalise(raw, fs)` while `raw`, `rate` and
+`normed` are all still referenced, that `--verify` adds `raw.copy()` plus the
+engine's own `rate`/`absolute`/`weights`, and that glibc does not return freed
+arenas to the OS so MaxRSS records the accumulated high-water mark. The same
+arithmetic in float64 comes to roughly 90 GB, i.e. the pre-fix script would not
+have fitted in its own request at all.
+
+Recommended follow-up (not done): free `raw` and `rate` before the ablations, or
+recompute each ablation from a re-read rather than holding all three stages live.
+
+Re-run under `deep_cc_steps_job.sh`, which carries `--verify`. That check got
+**stronger**, not weaker:
 
 ```
 === verification against ambient_lellouch2019_exact_stack.py ===
@@ -488,7 +506,7 @@ No float64 array over 2 GB remains in the audited paths except
 |---|---|---|---|
 | `read_records` | was 3.00× the returned array, now **1.13×** (measured, `tracemalloc`) | — | FIXED (F3) |
 | `deep_timeseries.block_spectra` | 3.70 GB at `per_group = 22` | 32 GB | OK after F3 (C5, 1.00× of budget) |
-| `deep_cc_steps.main` | was ~42 GB, now ~21 GB | 64 GB | FIXED (F7) |
+| `deep_cc_steps.main` | **49.0 GB measured** (`sacct` MaxRSS), ~90 GB in float64 | 64 GB | IMPROVED (F7), still tight |
 | `deep_record_section`, `deep_section_depth`, `deep_zerolag_vs_stack`, `nano_long_stack` | float32, in place, one full-size array live | 64–160 GB | OK |
 | `nano_find_wellhead.main` | ~16 GB float64 | 48 GB | **FLAGGED, not fixed** |
 
