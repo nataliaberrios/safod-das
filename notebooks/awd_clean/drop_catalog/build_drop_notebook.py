@@ -507,22 +507,43 @@ plt.show()
 
 # ------------------------------------------------- virtual source / deconv
 md("""
-## 10. Virtual source — correlation vs deconvolution
+## 10. Virtual source — convolution, correlation, deconvolution
 
 **Method demonstration, not a monitoring result.** Read the box at the end of
 this section before quoting anything from it.
 
-The AWD source sat fixed at the surface. A *virtual source* redatums it into the
-borehole: correlating channel A against channel B cancels the source term common
-to both and leaves the response between them, as though a source sat at A
-(Bakulin & Calvert 2006). Two ways to cancel it, both computed so they can be
-compared:
+### What the operators do, in plain terms
 
-- **Correlation** cancels the source term but keeps its spectrum. Better SNR.
-- **Deconvolution** divides B by A in the frequency domain, cancelling the
-  source *spectrum* whatever its shape (Snieder & Šafak 2006). Needs no source
-  aperture, which matters here because the AWD never moved — so the classic
-  Bakulin–Calvert sum over source positions is not available. Water level 0.01.
+Every trace is **the weight drop's own wiggle, smeared by the path it travelled**:
+
+```
+trace at A  =  S(t) ⊛ path to A
+trace at B  =  S(t) ⊛ path to B
+```
+
+`S(t)` is what the weight actually did, and it differs every drop — this survey
+has a 39 % amplitude CV. Leave it in and *how hard the weight hit* is
+indistinguishable from *what the rock did*. A **virtual source** removes it, and
+redatums the fixed surface source down into the borehole as though a source sat
+at channel A (Bakulin & Calvert 2006). Three ways to combine A and B, one line
+apart in the frequency domain:
+
+| operator | frequency domain | what happens to the drop |
+|---|---|---|
+| **convolution** | `B · A` | nothing removed — it enters **twice**, times **add** |
+| **correlation** | `B · conj(A)` | timing removed, frequency content kept: `\|S\|²` survives |
+| **deconvolution** | `B / A` | removed entirely, timing **and** frequency content |
+
+**Correlation** has the better SNR. **Deconvolution** is the one to trust for
+source cancellation — and it needs no source aperture, which matters because the
+AWD never moved, so the classic Bakulin–Calvert sum over source positions is not
+available here (Snieder & Šafak 2006). Water level 0.01.
+
+**Convolution is the control, not a third method.** For a source outside the
+receiver pair — which the surface AWD is, relative to any two downhole channels —
+convolving does not cancel anything. Any feature appearing in both the
+convolution and correlation panels therefore cannot be a redatumed arrival,
+because only one of those two operations could have redatumed it.
 
 Script of record: `awd_clean/awd_virtual_source.py`.
 
@@ -551,7 +572,8 @@ for fib, suf in (("Nano (cemented)", ""), ("Deep (wireline, outbound)", "_deep")
 # and the executor's dpi cap the notebook stays a few MB. Full-resolution
 # originals are in figures/awd_2026/plain_look/virtual_source/.
 for suf in ("", "_deep"):
-    for fig_ in ("vs_fig01_correlation_gathers", "vs_fig02_deconvolution_gathers"):
+    for fig_ in ("vs_fig04_convolution_gathers", "vs_fig01_correlation_gathers",
+                 "vs_fig02_deconvolution_gathers"):
         img = plt.imread(VS / f"{fig_}{suf}.png")
         fig, ax = plt.subplots(figsize=(9, 9 * img.shape[0] / img.shape[1]))
         ax.imshow(img)

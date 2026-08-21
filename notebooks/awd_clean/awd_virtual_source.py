@@ -58,6 +58,7 @@ Outputs
 figures/awd_2026/plain_look/vs_fig01_correlation_gathers.png
 figures/awd_2026/plain_look/vs_fig02_deconvolution_gathers.png
 figures/awd_2026/plain_look/vs_fig03_moveout_and_wiggles.png
+figures/awd_2026/plain_look/vs_fig04_convolution_gathers.png
 figures/awd_2026/plain_look/awd_virtual_source.npz
 """
 from __future__ import annotations
@@ -193,6 +194,28 @@ def correlate_gather(section, source_trace, fs, max_lag=MAX_LAG_S):
     return _center(cc, fs, max_lag)
 
 
+def convolve_gather(section, source_trace, fs, max_lag=MAX_LAG_S):
+    """B convolved with A: travel times ADD instead of cancelling.
+
+    Convolution interferometry (Slob & Wapenaar 2007) is a genuinely different
+    construction from the correlation one, not a synonym. Correlating B with A
+    subtracts the shared path and redatums the source to A; convolving them adds
+    the two paths, so the output sits at t_A + t_B rather than t_B - t_A.
+
+    It is retained here as a CONTROL, not as a redatuming operator. For a source
+    outside the receiver pair -- which the surface AWD is, relative to any two
+    downhole channels -- convolution does not cancel the source term at all: the
+    source wavelet enters squared. Any feature that looks the same in the
+    convolution and correlation panels therefore cannot be a redatumed arrival,
+    because only one of the two operations can have redatumed it.
+    """
+    n = section.shape[-1]
+    nfft = 1 << int(np.ceil(np.log2(2 * n - 1)))
+    A, B = _spectra(section, source_trace, nfft)
+    cv = np.fft.irfft(B * A[None, :], n=nfft, axis=-1)
+    return _center(cv, fs, max_lag)
+
+
 def deconvolve_gather(section, source_trace, fs, max_lag=MAX_LAG_S,
                       water=WATER_LEVEL):
     """B deconvolved by A: cancels the source term *and* its spectrum.
@@ -272,19 +295,22 @@ def main():
     print(f"aperture {z[0]:.0f}-{z[-1]:.0f} m ({sec.shape[0]} channels); "
           f"virtual sources at {[f'{z[c]:.0f} m' for c in src_ch]}", flush=True)
 
-    corr, deco = {}, {}
+    corr, deco, conv = {}, {}, {}
     for c in src_ch:
         lags, corr[c] = correlate_gather(sec, sec[c], fs, MAX_LAG_S)
         _, deco[c] = deconvolve_gather(sec, sec[c], fs, MAX_LAG_S)
+        _, conv[c] = convolve_gather(sec, sec[c], fs, MAX_LAG_S)
 
     # v_ref only draws a reference moveout; it is not fitted here.
     v_ref = cfg["v_ref"]
 
     for name, data, fname, note in [
         ("cross-correlation", corr, f"vs_fig01_correlation_gathers{suffix}.png",
-         "source term cancelled, source spectrum retained"),
+         "the weight drop's timing is removed; its frequency content is not"),
         ("deconvolution", deco, f"vs_fig02_deconvolution_gathers{suffix}.png",
-         "source term and spectrum both cancelled"),
+         "the weight drop is removed entirely -- timing and frequency content"),
+        ("convolution", conv, f"vs_fig04_convolution_gathers{suffix}.png",
+         "CONTROL: nothing is removed -- the drop enters twice and times add"),
     ]:
         fig, axes = plt.subplots(1, len(src_ch), figsize=(4.2 * len(src_ch), 6.5),
                                  sharey=True)
