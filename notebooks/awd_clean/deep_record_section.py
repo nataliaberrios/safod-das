@@ -38,6 +38,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import ambient_lellouch2019_exact_stack as ex
 import deep_cc_steps as steps
+import arrival_velocities as av
 
 STEM = HERE / "deep_record_section"   # --tag appends a suffix
 
@@ -69,7 +70,7 @@ def window_label(t_first, t_last):
 SRC = 400
 MAX_OFFSET_M = 750.0
 WINDOW_S, STEP_S = 30.0, 15.0
-V_MARK = 1675.0          # the recovered arrival
+V_MARK = av.V_DEEP_ARRIVAL       # retracted from 1675; see arrival_velocities.py
 V_LELL = 3200.0          # what Lellouch reports on the cemented main hole
 
 
@@ -92,14 +93,20 @@ def main():
     ap.add_argument("--fibre", choices=("deep", "nano"), default="deep",
                     help="nano reads the CEMENTED protobuf fibre instead")
     ap.add_argument("--v-mark", type=float, default=None,
-                    help="velocity to draw; defaults to 1675 (deep) / 2950 (nano)")
+                    help="velocity to draw; defaults to the Deep arrival (deep) "
+                         "or the in-band Nano expectation (nano)")
     a = ap.parse_args()
 
     global V_MARK
     if a.v_mark:
         V_MARK = a.v_mark
+    elif av.deep_velocity_for_source(a.source) is not None:
+        # draw the velocity measured for THIS source: it rises with source
+        # depth (1350 m/s at the wellhead to 1550 m/s at TVD 1208 m), so a
+        # global constant would be wrong for most sources
+        V_MARK = av.deep_velocity_for_source(a.source)
     elif a.fibre == "nano":
-        V_MARK = 2950.0        # the mode the AWD active source measures on Nano
+        V_MARK = av.V_NANO_INBAND   # 5-20 Hz value; 2950 is a 30-60 Hz number
 
     # HARD GUARD, on both fibres. A virtual source outside the borehole
     # correlates air against rock: it returns instrumental common mode at zero

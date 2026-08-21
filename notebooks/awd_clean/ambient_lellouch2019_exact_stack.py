@@ -28,6 +28,7 @@ import argparse
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 
 import h5py
@@ -84,6 +85,156 @@ def day_rows(date: str) -> pd.DataFrame:
     if rows.empty:
         raise RuntimeError(f"No manifest rows for {date}")
     return rows
+
+
+# --------------------------------------------------------------------------
+# OPT-IN DEEP-FIBRE PATH.  Added 2026-08-19.  Everything above and every default
+# below is unchanged: `--dataset mainhole` is the default and reproduces the
+# 2024-25 products bit for bit.  `--dataset deep` swaps ONLY the file list.
+#
+# WHY THE DEEP FIBRE IS WORTH A CROSS-CORRELATION RUN.  The 2024-25 main-hole
+# archive carries no downgoing/upgoing asymmetry in the body-wave fan
+# (|A| = 0.040, p = 0.73, and 11 significant windows of 240 against 12.0
+# expected by chance), which is why Figure 7c does not reproduce there. The June
+# 2026 Deep recording is a different fibre with a 10.209 m gauge length --
+# essentially the 10 m of Lellouch et al. (2019) -- and during part of it 989
+# GPS-timed weight drops were performed at the surface (`awd_manifest.csv`).
+# Nothing else about site activity is documented, so the drops are the only
+# evidence of surface sources and no inference about crew or vehicles is made.
+#
+# THE CONTRAST THAT MAKES THIS AN EXPERIMENT RATHER THAN A FISHING TRIP. The
+# recording starts 2026-06-15T23:06 but the first weight drop is
+# 2026-06-16T23:47, so the same fibre, interrogator, gauge length, sample rate
+# and channel spacing produce
+#
+#     ARM A   ~23.6 h of ambient BEFORE any drop
+#     ARM B   ambient DURING the drop survey, drop windows excluded
+#     ARM C   ambient from 2026-05-01 onward, 38 days, no survey at all
+#
+# Only site activity differs. ARM B excludes any 60 s file within
+# DEEP_DROP_GUARD_S of a drop, so all three arms are ambient and the comparison
+# is illumination, not active source against noise.
+DEEP_JUNE_ROOT = Path(
+    "/oak/stanford/groups/ettore88/data/SAFOD/ActiveJune2026/"
+    "01_--_recording_2026-06-15T230629Z_--_active_source"
+)
+DEEP_MAY_ROOT = Path(
+    "/oak/stanford/groups/ettore88/data/SAFOD/SAFOD-deep/2026-05/"
+    "01_nosppol_10kHz_2026-05-01T041000Z"
+)
+DEEP_MANIFEST = HERE / "awd_manifest.csv"
+DEEP_FILE_PATTERN = "SAFOD-Deep-*.h5"
+DEEP_TIME_RE = re.compile(r"_(\d{4}-\d{2}-\d{2}T\d{6})Z\.h5$")
+DEEP_RECORD_SECONDS = 60.0
+DEEP_DROP_GUARD_S = 45.0
+_DEEP_ROWS_CACHE: dict[str, pd.DataFrame] = {}
+
+
+def _deep_listing(root: Path) -> pd.DataFrame:
+    """Every Deep record under `root`, with its start time, in time order."""
+    rows = []
+    for path in root.glob(DEEP_FILE_PATTERN):
+        match = DEEP_TIME_RE.search(path.name)
+        if match is None:
+            continue
+        rows.append((str(path), match.group(1)))
+    if not rows:
+        raise RuntimeError(f"No Deep records under {root}")
+    frame = pd.DataFrame(rows, columns=["file", "stamp"])
+    frame["time"] = pd.to_datetime(
+        frame.stamp, format="%Y-%m-%dT%H%M%S", utc=True
+    )
+    frame = frame.drop(columns=["stamp"]).sort_values("time")
+    return frame.reset_index(drop=True)
+
+
+def _contiguous_runs(frame: pd.DataFrame) -> list[tuple[int, int]]:
+    """Maximal [start, stop) runs whose consecutive starts differ by one record."""
+    if len(frame) < 2:
+        return [(0, len(frame))]
+    gaps = np.diff(frame.time.astype("int64").to_numpy()) / 1.0e9
+    breaks = np.flatnonzero(np.abs(gaps - DEEP_RECORD_SECONDS) > 0.02)
+    bounds = np.concatenate(([0], breaks + 1, [len(frame)]))
+    return [
+        (int(bounds[i]), int(bounds[i + 1])) for i in range(len(bounds) - 1)
+    ]
+
+
+def deep_drop_times() -> np.ndarray:
+    """GPS weight-drop times with Deep coverage, as int64 nanoseconds."""
+    manifest = pd.read_csv(DEEP_MANIFEST)
+    manifest = manifest[manifest.deep_available == 1]
+    times = pd.to_datetime(manifest.utc_time, utc=True, errors="coerce").dropna()
+    return np.sort(times.astype("int64").to_numpy())
+
+
+def deep_rows(arm: str) -> pd.DataFrame:
+    """File list for one Deep arm.  `arm` takes the place of `--date`.
+
+    Recognised arms:
+      deepA        pre-survey June ambient, up to DEEP_DROP_GUARD_S before drop 1
+      deepB<k>     k-th longest drop-free contiguous run inside the survey period
+      deepC        2026-05-01 onward, the non-survey recording (no drops exist)
+      deepDROP<k>  k-th longest run that DOES contain drops -- a deliberate
+                   positive-control arm, never to be reported as ambient
+    """
+    if arm in _DEEP_ROWS_CACHE:
+        return _DEEP_ROWS_CACHE[arm]
+    if arm == "deepC":
+        listing = _deep_listing(DEEP_MAY_ROOT)
+        runs = _contiguous_runs(listing)
+        start, stop = max(runs, key=lambda r: r[1] - r[0])
+        rows = listing.iloc[start:stop].reset_index(drop=True)
+        _DEEP_ROWS_CACHE[arm] = rows
+        return rows
+    listing = _deep_listing(DEEP_JUNE_ROOT)
+    drops = deep_drop_times()
+    first_drop = int(drops[0])
+    starts = listing.time.astype("int64").to_numpy()
+    if arm == "deepA":
+        # every record that ENDS at least a guard interval before the first drop
+        ends = starts + int(DEEP_RECORD_SECONDS * 1e9)
+        keep = ends <= first_drop - int(DEEP_DROP_GUARD_S * 1e9)
+        rows = listing[keep].reset_index(drop=True)
+        runs = _contiguous_runs(rows)
+        a, b = max(runs, key=lambda r: r[1] - r[0])
+        rows = rows.iloc[a:b].reset_index(drop=True)
+        _DEEP_ROWS_CACHE[arm] = rows
+        return rows
+    if arm.startswith("deepB") or arm.startswith("deepDROP"):
+        want_clean = arm.startswith("deepB")
+        index = int(arm[len("deepB"):] if want_clean else arm[len("deepDROP"):])
+        guard = int(DEEP_DROP_GUARD_S * 1e9)
+        record = int(DEEP_RECORD_SECONDS * 1e9)
+        # a record is contaminated if any drop lands in [t - guard, t + 60 + guard)
+        lo = np.searchsorted(drops, starts - guard, side="left")
+        hi = np.searchsorted(drops, starts + record + guard, side="left")
+        contaminated = hi > lo
+        survey = starts >= first_drop - guard
+        want = survey & (~contaminated if want_clean else contaminated)
+        subset = listing[want].reset_index(drop=True)
+        if subset.empty:
+            raise RuntimeError(f"No records for arm {arm}")
+        runs = sorted(
+            _contiguous_runs(subset), key=lambda r: r[1] - r[0], reverse=True
+        )
+        if index < 1 or index > len(runs):
+            raise RuntimeError(
+                f"{arm}: only {len(runs)} runs available "
+                f"(longest {runs[0][1]-runs[0][0]} records)"
+            )
+        a, b = runs[index - 1]
+        rows = subset.iloc[a:b].reset_index(drop=True)
+        _DEEP_ROWS_CACHE[arm] = rows
+        return rows
+    raise RuntimeError(f"Unknown Deep arm {arm!r}")
+
+
+def dataset_rows(args: argparse.Namespace) -> pd.DataFrame:
+    """File list for the selected dataset.  Default path is untouched."""
+    if getattr(args, "dataset", "mainhole") == "deep":
+        return deep_rows(args.date)
+    return day_rows(args.date)
 
 
 def acquisition_metadata(path: Path) -> dict[str, float | int | str]:
@@ -168,17 +319,26 @@ def geometry(
     source_channel: int,
     dx: float,
     number_of_channels: int,
+    neighbor_half_width: int = NEIGHBOR_HALF_WIDTH,
 ) -> dict[str, np.ndarray]:
-    """Build the fixed-top Figure 7c receiver centers and R±10 neighborhoods."""
+    """Build the fixed-top Figure 7c receiver centers and R±10 neighborhoods.
+
+    `neighbor_half_width` defaults to the published R±10 and every existing
+    product used that value, so the default path is unchanged.  It is exposed
+    because R±10 is a count of CHANNELS, not a distance: at the 2024-25
+    main-hole spacing of 1.0209 m it spans ±10.2 m, but on the Deep fibre at
+    2.0419 m the same count spans ±20.4 m.  Whichever is chosen for a Deep run
+    has to be declared, so it is an argument rather than a silent constant.
+    """
     centers = source_channel + np.rint(TARGET_OFFSETS_M / dx).astype(int)
-    keep = centers + NEIGHBOR_HALF_WIDTH < number_of_channels
+    keep = centers + neighbor_half_width < number_of_channels
     centers = centers[keep]
     offsets = (centers - source_channel).astype(float) * dx
     neighborhoods = np.stack(
         [
             np.arange(
-                center - NEIGHBOR_HALF_WIDTH,
-                center + NEIGHBOR_HALF_WIDTH + 1,
+                center - neighbor_half_width,
+                center + neighbor_half_width + 1,
                 dtype=int,
             )
             for center in centers
@@ -229,12 +389,31 @@ def receiver_mapping(
     return mapped
 
 
-def read_file_channels(path: Path, mapped_channels: np.ndarray) -> np.ndarray:
-    """Read channels in analysis order, even if a null permutes physical channels."""
+def read_file_channels(
+    path: Path, mapped_channels: np.ndarray, slab: bool = False
+) -> np.ndarray:
+    """Read channels in analysis order, even if a null permutes physical channels.
+
+    `slab` is a pure performance option and produces bit-identical output. The
+    default point-list selection asks HDF5 for a scattered set of columns from a
+    (samples, channels) dataset, which is strided and slow; the Deep records are
+    60,000 x 3,200 at 1 kHz, four times the 2024-25 volume per file, and the
+    Figure 7c geometry needs a few hundred channels that are CONTIGUOUS in span.
+    Reading the enclosing slab once and subsetting in memory is much faster.  It
+    is opt-in rather than automatic so that no existing product's read path
+    changes.
+    """
     unique_channels = np.unique(mapped_channels)
     with h5py.File(path, "r") as handle:
         data = handle["Acquisition/Raw[0]/RawData"]
-        selected = np.asarray(data[:, unique_channels], dtype=np.float32).T
+        if slab:
+            low = int(unique_channels.min())
+            high = int(unique_channels.max()) + 1
+            block = np.asarray(data[:, low:high], dtype=np.float32).T
+            selected = block[unique_channels - low]
+            del block
+        else:
+            selected = np.asarray(data[:, unique_channels], dtype=np.float32).T
     lookup = {int(channel): index for index, channel in enumerate(unique_channels)}
     order = np.asarray([lookup[int(channel)] for channel in mapped_channels])
     return selected[order]
@@ -519,6 +698,8 @@ def chunk_tag(args: argparse.Namespace) -> str:
         f"{('_svd%d' % args.svd_rank) if getattr(args, 'svd_rank', 0) else ''}"
         f"{('_afk%g%s' % (args.afk_alpha, 'n' if getattr(args, 'afk_normalize', False) else '')) if getattr(args, 'afk_alpha', 0.0) else ''}"
         f"{('w%.6g' % args.svd_window_s).replace('.', 'p') if getattr(args, 'svd_window_s', 0) else ''}"
+        # only appended when non-default, so every existing chunk name is unchanged
+        f"{('_nb%d' % args.neighbor_half_width) if getattr(args, 'neighbor_half_width', NEIGHBOR_HALF_WIDTH) != NEIGHBOR_HALF_WIDTH else ''}"
     )
 
 
@@ -530,7 +711,7 @@ def chunk_path(args: argparse.Namespace, start: int, nfiles: int) -> Path:
 
 def run_chunk(args: argparse.Namespace) -> None:
     """Process a core file range with context halos and save summed spectra."""
-    rows = day_rows(args.date)
+    rows = dataset_rows(args)
     first_path = corrected_path(rows.iloc[0].file)
     metadata = acquisition_metadata(first_path)
     fs = float(metadata["sample_rate_hz"])
@@ -560,7 +741,11 @@ def run_chunk(args: argparse.Namespace) -> None:
     core_stop = min(core_first + int(args.nfiles), len(rows))
     if core_first < 0 or core_first >= core_stop:
         raise ValueError("Empty core range")
-    geom = geometry(args.source_channel, dx, int(metadata["number_of_channels"]))
+    geom = geometry(
+        args.source_channel, dx, int(metadata["number_of_channels"]),
+        neighbor_half_width=int(getattr(args, "neighbor_half_width",
+                                        NEIGHBOR_HALF_WIDTH)),
+    )
     mapped_channels = receiver_mapping(
         geom["required_channels"],
         args.source_channel,
@@ -605,7 +790,10 @@ def run_chunk(args: argparse.Namespace) -> None:
                     args.realization,
                 )
             else:
-                piece = read_file_channels(path, read_channels)
+                piece = read_file_channels(
+                    path, read_channels,
+                    slab=getattr(args, "dataset", "mainhole") == "deep",
+                )
             if piece.shape[1] != record_samples:
                 raise ValueError(f"Unexpected record shape for {path}: {piece.shape}")
             pieces.append(piece)
@@ -688,6 +876,13 @@ def run_chunk(args: argparse.Namespace) -> None:
         ram_samples=np.asarray(odd_ram_samples(args.ram_seconds, fs)),
         denominator_floored_fraction=np.asarray(total_floored / blocks_used),
         common_mode=np.asarray(args.common_mode),
+        dataset=np.asarray(getattr(args, "dataset", "mainhole")),
+        neighbor_half_width=np.asarray(
+            int(getattr(args, "neighbor_half_width", NEIGHBOR_HALF_WIDTH))
+        ),
+        first_record_time=np.asarray(str(rows.iloc[0].time)),
+        last_record_time=np.asarray(str(rows.iloc[-1].time)),
+        n_records_in_arm=np.asarray(len(rows)),
         svd_rank=np.asarray(int(getattr(args, "svd_rank", 0))),
         afk_alpha=np.asarray(float(getattr(args, "afk_alpha", 0.0))),
         afk_normalize=np.asarray(bool(getattr(args, "afk_normalize", False))),
@@ -789,20 +984,67 @@ def moveout_scores(
     section: np.ndarray,
     lags: np.ndarray,
     offsets: np.ndarray,
-    velocities: np.ndarray = VELOCITY_GRID_M_S,
+    velocities: np.ndarray | None = None,
     sign: float = 1.0,
     half_window_s: float = 0.012,
 ) -> np.ndarray:
-    """Median normalized envelope in a fixed gate along each trial moveout."""
+    """Median normalized envelope in a fixed gate along each trial moveout.
+
+    `velocities=None` resolves to the CURRENT module-level VELOCITY_GRID_M_S.
+    It used to be a default ARGUMENT (`velocities=VELOCITY_GRID_M_S`), which
+    Python evaluates once at function-definition time -- so `--velocity-min/max`
+    rebinding the global left this function still scoring on the original 181-point
+    grid while the caller plotted a 229-point one, and matplotlib raised
+    "x and y must have same first dimension, but have shapes (229,) and (181,)".
+    Resolving at call time is what makes the override actually take effect.
+
+    A TRIAL VELOCITY IS SCORED ONLY IF EVERY OFFSET'S GATE LIES WHOLLY INSIDE THE
+    LAG WINDOW. This replaces `nanmedian` over whichever offsets happened to fit,
+    and it matters more than it looks. At 700 m offset the moveout gate leaves a
+    +-0.35 s window below 1934 m/s, so across a 300-6000 m/s grid the low half of
+    the scan was being scored on a SHRINKING SUBSET of offsets -- and the ones
+    that survive are the near offsets, which sit closest to the zero-lag lobe and
+    therefore score high. The result is a score that rises smoothly as velocity
+    falls for a purely geometric reason. That is the shape of the "pedestal" this
+    scan has fought throughout, so any low-velocity peak measured this way is
+    suspect until re-measured with the offsets held fixed.
+
+    The old `mask.any()` test was also too weak on its own: it passes when the
+    gate is only PARTLY inside the window, averaging the envelope over half a
+    gate. The test here requires the whole gate.
+
+    Velocities that fail are returned as NaN rather than dropped, so the array
+    still lines up with `velocities` for plotting. Widen the window with
+    `--max-lag` to score them: the stored products are cross-spectra, so a wider
+    crop costs nothing but is not the default, because it would silently change
+    every existing number.
+    """
+    if velocities is None:
+        velocities = VELOCITY_GRID_M_S
     envelope = normalized_envelope(section)
-    scores = []
+    lag_lo, lag_hi = float(lags[0]), float(lags[-1])
+    offsets = np.asarray(offsets, dtype=float)
+    scores, dropped = [], 0
     for velocity in velocities:
-        values = []
-        for trace, offset in zip(envelope, offsets):
-            center = sign * offset / velocity
-            mask = np.abs(lags - center) <= half_window_s
-            values.append(float(np.mean(trace[mask])) if mask.any() else np.nan)
-        scores.append(float(np.nanmedian(values)))
+        centers = sign * offsets / velocity
+        if (centers - half_window_s < lag_lo).any() or (centers + half_window_s > lag_hi).any():
+            scores.append(np.nan)
+            dropped += 1
+            continue
+        values = [float(np.mean(trace[np.abs(lags - c) <= half_window_s]))
+                  for trace, c in zip(envelope, centers)]
+        scores.append(float(np.median(values)))
+    if dropped and not getattr(moveout_scores, "_warned", False):
+        moveout_scores._warned = True
+        slowest = float(np.max(np.abs(offsets)) / (max(abs(lag_lo), abs(lag_hi)) - half_window_s))
+        print("  NOTE: %d of %d trial velocities are NOT scored -- below about %.0f m/s"
+              % (dropped, len(velocities), slowest), flush=True)
+        print("        the far offsets' gates fall outside the %.2f s lag window."
+              % max(abs(lag_lo), abs(lag_hi)), flush=True)
+        print("        Scoring them on the surviving near offsets would bias the curve",
+              flush=True)
+        print("        upward as velocity falls. Use --max-lag to widen the window.",
+              flush=True)
     return np.asarray(scores)
 
 
@@ -860,8 +1102,40 @@ def plot_wiggles(
     axis.legend(frameon=False, fontsize=8, loc="lower right")
 
 
+def _apply_velocity_grid(args: argparse.Namespace) -> None:
+    """Rebind the module-level velocity scan from the CLI, if it was changed.
+
+    VELOCITY_GRID_M_S is read as a module global in several places inside
+    aggregate(); rebinding it once here keeps those call sites untouched. When the
+    arguments are left at their defaults this is a no-op and every existing
+    product remains bit-identical, which is the condition this repo places on any
+    new option.
+    """
+    global VELOCITY_GRID_M_S, MAX_LAG_SECONDS
+    ml = getattr(args, "max_lag", None)
+    if ml is not None and float(ml) != MAX_LAG_SECONDS:
+        if not float(ml) > 0:
+            raise ValueError("--max-lag must be positive, got %g" % float(ml))
+        MAX_LAG_SECONDS = float(ml)
+        print("lag window widened to +-%.2f s: trial velocities down to %.0f m/s can now"
+              % (MAX_LAG_SECONDS, 700.0 / MAX_LAG_SECONDS), flush=True)
+        print("  be scored on the full offset set (700 m aperture)", flush=True)
+    lo = float(getattr(args, "velocity_min", 1500.0))
+    hi = float(getattr(args, "velocity_max", 6000.0))
+    step = float(getattr(args, "velocity_step", 25.0))
+    if (lo, hi, step) == (1500.0, 6000.0, 25.0):
+        return          # velocity grid untouched; any --max-lag is already applied
+    if not (step > 0 and hi > lo):
+        raise ValueError("bad velocity grid: %g..%g step %g" % (lo, hi, step))
+    VELOCITY_GRID_M_S = np.arange(lo, hi + step * 0.5, step)
+    print("velocity scan overridden: %.0f to %.0f m/s in %d steps"
+          % (VELOCITY_GRID_M_S[0], VELOCITY_GRID_M_S[-1], VELOCITY_GRID_M_S.size),
+          flush=True)
+
+
 def aggregate(args: argparse.Namespace) -> None:
-    rows = day_rows(args.date)
+    _apply_velocity_grid(args)
+    rows = dataset_rows(args)
     expected_total = min(args.total_files, len(rows))
     starts = list(range(0, expected_total, args.nfiles))
     files = [
@@ -1289,6 +1563,32 @@ def synthetic_validation(args: argparse.Namespace) -> None:
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
     result.add_argument("--action", choices=("chunk", "aggregate", "synthetic"), default="chunk")
+    result.add_argument(
+        "--dataset", choices=("mainhole", "deep"), default="mainhole",
+        help="mainhole (default) reads the 2024-25 transfer manifest and is "
+             "bit-identical to every existing product. deep reads the June 2026 "
+             "and 2026-05 SAFOD-Deep HDF5 recordings, in which case --date names "
+             "an ARM (deepA, deepB1.., deepC, deepDROP1..) rather than a "
+             "calendar date; see deep_rows().")
+    result.add_argument(
+        "--neighbor-half-width", type=int, default=NEIGHBOR_HALF_WIDTH,
+        help="half-width of the published R+-10 receiver-neighbour sum, in "
+             "CHANNELS. Default 10 reproduces Lellouch et al. and every "
+             "existing product. On the Deep fibre 10 channels span +-20.4 m "
+             "rather than +-10.2 m, so the choice must be declared.")
+    # The velocity scan grid. Defaults reproduce every existing product exactly
+    # (1500 to 6000 m/s in 25 m/s steps, 181 points). The Deep fibre needs a
+    # LOWER floor: a first pass peaked at 1500-1950 m/s with several positions
+    # pinned to the 1500 m/s grid edge, and a fluid-filled-borehole tube wave runs
+    # ~1400-1500 m/s, so the true maximum may lie below the default floor.
+    result.add_argument("--max-lag", type=float, default=None,
+                        help="lag half-window in s (default %.2f). Widen it so the\n"
+                             "far offsets stay inside the window at low trial\n"
+                             "velocities; otherwise those velocities are not scored."
+                             % MAX_LAG_SECONDS)
+    result.add_argument("--velocity-min", type=float, default=1500.0)
+    result.add_argument("--velocity-max", type=float, default=6000.0)
+    result.add_argument("--velocity-step", type=float, default=25.0)
     result.add_argument("--date", default="2024-12-20")
     result.add_argument("--start", type=int, default=0)
     result.add_argument("--nfiles", type=int, default=60)

@@ -55,7 +55,8 @@ from scipy.signal import butter, hilbert, sosfiltfilt
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-import ambient_lellouch2019_exact_stack as ex  # the authoritative engine
+import ambient_lellouch2019_exact_stack as ex
+import arrival_velocities as av  # the authoritative engine
 
 STEM = HERE / "deep_cc_steps"
 
@@ -66,8 +67,13 @@ WINDOW_S = 30.0
 STEP_S = 15.0
 RAM_S = 0.1
 BAND = (5.0, 20.0)
-MAX_LAG_S = 0.35
+# Derived from the aperture and the scan floor, not hand-picked. At 0.35 s a
+# 700 m offset is unreachable below 1934 m/s, so most of V_GRID was scored on a
+# shrinking subset of NEAR offsets -- a bias that grows as v falls and which
+# manufactured the 1675 m/s peak now retracted. Set after V_GRID exists.
+MAX_LAG_S = None
 V_GRID = np.arange(300.0, 6000.1, 25.0)
+MAX_LAG_S = round(av.required_lag_s(OFFSETS_M.max(), V_GRID.min()), 2)
 GATE_S = 0.012
 NULLS = 400
 SEED = 20260820

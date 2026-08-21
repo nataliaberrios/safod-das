@@ -64,6 +64,7 @@ from scipy.signal import hilbert
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import safod_geometry as geo
+import arrival_velocities as av
 
 STEM = HERE / "fk_downgoing"
 INK, MUTED = "#444444", "#6b6b6b"
@@ -119,7 +120,7 @@ def separation_contrast(shape, dz, dt, taper_cells, v_ref, band=(5.0, 20.0)):
     return fr, np.ones_like(fr)
 
 
-def separate(gather, lags, positions, taper_cells=6.0, keep="auto", v_ref=1675.0,
+def separate(gather, lags, positions, taper_cells=6.0, keep="auto", v_ref=None,
              quiet=False):
     """Return (downgoing, upgoing, which_quadrant_was_kept).
 
@@ -127,7 +128,14 @@ def separate(gather, lags, positions, taper_cells=6.0, keep="auto", v_ref=1675.0
     INCREASING. A decreasing axis gives a negative dz, which negates the k axis
     and swaps the two quadrants; callers must sort by depth first (the section
     scripts do).
+
+    `v_ref=None` resolves to the current `arrival_velocities.V_DEEP_ARRIVAL` at
+    CALL time. It was a default argument of `1675.0`, which is both retracted and
+    frozen at import, so a later correction to the constant would not have
+    reached callers that relied on the default.
     """
+    if v_ref is None:
+        v_ref = av.V_DEEP_ARRIVAL
     positions = np.asarray(positions, dtype=float)
     dz = float(np.median(np.diff(positions)))
     if dz <= 0:
@@ -238,7 +246,7 @@ def moveout_energy(gather, lags, positions, v, sep=None):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True, help=".npz from a section script")
-    ap.add_argument("--v-ref", type=float, default=1675.0)
+    ap.add_argument("--v-ref", type=float, default=av.V_DEEP_ARRIVAL)
     ap.add_argument("--taper-cells", type=float, default=6.0)
     ap.add_argument("--keep", default="auto", choices=("auto", KF_NEG, KF_POS),
                     help="which quadrant to call downgoing; 'auto' uses the "
@@ -367,6 +375,7 @@ def main():
              fontsize=6.5, color="#9a9a9a")
     ext = [lags[0], lags[-1], pos[-1], pos[0]]
     sep = (pos - pos[0]) if sep_true is None else sep_true
+    _XLIM = av.plot_lag_limit(lags, float(np.max(np.abs(sep))), a.v_ref)
     for i, (dat, ttl) in enumerate(((gather, "(a) Raw gather"),
                                     (down, "(b) DOWNGOING only"),
                                     (up, "(c) Upgoing only"))):
@@ -375,7 +384,7 @@ def main():
         ax[i].imshow(tn, aspect="auto", cmap="RdBu_r", vmin=-lim, vmax=lim,
                      interpolation="nearest", extent=ext)
         ax[i].plot(sep / a.v_ref, pos, "-", color=C3, lw=1.4)
-        ax[i].set(xlim=(-0.35, 0.35), xlabel="correlation lag (s)", title=ttl)
+        ax[i].set(xlim=(-_XLIM, _XLIM), xlabel="correlation lag (s)", title=ttl)
         ax[i].grid(False)
     ax[0].set_ylabel(axis)
     ax[3].hist(null, bins=30, color="#8a8a8a", alpha=.85,
