@@ -110,11 +110,15 @@ def deep_label() -> str:
 def deep_velocity_for_source(source_channel):
     """Measured arrival velocity for THIS source channel, or None if unmeasured.
 
-    The velocity rises with source depth (1350 -> 1550 m/s over TVD 2 -> 1208 m),
-    so a figure that draws a global constant draws the wrong line for two of the
-    three sources. Returning None rather than a fallback is deliberate: a caller
-    with no measurement should say so on the figure, not silently annotate it
-    with a number measured somewhere else.
+    The two clean sources differ (1350 m/s at the wellhead, 1525 m/s from TVD
+    389 m), so a figure drawing a single global constant draws the wrong line for
+    one of them. Whether that difference is a real depth dependence is OPEN -- the
+    third source that appeared to make it a trend was excluded for leaving the
+    near-vertical section.
+
+    Returning None rather than a fallback is deliberate: a caller with no
+    measurement should say so on the figure, not silently annotate it with a
+    number measured somewhere else.
     """
     return V_DEEP_BY_SOURCE.get(int(source_channel))
 
