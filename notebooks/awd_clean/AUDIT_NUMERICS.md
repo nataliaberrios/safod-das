@@ -161,7 +161,9 @@ diff 0.000e+00) and the descending-channel return-limb path still works (R2).
 
 With this, `block_spectra`'s existing `4*3` formula becomes honest — the binding
 term is now the float64 return alive next to its float32 copy, exactly 12
-bytes/sample (`audit_test_correlator.py` C5, 1.00×).
+bytes/sample (`audit_test_correlator.py` C5, 1.00×). Observed effect: the deepC
+array (job 40078776) is running **16 of 16** tasks at a 32 GB request, where the
+previous attempt lost 12 of 16 to OOM at 64 GB.
 
 ### F4 — the chunked/whole equivalence gate could not distinguish an honest edge effect from a real bug  · RESOLVED BY REDESIGN
 
