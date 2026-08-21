@@ -84,30 +84,80 @@ WATER_LEVEL = 0.01              # fraction of mean |A|^2, standard spectral-divi
 # aperture at ~1545 m/s the differential travel time reaches ~1.8 s, so the
 # 0.35 s window that suits Nano's 600 m would truncate the gather entirely.
 #
-# Deep is restricted to the outbound leg. The fiber reverses at channel 1702, and
+# Deep is restricted to the outbound leg. The fiber reverses at channel 1700 (safod_geometry.py), and
 # past that "distance along fiber" stops being monotonic in depth, which would
 # make a redatumed moveout meaningless. 200-3000 m is channels 98-1469, safely
 # inside the outbound limb, and is the range validated for the Deep guided mode.
+# GEOMETRY GATE, added 2026-08-20. A virtual source only redatums the surface
+# AWD source *downhole* if the source channel is actually downhole. Both fibre
+# configurations previously violated that:
+#
+#   Nano  source  50 m -> channel  39, ABOVE the wellhead at channel 73
+#                                       (nano_find_wellhead.txt, entry at 92 m)
+#   Deep  source 400 m -> channel 196, SURFACE LEAD-IN (safod_geometry.py,
+#                                       first in-hole channel is 211 = 431 m)
+#
+# Both apertures also started above fibre entry (Nano at 0 m, Deep at 200 m).
+# Sources are now inside the ground on Nano, and inside the near-vertical
+# outbound section on Deep (channels 211-949 = 431-1938 m), so that along-fibre
+# distance is a depth. `check_geometry()` re-derives this at run time and
+# refuses to proceed rather than trusting these literals.
+NANO_WELLHEAD_CH = 73           # nano_find_wellhead.txt: amplitude AND coherence
+DEEP_FIRST_IN_HOLE_CH = 211     # safod_geometry.py
+DEEP_LAST_NEAR_VERTICAL_CH = 949
+
 FIBERS = {
     "nano": dict(
         stack_key="nano_stacks", dx_key="dx_nano",
         band=(20.0, 50.0),          # Nano working band
-        aperture_m=(0.0, 600.0),    # signal dies well before the 926 m fiber end
+        aperture_m=(100.0, 600.0),  # starts below the 92 m wellhead; signal dies
+                                    # well before the 926 m fiber end
         max_lag_s=0.35,
-        sources_m=[50.0, 150.0, 250.0, 350.0],
+        sources_m=[150.0, 250.0, 350.0, 450.0],
         v_ref=2975.0,
         label="Nano (cemented)",
     ),
     "deep": dict(
         stack_key="deep_stacks", dx_key="dx_deep",
         band=(15.0, 30.0),          # validated Deep guided-mode band
-        aperture_m=(200.0, 3000.0), # outbound leg, validated range
+        aperture_m=(440.0, 3000.0), # starts below fibre entry at 431 m. Above
+                                    # ~1938 m the hole deviates past 5 deg, so
+                                    # along-fibre distance stops being depth.
         max_lag_s=2.00,
-        sources_m=[400.0, 900.0, 1600.0, 2400.0],
+        sources_m=[500.0, 900.0, 1300.0, 1700.0],
         v_ref=1544.6,               # frozen outbound trajectory
         label="Deep (wireline, outbound leg)",
     ),
 }
+
+
+def check_geometry(fiber, dx, sources_m, aperture_m):
+    """Refuse to build a virtual source on fibre that is not in the ground."""
+    bad = []
+    if fiber == "nano":
+        lo = NANO_WELLHEAD_CH
+        for m in list(sources_m) + [aperture_m[0]]:
+            c = int(round(m / dx))
+            if c < lo:
+                bad.append("%.0f m -> ch %d is ABOVE the Nano wellhead (ch %d)"
+                           % (m, c, lo))
+    else:
+        import safod_geometry as GEO
+        for m in list(sources_m) + [aperture_m[0]]:
+            c = int(round(m / dx))
+            if c < DEEP_FIRST_IN_HOLE_CH:
+                bad.append("%.0f m -> ch %d is SURFACE LEAD-IN: %s"
+                           % (m, c, GEO.describe(c)))
+        for m in sources_m:
+            c = int(round(m / dx))
+            if c > DEEP_LAST_NEAR_VERTICAL_CH:
+                bad.append("%.0f m -> ch %d is DEVIATED, along-fibre distance is "
+                           "not depth: %s" % (m, c, GEO.describe(c)))
+    if bad:
+        raise SystemExit("geometry check failed for %s:\n  %s"
+                         % (fiber, "\n  ".join(bad)))
+    print("geometry OK (%s): sources %s m, aperture from %.0f m"
+          % (fiber, [int(x) for x in sources_m], aperture_m[0]))
 
 # Set by main() from the chosen fiber.
 BAND = FIBERS["nano"]["band"]
@@ -206,6 +256,8 @@ def main():
     d = np.load(STACKS)
     fs = float(d["fs"])
     dx = float(d[cfg["dx_key"]])
+    # Refuse to build a virtual source on fibre that is not in the ground.
+    check_geometry(fiber, dx, SOURCE_DEPTHS_M, APERTURE_M)
     counts = d["n_common"]
     nano, n_drops = weighted_stack(d[cfg["stack_key"]], counts)
     print(f"{cfg['label']} stack {nano.shape}, fs={fs}, dx={dx:.6f}, "
