@@ -115,14 +115,29 @@ leave-one-out delay is median 0.000 s with a 10–90 range of ±1 ms — consist
 with the node timing above.
 
 *Deep:* largely **not** detected. Stacked drop/sham peak-SNR ratio has median
-**1.017** — indistinguishable from no signal across the fibre as a whole. Energy
-is confined to a few responding sections, the strongest at fibre **200–664 m**
-(ratio 34.2) and **706–1060 m** (ratio 23.6), with further patches at 5.0–6.5 km.
-895 of 3200 channels exceed ratio 1.5.
+**1.017** — indistinguishable from no signal across the fibre as a whole. 895 of
+3200 channels exceed ratio 1.5, in a few localised sections.
 
-> **Deep positions are metres along fibre, not depth.** No depth registration
-> exists for that fibre. See `CLAUDE.md`: AWD Deep branch intersections are fibre
-> coordinates.
+> **Corrected 2026-08-20.** An earlier version of this file quoted the strongest
+> responding section as fibre **200–664 m, ratio 34.2** with no further comment,
+> and stated that no depth registration exists for Deep. Both need fixing.
+>
+> Registration **does** exist: `safod_geometry.py`, from
+> `SAFOD_Phase2_GeoReferenced_Channels.xlsx`. It puts the surface lead-in at
+> channels **0–210**, the first in-hole channel at **211**, and the reversal at
+> channel **1700** (MD 3053 m, TVD 2549 m), after which the fibre retraces the
+> same depths on a return limb.
+>
+> At dx = 2.0419 m, fibre 200–664 m is channels **98–325** — so roughly the first
+> half of that section is **surface lead-in, fibre that never enters the hole**.
+> Its 34.2 ratio is therefore not straightforwardly a formation response, and
+> should not be quoted as one. The second section, fibre 706–1060 m (channels
+> 346–519), is genuinely in-hole and near-vertical.
+>
+> `deep_drop_visibility.py` has been re-run with the registration applied; it now
+> reports TVD and limb per section and excludes the lead-in from its in-hole
+> summary. See `deep_drop_visibility.txt` for the current numbers, which
+> supersede any Deep figure quoted here.
 
 ---
 

@@ -1,0 +1,67 @@
+Deep fibre: is a weight drop VISIBLE, and at what apparent velocity?
+  h5py direct (never readFile_HDF -- median=True would delete common mode)
+  strain rate | 250 Hz | 5-20 Hz | envelope / per-channel pre-drop RMS
+  window 1.5 s before to 4.0 s after the GPS drop time
+  sham arm = identical processing at times with no drop within 45 s
+
+  Depth registration NOW EXISTS (safod_geometry.py, from
+  SAFOD_Phase2_GeoReferenced_Channels.xlsx, 2026-08-20). Positions are
+  still quoted as metres along fibre for continuity with earlier runs,
+  but responding sections are also given in TVD, and any section in the
+  SURFACE LEAD-IN -- fibre that never enters the hole -- is labelled and
+  excluded from the in-hole summary.
+
+  802 drops with Deep coverage and a fully-contained window, 2026-06-16 23:47:09.409500+00:00 to 2026-06-17 22:19:17.114000+00:00
+  2835 Deep files, 2026-06-15 23:06:46+00:00 to 2026-06-17 22:20:48+00:00
+  3200 channels x 2.0419 m = 6.53 km | 1000 Hz | gauge length 10.209524 m
+
+  2632 of 2835 files are drop-free within 45 s of their midpoint
+
+=== reading 30 drop windows ===
+  stacked 30 drop windows
+
+=== reading 30 sham windows (no drop within 45 s) ===
+  SAFOD-Deep-10mGL-1000HzFs-2mChDualPulse_2026-06-17T222048Z.h5 skipped: window does not fit
+  stacked 29 sham windows
+
+=== PART A: is the drop visible? ===
+  Stacked SNR envelope, peak over t > 0.05 s, per fibre position.
+  geometry: 2979 of 3200 channels in the hole; surface lead-in 221 channels
+  arm    median peak SNR   90th pct   max      argmax fibre position
+  drop            1.742      9.358   54.641            368 m  [ch 180: SURFACE LEAD-IN (not in the hole)]
+  sham            1.720      6.842   67.734           6508 m  [ch 3187: MD 6 m, TVD 6 m, inclination 0.1 deg, return limb, DEVIATED]
+
+  drop / sham peak-SNR ratio: median 1.017, max 34.243 at fibre 378 m
+  895 of 3200 channels have drop/sham > 1.5, spanning fibre 0-6526 m
+  contiguous responding sections (>= 20 m), with depth:
+    fibre    200 -    664 m ( 464 m, 228 ch), max ratio 34.24  | STRADDLES lead-in and hole (50% lead-in), TVD up to 236 m
+    fibre    706 -   1060 m ( 353 m, 174 ch), max ratio 23.55  | TVD 279-633 m, outbound
+    fibre   5858 -   6199 m ( 341 m, 168 ch), max ratio 16.58  | TVD 315-657 m, return limb
+    fibre   6303 -   6457 m ( 153 m,  76 ch), max ratio 11.12  | TVD 57-211 m, return limb
+    fibre   5025 -   5148 m ( 123 m,  61 ch), max ratio 10.52  | TVD 1370-1493 m, return limb
+    fibre   5272 -   5340 m (  67 m,  34 ch), max ratio 13.02  | TVD 1177-1245 m, return limb
+    fibre   5168 -   5219 m (  51 m,  26 ch), max ratio 14.73  | TVD 1298-1349 m, return limb
+    fibre   5438 -   5485 m (  47 m,  24 ch), max ratio  6.71  | TVD 1032-1079 m, return limb
+
+  in-hole channels only (surface lead-in excluded):
+    776 of 2979 in-hole channels have drop/sham > 1.5; median ratio 1.008
+    strongest in-hole: fibre 1740 m, TVD 1314 m, ratio 28.49
+
+  arrival time of the stacked peak, responding channels only:
+    median 0.828 s, 10-90 pct 0.148-3.331 s
+
+=== PART B: where is the energy in signed apparent velocity? ===
+
+  aperture 700 m (343 ch): dk = 0.00143 /m; at 10 Hz the 2500-4000 m/s
+  fan spans k = 0.00250-0.00400 /m, i.e. 1.1 wavenumber bins wide
+    drop  fan share of 5-20 Hz power  7.58 % | band-power peak at 936 m/s
+          |A| in the frozen fan, per position: median 0.020, max 0.331 at fibre 833 m
+    sham  fan share of 5-20 Hz power  8.89 % | band-power peak at 785 m/s
+          |A| in the frozen fan, per position: median 0.005, max 0.108 at fibre 1666 m
+
+  aperture 2800 m (1371 ch): dk = 0.00036 /m; at 10 Hz the 2500-4000 m/s
+  fan spans k = 0.00250-0.00400 /m, i.e. 4.2 wavenumber bins wide
+    drop  fan share of 5-20 Hz power  5.19 % | band-power peak at 327 m/s
+          |A| in the frozen fan, per position: median 0.034, max 0.068 at fibre 1599 m
+    sham  fan share of 5-20 Hz power  4.38 % | band-power peak at 327 m/s
+          |A| in the frozen fan, per position: median 0.027, max 0.078 at fibre 1599 m
