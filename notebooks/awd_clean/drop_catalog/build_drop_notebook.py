@@ -77,12 +77,12 @@ REBUILD_PRODUCTS = False
 
 # Which drops the example figures show. Change freely -- nothing downstream
 # depends on these; they are illustrative only.
-EXAMPLE_BURST = 0        # burst shown drop-by-drop in Figure 5
-N_EXAMPLE_DROPS = 6      # individual drops overlaid in Figure 4
+EXAMPLE_BURST = 0        # burst shown raw in Figure 1 and drop-by-drop in Figure 6
+N_EXAMPLE_DROPS = 6      # individual drops overlaid in Figure 5
 """)
 
 co("""
-import subprocess, sys, csv, datetime as dt
+import subprocess, sys, os, csv, datetime as dt
 from pathlib import Path
 
 import numpy as np
@@ -185,9 +185,73 @@ for line in (HERE / "timing_uncertainty.txt").read_text().splitlines():
         print(line)
 """)
 
+# ------------------------------------------------------- fig: raw burst trace
+md("""
+## 4. Figure 1 — a burst exactly as it was recorded, with every drop marked
+
+**This is the plain look.** One continuous Nano record through burst
+`EXAMPLE_BURST` — not windowed, not re-zeroed, just the trace running in real
+time — with a **red dotted line at every delivered drop time**. Twenty drops,
+twenty marks, ~9 s apart.
+
+Every other figure below windows each drop and re-zeroes it on its own pick,
+which is the right thing for stacking but puts exactly one mark in each panel.
+This one keeps absolute time so you can see the marks and the impulses together.
+
+The trace is the 30–60 Hz beam over 81–439 m of fibre at 2,975 m/s, the same
+beam the detection metrics use. The lower panel zooms the first few drops.
+""")
+
+co("""
+BT = HERE / "burst_timeseries.npz"
+if REBUILD_PRODUCTS or not BT.exists():
+    print("extracting the continuous burst record from $OAK ...")
+    env = dict(os.environ, BURST=str(EXAMPLE_BURST))
+    r = subprocess.run([sys.executable, str(HERE / "build_burst_timeseries.py")],
+                       capture_output=True, text=True, env=env)
+    print(r.stdout[-1500:] or r.stderr[-1500:])
+    if r.returncode != 0:
+        raise RuntimeError("build_burst_timeseries.py failed -- see above")
+
+b = np.load(BT, allow_pickle=True)
+tt, tr = b["t_seconds"], b["trace"]
+dsec = b["drop_seconds"]
+origin = dt.datetime.fromisoformat(str(b["origin_utc"]))
+bband, bv = b["band_hz"], float(b["velocity_mps"])
+t_rel = tt - dsec[0]                      # seconds from the first drop
+d_rel = dsec - dsec[0]
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6.4), constrained_layout=True)
+
+for ax, (lo, hi), lab in ((ax1, (t_rel[0], t_rel[-1]), "whole burst"),
+                          (ax2, (-4, 32), "first four drops")):
+    m = (t_rel >= lo) & (t_rel <= hi)
+    ax.plot(t_rel[m], tr[m], color=INK, lw=0.5, zorder=3)
+    for k, d in enumerate(d_rel):
+        if lo <= d <= hi:
+            ax.axvline(d, color=RED, lw=1.0, ls=(0, (3, 3)), zorder=4)
+    ax.set_xlim(lo, hi)
+    ax.set_ylabel("beam strain rate")
+    ax.margins(x=0)
+    ax.annotate(lab, (0.997, 0.94), xycoords="axes fraction", ha="right",
+                va="top", color=INK2, fontsize=9)
+
+n_in = int(((d_rel >= t_rel[0]) & (d_rel <= t_rel[-1])).sum())
+ax2.set_xlabel(f"seconds from the first drop of burst {int(b['burst_id'])}  "
+               f"({origin + dt.timedelta(seconds=float(dsec[0])):%H:%M:%S} UTC)")
+ax1.set_title(f"Burst {int(b['burst_id'])} as recorded — {n_in} weight drops on one continuous trace\\n"
+              f"{origin + dt.timedelta(seconds=float(dsec[0])):%Y-%m-%d %H:%M:%S}–"
+              f"{origin + dt.timedelta(seconds=float(dsec[-1])):%H:%M:%S} UTC "
+              f"({origin + dt.timedelta(seconds=float(dsec[0]) - 7*3600):%H:%M:%S}–"
+              f"{origin + dt.timedelta(seconds=float(dsec[-1]) - 7*3600):%H:%M:%S} PDT) · "
+              f"{(dsec[-1]-dsec[0]):.0f} s · Nano beam {bband[0]:.0f}–{bband[1]:.0f} Hz, {bv:.0f} m/s",
+              color=INK, loc="left")
+plt.show()
+""")
+
 # ----------------------------------------------------------------- fig 1
 md("""
-## 4. Figure 1 — every drop across the survey
+## 5. Figure 2 — every drop across the survey
 
 One mark per drop, over the full 24 h. The 49 bursts show up as clusters. Colour
 is Nano detection, so the vertical structure is where in the survey the source
@@ -227,7 +291,7 @@ plt.show()
 
 # ----------------------------------------------------------------- fig 2 (all)
 md("""
-## 5. Figure 2 — the whole survey, every drop
+## 6. Figure 3 — the whole survey, every drop
 
 **All 988 drops in one image**, in time order, top to bottom. Each row is one
 drop's Nano beam waveform: the 30–60 Hz record shifted along a 2,975 m/s
@@ -300,7 +364,7 @@ plt.show()
 
 # ----------------------------------------------------------------- fig 3 (bursts)
 md("""
-## 6. Figure 3 — the 49 bursts, stacked
+## 7. Figure 4 — the 49 bursts, stacked
 
 The same data reduced to **one row per burst** — each is the 20-drop stack for
 that burst, so this is the 24 hours at a glance without 988 rows of speckle.
@@ -339,11 +403,11 @@ plt.show()
 
 # ----------------------------------------------------------------- fig 4
 md("""
-## 7. Figure 4 — six drops close up
+## 8. Figure 5 — six drops close up
 
 An **excerpt**, not the survey: six individual drops pulled from six different
 bursts spread across the 24 hours, so the waveform is actually legible at trace
-scale. Figures 2 and 3 are the complete picture; this is a zoom.
+scale. Figures 3 and 4 are the complete picture; this is a zoom.
 
 The **red dotted line is the delivered node pick time** — the drop time we were
 given. Every trace is plotted on its own time axis relative to that pick. The
@@ -393,7 +457,7 @@ plt.show()
 
 # ----------------------------------------------------------------- fig 5
 md("""
-## 8. Figure 5 — one full burst, drop by drop
+## 9. Figure 6 — one full burst, drop by drop
 
 Every drop in a single burst as an image, so repeatability is visible directly:
 each row is one drop, time runs left to right, and the **red dotted line is
@@ -434,7 +498,7 @@ plt.show()
 
 # ----------------------------------------------------------------- caveats
 md("""
-## 9. What to be careful about
+## 10. What to be careful about
 
 - **The detection thresholds are descriptive.** NCC > 0.90 and SNR > 10 dB were
   chosen to make the flag reproducible, **not** pre-registered before looking.
