@@ -1,20 +1,29 @@
-"""Extract several bursts as CONTINUOUS Nano time series, for the drop-marker figure.
+"""Extract epochs as single-channel Nano traces for the GPS pick-QC figure.
 
-Why this exists. Every other figure in this directory windows each drop and
-re-zeroes it on its own pick, which is right for stacking but wrong for the
-question "do the drops line up with the marks?" -- each panel then has exactly
-one mark in it. This pulls the raw record straight through, unwindowed, so a
-burst of ~20 drops appears as ~20 impulses on one continuous trace and the
-delivered pick times can be drawn on top as vertical lines.
+This reproduces the "Identifying drops" figure from
+``notebooks/JULY24_fml_coupling.ipynb`` cell 17 (Step 3c QC), which is the
+figure of record for the picking technique. Parameters are taken from that
+notebook and must not drift from it:
 
-Bursts are sampled across the whole 24 h rather than taking one, because
-detection is strongly time-varying: burst 30 has 0 of 20 drops detected on Nano
-while burst 48 has 16 of 20. One burst is not representative of the survey.
+    FMIN,FMAX = 1,100   broadband; NOT the 30-60 Hz detection beam
+    FILE_DUR_S = 300    Nano .pb files are 5 minutes
 
-Reads the Nano .pb files spanning each burst, beams over the same 81-439 m
-aperture at the same 2,975 m/s used by nano_hierarchical_repeatability.py, and
-saves the 1-D trace plus its time axis. Output stays small enough to commit, so
-the notebook plots it without touching $OAK.
+**One parameter is deliberately NOT inherited.** That notebook uses
+``CH_DETECT = 50``, commented "ch 50 ~ 63 m, best-coupled depth".
+``nano_find_wellhead.txt`` puts fibre entry at channel **73** (92 m along
+fibre), so channel 50 is **in the air** and its 0.995 neighbour correlation is
+surface coupling, not good coupling. ``AUDIT_2026-08-20.md`` 1.4 voids Nano
+results built on air channels. The channel is chosen from the data here instead,
+restricted to the cemented range.
+
+The single channel is the point. Beaming over 81-439 m averages the drops into
+the background and the impulses stop being legible; one well-coupled channel
+shows each drop as a clean spike sitting on its GPS mark.
+
+Each panel uses the ONE .pb file holding the median drop of its epoch, and the
+x axis is time within that file -- so panels legitimately span different ranges,
+and an epoch straddling a file boundary shows fewer marks than it has drops.
+That is what the "(N in file)" half of each title reports.
 
     sbatch awd_clean/drop_catalog/burst_timeseries_job.sh
     BURSTS=0,5,10 sbatch awd_clean/drop_catalog/burst_timeseries_job.sh
@@ -27,9 +36,9 @@ from pathlib import Path
 
 import numpy as np
 
-# Three DAS-utilities checkouts are live on this system and they are NOT
-# interchangeable: only the ettore88 safod_das_git copy defines
-# readFile_protobuf. Insert in reverse so the preferred path ends up first.
+# Three DAS-utilities checkouts are live and they are NOT interchangeable: only
+# the ettore88 safod_das_git copy defines readFile_protobuf. Insert in reverse
+# so the preferred path ends up first.
 for _p in reversed([
         "/home/groups/ettore88/nberrios/safod_das_git/DAS-utilities/python",
         "/home/groups/edunham/nberrios/safod_das/DAS-utilities/python"]):
@@ -41,104 +50,135 @@ HERE = Path(__file__).resolve().parent
 AWD = HERE.parent
 NANO_DIR = Path("/oak/stanford/groups/ettore88/data/SAFOD/ActiveJune2026/Nano")
 MANIFEST = AWD / "awd_manifest.csv"
-BEAM_NPZ = AWD / "nano_hierarchical_repeatability.npz"
 OUT = HERE / "burst_timeseries.npz"
 
-BURSTS = [int(x) for x in os.environ.get("BURSTS", "0,10,20,30,40,48").split(",")]
-BAND = (30.0, 60.0)          # same band as the detection beam
-VELOCITY = 2975.0            # same moveout
-PAD_S = 20.0                 # context either side of each burst
+# --- band and file duration from JULY24_fml_coupling.ipynb cell 17 ---
+FMIN, FMAX = 1.0, 100.0
+FILE_DUR_S = 300.0
+PAD_S = 5.0                       # the notebook's xlim padding
+# Same six epochs the original figure shows.
+BURSTS = [int(x) for x in os.environ.get("BURSTS", "0,9,19,28,38,47").split(",")]
+
+# CHANNEL. The original figure used CH_DETECT = 50, annotated there as
+# "ch 50 ~ 63 m, best-coupled depth". That is WRONG and the figure must not be
+# reproduced with it: `nano_find_wellhead.txt` puts fibre entry at channel 73
+# (92 m along fibre), so channels 0-72 are in the AIR. Channel 50's high RMS and
+# 0.995 neighbour correlation are surface/air coupling, not good coupling.
+# `AUDIT_2026-08-20.md` §1.4 voids Nano results built on air channels.
+#
+# So the channel is chosen from the data instead of asserted: scan the cemented
+# range for the channel whose drop impulses stand highest above their own
+# background, and report it. Set CH_DETECT in the environment to override.
+CH_MIN = 73                       # wellhead; first channel in the ground
+CH_MAX = 347                      # top of the aperture used by the detection beam
+CH_OVERRIDE = os.environ.get("CH_DETECT")
 
 
 def pb_start(name):
-    """Start time from a Nano protobuf filename: parts[1]=date, parts[2]=HH.MM.SS."""
+    """Start time from a Nano .pb filename: parts[1]=date, parts[2]=HH.MM.SS."""
     p = Path(name).name.split("_")
     return dt.datetime.strptime(f"{p[1]} {p[2]}", "%Y-%m-%d %H.%M.%S")
 
 
-def beam_one(path, ch, dist):
-    """Read one .pb file and collapse the aperture onto a single 2975 m/s beam."""
-    DAS, info = readFile_protobuf([str(path)], fmin=BAND[0], fmax=BAND[1],
-                                  desampling=False, verbose=False)
-    fs = float(info["fs"])
-    sub = DAS[ch, :]
-    beam = np.zeros(sub.shape[1], dtype=np.float64)
-    for k in range(sub.shape[0]):
-        beam += np.roll(sub[k], -int(round(dist[k] / VELOCITY * fs)))
-    return (beam / sub.shape[0]).astype(np.float32), fs
+def pick_channel(DAS, fs, rel):
+    """Channel in [CH_MIN, CH_MAX] whose drop impulses stand highest above noise.
 
-
-def extract(burst, rows_by_burst, ch, dist):
-    rows = rows_by_burst[burst]
-    drops = [dt.datetime.fromisoformat(r["utc_time"]).replace(tzinfo=None) for r in rows]
-    files = sorted({r["nano_file"] for r in rows}, key=pb_start)
-    print(f"\nburst {burst}: {len(drops)} drops, "
-          f"{drops[0]:%Y-%m-%d %H:%M:%S}-{drops[-1]:%H:%M:%S} UTC, {len(files)} file(s)")
-
-    segs, t0s, fs = [], [], None
-    for name in files:
-        path = NANO_DIR / name
-        if not path.exists():
-            print(f"  MISSING {name} -- skipping burst {burst}")
-            return None
-        seg, fs = beam_one(path, ch, dist)
-        segs.append(seg)
-        t0s.append(pb_start(name))
-        print(f"  {name}: {len(seg)/fs:.0f} s at {fs:.0f} Hz")
-
-    origin = t0s[0]
-    total = int(round((t0s[-1] - origin).total_seconds() * fs)) + len(segs[-1])
-    trace = np.full(total, np.nan, dtype=np.float32)
-    for seg, t0 in zip(segs, t0s):
-        i = int(round((t0 - origin).total_seconds() * fs))
-        trace[i:i + len(seg)] = seg
-    tsec = np.arange(total) / fs
-
-    lo = (drops[0] - origin).total_seconds() - PAD_S
-    hi = (drops[-1] - origin).total_seconds() + PAD_S
-    m = (tsec >= lo) & (tsec <= hi)
-    # store time relative to the burst's FIRST drop, so panels share an x axis
-    return {
-        "trace": trace[m],
-        "t_rel": (tsec[m] - (drops[0] - origin).total_seconds()).astype(np.float32),
-        "drop_rel": np.array([(d - drops[0]).total_seconds() for d in drops]),
-        "start_utc": drops[0].isoformat(),
-        "n_drops": len(drops),
-        "fs": fs,
-    }
+    Score is median peak |amplitude| in a 0.3 s window after each drop, divided
+    by the channel's own median |amplitude| away from drops. Per-channel
+    normalisation means a loud but uninformative channel cannot win.
+    """
+    n = DAS.shape[1]
+    on = np.zeros(n, dtype=bool)
+    for r in rel:
+        i = int(r * fs)
+        on[max(0, i):min(n, i + int(0.3 * fs))] = True
+    hi = min(CH_MAX, DAS.shape[0] - 1)
+    best, best_score = None, -np.inf
+    for c in range(CH_MIN, hi + 1):
+        x = np.abs(np.asarray(DAS[c, :], dtype=np.float64))
+        bg = np.median(x[~on])
+        if not np.isfinite(bg) or bg <= 0:
+            continue
+        score = np.median([x[max(0, int(r*fs)):min(n, int(r*fs)+int(0.3*fs))].max()
+                           for r in rel]) / bg
+        if score > best_score:
+            best, best_score = c, score
+    return best, best_score
 
 
 def main():
     rows_by_burst = {}
     for r in csv.DictReader(MANIFEST.open()):
         rows_by_burst.setdefault(int(r["burst_id"]), []).append(r)
-
-    z = np.load(BEAM_NPZ, allow_pickle=True)
-    ch, dist = z["aperture_channel"], z["aperture_distance_m"]
-    print(f"aperture: {len(ch)} channels, {dist.min():.0f}-{dist.max():.0f} m")
-    print(f"bursts requested: {BURSTS}")
+    print(f"epochs requested: {BURSTS}")
+    print(f"band {FMIN:.0f}-{FMAX:.0f} Hz (JULY24 cell 17)")
+    how = f"forced to {CH_OVERRIDE}" if CH_OVERRIDE else f"chosen from data in [{CH_MIN}, {CH_MAX}]"
+    print(f"channel: {how}")
+    print("  NOT channel 50 -- nano_find_wellhead.txt puts fibre entry at 73, "
+          "so 0-72 are in the air")
+    ch_detect = int(CH_OVERRIDE) if CH_OVERRIDE else None
 
     out, kept = {}, []
     for b in BURSTS:
         if b not in rows_by_burst:
-            print(f"\nburst {b}: not in the manifest -- skipped")
+            print(f"\nepoch {b}: not in the manifest -- skipped")
             continue
-        d = extract(b, rows_by_burst, ch, dist)
-        if d is None:
+        rows = rows_by_burst[b]
+        drops = [dt.datetime.fromisoformat(r["utc_time"]).replace(tzinfo=None)
+                 for r in rows]
+
+        # The file holding the MEDIAN drop, as the original does -- not every
+        # file the epoch touches.
+        median_drop = drops[len(drops) // 2]
+        name = rows[len(rows) // 2]["nano_file"]
+        path = NANO_DIR / name
+        if not path.exists():
+            print(f"\nepoch {b}: missing {name} -- skipped")
             continue
+        t_file = pb_start(name)
+
+        DAS, info = readFile_protobuf([str(path)], fmin=FMIN, fmax=FMAX,
+                                      desampling=False, verbose=False)
+        fs = float(info["fs"])
+        if ch_detect is None:                      # choose once, on the first epoch
+            rel0 = np.array([(d - t_file).total_seconds() for d in drops
+                             if t_file <= d < t_file + dt.timedelta(seconds=FILE_DUR_S)])
+            ch_detect, sc = pick_channel(DAS, fs, rel0)
+            print(f"  chose channel {ch_detect} (drop/background {sc:.1f}x); "
+                  f"reused for every epoch")
+        trace = np.asarray(DAS[ch_detect, :], dtype=np.float32)
+        t = np.arange(len(trace)) / fs
+
+        # drops that actually fall inside THIS file
+        rel = np.array([(d - t_file).total_seconds() for d in drops
+                        if t_file <= d < t_file + dt.timedelta(seconds=FILE_DUR_S)])
+        if rel.size == 0:
+            print(f"\nepoch {b}: no drops inside {name} -- skipped")
+            continue
+
+        # crop to the plotted window so the stored arrays stay small
+        m = (t >= rel.min() - PAD_S - 1) & (t <= rel.max() + PAD_S + 1)
+        print(f"\nepoch {b:2d}: {len(drops)} GPS drops ({rel.size} in file), "
+              f"{median_drop:%Y-%m-%d %H:%M:%S} UTC, {name}")
+        print(f"           file window {rel.min():.1f}-{rel.max():.1f} s, "
+              f"{m.sum()/fs:.0f} s kept at {fs:.0f} Hz")
+
         kept.append(b)
-        for k, v in d.items():
-            out[f"b{b}_{k}"] = v
+        out[f"b{b}_trace"] = trace[m]
+        out[f"b{b}_t_file"] = t[m].astype(np.float32)
+        out[f"b{b}_drop_in_file"] = rel
+        out[f"b{b}_n_gps"] = len(drops)
+        out[f"b{b}_start_utc"] = drops[0].isoformat()
+        out[f"b{b}_file"] = name
 
     if not kept:
-        raise SystemExit("no bursts extracted")
+        raise SystemExit("no epochs extracted")
     out["bursts"] = np.array(kept)
-    out["band_hz"] = np.array(BAND)
-    out["velocity_mps"] = VELOCITY
-    out["aperture_m"] = np.array([dist.min(), dist.max()])
-    out["n_channels"] = len(ch)
+    out["ch_detect"] = ch_detect
+    out["band_hz"] = np.array([FMIN, FMAX])
+    out["pad_s"] = PAD_S
     np.savez_compressed(OUT, **out)
-    print(f"\nwrote {OUT.name}: {len(kept)} bursts {kept}, "
+    print(f"\nwrote {OUT.name}: {len(kept)} epochs {kept}, "
           f"{OUT.stat().st_size/1e6:.1f} MB")
 
 

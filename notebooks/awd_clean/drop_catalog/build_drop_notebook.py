@@ -187,80 +187,74 @@ for line in (HERE / "timing_uncertainty.txt").read_text().splitlines():
 
 # ------------------------------------------------------- fig: raw burst trace
 md("""
-## 4. Figure 1 — six bursts as recorded, with every drop marked
+## 4. Figure 1 — Identifying drops
 
-**This is the plain look.** Continuous Nano record through each of six bursts —
-not windowed, not re-zeroed, just the trace running in real time — with a **red
-dotted line at every delivered drop time**. ~20 drops and ~20 marks per panel,
-about 9 s apart.
+**Does the cc9 GPS time land on a real drop?** This is the QC for the picking
+technique itself. Drops are selected by **GPS time**, not by a detector, so the
+thing to check is whether those times sit on impulsive AWD arrivals in the DAS.
 
-Every other figure below windows each drop and re-zeroes it on its own pick,
-which is right for stacking but puts exactly one mark in each panel. These keep
-absolute time so the marks and the impulses can be seen together.
+Six epochs spread across the 24 hours, one raw Nano trace each, with a **red
+line at every cc9 GPS drop time** that falls inside the plotted file. The x axis
+is time within the `.pb` file, so the panels legitimately cover different ranges.
 
-**Six bursts, not one, because detection is strongly time-varying.** The panels
-are sampled across the full 24 hours, and they do not look alike: burst 30 has
-**0 of 20** drops detected on Nano while burst 48 has **16 of 20**. Any single
-burst would misrepresent the survey.
+Each title reads `N GPS drops (M in file)`: an epoch straddling a 5-minute file
+boundary has fewer marks on screen than it has drops. That is expected, not a
+loss.
 
-The trace is the 30–60 Hz beam over 81–439 m of fibre at 2,975 m/s — the same
-beam the detection metrics use. All panels share one time axis, measured from
-each burst's own first drop.
+> **Channel.** The original version of this figure used channel 50, labelled
+> there as the best-coupled depth. It is not — `nano_find_wellhead.txt` puts
+> fibre entry at **channel 73**, so channels 0–72 are in the **air**, and
+> `AUDIT_2026-08-20.md` §1.4 voids Nano results built on air channels. The
+> channel here is picked from the data within the cemented range instead.
 """)
 
 co("""
 BT = HERE / "burst_timeseries.npz"
 if REBUILD_PRODUCTS or not BT.exists():
-    print("extracting the continuous burst records from $OAK ...")
+    print("extracting the epoch traces from $OAK ...")
     r = subprocess.run([sys.executable, str(HERE / "build_burst_timeseries.py")],
                        capture_output=True, text=True, env=os.environ)
-    print(r.stdout[-1500:] or r.stderr[-1500:])
+    print(r.stdout[-1800:] or r.stderr[-1800:])
     if r.returncode != 0:
         raise RuntimeError("build_burst_timeseries.py failed -- see above")
 
-b = np.load(BT, allow_pickle=True)
-blist = list(b["bursts"])
-bband, bv = b["band_hz"], float(b["velocity_mps"])
-bap = b["aperture_m"]
+from matplotlib.lines import Line2D
 
-# detected-count per burst, straight from the burst summary
-det = {int(r["burst_id"]): (int(r["n_nano_detected"]), int(r["n_drops"]))
-       for r in bursts}
+bz = np.load(BT, allow_pickle=True)
+eps = list(bz["bursts"])
+ch = int(bz["ch_detect"])
+band = bz["band_hz"]
+pad = float(bz["pad_s"])
 
-fig, axes = plt.subplots(len(blist), 1, figsize=(12, 1.55 * len(blist) + 1.1),
-                         sharex=True, constrained_layout=True)
-axes = np.atleast_1d(axes)
+fig, axes = plt.subplots(3, 2, figsize=(15, 9))
+for ax, ep in zip(axes.flat, eps):
+    t = bz[f"b{ep}_t_file"]
+    tr = bz[f"b{ep}_trace"]
+    rel = bz[f"b{ep}_drop_in_file"]
+    n_gps = int(bz[f"b{ep}_n_gps"])
 
-for ax, bn in zip(axes, blist):
-    t_rel = b[f"b{bn}_t_rel"]
-    tr = b[f"b{bn}_trace"]
-    d_rel = b[f"b{bn}_drop_rel"]
-    t0 = dt.datetime.fromisoformat(str(b[f"b{bn}_start_utc"]))
+    ax.plot(t, tr, "k", lw=0.4, zorder=3)
+    for r_ in rel:
+        ax.axvline(r_, color=RED, lw=0.7, alpha=0.7, zorder=4)
+    ax.set_xlim(rel.min() - pad, rel.max() + pad)
+    ax.set_title(f"Epoch {int(ep):02d} - {n_gps} GPS drops ({rel.size} in file)",
+                 fontsize=9, color=INK)
+    ax.set_xlabel("Time in file (s)", fontsize=8)
+    ax.set_ylabel("Strain rate", fontsize=8)
+    ax.tick_params(labelsize=8)
 
-    ax.plot(t_rel, tr, color=INK, lw=0.4, zorder=3)
-    for d in d_rel:
-        ax.axvline(d, color=RED, lw=0.9, ls=(0, (3, 3)), zorder=4)
+for ax in axes.flat[len(eps):]:
+    ax.set_visible(False)
 
-    nd, nt = det.get(int(bn), (0, len(d_rel)))
-    # opaque box: several panels are dense enough that bare text is unreadable
-    ax.annotate(f"burst {int(bn)} · {t0:%H:%M} UTC ({t0 - dt.timedelta(hours=7):%H:%M} PDT)"
-                f" · {len(d_rel)} drops · {nd}/{nt} detected",
-                (0.004, 0.96), xycoords="axes fraction", va="top",
-                color=INK, fontsize=9, zorder=6,
-                bbox=dict(facecolor=SURFACE, edgecolor="none", pad=1.6, alpha=0.92))
-    ax.set_yticks([])
-    ax.margins(x=0)
-    ax.grid(axis="y", visible=False)
-
-axes[-1].set_xlabel("seconds from each burst's own first drop  "
-                    "(red dotted line = a delivered drop time)")
-axes[len(axes) // 2].set_ylabel("beam strain rate  (per-panel scale)")
-axes[0].set_title(
-    f"Six bursts as recorded — every weight drop marked\\n"
-    f"sampled across 24.0 h, 2026-06-16 23:47–2026-06-17 23:47 UTC "
-    f"(16:47–16:47 PDT) · Nano beam {bband[0]:.0f}–{bband[1]:.0f} Hz, "
-    f"{bv:.0f} m/s, {bap[0]:.0f}–{bap[1]:.0f} m aperture",
-    color=INK, loc="left")
+axes.flat[0].legend([Line2D([0], [0], color=RED, lw=1)], ["cc9 GPS drop time"],
+                    fontsize=8, loc="upper right")
+fig.suptitle(
+    f"Identifying drops — cc9 GPS drop times on the Nano trace, channel {ch}\\n"
+    f"red lines = GPS drop times; they should land on the impulsive AWD arrivals · "
+    f"{band[0]:.0f}–{band[1]:.0f} Hz · six epochs across 24.0 h, "
+    f"2026-06-16 23:47–2026-06-17 23:47 UTC (16:47–16:47 PDT)",
+    fontsize=11, color=INK)
+plt.tight_layout()
 plt.show()
 """)
 
