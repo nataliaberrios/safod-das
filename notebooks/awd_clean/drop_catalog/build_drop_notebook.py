@@ -24,7 +24,12 @@ md("""
 **June 2026 active-source survey.** 2026-06-16 23:47 → 2026-06-17 23:47 UTC
 (24.0 h) · local 2026-06-16 16:47 → 2026-06-17 16:47 PDT.
 
-This notebook shows **which weight drops we detected in the DAS, and how we
+**The survey: 20 weight drops every 30 minutes, around the clock for 24 hours.**
+Measured from the delivered picks — 49 bursts, median gap 30.0 min (range
+27.6–31.2), 20 drops in 36 of the 49 bursts (19–23 overall), drops 9.0 s apart
+within a burst, 171 s per burst, **989 drops** in total.
+
+This notebook shows **which of those drops we detected in the DAS, and how we
 found them**. It reads the finished products by default and re-runs nothing, so
 it opens in a couple of seconds.
 
@@ -72,8 +77,8 @@ REBUILD_PRODUCTS = False
 
 # Which drops the example figures show. Change freely -- nothing downstream
 # depends on these; they are illustrative only.
-EXAMPLE_BURST = 0        # burst shown in full in Figure 3
-N_EXAMPLE_DROPS = 6      # individual drops overlaid in Figure 2
+EXAMPLE_BURST = 0        # burst shown drop-by-drop in Figure 5
+N_EXAMPLE_DROPS = 6      # individual drops overlaid in Figure 4
 """)
 
 co("""
@@ -220,14 +225,125 @@ ax.set_title("Every delivered weight drop, and whether Nano saw it\\n"
 plt.show()
 """)
 
-# ----------------------------------------------------------------- fig 2
+# ----------------------------------------------------------------- fig 2 (all)
 md("""
-## 5. Figure 2 — a few drops, with the drop time marked
+## 5. Figure 2 — the whole survey, every drop
 
-**This is the figure that shows the timing works.** Each trace is the Nano beam
-waveform for one drop: the 30–60 Hz record shifted along a 2,975 m/s trajectory
-and averaged over 81–439 m of fibre, from
+**All 988 drops in one image**, in time order, top to bottom. Each row is one
+drop's Nano beam waveform: the 30–60 Hz record shifted along a 2,975 m/s
+trajectory and averaged over 81–439 m of fibre, from
 `nano_hierarchical_repeatability.npz`.
+
+The **red dotted line is the delivered node pick time**. The arrival is the
+vertical stripe at about +130 ms — vertical means every drop across 24 hours
+landed at the same time relative to its own pick, which is the whole case that
+the delivered timing is usable.
+
+The horizontal banding is real: it is the 49 bursts, and the bands where the
+stripe fades are the hours when the source was not getting into the fibre. That
+is the same structure Figure 1 shows as colour.
+""")
+
+co("""
+z = np.load(AWD / "nano_hierarchical_repeatability.npz", allow_pickle=True)
+tau, beams = z["tau_s"], z["beam_waveforms"]
+bid, did = z["burst_id"], z["drop_id"]
+btmp = z["normalized_burst_templates"]
+v, band = float(z["velocity_mps"]), z["band_hz"]
+ap = z["aperture_m"]
+
+# The npz holds the 988 drops that entered the manifest; `times` above holds all
+# 989 delivered picks. Use the npz's OWN timestamps so the two never mis-align --
+# slicing `times[:988]` would silently shift every row if the missing pick were
+# not the last one.
+btimes = np.array([dt.datetime.fromisoformat(s) for s in z["utc_date"]])
+btimes = np.array([t.replace(tzinfo=None) for t in btimes])
+assert len(btimes) == len(beams) == len(bid)
+
+# SNR indexed the same way as the npz rows, joined on timestamp.
+_snr_by_time = {t: v for t, v in zip(times, snr)}
+bsnr = np.array([_snr_by_time.get(t, np.nan) for t in btimes])
+assert np.isfinite(bsnr).sum() > 0.95 * len(bsnr), "SNR join failed"
+
+allimg = beams / np.max(np.abs(beams), axis=1, keepdims=True)
+lim = np.percentile(np.abs(allimg), 99)
+
+fig, ax = plt.subplots(figsize=(10, 7), constrained_layout=True)
+m = ax.imshow(allimg, aspect="auto", cmap="RdBu_r", vmin=-lim, vmax=lim,
+              extent=[tau[0] * 1e3, tau[-1] * 1e3, len(allimg), 0],
+              interpolation="nearest", zorder=2)
+ax.axvline(0, color=RED, lw=1.4, ls=(0, (3, 3)), zorder=5)
+# Label sits at the BOTTOM of the axes, inside: the pre-arrival region is pale
+# there, and the top edge is taken by the two-line title.
+ax.annotate("delivered drop time", xy=(0, 0), xycoords=("data", "axes fraction"),
+            xytext=(6, 7), textcoords="offset points", color=RED, fontsize=9,
+            va="bottom", ha="left")
+
+# right-hand axis ticks in hours, so the 24 h is legible without a second scale
+hh = np.array([(t - btimes.min()).total_seconds() / 3600 for t in btimes])
+ticks = [int(np.argmin(np.abs(hh - q))) for q in range(0, 25, 4)]
+ax.set_yticks(ticks)
+ax.set_yticklabels([f"{int(round(hh[i]))} h" for i in ticks])
+ax.set_ylabel("drop, in time order  (elapsed since survey start)")
+ax.set_xlabel("time relative to the delivered drop time (ms)")
+ax.grid(False)
+fig.colorbar(m, ax=ax, pad=0.015, label="normalised beam amplitude")
+ax.set_title(f"All {len(allimg)} weight drops — 20 drops every 30 min for 24 h\\n"
+             f"{len(np.unique(bid))} bursts · "
+             f"{times.min():%Y-%m-%d %H:%M}–{times.max():%H:%M} UTC "
+             f"({times.min() - dt.timedelta(hours=7):%Y-%m-%d %H:%M}–"
+             f"{times.max() - dt.timedelta(hours=7):%H:%M} PDT) · "
+             f"Nano beam {band[0]:.0f}–{band[1]:.0f} Hz, {v:.0f} m/s",
+             color=INK, loc="left")
+plt.show()
+""")
+
+# ----------------------------------------------------------------- fig 3 (bursts)
+md("""
+## 6. Figure 3 — the 49 bursts, stacked
+
+The same data reduced to **one row per burst** — each is the 20-drop stack for
+that burst, so this is the 24 hours at a glance without 988 rows of speckle.
+Red dotted line is again the delivered drop time.
+""")
+
+co("""
+bt = btmp / np.max(np.abs(btmp), axis=1, keepdims=True)
+lim2 = np.percentile(np.abs(bt), 99)
+bstart = [btimes[bid == b].min() for b in range(len(bt))]
+
+fig, ax = plt.subplots(figsize=(10, 5.4), constrained_layout=True)
+m = ax.imshow(bt, aspect="auto", cmap="RdBu_r", vmin=-lim2, vmax=lim2,
+              extent=[tau[0] * 1e3, tau[-1] * 1e3, len(bt) - 0.5, -0.5],
+              interpolation="nearest", zorder=2)
+ax.axvline(0, color=RED, lw=1.4, ls=(0, (3, 3)), zorder=5)
+# Label sits at the BOTTOM of the axes, inside: the pre-arrival region is pale
+# there, and the top edge is taken by the two-line title.
+ax.annotate("delivered drop time", xy=(0, 0), xycoords=("data", "axes fraction"),
+            xytext=(6, 7), textcoords="offset points", color=RED, fontsize=9,
+            va="bottom", ha="left")
+ax.set_yticks(range(0, len(bt), 4))
+ax.set_yticklabels([f"{b}  ({bstart[b]:%H:%M})" for b in range(0, len(bt), 4)],
+                   fontsize=8.5)
+ax.set_ylabel("burst  (start time, UTC)")
+ax.set_xlabel("time relative to the delivered drop time (ms)")
+ax.grid(False)
+fig.colorbar(m, ax=ax, pad=0.015, label="normalised burst stack")
+ax.set_title(f"All {len(bt)} bursts, each a stack of ~20 drops · 24.0 h\\n"
+             f"one row per burst, 30 min apart · "
+             f"{times.min():%Y-%m-%d %H:%M} UTC "
+             f"({times.min() - dt.timedelta(hours=7):%H:%M} PDT) onwards",
+             color=INK, loc="left")
+plt.show()
+""")
+
+# ----------------------------------------------------------------- fig 4
+md("""
+## 7. Figure 4 — six drops close up
+
+An **excerpt**, not the survey: six individual drops pulled from six different
+bursts spread across the 24 hours, so the waveform is actually legible at trace
+scale. Figures 2 and 3 are the complete picture; this is a zoom.
 
 The **red dotted line is the delivered node pick time** — the drop time we were
 given. Every trace is plotted on its own time axis relative to that pick. The
@@ -240,29 +356,23 @@ delivered timing is good enough to stack on.
 """)
 
 co("""
-z = np.load(AWD / "nano_hierarchical_repeatability.npz", allow_pickle=True)
-tau, beams = z["tau_s"], z["beam_waveforms"]
-bid, did = z["burst_id"], z["drop_id"]
-v, band = float(z["velocity_mps"]), z["band_hz"]
-ap = z["aperture_m"]
-
 # Pick N drops spread across the whole survey, strongest-SNR first within reach.
-order = np.argsort(-snr[:len(beams)])
+order = np.argsort(-bsnr)
 picked, seen = [], set()
 for i in order:
-    if bid[i] not in seen and np.isfinite(snr[i]):
+    if bid[i] not in seen and np.isfinite(bsnr[i]):
         picked.append(i); seen.add(bid[i])
     if len(picked) == N_EXAMPLE_DROPS:
         break
-picked = sorted(picked, key=lambda i: times[i])
+picked = sorted(picked, key=lambda i: btimes[i])
 
 fig, ax = plt.subplots(figsize=(9, 6.2), constrained_layout=True)
 step = 2.4
 for k, i in enumerate(picked):
     w = beams[i] / np.max(np.abs(beams[i]))
     ax.plot(tau * 1e3, w + k * step, color=INK, lw=1.0, zorder=3)
-    ax.annotate(f"burst {bid[i]}, drop {did[i]} · {times[i]:%H:%M:%S} UTC · "
-                f"{snr[i]:.0f} dB",
+    ax.annotate(f"burst {bid[i]}, drop {did[i]} · {btimes[i]:%H:%M:%S} UTC · "
+                f"{bsnr[i]:.0f} dB",
                 (tau[0] * 1e3, k * step), xytext=(4, 9), textcoords="offset points",
                 color=INK2, fontsize=8.5)
 
@@ -281,9 +391,9 @@ ax.set_title(f"{len(picked)} drops from {len(picked)} different bursts, aligned 
 plt.show()
 """)
 
-# ----------------------------------------------------------------- fig 3
+# ----------------------------------------------------------------- fig 5
 md("""
-## 6. Figure 3 — one full burst
+## 8. Figure 5 — one full burst, drop by drop
 
 Every drop in a single burst as an image, so repeatability is visible directly:
 each row is one drop, time runs left to right, and the **red dotted line is
@@ -302,10 +412,13 @@ m = ax.imshow(img, aspect="auto", cmap="RdBu_r", vmin=-lim, vmax=lim,
               extent=[tau[0] * 1e3, tau[-1] * 1e3, len(sel) - 0.5, -0.5],
               interpolation="nearest", zorder=2)
 ax.axvline(0, color=RED, lw=1.4, ls=(0, (3, 3)), zorder=5)
-ax.annotate("delivered drop time", (0, -0.5), xytext=(6, -12),
-            textcoords="offset points", color=RED, fontsize=9)
+# Label sits at the BOTTOM of the axes, inside: the pre-arrival region is pale
+# there, and the top edge is taken by the two-line title.
+ax.annotate("delivered drop time", xy=(0, 0), xycoords=("data", "axes fraction"),
+            xytext=(6, 7), textcoords="offset points", color=RED, fontsize=9,
+            va="bottom", ha="left")
 
-t0, t1 = times[sel[0]], times[sel[-1]]
+t0, t1 = btimes[sel[0]], btimes[sel[-1]]
 ax.set_xlabel("time relative to the delivered drop time (ms)")
 ax.set_ylabel("drop within burst")
 ax.set_yticks(np.arange(0, len(sel), 2))   # integer: drop index is discrete
@@ -321,7 +434,7 @@ plt.show()
 
 # ----------------------------------------------------------------- caveats
 md("""
-## 7. What to be careful about
+## 9. What to be careful about
 
 - **The detection thresholds are descriptive.** NCC > 0.90 and SNR > 10 dB were
   chosen to make the flag reproducible, **not** pre-registered before looking.
