@@ -652,7 +652,99 @@ md("""
 
 # ----------------------------------------------------------------- caveats
 md("""
-## 11. Provenance — what produced every figure and number
+## 11. Where the variability lives — and why it decides what to do next
+
+Two scatter terms behave completely differently, and telling them apart settles
+which improvements are worth attempting:
+
+- **within-burst** (drop to drop) averages down as `1/sqrt(N)` when you stack;
+- **between-burst** does **not**. It is the floor a monitoring measurement sits on.
+
+**Source.** Computed by **`drop_catalog/build_variability.py`** from
+`../nano_drop_repeatability.csv` and `../nano_burst_repeatability_hierarchical.csv`,
+both written by **`../nano_hierarchical_repeatability.py`**. No new waveform
+quantity is measured; the script only separates terms already in those files.
+
+> **Estimator note.** The obvious way to time each drop is to pick its envelope
+> peak. Do **not** — on low-SNR drops the peak jumps between lobes and the
+> scatter comes out near 32 ms, which is picker failure, not timing. The
+> leave-one-out cross-correlation delays in those CSVs give 0.4 ms and are the
+> right quantity.
+""")
+
+co("""
+V = np.load(HERE / "variability.npz", allow_pickle=True)
+print((HERE / "variability.txt").read_text())
+""")
+
+co("""
+gate = V["drop_snr_db"] > float(V["snr_gate_db"])
+fig, ax = plt.subplots(1, 3, figsize=(13, 3.9), constrained_layout=True)
+
+# (a) per-drop delay through the survey, split by the quality gate
+ax[0].scatter(V["drop_hours"][~gate], V["drop_delay_ms"][~gate], s=6, c=ORANGE,
+              label=f"SNR < {float(V['snr_gate_db']):.0f} dB  (n={int((~gate).sum())})", zorder=3)
+ax[0].scatter(V["drop_hours"][gate], V["drop_delay_ms"][gate], s=6, c=BLUE,
+              label=f"SNR > {float(V['snr_gate_db']):.0f} dB  (n={int(gate.sum())})", zorder=4)
+ax[0].set(xlabel="hours from survey start", ylabel="drop delay vs own burst (ms)",
+          ylim=(-6, 6))
+ax[0].legend(loc="upper left", fontsize=8, ncols=1)
+ax[0].set_title("(a) drop-to-drop, within burst", color=INK, loc="left")
+
+# (b) burst-median delay: the term stacking cannot remove
+bh, bd = V["burst_hours"], V["burst_delay_ms"]
+ax[1].axhline(0, color=INK2, lw=0.8, zorder=2)
+ax[1].plot(bh, bd, "o-", color=BLUE, ms=4, lw=1.0, zorder=4)
+sl, ic = np.polyfit(bh, bd, 1)
+ax[1].plot(bh, sl * bh + ic, color=RED, lw=1.4, ls=(0, (4, 3)), zorder=5,
+           label=f"trend {sl*24:+.2f} ms / 24 h")
+ax[1].set(xlabel="hours from survey start", ylabel="burst delay vs other bursts (ms)")
+ax[1].legend(loc="upper right", fontsize=8)
+ax[1].set_title("(b) burst-to-burst — the floor", color=INK, loc="left")
+
+# (c) the comparison, as a single readable statement
+terms = [("drop-to-drop\\nper drop", float(V["s_within"]), ORANGE),
+         ("drop-to-drop\\nafter stacking 20", float(V["s_within_stacked"]), BLUE),
+         ("burst-to-burst\\n(cannot be stacked away)", float(V["s_between"]), RED)]
+ax[2].barh([t[0] for t in terms], [t[1] for t in terms],
+           color=[t[2] for t in terms], height=0.55, zorder=3)
+for i, (_, v, _) in enumerate(terms):
+    ax[2].annotate(f"{v:.3f} ms", (v, i), xytext=(5, 0), textcoords="offset points",
+                   va="center", color=INK, fontsize=9)
+ax[2].set(xlabel="timing scatter (ms)", xlim=(0, 0.52))
+ax[2].grid(axis="y", visible=False)
+ax[2].set_title("(c) what stacking can and cannot fix", color=INK, loc="left")
+
+fig.suptitle("AWD timing scatter: drop-to-drop vs burst-to-burst  ·  "
+             f"{int(V['n_per_burst'])} drops x 49 bursts over 24.0 h  ·  "
+             "2026-06-16 23:47-2026-06-17 23:47 UTC (16:47-16:47 PDT)",
+             color=INK, x=0.005, ha="left")
+plt.show()
+""")
+
+md("""
+### What this says
+
+**Stacking is already done working.** Twenty drops per burst pulls the
+drop-to-drop term to 0.090 ms, which is **3x below** the burst-to-burst floor of
+0.273 ms. Collecting more drops per burst would buy essentially nothing.
+
+**The floor is between-burst, and it matches the documented figure.**
+`docs/paper1/STATUS.md` records sigma_alpha ~ 0.30 ms common-mode as the limiter.
+The between-burst scatter measured here is 0.273 ms. Those are the same number,
+which confirms the "source is the limiter" claim refers to the term stacking
+cannot touch.
+
+**Drop quality matters more than drop count.** Gating on beam SNR > 10 dB tightens
+the within-burst term 3.3x, from 1.332 ms to 0.403 ms. That is free.
+
+Panel (b) is also the offset time series worth having next to the field
+observation that the ground compacted under the plate: a slight negative trend,
+not resolved against burst-to-burst scatter.
+""")
+
+md("""
+## 12. Provenance — what produced every figure and number
 
 Every output in this notebook, traced to the script that made it and the data it
 read. Same convention as `awd_clean/manuscript/REPRODUCE.md`. Paths are relative
@@ -707,7 +799,7 @@ does not). Edit `build_drop_notebook.py`, never the `.ipynb`.
 """)
 
 md("""
-## 12. What to be careful about
+## 13. What to be careful about
 
 - **The detection thresholds are descriptive.** NCC > 0.90 and SNR > 10 dB were
   chosen to make the flag reproducible, **not** pre-registered before looking.

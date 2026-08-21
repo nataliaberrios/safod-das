@@ -1,0 +1,30 @@
+AWD timing scatter: drop-to-drop versus burst-to-burst
+==================================================================
+
+988 drops in 49 bursts, 20 drops per burst
+drop-quality gate: beam SNR > 10 dB (427 of 988 drops pass)
+
+WITHIN-BURST (drop to drop, leave-one-out vs own burst template)
+  all drops                  sd   1.332 ms
+  SNR-gated drops            sd   0.403 ms   (3.3x tighter)
+  after stacking 20 drops    sd   0.090 ms
+
+BETWEEN-BURST (leave-one-burst-out)
+  burst-to-burst             sd   0.273 ms   range -0.53 to +0.54 ms
+  burst waveform NCC         median 0.9757
+  burst relative amplitude   sd 0.075
+
+THE COMPARISON THAT DECIDES WHAT TO DO NEXT
+  within-burst, stacked        0.090 ms   averages down as 1/sqrt(N)
+  between-burst                0.273 ms   does NOT average down
+  ratio                          3.0x
+
+  Stacking 20 drops already puts the within-burst term 3.0x below the
+  between-burst floor. More drops per burst buys effectively nothing.
+  The floor is between-burst, and it is what a monitoring measurement
+  actually sits on.
+
+  For reference, docs/paper1/STATUS.md records sigma_alpha ~ 0.30 ms
+  common-mode. The between-burst term measured here is 0.273 ms,
+  so that documented figure is the BETWEEN-burst scatter -- which is
+  consistent, and confirms stacking is not the lever.
