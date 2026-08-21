@@ -2,7 +2,8 @@
 """Step-by-step ablation of the Deep-fibre ambient-noise cross-correlation.
 
 PURPOSE. Produce every array needed for a manuscript-level figure sequence that
-walks from raw phase to the recovered ~1675 m/s arrival, and that demonstrates
+walks from raw phase to the recovered ~1350 m/s arrival (1675 m/s is retracted;
+see arrival_velocities.py), and that demonstrates
 each processing step is NECESSARY by removing it and showing what breaks.
 
 Necessity is shown by ABLATION, not by assertion: every panel compares the full
@@ -60,7 +61,10 @@ import arrival_velocities as av  # the authoritative engine
 
 STEM = HERE / "deep_cc_steps"
 
-SRC_CH = 400                      # strongest of the three recovering positions
+# The WELLHEAD, which is the Lellouch Figure 7c geometry (a source at the top of
+# the array). This was 400 -- 389 m down the hole -- chosen because it scored
+# highest, but the walkthrough should show the geometry the paper describes.
+SRC_CH = 211
 OFFSETS_M = np.arange(50.0, 700.1, 50.0)
 NEIGHBOUR = 10                    # published R+-10
 WINDOW_S = 30.0
