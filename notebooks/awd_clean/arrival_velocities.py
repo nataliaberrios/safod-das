@@ -16,26 +16,39 @@ which sit closest to the zero-lag lobe and score high. The score therefore rose
 as velocity fell for a purely geometric reason -- the "pedestal" -- and the peak
 was dragged down to 1675 m/s.
 
-Re-aggregated at +-2.5 s, which holds 700 m down to 280 m/s, three geometrically
-valid source channels give:
+Re-aggregated at +-2.5 s, which holds 700 m down to 280 m/s:
 
-    src 211 (TVD    2 m)  1350 m/s   score 18.82   max-null p = 0.0002
-    src 400 (TVD  389 m)  1525 m/s   score 27.08   max-null p = 0.0002
-    src 800 (TVD 1208 m)  1550 m/s   score  7.66   max-null p = 0.0002
+    source            TVD span        moveout scan   envelope regression
+    src 211 wellhead     2- 705 m       1350 m/s       1469 m/s (r = 0.94)
+    src 400              389-1092 m     1525 m/s       1443 m/s (r = 0.98)
+    src 800             CONTAMINATED -- see below
 
-THIS IS A DEPTH TREND, NOT SCATTER. The velocity rises monotonically with source
-depth, which is what a mode whose speed tracks formation stiffness should do, and
-it means NO SINGLE NUMBER is right for every figure -- a figure must draw the
-velocity measured for ITS OWN source. `deep_velocity_for_source()` exists so that
-happens by construction rather than by remembering.
+So the Deep arrival is ~1350-1525 m/s, and the two estimators differ by up to 9 %
+on the same gather. The scan takes a median of envelope amplitude in a gate over
+the R+-10 neighbour sum; the regression fits per-trace envelope peaks with no
+neighbour sum. Neither is obviously better and they are quoted as a range, not
+averaged into a false precision. All of it is far from 3200 m/s.
 
-An independent envelope-peak regression (lag on separation, 100-450 m) over four
-gathers spanning BOTH fibre limbs gives 1443-1537 m/s, inside this range.
+SRC 800 IS EXCLUDED, and an earlier claim of a monotonic velocity-versus-depth
+trend (1350 -> 1525 -> 1550) IS WITHDRAWN because it rested on it. Its 700 m
+aperture runs from channel 810 to 1153, but the near-vertical section ends at
+channel 949, so 204 of its 354 channels are in the deviated hole (17-55 degrees).
+There, along-fibre distance is not vertical depth, so its 1550 m/s is an APPARENT
+velocity and cannot be compared with the other two. `deep_pervel` now checks the
+receiver span, not just the source channel, which is what let this through.
 
-Treat the trend as provisional: three sources is three points, the three gathers
-have very different scores (7.7 to 27.1), and no per-velocity null has yet been
-run on the corrected aggregates. It is reported because it is what the numbers
-say, not because it is established.
+Two clean sources are not a depth trend. Whether velocity varies with depth is
+open, and the doubled-aperture run (1400 m from the wellhead, the full
+near-vertical section) is the way to test it within a single gather.
+
+An independent envelope-peak regression over four gathers spanning BOTH fibre
+limbs gives 1443-1537 m/s, consistent with the above.
+
+STILL MISSING: no per-velocity null has been run on the corrected aggregates. The
+p = 0.0002 attached to these scans is the MAX-OVER-GRID statistic, which this
+project retired because it depends on where the scan edges are set, and it is
+also the permutation floor (1/5001) so it cannot read lower. Do not quote it as
+significance.
 
 WHAT IT IS NOT. This is not Lellouch's 3200 m/s P wave, and it is not a body
 wave. It is ~2x slower, it appears on a WIRELINE (fluid-coupled) fibre, and the
@@ -65,12 +78,16 @@ from __future__ import annotations
 
 # Deep fibre, 5-20 Hz, per source channel: scan peak at +-2.5 s over 300-6000 m/s.
 # Keyed by source so a figure cannot draw another source's velocity.
-V_DEEP_BY_SOURCE = {211: 1350.0, 400: 1525.0, 800: 1550.0}
+# src 800 is deliberately ABSENT: 204 of its 354 receiver channels lie past the
+# end of the near-vertical section, so its moveout is apparent, not vertical.
+# deep_velocity_for_source(800) therefore returns None and a figure using it must
+# say it has no measured velocity rather than borrow another source's.
+V_DEEP_BY_SOURCE = {211: 1350.0, 400: 1525.0}
 
 # Default for contexts with no single source (whole-archive stacks, schematics).
 # The wellhead is the Lellouch Figure 7c geometry, so it is the canonical one.
 V_DEEP_ARRIVAL = V_DEEP_BY_SOURCE[211]
-V_DEEP_ARRIVAL_RANGE = (1350.0, 1550.0)
+V_DEEP_ARRIVAL_RANGE = (1350.0, 1525.0)   # scan; envelope fits give 1443-1469
 
 # Nano / cemented fibre. Use the in-band value for 5-20 Hz work.
 V_NANO_INBAND = 3200.0            # 5-20 Hz, extrapolated 3102-3238

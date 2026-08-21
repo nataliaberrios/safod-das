@@ -1111,7 +1111,18 @@ def _apply_velocity_grid(args: argparse.Namespace) -> None:
     product remains bit-identical, which is the condition this repo places on any
     new option.
     """
-    global VELOCITY_GRID_M_S, MAX_LAG_SECONDS
+    global VELOCITY_GRID_M_S, MAX_LAG_SECONDS, TARGET_OFFSETS_M
+    mo = getattr(args, "max_offset", None)
+    if mo is not None:
+        step = float(getattr(args, "offset_step", 50.0) or 50.0)
+        TARGET_OFFSETS_M = np.arange(step, float(mo) + step * 0.5, step)
+        print("aperture overridden: %.0f to %.0f m in %d offsets"
+              % (TARGET_OFFSETS_M[0], TARGET_OFFSETS_M[-1], TARGET_OFFSETS_M.size),
+              flush=True)
+        print("  NOTE the receivers must stay inside the near-vertical section "
+              "(Deep ch 211-949);", flush=True)
+        print("  beyond it, along-fibre distance is not vertical depth and the "
+              "velocity is apparent.", flush=True)
     ml = getattr(args, "max_lag", None)
     if ml is not None and float(ml) != MAX_LAG_SECONDS:
         if not float(ml) > 0:
@@ -1581,6 +1592,12 @@ def parser() -> argparse.ArgumentParser:
     # LOWER floor: a first pass peaked at 1500-1950 m/s with several positions
     # pinned to the 1500 m/s grid edge, and a fluid-filled-borehole tube wave runs
     # ~1400-1500 m/s, so the true maximum may lie below the default floor.
+    result.add_argument("--max-offset", type=float, default=None,
+                        help="largest source-receiver offset in m (default 700, "
+                             "Lellouch Figure 7c). The Deep near-vertical section "
+                             "allows 1507 m from the wellhead, so 700 uses under "
+                             "half the available aperture.")
+    result.add_argument("--offset-step", type=float, default=50.0)
     result.add_argument("--max-lag", type=float, default=None,
                         help="lag half-window in s (default %.2f). Widen it so the\n"
                              "far offsets stay inside the window at low trial\n"

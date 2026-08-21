@@ -108,6 +108,24 @@ def main():
             if not gd["near_vertical"][j]:
                 rejected.append((src, geo.describe(int(src)).split(": ", 1)[1]))
                 continue
+            # THE RECEIVERS MUST BE NEAR-VERTICAL TOO, not just the source.
+            # Checking only the source passed src 800, whose 700 m aperture runs
+            # from channel 810 to 1153 -- and the near-vertical section ends at
+            # 949, so 204 of its 354 channels are in the deviated hole (17-55
+            # degrees). Along-fibre distance is not vertical depth there, so its
+            # "velocity" is an apparent one and cannot join a depth comparison.
+            cc = np.asarray(d["center_channels"]).ravel().astype(int)
+            span = np.arange(cc.min() - 10, cc.max() + 11)   # R+-10 neighbours
+            idx = np.clip(np.searchsorted(gd["channel"], span), 0,
+                          gd["channel"].size - 1)
+            nv = gd["near_vertical"][idx]
+            if not nv.all():
+                rejected.append((src, "receivers ch %d-%d leave the near-vertical "
+                                      "section (%d of %d channels deviated); the "
+                                      "moveout is apparent, not vertical"
+                                      % (span.min(), span.max(),
+                                         int((~nv).sum()), nv.size)))
+                continue
         except Exception:
             pass                      # geometry unavailable; fall through
         keep.append((src, f))
