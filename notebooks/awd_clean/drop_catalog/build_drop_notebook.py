@@ -187,65 +187,80 @@ for line in (HERE / "timing_uncertainty.txt").read_text().splitlines():
 
 # ------------------------------------------------------- fig: raw burst trace
 md("""
-## 4. Figure 1 — a burst exactly as it was recorded, with every drop marked
+## 4. Figure 1 — six bursts as recorded, with every drop marked
 
-**This is the plain look.** One continuous Nano record through burst
-`EXAMPLE_BURST` — not windowed, not re-zeroed, just the trace running in real
-time — with a **red dotted line at every delivered drop time**. Twenty drops,
-twenty marks, ~9 s apart.
+**This is the plain look.** Continuous Nano record through each of six bursts —
+not windowed, not re-zeroed, just the trace running in real time — with a **red
+dotted line at every delivered drop time**. ~20 drops and ~20 marks per panel,
+about 9 s apart.
 
 Every other figure below windows each drop and re-zeroes it on its own pick,
-which is the right thing for stacking but puts exactly one mark in each panel.
-This one keeps absolute time so you can see the marks and the impulses together.
+which is right for stacking but puts exactly one mark in each panel. These keep
+absolute time so the marks and the impulses can be seen together.
 
-The trace is the 30–60 Hz beam over 81–439 m of fibre at 2,975 m/s, the same
-beam the detection metrics use. The lower panel zooms the first few drops.
+**Six bursts, not one, because detection is strongly time-varying.** The panels
+are sampled across the full 24 hours, and they do not look alike: burst 30 has
+**0 of 20** drops detected on Nano while burst 48 has **16 of 20**. Any single
+burst would misrepresent the survey.
+
+The trace is the 30–60 Hz beam over 81–439 m of fibre at 2,975 m/s — the same
+beam the detection metrics use. All panels share one time axis, measured from
+each burst's own first drop.
 """)
 
 co("""
 BT = HERE / "burst_timeseries.npz"
 if REBUILD_PRODUCTS or not BT.exists():
-    print("extracting the continuous burst record from $OAK ...")
-    env = dict(os.environ, BURST=str(EXAMPLE_BURST))
+    print("extracting the continuous burst records from $OAK ...")
     r = subprocess.run([sys.executable, str(HERE / "build_burst_timeseries.py")],
-                       capture_output=True, text=True, env=env)
+                       capture_output=True, text=True, env=os.environ)
     print(r.stdout[-1500:] or r.stderr[-1500:])
     if r.returncode != 0:
         raise RuntimeError("build_burst_timeseries.py failed -- see above")
 
 b = np.load(BT, allow_pickle=True)
-tt, tr = b["t_seconds"], b["trace"]
-dsec = b["drop_seconds"]
-origin = dt.datetime.fromisoformat(str(b["origin_utc"]))
+blist = list(b["bursts"])
 bband, bv = b["band_hz"], float(b["velocity_mps"])
-t_rel = tt - dsec[0]                      # seconds from the first drop
-d_rel = dsec - dsec[0]
+bap = b["aperture_m"]
 
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6.4), constrained_layout=True)
+# detected-count per burst, straight from the burst summary
+det = {int(r["burst_id"]): (int(r["n_nano_detected"]), int(r["n_drops"]))
+       for r in bursts}
 
-for ax, (lo, hi), lab in ((ax1, (t_rel[0], t_rel[-1]), "whole burst"),
-                          (ax2, (-4, 32), "first four drops")):
-    m = (t_rel >= lo) & (t_rel <= hi)
-    ax.plot(t_rel[m], tr[m], color=INK, lw=0.5, zorder=3)
-    for k, d in enumerate(d_rel):
-        if lo <= d <= hi:
-            ax.axvline(d, color=RED, lw=1.0, ls=(0, (3, 3)), zorder=4)
-    ax.set_xlim(lo, hi)
-    ax.set_ylabel("beam strain rate")
+fig, axes = plt.subplots(len(blist), 1, figsize=(12, 1.55 * len(blist) + 1.1),
+                         sharex=True, constrained_layout=True)
+axes = np.atleast_1d(axes)
+
+for ax, bn in zip(axes, blist):
+    t_rel = b[f"b{bn}_t_rel"]
+    tr = b[f"b{bn}_trace"]
+    d_rel = b[f"b{bn}_drop_rel"]
+    t0 = dt.datetime.fromisoformat(str(b[f"b{bn}_start_utc"]))
+
+    ax.plot(t_rel, tr, color=INK, lw=0.4, zorder=3)
+    for d in d_rel:
+        ax.axvline(d, color=RED, lw=0.9, ls=(0, (3, 3)), zorder=4)
+
+    nd, nt = det.get(int(bn), (0, len(d_rel)))
+    # opaque box: several panels are dense enough that bare text is unreadable
+    ax.annotate(f"burst {int(bn)} · {t0:%H:%M} UTC ({t0 - dt.timedelta(hours=7):%H:%M} PDT)"
+                f" · {len(d_rel)} drops · {nd}/{nt} detected",
+                (0.004, 0.96), xycoords="axes fraction", va="top",
+                color=INK, fontsize=9, zorder=6,
+                bbox=dict(facecolor=SURFACE, edgecolor="none", pad=1.6, alpha=0.92))
+    ax.set_yticks([])
     ax.margins(x=0)
-    ax.annotate(lab, (0.997, 0.94), xycoords="axes fraction", ha="right",
-                va="top", color=INK2, fontsize=9)
+    ax.grid(axis="y", visible=False)
 
-n_in = int(((d_rel >= t_rel[0]) & (d_rel <= t_rel[-1])).sum())
-ax2.set_xlabel(f"seconds from the first drop of burst {int(b['burst_id'])}  "
-               f"({origin + dt.timedelta(seconds=float(dsec[0])):%H:%M:%S} UTC)")
-ax1.set_title(f"Burst {int(b['burst_id'])} as recorded — {n_in} weight drops on one continuous trace\\n"
-              f"{origin + dt.timedelta(seconds=float(dsec[0])):%Y-%m-%d %H:%M:%S}–"
-              f"{origin + dt.timedelta(seconds=float(dsec[-1])):%H:%M:%S} UTC "
-              f"({origin + dt.timedelta(seconds=float(dsec[0]) - 7*3600):%H:%M:%S}–"
-              f"{origin + dt.timedelta(seconds=float(dsec[-1]) - 7*3600):%H:%M:%S} PDT) · "
-              f"{(dsec[-1]-dsec[0]):.0f} s · Nano beam {bband[0]:.0f}–{bband[1]:.0f} Hz, {bv:.0f} m/s",
-              color=INK, loc="left")
+axes[-1].set_xlabel("seconds from each burst's own first drop  "
+                    "(red dotted line = a delivered drop time)")
+axes[len(axes) // 2].set_ylabel("beam strain rate  (per-panel scale)")
+axes[0].set_title(
+    f"Six bursts as recorded — every weight drop marked\\n"
+    f"sampled across 24.0 h, 2026-06-16 23:47–2026-06-17 23:47 UTC "
+    f"(16:47–16:47 PDT) · Nano beam {bband[0]:.0f}–{bband[1]:.0f} Hz, "
+    f"{bv:.0f} m/s, {bap[0]:.0f}–{bap[1]:.0f} m aperture",
+    color=INK, loc="left")
 plt.show()
 """)
 
