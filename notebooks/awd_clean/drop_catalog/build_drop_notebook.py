@@ -505,9 +505,81 @@ ax.set_title(f"Burst {EXAMPLE_BURST} — all {len(sel)} drops\\n"
 plt.show()
 """)
 
+# ------------------------------------------------- virtual source / deconv
+md("""
+## 10. Virtual source — correlation vs deconvolution
+
+**Method demonstration, not a monitoring result.** Read the box at the end of
+this section before quoting anything from it.
+
+The AWD source sat fixed at the surface. A *virtual source* redatums it into the
+borehole: correlating channel A against channel B cancels the source term common
+to both and leaves the response between them, as though a source sat at A
+(Bakulin & Calvert 2006). Two ways to cancel it, both computed so they can be
+compared:
+
+- **Correlation** cancels the source term but keeps its spectrum. Better SNR.
+- **Deconvolution** divides B by A in the frequency domain, cancelling the
+  source *spectrum* whatever its shape (Snieder & Šafak 2006). Needs no source
+  aperture, which matters here because the AWD never moved — so the classic
+  Bakulin–Calvert sum over source positions is not available. Water level 0.01.
+
+Script of record: `awd_clean/awd_virtual_source.py`.
+
+> **Geometry corrected 2026-08-20.** Both fibres previously placed one virtual
+> source on fibre that was not in the ground — Nano at 50 m (channel 39, above
+> the wellhead at channel 73) and Deep at 400 m (channel 196, surface lead-in;
+> first in-hole channel is 211). Deep also used a source at 2,400 m where the
+> hole is deviated 48.5°, so along-fibre distance is not a depth. A virtual
+> source there does not redatum anything downhole. The gathers below are the
+> re-run with sources constrained to the ground, and on Deep to the
+> near-vertical outbound section (channels 211–949).
+""")
+
+co("""
+VS = AWD.parent / "figures" / "awd_2026" / "plain_look" / "virtual_source"
+for fib, suf in (("Nano (cemented)", ""), ("Deep (wireline, outbound)", "_deep")):
+    sp = np.load(VS / f"awd_virtual_source_speeds{suf}.npz")
+    print(f"{fib}: slant-stack apparent speed of the redatumed arrival")
+    for d_, v_, sm in zip(sp["source_depths"], sp["best_v"], sp["best_semblance"]):
+        print(f"    virtual source {d_:6.0f} m -> {v_:6.0f} m/s  (semblance {sm:.3f})")
+    print(f"    median {np.median(sp['best_v']):.0f} m/s, "
+          f"spread {sp['best_v'].min():.0f}-{sp['best_v'].max():.0f}\\n")
+
+# Re-encode through matplotlib rather than embedding the raw PNGs. The source
+# files are 1.4-2.5 MB each of dense speckle, which compresses badly; at 9 in
+# and the executor's dpi cap the notebook stays a few MB. Full-resolution
+# originals are in figures/awd_2026/plain_look/virtual_source/.
+for suf in ("", "_deep"):
+    for fig_ in ("vs_fig01_correlation_gathers", "vs_fig02_deconvolution_gathers"):
+        img = plt.imread(VS / f"{fig_}{suf}.png")
+        fig, ax = plt.subplots(figsize=(9, 9 * img.shape[0] / img.shape[1]))
+        ax.imshow(img)
+        ax.axis("off")
+        fig.subplots_adjust(0, 0, 1, 1)
+        plt.show()
+""")
+
+md("""
+> **What this is not.** These gathers deconvolve one drop-count-weighted stack
+> over the whole survey — 859 paired drops, Nano 20–50 Hz, Deep 15–30 Hz. That
+> is a wavefield/redatuming visual. It is **not** a test of whether
+> deconvolution reduces drop-to-drop variability, and it predates the current
+> population (926 paired impacts, 46 paired bursts, Deep 3–15 Hz). Do not read
+> it as supporting any M90 monitoring threshold.
+>
+> The open question, and the one worth running next, is a single ablation:
+> current processing **versus** current processing + spectral deconvolution,
+> compared on NRMS and M90 with everything else frozen. Note that deconvolution
+> is a **pre-correlation operator**, so per
+> `Ambient_FK_QC_workflow.ipynb` §13.1 it owes an **input-level** null, not just
+> the gather-level injection-recovery — that is exactly the failure mode that
+> produced a spurious p = 0.0060 in the adaptive F–K run.
+""")
+
 # ----------------------------------------------------------------- caveats
 md("""
-## 10. What to be careful about
+## 11. What to be careful about
 
 - **The detection thresholds are descriptive.** NCC > 0.90 and SNR > 10 dB were
   chosen to make the flag reproducible, **not** pre-registered before looking.
@@ -529,6 +601,15 @@ md("""
 Full detail, including the two-node timing comparison: `README.md` in this
 directory.
 """)
+
+# Guard: a patch script that eats a backslash-n emits a cell that cannot parse,
+# and the failure only shows up minutes later inside the Slurm job. Catch it here.
+for _i, _c in enumerate(C):
+    if _c["cell_type"] == "code":
+        try:
+            compile("".join(_c["source"]), f"cell{_i}", "exec")
+        except SyntaxError as _e:
+            raise SystemExit(f"generated cell {_i} does not parse: {_e}")
 
 nb["cells"] = C
 nb.metadata["kernelspec"] = {"display_name": "das", "language": "python", "name": "das"}
