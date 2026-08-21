@@ -71,8 +71,10 @@ def main():
         % (inc.min(), inc.max()))
     say("")
 
-    rows = ex.deep_rows("deepA")
-    paths = [str(p) for p in rows["path"].to_numpy()[: a.nfiles]]
+    rows = ex.deep_rows("deepA").iloc[: a.nfiles]
+    # the manifest column is `file`, and some rows predate a data move, so every
+    # path goes through corrected_path -- same as deep_timeseries does
+    paths = [ex.corrected_path(r) for r in rows.file]
     hours = len(paths) * 60 / 3600.0
     say("  %.2f h stacked (%d x 60 s records)" % (hours, len(paths)))
 
@@ -133,7 +135,7 @@ def main():
         say("")
 
     fig, ax = plt.subplots(1, 2, figsize=(13.5, 6.4), constrained_layout=True)
-    t0, t1 = rows["time"].to_numpy()[0], rows["time"].to_numpy()[min(a.nfiles, len(rows)) - 1]
+    t0, t1 = rows.time.iloc[0], rows.time.iloc[-1]
     title, foot = geo.figure_label(t0, t1, hours, fibre="Deep",
                                    extra="whole outbound limb, source ch %d" % SOURCE_CH)
     fig.suptitle(title, fontsize=10.5)
