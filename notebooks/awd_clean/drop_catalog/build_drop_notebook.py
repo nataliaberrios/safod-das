@@ -566,7 +566,37 @@ convolving does not cancel anything. Any feature appearing in both the
 convolution and correlation panels therefore cannot be a redatumed arrival,
 because only one of those two operations could have redatumed it.
 
-Script of record: `awd_clean/awd_virtual_source.py`.
+**Source. Everything in this section is produced by one script:**
+
+### `notebooks/awd_clean/awd_virtual_source.py`
+
+| what | where, exactly |
+|---|---|
+| convolution operator | `awd_virtual_source.py:197` — `convolve_gather()`, `B * A` |
+| correlation operator | `awd_virtual_source.py:188` — `correlate_gather()`, `B * conj(A)` |
+| deconvolution operator | `awd_virtual_source.py:219` — `deconvolve_gather()`, `B * conj(A) / (\|A\|² + ε)` |
+| water level ε | `awd_virtual_source.py:82` — `WATER_LEVEL = 0.01`, a fraction of mean `\|A\|²` |
+| geometry gate | `awd_virtual_source.py:135` — `check_geometry()`, refuses out-of-ground sources |
+| **input data** | `awd_virtual_source.py:76` — `canonical_epoch_stacks_paired_deep_all.npz` (859 paired drops, 46 burst stacks), written by `paired_stack_job_deep_all.py` |
+
+**Outputs**, all in `notebooks/figures/awd_2026/plain_look/virtual_source/`:
+
+| file | panel below |
+|---|---|
+| `vs_fig04_convolution_gathers{,_deep}.png` | convolution — the control |
+| `vs_fig01_correlation_gathers{,_deep}.png` | correlation |
+| `vs_fig02_deconvolution_gathers{,_deep}.png` | deconvolution |
+| `awd_virtual_source_speeds{,_deep}.npz` | the slant-stack speed table printed above |
+
+**To re-run it yourself:**
+
+```bash
+sbatch awd_clean/awd_virtual_source.sbatch --fiber nano
+sbatch awd_clean/awd_virtual_source.sbatch --fiber deep
+```
+
+The cell below only *displays* those PNGs and reads the speed `.npz`. It computes
+no deconvolution itself.
 
 > **Geometry corrected 2026-08-20.** Both fibres previously placed one virtual
 > source on fibre that was not in the ground — Nano at 50 m (channel 39, above
