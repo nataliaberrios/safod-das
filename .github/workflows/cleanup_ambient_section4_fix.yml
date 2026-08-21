@@ -1,0 +1,47 @@
+name: Temporary Section 4 cleanup
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  cleanup:
+    if: github.event.issue.title == '[maintenance] Clean Section 4 trigger'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Close temporary maintenance issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh issue list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state open \
+            --limit 100 \
+            --json number,title \
+            --jq '.[] | select(.title == "[maintenance] Run Section 4 export" or .title == "[maintenance] Clean Section 4 trigger") | .number' \
+          | while read -r number; do
+              gh issue close "$number" --repo "$GITHUB_REPOSITORY"
+            done
+
+      - name: Remove temporary workflows
+        shell: bash
+        run: |
+          rm -f .github/workflows/run_ambient_section4_fix.yml
+          rm -f .github/workflows/cleanup_ambient_section4_fix.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Remove temporary Section 4 maintenance workflows"
+          git push origin HEAD:main
