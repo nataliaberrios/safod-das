@@ -66,6 +66,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import butter, detrend, resample_poly, sosfiltfilt
 from scipy.stats import binom
 
+import safod_geometry as geo
 HERE = Path(__file__).resolve().parent
 STEM = HERE / "illumination_window_scan"
 CSV = Path("/oak/stanford/groups/ettore88/data/SAFOD/SAFODAS1-harddrive-transfer/SAFOD_2024_2025.csv")
@@ -340,6 +341,14 @@ def main():
         % (V_LO, V_HI))
     say("  exactly vertical in this borehole.")
 
+    # Duration here is the SAMPLED total (N windows x SECONDS), not the span of
+    # the archive -- the windows are spread across a year, so quoting the span as
+    # if it were stacked would badly overstate it. Both are on the figure.
+    _sampled_h = len(idx) * SECONDS / 3600.0
+    _title, _foot = geo.figure_label(db.t.iloc[idx[0]], db.t.iloc[idx[-1]],
+                                     _sampled_h, fibre="Nano (2024-25 archive)",
+                                     extra="%d x %.0f s windows sampled across the span"
+                                           % (len(idx), SECONDS))
     fig, ax = plt.subplots(1, 3, figsize=(17, 5), constrained_layout=True)
     ax[0].plot(df.t, df.asym, ".", ms=3, color="0.5", label="all windows")
     if len(hits):
@@ -358,7 +367,10 @@ def main():
     ax[2].set(xlabel="hour of day (UTC)", ylabel="median |A|",
               title="Diurnal pattern\n(surface activity would show one)")
     ax[2].grid(alpha=.3, axis="y")
-    fig.savefig(str(STEM) + ".png", dpi=190)
+    fig.suptitle(_title, fontsize=10.5)
+    fig.text(0.995, 0.002, _foot, ha="right", va="bottom",
+             fontsize=6.5, color="#9a9a9a")
+    fig.savefig(str(STEM) + ".png", dpi=190, bbox_inches="tight")
     np.savez(str(STEM) + ".npz",
              t=df.t.astype("int64").to_numpy(), asym=df.asym.to_numpy(),
              signed=df.signed.to_numpy(), p=df.p.to_numpy(),

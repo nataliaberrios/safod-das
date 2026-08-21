@@ -26,10 +26,13 @@ cannot hold a 700 m offset below 1934 m/s, so on a 300-6000 m/s grid the far
 offsets' gates fell outside the window and the median ran over the surviving NEAR
 offsets -- the ones closest to the zero-lag lobe, which score high. The score
 therefore rose as velocity fell for a geometric reason, which is the "pedestal".
-Re-aggregated at +-2.5 s the peak is 1525 m/s (src 400) and 1550 m/s (src 800),
-a 25 m/s spread where it had been 138, and matching an independent envelope-pick
-regression of 1443-1537 m/s. `ex.moveout_scores` now refuses to score a velocity
-whose gates do not fit, and this script refuses stale narrow-window products.
+Re-aggregated at +-2.5 s the peak is 1350 m/s at the wellhead (src 211) and
+1525 m/s at src 400, with 37 and 64 of 229 velocities clearing their own null
+against 11.5 by chance, and in both the maximum is INTERIOR -- the curve turns
+over instead of rising, which is the whole point. src 800 is excluded: 204 of its
+354 receiver channels lie past the end of the near-vertical section.
+`ex.moveout_scores` now refuses to score a velocity whose gates do not fit, and
+this script refuses stale narrow-window products and non-vertical receiver spans.
 See AUDIT_2026-08-20.md.
 
 Reads the stored aggregates only. No reprocessing.
@@ -204,6 +207,15 @@ def main():
         say("  is a candidate arrival and needs the remaining gates (pedestal,")
         say("  causal dominance, and an input-level null) before it is a result.")
 
+    # PI convention: hours stacked, LOCAL date range in the title, UTC as a
+    # footnote. These panels previously carried neither, so a reader could not
+    # check the run against what was happening at SAFOD that day.
+    _rows = ex.deep_rows("deepA")
+    _t = _rows["time"].to_numpy()
+    _n = min(300, len(_t))
+    _title, _foot = geo.figure_label(_t[0], _t[_n - 1], _n * 60 / 3600.0,
+                                     fibre="Deep",
+                                     extra="per-velocity nulls, %d permutations" % NULLS)
     fig, ax = plt.subplots(1, len(out), figsize=(5.2*len(out), 4.0), squeeze=False,
                            constrained_layout=True)
     for i, (src, v) in enumerate(sorted(out.items())):
@@ -217,7 +229,10 @@ def main():
         a.set(xlabel="trial velocity (km/s)", ylabel="moveout score" if i==0 else "",
               title="src %s: %d/%d velocities clear" % (src, v["n_clear"], v["g"].size))
         a.legend(fontsize=7); a.grid(alpha=.3)
-    fig.savefig(str(STEM)+".png", dpi=190)
+    fig.suptitle(_title, fontsize=10.5)
+    fig.text(0.995, 0.002, _foot, ha="right", va="bottom",
+             fontsize=6.5, color="#9a9a9a")
+    fig.savefig(str(STEM)+".png", dpi=190, bbox_inches="tight")
     np.savez(str(STEM)+".npz", **{f"{s}_{k}": v[k] for s, v in out.items()
                                   for k in ("g","cs","thresh","pv")})
     Path(str(STEM)+".txt").write_text("\n".join(log)+"\n")

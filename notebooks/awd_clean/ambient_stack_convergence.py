@@ -47,6 +47,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -54,6 +55,7 @@ from scipy.signal import butter, hilbert, sosfiltfilt
 
 import ambient_lellouch2019_exact_stack as X
 
+import safod_geometry as geo
 HERE = Path(__file__).resolve().parent
 STEM = HERE / "ambient_stack_convergence"
 CHUNKS = HERE / "ambient_transfer" / "lellouch2019_exact_stack"
@@ -228,6 +230,13 @@ def main():
     say("  is receiver-order permutation, which does not contain any pre-")
     say("  correlation operator.")
 
+    # PI convention: hours stacked and the LOCAL date range belong in the title,
+    # not just in the log, so a reader can check the run against site activity.
+    _hrs = max(max(r["counts"]) for r in results.values()) if results else 0.0
+    _t0 = pd.Timestamp(DATE + " 00:00", tz="UTC")
+    _title, _foot = geo.figure_label(_t0, _t0 + pd.Timedelta(hours=float(_hrs)),
+                                     float(_hrs), fibre="Nano (2024-25 archive)",
+                                     extra="stack convergence, hourly chunks")
     fig, ax = plt.subplots(1, 3, figsize=(16.5, 4.6), constrained_layout=True)
     cols = {"baseline (no common-mode removal)": "#D55E00",
             "common-mode removed": "#0072B2"}
@@ -253,7 +262,10 @@ def main():
     ax[2].set(xlabel="hourly chunks stacked", ylabel="p value", yscale="log",
               title="(c) Significance vs stack length")
     ax[2].legend(fontsize=7); ax[2].grid(alpha=.3, which="both")
-    fig.savefig(str(STEM) + ".png", dpi=190)
+    fig.suptitle(_title, fontsize=10.5)
+    fig.text(0.995, 0.002, _foot, ha="right", va="bottom",
+             fontsize=6.5, color="#9a9a9a")
+    fig.savefig(str(STEM) + ".png", dpi=190, bbox_inches="tight")
 
     np.savez(str(STEM) + ".npz",
              **{("%s_%s" % (k.split()[0], f)): v[f]

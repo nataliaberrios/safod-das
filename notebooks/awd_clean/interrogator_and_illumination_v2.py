@@ -342,6 +342,22 @@ def main():
     say("  and rank-k removal takes out any genuinely plane-wave arrival that is")
     say("  itself low-rank, so high ranks are conservative against detection.")
 
+    # TWO EPOCHS, so geo.figure_label's single span does not apply and the header
+    # is built by hand -- but it keeps the same convention: duration first, LOCAL
+    # dates in the title, UTC as a footnote. Duration is the SAMPLED total (one
+    # 30 s window per day, plus ~5 s from two 2017 records), not an archive span:
+    # these are matched short windows, not a stack, and labelling them with the
+    # span would overstate them by five orders of magnitude.
+    from zoneinfo import ZoneInfo as _TZ
+    _LA = _TZ("America/Los_Angeles")
+    _d = [pd.Timestamp(r["day"]).tz_localize("UTC").tz_convert(_LA) for r in loaded]
+    _title = ("Nano fibre, %d x %.0f s sampled (%.1f min total)   |   "
+              "2024-25: %s to %s  (local)   vs   Lellouch 2017   |   "
+              "downgoing/upgoing asymmetry"
+              % (len(loaded), SECONDS, len(loaded) * SECONDS / 60.0,
+                 _d[0].strftime("%a %d %b %Y"), _d[-1].strftime("%a %d %b %Y")))
+    _foot = ("UTC: %s to %s; 2017 comparison is ~5 s from two records"
+             % (loaded[0]["day"], loaded[-1]["day"]))
     fig, ax = plt.subplots(1, 3, figsize=(17, 5), constrained_layout=True)
     for rec2 in loaded:
         ax[0].plot(np.arange(WELLHEAD_CH, WELLHEAD_CH + rec2["u"].shape[0]),
@@ -366,7 +382,10 @@ def main():
     ax[2].set(xlabel="spatial rank removed", ylabel="|A| in the fan", yscale="log",
               title="Illumination vs static-pattern removal")
     ax[2].legend(fontsize=7); ax[2].grid(alpha=.3)
-    fig.savefig(str(STEM) + ".png", dpi=190)
+    fig.suptitle(_title, fontsize=10.0)
+    fig.text(0.995, 0.002, _foot, ha="right", va="bottom",
+             fontsize=6.5, color="#9a9a9a")
+    fig.savefig(str(STEM) + ".png", dpi=190, bbox_inches="tight")
     Path(str(STEM) + ".txt").write_text("\n".join(log) + "\n")
     say("")
     say("wrote %s.{png,txt}" % STEM.name)
